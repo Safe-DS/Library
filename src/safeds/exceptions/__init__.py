@@ -75,7 +75,6 @@ __all__ = [
     # ML exceptions
     "DatasetMissesDataError",
     "DatasetMissesFeaturesError",
-
     "EmptyChoiceError",
     "FeatureDataMismatchError",
     "FittingWithChoiceError",

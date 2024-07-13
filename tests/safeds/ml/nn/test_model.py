@@ -7,10 +7,12 @@ from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
     FeatureDataMismatchError,
+    FittingWithChoiceError,
+    FittingWithoutChoiceError,
     InvalidFitDataError,
     InvalidModelStructureError,
     ModelNotFittedError,
-    OutOfBoundsError, FittingWithChoiceError, FittingWithoutChoiceError,
+    OutOfBoundsError,
 )
 from safeds.ml.hyperparameters import Choice
 from safeds.ml.metrics import ClassifierMetric, RegressorMetric
@@ -162,7 +164,8 @@ class TestClassificationModel:
                 (
                     Table.from_dict({"a": ["a", "b", "c"], "b": [1, 2, 3], "c": [0, 15, 5]}).to_tabular_dataset("c"),
                     re.escape(
-                        "The given Fit Data is invalid:\nThe following Columns contain non-numerical data: ['a']"),
+                        "The given Fit Data is invalid:\nThe following Columns contain non-numerical data: ['a']",
+                    ),
                 ),
                 (
                     Table.from_dict({"a": ["a", "b", "c"], "b": [1, 2, None], "c": [0, 15, 5]}).to_tabular_dataset("c"),
@@ -179,7 +182,8 @@ class TestClassificationModel:
                 (
                     Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": ["a", "b", "a"]}).to_tabular_dataset("c"),
                     re.escape(
-                        "The given Fit Data is invalid:\nThe following Columns contain non-numerical data: ['c']"),
+                        "The given Fit Data is invalid:\nThe following Columns contain non-numerical data: ['c']",
+                    ),
                 ),
             ],
             ids=[
@@ -220,8 +224,9 @@ class TestClassificationModel:
                     return self.was_called
 
             obj = Test()
-            model.fit(Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"),
-                      callback_on_batch_completion=obj.cb)
+            model.fit(
+                Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"), callback_on_batch_completion=obj.cb,
+            )
 
             assert obj.callback_was_called() is True
 
@@ -243,8 +248,9 @@ class TestClassificationModel:
                     return self.was_called
 
             obj = Test()
-            model.fit(Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"),
-                      callback_on_epoch_completion=obj.cb)
+            model.fit(
+                Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"), callback_on_epoch_completion=obj.cb,
+            )
 
             assert obj.callback_was_called() is True
 
@@ -260,8 +266,9 @@ class TestClassificationModel:
             )
             assert model.input_size == 1
 
-        def test_should_raise_if_epoch_size_out_of_bounds_when_fitting_by_exhaustive_search(self,
-                                                                                            device: Device) -> None:
+        def test_should_raise_if_epoch_size_out_of_bounds_when_fitting_by_exhaustive_search(
+            self, device: Device,
+        ) -> None:
             invalid_epoch_size = 0
             configure_test_with_device(device)
             with pytest.raises(OutOfBoundsError):
@@ -274,8 +281,9 @@ class TestClassificationModel:
                     epoch_size=invalid_epoch_size,
                 )
 
-        def test_should_raise_if_batch_size_out_of_bounds_when_fitting_by_exhaustive_search(self,
-                                                                                            device: Device) -> None:
+        def test_should_raise_if_batch_size_out_of_bounds_when_fitting_by_exhaustive_search(
+            self, device: Device,
+        ) -> None:
             invalid_batch_size = 0
             configure_test_with_device(device)
             with pytest.raises(OutOfBoundsError):
@@ -293,8 +301,8 @@ class TestClassificationModel:
             model = NeuralNetworkClassifier(InputConversionTable(), [ForwardLayer(1)])
             with pytest.raises(FittingWithoutChoiceError):
                 model.fit_by_exhaustive_search(
-                    Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("b"),
-                    ClassifierMetric.ACCURACY)
+                    Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("b"), ClassifierMetric.ACCURACY,
+                )
 
         def test_should_assert_that_is_fitted_is_set_correctly(self, device: Device) -> None:
             configure_test_with_device(device)
@@ -302,7 +310,8 @@ class TestClassificationModel:
             assert not model.is_fitted
             fitted_model = model.fit_by_exhaustive_search(
                 Table.from_dict({"a": [1, 2, 3, 4], "b": [0, 1, 0, 1]}).to_tabular_dataset("b"),
-                ClassifierMetric.ACCURACY)
+                ClassifierMetric.ACCURACY,
+            )
             assert fitted_model.is_fitted
 
         def test_should_raise_if_fit_by_exhaustive_search_function_returns_wrong_datatype(self, device: Device) -> None:
@@ -310,7 +319,8 @@ class TestClassificationModel:
             model = NeuralNetworkClassifier(InputConversionTable(), [ForwardLayer(Choice(2, 4)), ForwardLayer(1)])
             fitted_model = model.fit_by_exhaustive_search(
                 Table.from_dict({"a": [1, 2, 3, 4], "b": [0, 1, 0, 1]}).to_tabular_dataset("b"),
-                ClassifierMetric.ACCURACY)
+                ClassifierMetric.ACCURACY,
+            )
             assert isinstance(fitted_model, NeuralNetworkClassifier)
 
     class TestPredict:
@@ -633,7 +643,6 @@ class TestRegressionModel:
             with pytest.raises(FittingWithChoiceError):
                 model.fit(Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"))
 
-
         def test_should_raise_if_is_fitted_is_set_correctly(self, device: Device) -> None:
             configure_test_with_device(device)
             model = NeuralNetworkRegressor(
@@ -673,7 +682,8 @@ class TestRegressionModel:
                 (
                     Table.from_dict({"a": ["a", "b", "c"], "b": [1, 2, 3], "c": [0, 15, 5]}).to_tabular_dataset("c"),
                     re.escape(
-                        "The given Fit Data is invalid:\nThe following Columns contain non-numerical data: ['a']"),
+                        "The given Fit Data is invalid:\nThe following Columns contain non-numerical data: ['a']",
+                    ),
                 ),
                 (
                     Table.from_dict({"a": ["a", "b", "c"], "b": [1, 2, None], "c": [0, 15, 5]}).to_tabular_dataset("c"),
@@ -690,7 +700,8 @@ class TestRegressionModel:
                 (
                     Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": ["a", "b", "a"]}).to_tabular_dataset("c"),
                     re.escape(
-                        "The given Fit Data is invalid:\nThe following Columns contain non-numerical data: ['c']"),
+                        "The given Fit Data is invalid:\nThe following Columns contain non-numerical data: ['c']",
+                    ),
                 ),
             ],
             ids=[
@@ -731,8 +742,9 @@ class TestRegressionModel:
                     return self.was_called
 
             obj = Test()
-            model.fit(Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"),
-                      callback_on_batch_completion=obj.cb)
+            model.fit(
+                Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"), callback_on_batch_completion=obj.cb,
+            )
 
             assert obj.callback_was_called() is True
 
@@ -754,8 +766,9 @@ class TestRegressionModel:
                     return self.was_called
 
             obj = Test()
-            model.fit(Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"),
-                      callback_on_epoch_completion=obj.cb)
+            model.fit(
+                Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"), callback_on_epoch_completion=obj.cb,
+            )
 
             assert obj.callback_was_called() is True
 
@@ -771,7 +784,9 @@ class TestRegressionModel:
             )
             assert model.input_size == 1
 
-        def test_should_raise_if_epoch_size_out_of_bounds_when_fitting_by_exhaustive_search(self, device: Device) -> None:
+        def test_should_raise_if_epoch_size_out_of_bounds_when_fitting_by_exhaustive_search(
+            self, device: Device,
+        ) -> None:
             invalid_epoch_size = 0
             configure_test_with_device(device)
             with pytest.raises(OutOfBoundsError):
@@ -784,7 +799,9 @@ class TestRegressionModel:
                     epoch_size=invalid_epoch_size,
                 )
 
-        def test_should_raise_if_batch_size_out_of_bounds_when_fitting_by_exhaustive_search(self, device: Device) -> None:
+        def test_should_raise_if_batch_size_out_of_bounds_when_fitting_by_exhaustive_search(
+            self, device: Device,
+        ) -> None:
             invalid_batch_size = 0
             configure_test_with_device(device)
             with pytest.raises(OutOfBoundsError):
@@ -803,7 +820,8 @@ class TestRegressionModel:
             with pytest.raises(FittingWithoutChoiceError):
                 model.fit_by_exhaustive_search(
                     Table.from_dict({"a": [1], "b": [1.0]}).to_tabular_dataset("b"),
-                    RegressorMetric.COEFFICIENT_OF_DETERMINATION)
+                    RegressorMetric.COEFFICIENT_OF_DETERMINATION,
+                )
 
         def test_should_assert_that_is_fitted_is_set_correctly(self, device: Device) -> None:
             configure_test_with_device(device)
@@ -811,7 +829,8 @@ class TestRegressionModel:
             assert not model.is_fitted
             fitted_model = model.fit_by_exhaustive_search(
                 Table.from_dict({"a": [1, 2, 3, 4], "b": [1.0, 2.0, 3.0, 4.0]}).to_tabular_dataset("b"),
-                RegressorMetric.MEAN_ABSOLUTE_ERROR)
+                RegressorMetric.MEAN_ABSOLUTE_ERROR,
+            )
             assert fitted_model.is_fitted
 
         def test_should_raise_if_fit_by_exhaustive_search_function_returns_wrong_datatype(self, device: Device) -> None:
@@ -819,7 +838,8 @@ class TestRegressionModel:
             model = NeuralNetworkRegressor(InputConversionTable(), [ForwardLayer(Choice(2, 4)), ForwardLayer(1)])
             fitted_model = model.fit_by_exhaustive_search(
                 Table.from_dict({"a": [1, 2, 3, 4], "b": [1.0, 2.0, 3.0, 4.0]}).to_tabular_dataset("b"),
-                RegressorMetric.MEAN_ABSOLUTE_ERROR)
+                RegressorMetric.MEAN_ABSOLUTE_ERROR,
+            )
             assert isinstance(fitted_model, NeuralNetworkRegressor)
 
     class TestPredict:

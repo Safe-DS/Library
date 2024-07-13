@@ -78,11 +78,7 @@ def test_should_raise_if_output_size_out_of_bounds(output_size: int | Choice[int
 
 @pytest.mark.parametrize(
     "output_size",
-    [
-        1,
-        20,
-        Choice(1, 20)
-    ],
+    [1, 20, Choice(1, 20)],
     ids=["one", "twenty", "choice"],
 )
 def test_should_return_output_size(output_size: int | Choice[int]) -> None:
@@ -117,7 +113,8 @@ def test_should_raise_if_activation_function_not_set() -> None:
             ForwardLayer(neuron_count=1),
             False,
         ),
-        (   ForwardLayer(neuron_count=Choice(2)),
+        (
+            ForwardLayer(neuron_count=Choice(2)),
             ForwardLayer(neuron_count=Choice(2)),
             True,
         ),

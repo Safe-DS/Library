@@ -66,11 +66,7 @@ def test_should_raise_if_output_size_out_of_bounds(output_size: int | Choice[int
 
 @pytest.mark.parametrize(
     "output_size",
-    [
-        1,
-        20,
-        Choice(1, 20)
-    ],
+    [1, 20, Choice(1, 20)],
     ids=["one", "twenty", "choice"],
 )
 def test_should_raise_if_output_size_doesnt_match(output_size: int | Choice[int]) -> None:

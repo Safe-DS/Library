@@ -373,7 +373,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         for combination in all_possible_layer_combinations:
             new_model = NeuralNetworkRegressor(input_conversion=self._input_conversion, layers=combination)
             models.append(new_model)
-        return models   # type: ignore[return-value]
+        return models  # type: ignore[return-value]
 
     def predict(self, test_data: IPT) -> IFT:
         """
@@ -794,7 +794,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         for combination in all_possible_layer_combinations:
             new_model = NeuralNetworkClassifier(input_conversion=self._input_conversion, layers=combination)
             models.append(new_model)
-        return models   # type: ignore[return-value]
+        return models  # type: ignore[return-value]
 
     def predict(self, test_data: IPT) -> IFT:
         """
