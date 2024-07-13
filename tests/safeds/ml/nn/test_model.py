@@ -330,9 +330,11 @@ class TestClassificationModel:
                     0,
                 ),
             ],
-            ids=["accuracy", "precision", "f1score", "recall"]
+            ids=["accuracy", "precision", "f1score", "recall"],
         )
-        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type(self, metric: ClassifierMetric, positive_class: Any, device: Device) -> None:
+        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type(
+            self, metric: ClassifierMetric, positive_class: Any, device: Device,
+        ) -> None:
             configure_test_with_device(device)
             model = NeuralNetworkClassifier(InputConversionTable(), [ForwardLayer(Choice(2, 4)), ForwardLayer(1)])
             assert not model.is_fitted
@@ -861,9 +863,16 @@ class TestRegressionModel:
                 RegressorMetric.MEDIAN_ABSOLUTE_DEVIATION,
                 RegressorMetric.COEFFICIENT_OF_DETERMINATION,
             ],
-            ids=["mean_squared_error", "mean_absolute_error", "median_absolute_deviation", "coefficient_of_determination"],
+            ids=[
+                "mean_squared_error",
+                "mean_absolute_error",
+                "median_absolute_deviation",
+                "coefficient_of_determination",
+            ],
         )
-        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type(self, metric: RegressorMetric, device: Device) -> None:
+        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type(
+            self, metric: RegressorMetric, device: Device,
+        ) -> None:
             configure_test_with_device(device)
             model = NeuralNetworkRegressor(InputConversionTable(), [ForwardLayer(Choice(2, 4)), ForwardLayer(1)])
             assert not model.is_fitted
