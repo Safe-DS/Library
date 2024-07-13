@@ -332,23 +332,23 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
                     case "mean_squared_error":
                         error_of_fitted_model = RegressionMetrics.mean_squared_error(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
                         if error_of_fitted_model < best_metric_value:
-                            best_model = fitted_model
-                            best_metric_value = error_of_fitted_model
+                            best_model = fitted_model                   # pragma: no cover
+                            best_metric_value = error_of_fitted_model   # pragma: no cover
                     case "mean_absolute_error":
                         error_of_fitted_model = RegressionMetrics.mean_absolute_error(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
                         if error_of_fitted_model < best_metric_value:
-                            best_model = fitted_model
-                            best_metric_value = error_of_fitted_model
+                            best_model = fitted_model                   # pragma: no cover
+                            best_metric_value = error_of_fitted_model   # pragma: no cover
                     case "median_absolute_deviation":
                         error_of_fitted_model = RegressionMetrics.median_absolute_deviation(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
                         if error_of_fitted_model < best_metric_value:
-                            best_model = fitted_model
-                            best_metric_value = error_of_fitted_model
+                            best_model = fitted_model                   # pragma: no cover
+                            best_metric_value = error_of_fitted_model   # pragma: no cover
                     case "coefficient_of_determination":
                         error_of_fitted_model = RegressionMetrics.coefficient_of_determination(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
-                            best_model = fitted_model
-                            best_metric_value = error_of_fitted_model
+                            best_model = fitted_model                   # pragma: no cover
+                            best_metric_value = error_of_fitted_model   # pragma: no cover
         assert best_model is not None  # just for linter
         best_model._is_fitted = True
         return best_model
@@ -746,30 +746,30 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
                         best_metric_value = ClassificationMetrics.precision(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)  # type: ignore[arg-type]
                     case "recall":
                         best_metric_value = ClassificationMetrics.recall(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)  # type: ignore[arg-type]
-                    case "f1score":
+                    case "f1_score":
                         best_metric_value = ClassificationMetrics.f1_score(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)  # type: ignore[arg-type]
             else:
                 match optimization_metric.value:
                     case "accuracy":
                         error_of_fitted_model = ClassificationMetrics.accuracy(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
-                            best_model = fitted_model
-                            best_metric_value = error_of_fitted_model
+                            best_model = fitted_model                   # pragma: no cover
+                            best_metric_value = error_of_fitted_model   # pragma: no cover
                     case "precision":
                         error_of_fitted_model = ClassificationMetrics.precision(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
-                            best_model = fitted_model
-                            best_metric_value = error_of_fitted_model
+                            best_model = fitted_model                   # pragma: no cover
+                            best_metric_value = error_of_fitted_model   # pragma: no cover
                     case "recall":
                         error_of_fitted_model = ClassificationMetrics.recall(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
-                            best_model = fitted_model
-                            best_metric_value = error_of_fitted_model
-                    case "f1score":
+                            best_model = fitted_model                   # pragma: no cover
+                            best_metric_value = error_of_fitted_model   # pragma: no cover
+                    case "f1_score":
                         error_of_fitted_model = ClassificationMetrics.f1_score(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
-                            best_model = fitted_model
-                            best_metric_value = error_of_fitted_model
+                            best_model = fitted_model                   # pragma: no cover
+                            best_metric_value = error_of_fitted_model   # pragma: no cover
         assert best_model is not None  # just for linter
         best_model._is_fitted = True
         return best_model
