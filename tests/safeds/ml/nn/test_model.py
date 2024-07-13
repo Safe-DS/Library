@@ -333,7 +333,10 @@ class TestClassificationModel:
             ids=["accuracy", "precision", "f1score", "recall"],
         )
         def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type(
-            self, metric: ClassifierMetric, positive_class: Any, device: Device,
+            self,
+            metric: ClassifierMetric,
+            positive_class: Any,
+            device: Device,
         ) -> None:
             configure_test_with_device(device)
             model = NeuralNetworkClassifier(InputConversionTable(), [ForwardLayer(Choice(2, 4)), ForwardLayer(1)])
@@ -871,7 +874,9 @@ class TestRegressionModel:
             ],
         )
         def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type(
-            self, metric: RegressorMetric, device: Device,
+            self,
+            metric: RegressorMetric,
+            device: Device,
         ) -> None:
             configure_test_with_device(device)
             model = NeuralNetworkRegressor(InputConversionTable(), [ForwardLayer(Choice(2, 4)), ForwardLayer(1)])
