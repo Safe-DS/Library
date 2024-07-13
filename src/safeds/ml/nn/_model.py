@@ -274,16 +274,23 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         batch_size: int = 1,
         learning_rate: float = 0.001,
     ) -> Self:
+
+        _init_default_device()
+
         if not self._contains_choices():
             raise FittingWithoutChoiceError
-
-        list_of_models = self._get_models_for_all_choices()
-        list_of_fitted_models: list[Self] = []
 
         if isinstance(train_data, TimeSeriesDataset):
             raise LearningError("RNN-Hyperparameter optimization is currently not supported.")  # pragma: no cover
         if isinstance(train_data, ImageDataset):
             raise LearningError("CNN-Hyperparameter optimization is currently not supported.")  # pragma: no cover
+
+        _check_bounds("epoch_size", epoch_size, lower_bound=_ClosedBound(1))
+        _check_bounds("batch_size", batch_size, lower_bound=_ClosedBound(1))
+
+        list_of_models = self._get_models_for_all_choices()
+        list_of_fitted_models: list[Self] = []
+
         with ProcessPoolExecutor(max_workers=len(list_of_models)) as executor:
             futures = []
             for model in list_of_models:
@@ -293,8 +300,17 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
                 list_of_fitted_models.append(future.result())
         executor.shutdown()
 
+        # Cross Validation
+        [train_split, test_split] = train_data.to_table().split_rows(0.75)
+        train_data = train_split.to_tabular_dataset(
+            target_name=train_data.target.name,
+            extra_names=train_data.extras.column_names,
+        )
+        test_data = test_split.to_tabular_dataset(
+            target_name=train_data.target.name,
+            extra_names=train_data.extras.column_names,
+        ).features
         target_col = train_data.target
-        test_data = train_data.to_table().remove_columns([target_col.name])
 
         best_model = None
         best_metric_value = None
@@ -355,9 +371,8 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
 
         models = []
         for combination in all_possible_layer_combinations:
-            copied_model = copy.deepcopy(self)
-            copied_model._layers = combination
-            models.append(copied_model)
+            new_model = NeuralNetworkRegressor(input_conversion=self._input_conversion, layers=combination)
+            models.append(new_model)
         return models
 
     def predict(self, test_data: IPT) -> IFT:
@@ -680,16 +695,22 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         batch_size: int = 1,
         learning_rate: float = 0.001,
     ) -> Self:
+
+        _init_default_device()
+
         if not self._contains_choices():
             raise FittingWithoutChoiceError
-
-        list_of_models = self._get_models_for_all_choices()
-        list_of_fitted_models: list[Self] = []
 
         if isinstance(train_data, TimeSeriesDataset):
             raise LearningError("RNN-Hyperparameter optimization is currently not supported.")  # pragma: no cover
         if isinstance(train_data, ImageDataset):
             raise LearningError("CNN-Hyperparameter optimization is currently not supported.")  # pragma: no cover
+
+        _check_bounds("epoch_size", epoch_size, lower_bound=_ClosedBound(1))
+        _check_bounds("batch_size", batch_size, lower_bound=_ClosedBound(1))
+
+        list_of_models = self._get_models_for_all_choices()
+        list_of_fitted_models: list[Self] = []
 
         with ProcessPoolExecutor(max_workers=len(list_of_models)) as executor:
             futures = []
@@ -700,8 +721,17 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
                 list_of_fitted_models.append(future.result())
         executor.shutdown()
 
+        # Cross Validation
+        [train_split, test_split] = train_data.to_table().split_rows(0.75)
+        train_data = train_split.to_tabular_dataset(
+            target_name=train_data.target.name,
+            extra_names=train_data.extras.column_names,
+        )
+        test_data = test_split.to_tabular_dataset(
+            target_name=train_data.target.name,
+            extra_names=train_data.extras.column_names,
+        ).features
         target_col = train_data.target
-        test_data = train_data.to_table().remove_columns([target_col.name])
 
         best_model = None
         best_metric_value = None
@@ -762,9 +792,8 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
 
         models = []
         for combination in all_possible_layer_combinations:
-            copied_model = copy.deepcopy(self)
-            copied_model._layers = combination
-            models.append(copied_model)
+            new_model = NeuralNetworkClassifier(input_conversion=self._input_conversion, layers=combination)
+            models.append(new_model)
         return models
 
     def predict(self, test_data: IPT) -> IFT:

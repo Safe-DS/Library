@@ -10,8 +10,10 @@ from safeds.exceptions import (
     InvalidFitDataError,
     InvalidModelStructureError,
     ModelNotFittedError,
-    OutOfBoundsError,
+    OutOfBoundsError, FittingWithChoiceError, FittingWithoutChoiceError,
 )
+from safeds.ml.hyperparameters import Choice
+from safeds.ml.metrics import ClassifierMetric, RegressorMetric
 from safeds.ml.nn import (
     NeuralNetworkClassifier,
     NeuralNetworkRegressor,
@@ -41,302 +43,355 @@ from tests.helpers import configure_test_with_device, get_devices, get_devices_i
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestClassificationModel:
-    def test_should_return_input_size(self, device: Device) -> None:
-        configure_test_with_device(device)
-        model = NeuralNetworkClassifier(
-            InputConversionTable(),
-            [ForwardLayer(neuron_count=1)],
-        ).fit(
-            Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
-        )
-
-        assert model.input_size == 1
-
-    @pytest.mark.parametrize(
-        "epoch_size",
-        [
-            0,
-        ],
-        ids=["epoch_size_out_of_bounds"],
-    )
-    def test_should_raise_if_epoch_size_out_of_bounds(self, epoch_size: int, device: Device) -> None:
-        configure_test_with_device(device)
-        with pytest.raises(OutOfBoundsError):
-            NeuralNetworkClassifier(
-                InputConversionTable(),
-                [ForwardLayer(1)],
-            ).fit(
-                Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
-                epoch_size=epoch_size,
-            )
-
-    @pytest.mark.parametrize(
-        "batch_size",
-        [
-            0,
-        ],
-        ids=["batch_size_out_of_bounds"],
-    )
-    def test_should_raise_if_batch_size_out_of_bounds(self, batch_size: int, device: Device) -> None:
-        configure_test_with_device(device)
-        with pytest.raises(OutOfBoundsError):
-            NeuralNetworkClassifier(
+    class TestFit:
+        def test_should_return_input_size(self, device: Device) -> None:
+            configure_test_with_device(device)
+            model = NeuralNetworkClassifier(
                 InputConversionTable(),
                 [ForwardLayer(neuron_count=1)],
             ).fit(
                 Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
+            )
+
+            assert model.input_size == 1
+
+        def test_should_raise_if_epoch_size_out_of_bounds(self, device: Device) -> None:
+            invalid_epoch_size = 0
+            configure_test_with_device(device)
+            with pytest.raises(OutOfBoundsError):
+                NeuralNetworkClassifier(
+                    InputConversionTable(),
+                    [ForwardLayer(1)],
+                ).fit(
+                    Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
+                    epoch_size=invalid_epoch_size,
+                )
+
+        def test_should_raise_if_batch_size_out_of_bounds(self, device: Device) -> None:
+            invalid_batch_size = 0
+            configure_test_with_device(device)
+            with pytest.raises(OutOfBoundsError):
+                NeuralNetworkClassifier(
+                    InputConversionTable(),
+                    [ForwardLayer(neuron_count=1)],
+                ).fit(
+                    Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
+                    batch_size=invalid_batch_size,
+                )
+
+        def test_should_raise_if_fit_function_returns_wrong_datatype(self, device: Device) -> None:
+            configure_test_with_device(device)
+            fitted_model = NeuralNetworkClassifier(
+                InputConversionTable(),
+                [ForwardLayer(neuron_count=2), ForwardLayer(neuron_count=1)],
+            ).fit(
+                Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"),
+            )
+            assert isinstance(fitted_model, NeuralNetworkClassifier)
+
+        def test_should_raise_when_fitting_with_choice(self, device: Device) -> None:
+            configure_test_with_device(device)
+            model = NeuralNetworkClassifier(InputConversionTable(), [ForwardLayer(Choice(1, 2))])
+            with pytest.raises(FittingWithChoiceError):
+                model.fit(Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"))
+
+        def test_should_raise_if_is_fitted_is_set_correctly_for_binary_classification(self, device: Device) -> None:
+            configure_test_with_device(device)
+            model = NeuralNetworkClassifier(
+                InputConversionTable(),
+                [ForwardLayer(neuron_count=1)],
+            )
+            model_2 = NeuralNetworkClassifier(
+                InputConversionTable(),
+                [LSTMLayer(neuron_count=1)],
+            )
+            assert not model.is_fitted
+            assert not model_2.is_fitted
+            model = model.fit(
+                Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"),
+            )
+            model_2 = model_2.fit(
+                Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"),
+            )
+            assert model.is_fitted
+            assert model_2.is_fitted
+
+        def test_should_raise_if_is_fitted_is_set_correctly_for_multiclass_classification(self, device: Device) -> None:
+            configure_test_with_device(device)
+            model = NeuralNetworkClassifier(
+                InputConversionTable(),
+                [ForwardLayer(neuron_count=1), ForwardLayer(neuron_count=3)],
+            )
+            model_2 = NeuralNetworkClassifier(
+                InputConversionTable(),
+                [ForwardLayer(neuron_count=1), LSTMLayer(neuron_count=3)],
+            )
+            assert not model.is_fitted
+            assert not model_2.is_fitted
+            model = model.fit(
+                Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).to_tabular_dataset("a"),
+            )
+            model_2 = model_2.fit(
+                Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).to_tabular_dataset("a"),
+            )
+            assert model.is_fitted
+            assert model_2.is_fitted
+
+        def test_should_raise_if_train_features_mismatch(self, device: Device) -> None:
+            configure_test_with_device(device)
+            model = NeuralNetworkClassifier(
+                InputConversionTable(),
+                [ForwardLayer(neuron_count=1), ForwardLayer(neuron_count=1)],
+            )
+            learned_model = model.fit(
+                Table.from_dict({"a": [0.1, 0, 0.2], "b": [0, 0.15, 0.5]}).to_tabular_dataset("b"),
+            )
+            with pytest.raises(
+                FeatureDataMismatchError,
+                match="The features in the given table do not match with the specified feature columns names of the model.",
+            ):
+                learned_model.fit(Table.from_dict({"k": [0.1, 0, 0.2], "l": [0, 0.15, 0.5]}).to_tabular_dataset("k"))
+
+        @pytest.mark.parametrize(
+            ("table", "reason"),
+            [
+                (
+                    Table.from_dict({"a": [1, 2, 3], "b": [1, 2, None], "c": [0, 15, 5]}).to_tabular_dataset("c"),
+                    re.escape("The given Fit Data is invalid:\nThe following Columns contain missing values: ['b']\n"),
+                ),
+                (
+                    Table.from_dict({"a": ["a", "b", "c"], "b": [1, 2, 3], "c": [0, 15, 5]}).to_tabular_dataset("c"),
+                    re.escape(
+                        "The given Fit Data is invalid:\nThe following Columns contain non-numerical data: ['a']"),
+                ),
+                (
+                    Table.from_dict({"a": ["a", "b", "c"], "b": [1, 2, None], "c": [0, 15, 5]}).to_tabular_dataset("c"),
+                    re.escape(
+                        "The given Fit Data is invalid:\nThe following Columns contain missing values: ['b']\nThe following Columns contain non-numerical data: ['a']",
+                    ),
+                ),
+                (
+                    Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, None, 5]}).to_tabular_dataset("c"),
+                    re.escape(
+                        "The given Fit Data is invalid:\nThe following Columns contain missing values: ['c']\n",
+                    ),
+                ),
+                (
+                    Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": ["a", "b", "a"]}).to_tabular_dataset("c"),
+                    re.escape(
+                        "The given Fit Data is invalid:\nThe following Columns contain non-numerical data: ['c']"),
+                ),
+            ],
+            ids=[
+                "missing value feature",
+                "non-numerical feature",
+                "missing value and non-numerical features",
+                "missing value target",
+                "non-numerical target",
+            ],
+        )
+        def test_should_catch_invalid_fit_data(self, device: Device, table: TabularDataset, reason: str) -> None:
+            configure_test_with_device(device)
+            model = NeuralNetworkClassifier(
+                InputConversionTable(),
+                [ForwardLayer(neuron_count=4), ForwardLayer(1)],
+            )
+            with pytest.raises(
+                InvalidFitDataError,
+                match=reason,
+            ):
+                model.fit(table)
+
+        def test_should_raise_if_fit_doesnt_batch_callback(self, device: Device) -> None:
+            configure_test_with_device(device)
+            model = NeuralNetworkClassifier(
+                InputConversionTable(),
+                [ForwardLayer(neuron_count=1)],
+            )
+
+            class Test:
+                self.was_called = False
+
+                def cb(self, ind: int, loss: float) -> None:
+                    if ind >= 0 and loss >= 0.0:
+                        self.was_called = True
+
+                def callback_was_called(self) -> bool:
+                    return self.was_called
+
+            obj = Test()
+            model.fit(Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"),
+                      callback_on_batch_completion=obj.cb)
+
+            assert obj.callback_was_called() is True
+
+        def test_should_raise_if_fit_doesnt_epoch_callback(self, device: Device) -> None:
+            configure_test_with_device(device)
+            model = NeuralNetworkClassifier(
+                InputConversionTable(),
+                [ForwardLayer(neuron_count=1)],
+            )
+
+            class Test:
+                self.was_called = False
+
+                def cb(self, ind: int, loss: float) -> None:
+                    if ind >= 0 and loss >= 0.0:
+                        self.was_called = True
+
+                def callback_was_called(self) -> bool:
+                    return self.was_called
+
+            obj = Test()
+            model.fit(Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"),
+                      callback_on_epoch_completion=obj.cb)
+
+            assert obj.callback_was_called() is True
+
+    class TestFitByExhaustiveSearch:
+        def test_should_return_input_size(self, device: Device) -> None:
+            configure_test_with_device(device)
+            model = NeuralNetworkClassifier(
+                InputConversionTable(),
+                [ForwardLayer(neuron_count=Choice(2, 4)), ForwardLayer(1)],
+            ).fit_by_exhaustive_search(
+                Table.from_dict({"a": [1, 2, 3, 4], "b": [0, 1, 0, 1]}).to_tabular_dataset("b"),
+                ClassifierMetric.ACCURACY,
+            )
+            assert model.input_size == 1
+
+        def test_should_raise_if_epoch_size_out_of_bounds_when_fitting_by_exhaustive_search(self,
+                                                                                            device: Device) -> None:
+            invalid_epoch_size = 0
+            configure_test_with_device(device)
+            with pytest.raises(OutOfBoundsError):
+                NeuralNetworkClassifier(
+                    InputConversionTable(),
+                    [ForwardLayer(Choice(2, 4)), ForwardLayer(1)],
+                ).fit_by_exhaustive_search(
+                    Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("b"),
+                    ClassifierMetric.ACCURACY,
+                    epoch_size=invalid_epoch_size,
+                )
+
+        def test_should_raise_if_batch_size_out_of_bounds_when_fitting_by_exhaustive_search(self,
+                                                                                            device: Device) -> None:
+            invalid_batch_size = 0
+            configure_test_with_device(device)
+            with pytest.raises(OutOfBoundsError):
+                NeuralNetworkClassifier(
+                    InputConversionTable(),
+                    [ForwardLayer(neuron_count=Choice(2, 4)), ForwardLayer(1)],
+                ).fit_by_exhaustive_search(
+                    Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("b"),
+                    ClassifierMetric.ACCURACY,
+                    batch_size=invalid_batch_size,
+                )
+
+        def test_should_raise_when_fitting_by_exhaustive_search_without_choice(self, device: Device) -> None:
+            configure_test_with_device(device)
+            model = NeuralNetworkClassifier(InputConversionTable(), [ForwardLayer(1)])
+            with pytest.raises(FittingWithoutChoiceError):
+                model.fit_by_exhaustive_search(
+                    Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("b"),
+                    ClassifierMetric.ACCURACY)
+
+        def test_should_assert_that_is_fitted_is_set_correctly(self, device: Device) -> None:
+            configure_test_with_device(device)
+            model = NeuralNetworkClassifier(InputConversionTable(), [ForwardLayer(Choice(2, 4)), ForwardLayer(1)])
+            assert not model.is_fitted
+            fitted_model = model.fit_by_exhaustive_search(
+                Table.from_dict({"a": [1, 2, 3, 4], "b": [0, 1, 0, 1]}).to_tabular_dataset("b"),
+                ClassifierMetric.ACCURACY)
+            assert fitted_model.is_fitted
+
+        def test_should_raise_if_fit_by_exhaustive_search_function_returns_wrong_datatype(self, device: Device) -> None:
+            configure_test_with_device(device)
+            model = NeuralNetworkClassifier(InputConversionTable(), [ForwardLayer(Choice(2, 4)), ForwardLayer(1)])
+            fitted_model = model.fit_by_exhaustive_search(
+                Table.from_dict({"a": [1, 2, 3, 4], "b": [0, 1, 0, 1]}).to_tabular_dataset("b"),
+                ClassifierMetric.ACCURACY)
+            assert isinstance(fitted_model, NeuralNetworkClassifier)
+
+    class TestPredict:
+
+        @pytest.mark.parametrize(
+            "batch_size",
+            [
+                1,
+                2,
+            ],
+            ids=["one", "two"],
+        )
+        def test_should_raise_if_predict_function_returns_wrong_datatype(self, batch_size: int, device: Device) -> None:
+            configure_test_with_device(device)
+            fitted_model = NeuralNetworkClassifier(
+                InputConversionTable(),
+                [ForwardLayer(neuron_count=8), ForwardLayer(neuron_count=1)],
+            ).fit(
+                Table.from_dict({"a": [1, 0, 1, 0, 1, 0], "b": [0, 1, 0, 12, 3, 3]}).to_tabular_dataset("a"),
                 batch_size=batch_size,
             )
+            predictions = fitted_model.predict(Table.from_dict({"b": [1, 0]}))
+            assert isinstance(predictions, TabularDataset)
 
-    def test_should_raise_if_fit_function_returns_wrong_datatype(self, device: Device) -> None:
-        configure_test_with_device(device)
-        fitted_model = NeuralNetworkClassifier(
-            InputConversionTable(),
-            [ForwardLayer(neuron_count=8), ForwardLayer(neuron_count=1)],
-        ).fit(
-            Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"),
+        @pytest.mark.parametrize(
+            "batch_size",
+            [
+                1,
+                2,
+            ],
+            ids=["one", "two"],
         )
-        assert isinstance(fitted_model, NeuralNetworkClassifier)
-
-    @pytest.mark.parametrize(
-        "batch_size",
-        [
-            1,
-            2,
-        ],
-        ids=["one", "two"],
-    )
-    def test_should_raise_if_predict_function_returns_wrong_datatype(self, batch_size: int, device: Device) -> None:
-        configure_test_with_device(device)
-        fitted_model = NeuralNetworkClassifier(
-            InputConversionTable(),
-            [ForwardLayer(neuron_count=8), ForwardLayer(neuron_count=1)],
-        ).fit(
-            Table.from_dict({"a": [1, 0, 1, 0, 1, 0], "b": [0, 1, 0, 12, 3, 3]}).to_tabular_dataset("a"),
-            batch_size=batch_size,
-        )
-        predictions = fitted_model.predict(Table.from_dict({"b": [1, 0]}))
-        assert isinstance(predictions, TabularDataset)
-
-    @pytest.mark.parametrize(
-        "batch_size",
-        [
-            1,
-            2,
-        ],
-        ids=["one", "two"],
-    )
-    def test_should_raise_if_predict_function_returns_wrong_datatype_for_multiclass_classification(
-        self,
-        batch_size: int,
-        device: Device,
-    ) -> None:
-        configure_test_with_device(device)
-        fitted_model = NeuralNetworkClassifier(
-            InputConversionTable(),
-            [ForwardLayer(neuron_count=8), ForwardLayer(neuron_count=3)],
-        ).fit(
-            Table.from_dict({"a": [0, 1, 2], "b": [0, 15, 51]}).to_tabular_dataset("a"),
-            batch_size=batch_size,
-        )
-        NeuralNetworkClassifier(
-            InputConversionTable(),
-            [ForwardLayer(neuron_count=8), LSTMLayer(neuron_count=3)],
-        ).fit(
-            Table.from_dict({"a": [0, 1, 2], "b": [0, 15, 51]}).to_tabular_dataset("a"),
-            batch_size=batch_size,
-        )
-        predictions = fitted_model.predict(Table.from_dict({"b": [1, 4, 124]}))
-        assert isinstance(predictions, TabularDataset)
-
-    def test_should_raise_if_model_has_not_been_fitted(self, device: Device) -> None:
-        configure_test_with_device(device)
-        with pytest.raises(ModelNotFittedError, match="The model has not been fitted yet."):
+        def test_should_raise_if_predict_function_returns_wrong_datatype_for_multiclass_classification(
+            self,
+            batch_size: int,
+            device: Device,
+        ) -> None:
+            configure_test_with_device(device)
+            fitted_model = NeuralNetworkClassifier(
+                InputConversionTable(),
+                [ForwardLayer(neuron_count=8), ForwardLayer(neuron_count=3)],
+            ).fit(
+                Table.from_dict({"a": [0, 1, 2], "b": [0, 15, 51]}).to_tabular_dataset("a"),
+                batch_size=batch_size,
+            )
             NeuralNetworkClassifier(
                 InputConversionTable(),
-                [ForwardLayer(neuron_count=1)],
-            ).predict(
-                Table.from_dict({"a": [1]}),
+                [ForwardLayer(neuron_count=8), LSTMLayer(neuron_count=3)],
+            ).fit(
+                Table.from_dict({"a": [0, 1, 2], "b": [0, 15, 51]}).to_tabular_dataset("a"),
+                batch_size=batch_size,
             )
+            predictions = fitted_model.predict(Table.from_dict({"b": [1, 4, 124]}))
+            assert isinstance(predictions, TabularDataset)
 
-    def test_should_raise_if_is_fitted_is_set_correctly_for_binary_classification(self, device: Device) -> None:
-        configure_test_with_device(device)
-        model = NeuralNetworkClassifier(
-            InputConversionTable(),
-            [ForwardLayer(neuron_count=1)],
-        )
-        model_2 = NeuralNetworkClassifier(
-            InputConversionTable(),
-            [LSTMLayer(neuron_count=1)],
-        )
-        assert not model.is_fitted
-        assert not model_2.is_fitted
-        model = model.fit(
-            Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"),
-        )
-        model_2 = model_2.fit(
-            Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"),
-        )
-        assert model.is_fitted
-        assert model_2.is_fitted
+        def test_should_raise_if_model_has_not_been_fitted(self, device: Device) -> None:
+            configure_test_with_device(device)
+            with pytest.raises(ModelNotFittedError, match="The model has not been fitted yet."):
+                NeuralNetworkClassifier(
+                    InputConversionTable(),
+                    [ForwardLayer(neuron_count=1)],
+                ).predict(
+                    Table.from_dict({"a": [1]}),
+                )
 
-    def test_should_raise_if_is_fitted_is_set_correctly_for_multiclass_classification(self, device: Device) -> None:
-        configure_test_with_device(device)
-        model = NeuralNetworkClassifier(
-            InputConversionTable(),
-            [ForwardLayer(neuron_count=1), ForwardLayer(neuron_count=3)],
-        )
-        model_2 = NeuralNetworkClassifier(
-            InputConversionTable(),
-            [ForwardLayer(neuron_count=1), LSTMLayer(neuron_count=3)],
-        )
-        assert not model.is_fitted
-        assert not model_2.is_fitted
-        model = model.fit(
-            Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).to_tabular_dataset("a"),
-        )
-        model_2 = model_2.fit(
-            Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).to_tabular_dataset("a"),
-        )
-        assert model.is_fitted
-        assert model_2.is_fitted
-
-    def test_should_raise_if_test_features_mismatch(self, device: Device) -> None:
-        configure_test_with_device(device)
-        model = NeuralNetworkClassifier(
-            InputConversionTable(),
-            [ForwardLayer(neuron_count=1), ForwardLayer(neuron_count=3)],
-        )
-        model = model.fit(
-            Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).to_tabular_dataset("a"),
-        )
-        with pytest.raises(
-            FeatureDataMismatchError,
-            match="The features in the given table do not match with the specified feature columns names of the model.",
-        ):
-            model.predict(
-                Table.from_dict({"a": [1], "c": [2]}),
+        def test_should_raise_if_test_features_mismatch(self, device: Device) -> None:
+            configure_test_with_device(device)
+            model = NeuralNetworkClassifier(
+                InputConversionTable(),
+                [ForwardLayer(neuron_count=1), ForwardLayer(neuron_count=3)],
             )
-
-    def test_should_raise_if_train_features_mismatch(self, device: Device) -> None:
-        configure_test_with_device(device)
-        model = NeuralNetworkClassifier(
-            InputConversionTable(),
-            [ForwardLayer(neuron_count=1), ForwardLayer(neuron_count=1)],
-        )
-        learned_model = model.fit(
-            Table.from_dict({"a": [0.1, 0, 0.2], "b": [0, 0.15, 0.5]}).to_tabular_dataset("b"),
-        )
-        with pytest.raises(
-            FeatureDataMismatchError,
-            match="The features in the given table do not match with the specified feature columns names of the model.",
-        ):
-            learned_model.fit(Table.from_dict({"k": [0.1, 0, 0.2], "l": [0, 0.15, 0.5]}).to_tabular_dataset("k"))
-
-    @pytest.mark.parametrize(
-        ("table", "reason"),
-        [
-            (
-                Table.from_dict({"a": [1, 2, 3], "b": [1, 2, None], "c": [0, 15, 5]}).to_tabular_dataset("c"),
-                re.escape("The given Fit Data is invalid:\nThe following Columns contain missing values: ['b']\n"),
-            ),
-            (
-                Table.from_dict({"a": ["a", "b", "c"], "b": [1, 2, 3], "c": [0, 15, 5]}).to_tabular_dataset("c"),
-                re.escape("The given Fit Data is invalid:\nThe following Columns contain non-numerical data: ['a']"),
-            ),
-            (
-                Table.from_dict({"a": ["a", "b", "c"], "b": [1, 2, None], "c": [0, 15, 5]}).to_tabular_dataset("c"),
-                re.escape(
-                    "The given Fit Data is invalid:\nThe following Columns contain missing values: ['b']\nThe following Columns contain non-numerical data: ['a']",
-                ),
-            ),
-            (
-                Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, None, 5]}).to_tabular_dataset("c"),
-                re.escape(
-                    "The given Fit Data is invalid:\nThe following Columns contain missing values: ['c']\n",
-                ),
-            ),
-            (
-                Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": ["a", "b", "a"]}).to_tabular_dataset("c"),
-                re.escape("The given Fit Data is invalid:\nThe following Columns contain non-numerical data: ['c']"),
-            ),
-        ],
-        ids=[
-            "missing value feature",
-            "non-numerical feature",
-            "missing value and non-numerical features",
-            "missing value target",
-            "non-numerical target",
-        ],
-    )
-    def test_should_catch_invalid_fit_data(self, device: Device, table: TabularDataset, reason: str) -> None:
-        configure_test_with_device(device)
-        model = NeuralNetworkClassifier(
-            InputConversionTable(),
-            [ForwardLayer(neuron_count=4), ForwardLayer(1)],
-        )
-        with pytest.raises(
-            InvalidFitDataError,
-            match=reason,
-        ):
-            model.fit(table)
-
-    # def test_should_raise_if_table_size_and_input_size_mismatch(self, device: Device) -> None:
-    #     configure_test_with_device(device)
-    #     model = NeuralNetworkClassifier(
-    #         InputConversionTable(),
-    #         [ForwardLayer(neuron_count=1), ForwardLayer(neuron_count=3)],
-    #     )
-    #     with pytest.raises(
-    #         InputSizeError,
-    #     ):
-    #         model.fit(
-    #             Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5], "c": [3, 33, 333]}).to_tabular_dataset("a"),
-    #         )
-
-    def test_should_raise_if_fit_doesnt_batch_callback(self, device: Device) -> None:
-        configure_test_with_device(device)
-        model = NeuralNetworkClassifier(
-            InputConversionTable(),
-            [ForwardLayer(neuron_count=1)],
-        )
-
-        class Test:
-            self.was_called = False
-
-            def cb(self, ind: int, loss: float) -> None:
-                if ind >= 0 and loss >= 0.0:
-                    self.was_called = True
-
-            def callback_was_called(self) -> bool:
-                return self.was_called
-
-        obj = Test()
-        model.fit(Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"), callback_on_batch_completion=obj.cb)
-
-        assert obj.callback_was_called() is True
-
-    def test_should_raise_if_fit_doesnt_epoch_callback(self, device: Device) -> None:
-        configure_test_with_device(device)
-        model = NeuralNetworkClassifier(
-            InputConversionTable(),
-            [ForwardLayer(neuron_count=1)],
-        )
-
-        class Test:
-            self.was_called = False
-
-            def cb(self, ind: int, loss: float) -> None:
-                if ind >= 0 and loss >= 0.0:
-                    self.was_called = True
-
-            def callback_was_called(self) -> bool:
-                return self.was_called
-
-        obj = Test()
-        model.fit(Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"), callback_on_epoch_completion=obj.cb)
-
-        assert obj.callback_was_called() is True
+            model = model.fit(
+                Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).to_tabular_dataset("a"),
+            )
+            with pytest.raises(
+                FeatureDataMismatchError,
+                match="The features in the given table do not match with the specified feature columns names of the model.",
+            ):
+                model.predict(
+                    Table.from_dict({"a": [1], "c": [2]}),
+                )
 
     @pytest.mark.parametrize(
         ("input_conversion", "layers", "error_msg"),
@@ -517,252 +572,303 @@ class TestClassificationModel:
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestRegressionModel:
-    def test_should_return_input_size(self, device: Device) -> None:
-        configure_test_with_device(device)
-        model = NeuralNetworkRegressor(
-            InputConversionTable(),
-            [ForwardLayer(neuron_count=1)],
-        ).fit(
-            Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
-        )
-
-        assert model.input_size == 1
-
-    @pytest.mark.parametrize(
-        "epoch_size",
-        [
-            0,
-        ],
-        ids=["epoch_size_out_of_bounds"],
-    )
-    def test_should_raise_if_epoch_size_out_of_bounds(self, epoch_size: int, device: Device) -> None:
-        configure_test_with_device(device)
-        with pytest.raises(OutOfBoundsError):
-            NeuralNetworkRegressor(
+    class TestFit:
+        def test_should_return_input_size(self, device: Device) -> None:
+            configure_test_with_device(device)
+            model = NeuralNetworkRegressor(
                 InputConversionTable(),
                 [ForwardLayer(neuron_count=1)],
             ).fit(
                 Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
-                epoch_size=epoch_size,
             )
 
-    @pytest.mark.parametrize(
-        "batch_size",
-        [
-            0,
-        ],
-        ids=["batch_size_out_of_bounds"],
-    )
-    def test_should_raise_if_batch_size_out_of_bounds(self, batch_size: int, device: Device) -> None:
-        configure_test_with_device(device)
-        with pytest.raises(OutOfBoundsError):
-            NeuralNetworkRegressor(
+            assert model.input_size == 1
+
+        def test_should_raise_if_epoch_size_out_of_bounds(self, device: Device) -> None:
+            invalid_epoch_size = 0
+            configure_test_with_device(device)
+            with pytest.raises(OutOfBoundsError):
+                NeuralNetworkRegressor(
+                    InputConversionTable(),
+                    [ForwardLayer(neuron_count=1)],
+                ).fit(
+                    Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
+                    epoch_size=invalid_epoch_size,
+                )
+
+        def test_should_raise_if_batch_size_out_of_bounds(self, device: Device) -> None:
+            invalid_batch_size = 0
+            configure_test_with_device(device)
+            with pytest.raises(OutOfBoundsError):
+                NeuralNetworkRegressor(
+                    InputConversionTable(),
+                    [ForwardLayer(neuron_count=1)],
+                ).fit(
+                    Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
+                    batch_size=invalid_batch_size,
+                )
+
+        @pytest.mark.parametrize(
+            "batch_size",
+            [
+                1,
+                2,
+            ],
+            ids=["one", "two"],
+        )
+        def test_should_raise_if_fit_function_returns_wrong_datatype(self, batch_size: int, device: Device) -> None:
+            configure_test_with_device(device)
+            fitted_model = NeuralNetworkRegressor(
                 InputConversionTable(),
                 [ForwardLayer(neuron_count=1)],
             ).fit(
-                Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
+                Table.from_dict({"a": [1, 0, 1], "b": [2, 3, 4]}).to_tabular_dataset("a"),
                 batch_size=batch_size,
             )
+            assert isinstance(fitted_model, NeuralNetworkRegressor)
 
-    @pytest.mark.parametrize(
-        "batch_size",
-        [
-            1,
-            2,
-        ],
-        ids=["one", "two"],
-    )
-    def test_should_raise_if_fit_function_returns_wrong_datatype(self, batch_size: int, device: Device) -> None:
-        configure_test_with_device(device)
-        fitted_model = NeuralNetworkRegressor(
-            InputConversionTable(),
-            [ForwardLayer(neuron_count=1)],
-        ).fit(
-            Table.from_dict({"a": [1, 0, 1], "b": [2, 3, 4]}).to_tabular_dataset("a"),
-            batch_size=batch_size,
-        )
-        assert isinstance(fitted_model, NeuralNetworkRegressor)
+        def test_should_raise_when_fitting_with_choice(self, device: Device) -> None:
+            configure_test_with_device(device)
+            model = NeuralNetworkRegressor(InputConversionTable(), [ForwardLayer(Choice(1, 2))])
+            with pytest.raises(FittingWithChoiceError):
+                model.fit(Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"))
 
-    @pytest.mark.parametrize(
-        "batch_size",
-        [
-            1,
-            2,
-        ],
-        ids=["one", "two"],
-    )
-    def test_should_raise_if_predict_function_returns_wrong_datatype(self, batch_size: int, device: Device) -> None:
-        configure_test_with_device(device)
-        fitted_model = NeuralNetworkRegressor(
-            InputConversionTable(),
-            [ForwardLayer(neuron_count=1)],
-        ).fit(
-            Table.from_dict({"a": [1, 0, 1], "b": [2, 3, 4]}).to_tabular_dataset("a"),
-            batch_size=batch_size,
-        )
-        predictions = fitted_model.predict(Table.from_dict({"b": [5, 6, 7]}))
-        assert isinstance(predictions, TabularDataset)
 
-    def test_should_raise_if_model_has_not_been_fitted(self, device: Device) -> None:
-        configure_test_with_device(device)
-        with pytest.raises(ModelNotFittedError, match="The model has not been fitted yet."):
-            NeuralNetworkRegressor(
+        def test_should_raise_if_is_fitted_is_set_correctly(self, device: Device) -> None:
+            configure_test_with_device(device)
+            model = NeuralNetworkRegressor(
                 InputConversionTable(),
                 [ForwardLayer(neuron_count=1)],
-            ).predict(
-                Table.from_dict({"a": [1]}),
             )
-
-    def test_should_raise_if_is_fitted_is_set_correctly(self, device: Device) -> None:
-        configure_test_with_device(device)
-        model = NeuralNetworkRegressor(
-            InputConversionTable(),
-            [ForwardLayer(neuron_count=1)],
-        )
-        assert not model.is_fitted
-        model = model.fit(
-            Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"),
-        )
-        assert model.is_fitted
-
-    def test_should_raise_if_test_features_mismatch(self, device: Device) -> None:
-        configure_test_with_device(device)
-        model = NeuralNetworkRegressor(
-            InputConversionTable(),
-            [ForwardLayer(neuron_count=1)],
-        )
-        model = model.fit(
-            Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).to_tabular_dataset("a"),
-        )
-        with pytest.raises(
-            FeatureDataMismatchError,
-            match="The features in the given table do not match with the specified feature columns names of the model.",
-        ):
-            model.predict(
-                Table.from_dict({"a": [1], "c": [2]}),
+            assert not model.is_fitted
+            model = model.fit(
+                Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"),
             )
+            assert model.is_fitted
 
-    def test_should_raise_if_train_features_mismatch(self, device: Device) -> None:
-        configure_test_with_device(device)
-        model = NeuralNetworkRegressor(
-            InputConversionTable(),
-            [ForwardLayer(neuron_count=1)],
-        )
-        trained_model = model.fit(
-            Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).to_tabular_dataset("b"),
-        )
-        with pytest.raises(
-            FeatureDataMismatchError,
-            match="The features in the given table do not match with the specified feature columns names of the model.",
-        ):
-            trained_model.fit(
-                Table.from_dict({"k": [1, 0, 2], "l": [0, 15, 5]}).to_tabular_dataset("l"),
+        def test_should_raise_if_train_features_mismatch(self, device: Device) -> None:
+            configure_test_with_device(device)
+            model = NeuralNetworkRegressor(
+                InputConversionTable(),
+                [ForwardLayer(neuron_count=1)],
             )
+            trained_model = model.fit(
+                Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).to_tabular_dataset("b"),
+            )
+            with pytest.raises(
+                FeatureDataMismatchError,
+                match="The features in the given table do not match with the specified feature columns names of the model.",
+            ):
+                trained_model.fit(
+                    Table.from_dict({"k": [1, 0, 2], "l": [0, 15, 5]}).to_tabular_dataset("l"),
+                )
 
-    @pytest.mark.parametrize(
-        ("table", "reason"),
-        [
-            (
-                Table.from_dict({"a": [1, 2, 3], "b": [1, 2, None], "c": [0, 15, 5]}).to_tabular_dataset("c"),
-                re.escape("The given Fit Data is invalid:\nThe following Columns contain missing values: ['b']\n"),
-            ),
-            (
-                Table.from_dict({"a": ["a", "b", "c"], "b": [1, 2, 3], "c": [0, 15, 5]}).to_tabular_dataset("c"),
-                re.escape("The given Fit Data is invalid:\nThe following Columns contain non-numerical data: ['a']"),
-            ),
-            (
-                Table.from_dict({"a": ["a", "b", "c"], "b": [1, 2, None], "c": [0, 15, 5]}).to_tabular_dataset("c"),
-                re.escape(
-                    "The given Fit Data is invalid:\nThe following Columns contain missing values: ['b']\nThe following Columns contain non-numerical data: ['a']",
+        @pytest.mark.parametrize(
+            ("table", "reason"),
+            [
+                (
+                    Table.from_dict({"a": [1, 2, 3], "b": [1, 2, None], "c": [0, 15, 5]}).to_tabular_dataset("c"),
+                    re.escape("The given Fit Data is invalid:\nThe following Columns contain missing values: ['b']\n"),
                 ),
-            ),
-            (
-                Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, None, 5]}).to_tabular_dataset("c"),
-                re.escape(
-                    "The given Fit Data is invalid:\nThe following Columns contain missing values: ['c']\n",
+                (
+                    Table.from_dict({"a": ["a", "b", "c"], "b": [1, 2, 3], "c": [0, 15, 5]}).to_tabular_dataset("c"),
+                    re.escape(
+                        "The given Fit Data is invalid:\nThe following Columns contain non-numerical data: ['a']"),
                 ),
-            ),
-            (
-                Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": ["a", "b", "a"]}).to_tabular_dataset("c"),
-                re.escape("The given Fit Data is invalid:\nThe following Columns contain non-numerical data: ['c']"),
-            ),
-        ],
-        ids=[
-            "missing value feature",
-            "non-numerical feature",
-            "missing value and non-numerical features",
-            "missing value target",
-            "non-numerical target",
-        ],
-    )
-    def test_should_catch_invalid_fit_data(self, device: Device, table: TabularDataset, reason: str) -> None:
-        configure_test_with_device(device)
-        model = NeuralNetworkRegressor(
-            InputConversionTable(),
-            [ForwardLayer(neuron_count=4), ForwardLayer(1)],
+                (
+                    Table.from_dict({"a": ["a", "b", "c"], "b": [1, 2, None], "c": [0, 15, 5]}).to_tabular_dataset("c"),
+                    re.escape(
+                        "The given Fit Data is invalid:\nThe following Columns contain missing values: ['b']\nThe following Columns contain non-numerical data: ['a']",
+                    ),
+                ),
+                (
+                    Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, None, 5]}).to_tabular_dataset("c"),
+                    re.escape(
+                        "The given Fit Data is invalid:\nThe following Columns contain missing values: ['c']\n",
+                    ),
+                ),
+                (
+                    Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": ["a", "b", "a"]}).to_tabular_dataset("c"),
+                    re.escape(
+                        "The given Fit Data is invalid:\nThe following Columns contain non-numerical data: ['c']"),
+                ),
+            ],
+            ids=[
+                "missing value feature",
+                "non-numerical feature",
+                "missing value and non-numerical features",
+                "missing value target",
+                "non-numerical target",
+            ],
         )
-        with pytest.raises(
-            InvalidFitDataError,
-            match=reason,
-        ):
-            model.fit(table)
+        def test_should_catch_invalid_fit_data(self, device: Device, table: TabularDataset, reason: str) -> None:
+            configure_test_with_device(device)
+            model = NeuralNetworkRegressor(
+                InputConversionTable(),
+                [ForwardLayer(neuron_count=4), ForwardLayer(1)],
+            )
+            with pytest.raises(
+                InvalidFitDataError,
+                match=reason,
+            ):
+                model.fit(table)
 
-    # def test_should_raise_if_table_size_and_input_size_mismatch(self, device: Device) -> None:
-    #     configure_test_with_device(device)
-    #     model = NeuralNetworkRegressor(
-    #         InputConversionTable(),
-    #         [ForwardLayer(neuron_count=1), ForwardLayer(neuron_count=3)],
-    #     )
-    #     with pytest.raises(
-    #         InputSizeError,
-    #     ):
-    #         model.fit(
-    #             Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5], "c": [3, 33, 333]}).to_tabular_dataset("a"),
-    #         )
+        def test_should_raise_if_fit_doesnt_batch_callback(self, device: Device) -> None:
+            configure_test_with_device(device)
+            model = NeuralNetworkRegressor(
+                InputConversionTable(),
+                [ForwardLayer(neuron_count=1)],
+            )
 
-    def test_should_raise_if_fit_doesnt_batch_callback(self, device: Device) -> None:
-        configure_test_with_device(device)
-        model = NeuralNetworkRegressor(
-            InputConversionTable(),
-            [ForwardLayer(neuron_count=1)],
+            class Test:
+                self.was_called = False
+
+                def cb(self, ind: int, loss: float) -> None:
+                    if ind >= 0 and loss >= 0.0:
+                        self.was_called = True
+
+                def callback_was_called(self) -> bool:
+                    return self.was_called
+
+            obj = Test()
+            model.fit(Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"),
+                      callback_on_batch_completion=obj.cb)
+
+            assert obj.callback_was_called() is True
+
+        def test_should_raise_if_fit_doesnt_epoch_callback(self, device: Device) -> None:
+            configure_test_with_device(device)
+            model = NeuralNetworkRegressor(
+                InputConversionTable(),
+                [ForwardLayer(neuron_count=1)],
+            )
+
+            class Test:
+                self.was_called = False
+
+                def cb(self, ind: int, loss: float) -> None:
+                    if ind >= 0 and loss >= 0.0:
+                        self.was_called = True
+
+                def callback_was_called(self) -> bool:
+                    return self.was_called
+
+            obj = Test()
+            model.fit(Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"),
+                      callback_on_epoch_completion=obj.cb)
+
+            assert obj.callback_was_called() is True
+
+    class TestFitByExhaustiveSearch:
+        def test_should_return_input_size(self, device: Device) -> None:
+            configure_test_with_device(device)
+            model = NeuralNetworkRegressor(
+                InputConversionTable(),
+                [ForwardLayer(neuron_count=Choice(2, 4)), ForwardLayer(1)],
+            ).fit_by_exhaustive_search(
+                Table.from_dict({"a": [1, 2, 3, 4], "b": [1.0, 2.0, 3.0, 4.0]}).to_tabular_dataset("b"),
+                RegressorMetric.MEAN_SQUARED_ERROR,
+            )
+            assert model.input_size == 1
+
+        def test_should_raise_if_epoch_size_out_of_bounds_when_fitting_by_exhaustive_search(self, device: Device) -> None:
+            invalid_epoch_size = 0
+            configure_test_with_device(device)
+            with pytest.raises(OutOfBoundsError):
+                NeuralNetworkRegressor(
+                    InputConversionTable(),
+                    [ForwardLayer(Choice(1, 3))],
+                ).fit_by_exhaustive_search(
+                    Table.from_dict({"a": [1], "b": [1.0]}).to_tabular_dataset("b"),
+                    RegressorMetric.MEAN_ABSOLUTE_ERROR,
+                    epoch_size=invalid_epoch_size,
+                )
+
+        def test_should_raise_if_batch_size_out_of_bounds_when_fitting_by_exhaustive_search(self, device: Device) -> None:
+            invalid_batch_size = 0
+            configure_test_with_device(device)
+            with pytest.raises(OutOfBoundsError):
+                NeuralNetworkRegressor(
+                    InputConversionTable(),
+                    [ForwardLayer(neuron_count=Choice(1, 3))],
+                ).fit_by_exhaustive_search(
+                    Table.from_dict({"a": [1], "b": [1.0]}).to_tabular_dataset("b"),
+                    RegressorMetric.MEDIAN_ABSOLUTE_DEVIATION,
+                    batch_size=invalid_batch_size,
+                )
+
+        def test_should_raise_when_fitting_by_exhaustive_search_without_choice(self, device: Device) -> None:
+            configure_test_with_device(device)
+            model = NeuralNetworkRegressor(InputConversionTable(), [ForwardLayer(1)])
+            with pytest.raises(FittingWithoutChoiceError):
+                model.fit_by_exhaustive_search(
+                    Table.from_dict({"a": [1], "b": [1.0]}).to_tabular_dataset("b"),
+                    RegressorMetric.COEFFICIENT_OF_DETERMINATION)
+
+        def test_should_assert_that_is_fitted_is_set_correctly(self, device: Device) -> None:
+            configure_test_with_device(device)
+            model = NeuralNetworkRegressor(InputConversionTable(), [ForwardLayer(Choice(2, 4)), ForwardLayer(1)])
+            assert not model.is_fitted
+            fitted_model = model.fit_by_exhaustive_search(
+                Table.from_dict({"a": [1, 2, 3, 4], "b": [1.0, 2.0, 3.0, 4.0]}).to_tabular_dataset("b"),
+                RegressorMetric.MEAN_ABSOLUTE_ERROR)
+            assert fitted_model.is_fitted
+
+        def test_should_raise_if_fit_by_exhaustive_search_function_returns_wrong_datatype(self, device: Device) -> None:
+            configure_test_with_device(device)
+            model = NeuralNetworkRegressor(InputConversionTable(), [ForwardLayer(Choice(2, 4)), ForwardLayer(1)])
+            fitted_model = model.fit_by_exhaustive_search(
+                Table.from_dict({"a": [1, 2, 3, 4], "b": [1.0, 2.0, 3.0, 4.0]}).to_tabular_dataset("b"),
+                RegressorMetric.MEAN_ABSOLUTE_ERROR)
+            assert isinstance(fitted_model, NeuralNetworkRegressor)
+
+    class TestPredict:
+        @pytest.mark.parametrize(
+            "batch_size",
+            [
+                1,
+                2,
+            ],
+            ids=["one", "two"],
         )
+        def test_should_raise_if_predict_function_returns_wrong_datatype(self, batch_size: int, device: Device) -> None:
+            configure_test_with_device(device)
+            fitted_model = NeuralNetworkRegressor(
+                InputConversionTable(),
+                [ForwardLayer(neuron_count=1)],
+            ).fit(
+                Table.from_dict({"a": [1, 0, 1], "b": [2, 3, 4]}).to_tabular_dataset("a"),
+                batch_size=batch_size,
+            )
+            predictions = fitted_model.predict(Table.from_dict({"b": [5, 6, 7]}))
+            assert isinstance(predictions, TabularDataset)
 
-        class Test:
-            self.was_called = False
+        def test_should_raise_if_model_has_not_been_fitted(self, device: Device) -> None:
+            configure_test_with_device(device)
+            with pytest.raises(ModelNotFittedError, match="The model has not been fitted yet."):
+                NeuralNetworkRegressor(
+                    InputConversionTable(),
+                    [ForwardLayer(neuron_count=1)],
+                ).predict(
+                    Table.from_dict({"a": [1]}),
+                )
 
-            def cb(self, ind: int, loss: float) -> None:
-                if ind >= 0 and loss >= 0.0:
-                    self.was_called = True
-
-            def callback_was_called(self) -> bool:
-                return self.was_called
-
-        obj = Test()
-        model.fit(Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"), callback_on_batch_completion=obj.cb)
-
-        assert obj.callback_was_called() is True
-
-    def test_should_raise_if_fit_doesnt_epoch_callback(self, device: Device) -> None:
-        configure_test_with_device(device)
-        model = NeuralNetworkRegressor(
-            InputConversionTable(),
-            [ForwardLayer(neuron_count=1)],
-        )
-
-        class Test:
-            self.was_called = False
-
-            def cb(self, ind: int, loss: float) -> None:
-                if ind >= 0 and loss >= 0.0:
-                    self.was_called = True
-
-            def callback_was_called(self) -> bool:
-                return self.was_called
-
-        obj = Test()
-        model.fit(Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"), callback_on_epoch_completion=obj.cb)
-
-        assert obj.callback_was_called() is True
+        def test_should_raise_if_test_features_mismatch(self, device: Device) -> None:
+            configure_test_with_device(device)
+            model = NeuralNetworkRegressor(
+                InputConversionTable(),
+                [ForwardLayer(neuron_count=1)],
+            )
+            model = model.fit(
+                Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).to_tabular_dataset("a"),
+            )
+            with pytest.raises(
+                FeatureDataMismatchError,
+                match="The features in the given table do not match with the specified feature columns names of the model.",
+            ):
+                model.predict(
+                    Table.from_dict({"a": [1], "c": [2]}),
+                )
 
     @pytest.mark.parametrize(
         ("input_conversion", "layers", "error_msg"),
