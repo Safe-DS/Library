@@ -311,7 +311,7 @@ class TestClassificationModel:
                 )
 
         @pytest.mark.parametrize(
-            ["metric", "positive_class"],
+            ("metric", "positive_class"),
             [
                 (
                     ClassifierMetric.ACCURACY,
