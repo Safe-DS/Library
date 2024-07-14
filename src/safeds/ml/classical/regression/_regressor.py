@@ -16,8 +16,7 @@ from safeds.ml.classical import SupervisedModel
 from safeds.ml.metrics import RegressionMetrics, RegressorMetric
 
 if TYPE_CHECKING:
-    from safeds.data.tabular.containers import Column
-    from safeds.data.tabular.containers import Table
+    from safeds.data.tabular.containers import Column, Table
 
 
 class Regressor(SupervisedModel, ABC):
@@ -327,23 +326,23 @@ class Regressor(SupervisedModel, ABC):
                     case "mean_squared_error":
                         error_of_fitted_model = fitted_model.mean_squared_error(test_data)
                         if error_of_fitted_model < best_metric_value:
-                            best_model = fitted_model                   # pragma: no cover
-                            best_metric_value = error_of_fitted_model   # pragma: no cover
+                            best_model = fitted_model  # pragma: no cover
+                            best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "mean_absolute_error":
                         error_of_fitted_model = fitted_model.mean_absolute_error(test_data)
                         if error_of_fitted_model < best_metric_value:
-                            best_model = fitted_model                   # pragma: no cover
-                            best_metric_value = error_of_fitted_model   # pragma: no cover
+                            best_model = fitted_model  # pragma: no cover
+                            best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "median_absolute_deviation":
                         error_of_fitted_model = fitted_model.median_absolute_deviation(test_data)
                         if error_of_fitted_model < best_metric_value:
-                            best_model = fitted_model                   # pragma: no cover
-                            best_metric_value = error_of_fitted_model   # pragma: no cover
+                            best_model = fitted_model  # pragma: no cover
+                            best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "coefficient_of_determination":
                         error_of_fitted_model = fitted_model.coefficient_of_determination(test_data)
                         if error_of_fitted_model > best_metric_value:
-                            best_model = fitted_model                   # pragma: no cover
-                            best_metric_value = error_of_fitted_model   # pragma: no cover
+                            best_model = fitted_model  # pragma: no cover
+                            best_metric_value = error_of_fitted_model  # pragma: no cover
         assert best_model is not None
         return best_model
 

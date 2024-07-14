@@ -10,7 +10,6 @@ from safeds.exceptions import (
     ColumnLengthMismatchError,
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
-    EmptyChoiceError,
     FittingWithChoiceError,
     FittingWithoutChoiceError,
     MissingValuesColumnError,
