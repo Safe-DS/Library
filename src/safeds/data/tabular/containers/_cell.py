@@ -32,10 +32,12 @@ class Cell(ABC, Generic[T_co]):
 
         Parameters
         ----------
-            cells: The list of cells to be searched.
+        cells: 
+            The list of cells to be searched.
 
         Results
         -------
+        cell:
             Returns the contents of the first cell that is not None.
             If all cells in the list are None or the list is empty returns None.
 
