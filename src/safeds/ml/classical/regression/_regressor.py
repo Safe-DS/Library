@@ -7,18 +7,17 @@ from typing import TYPE_CHECKING, Self
 from joblib._multiprocessing_helpers import mp
 
 from safeds.data.labeled.containers import TabularDataset
-from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
     ColumnLengthMismatchError,
     DatasetMissesDataError,
     ModelNotFittedError,
-    PlainTableError,
 )
 from safeds.ml.classical import SupervisedModel
 from safeds.ml.metrics import RegressionMetrics, RegressorMetric
 
 if TYPE_CHECKING:
     from safeds.data.tabular.containers import Column
+    from safeds.data.tabular.containers import Table
 
 
 class Regressor(SupervisedModel, ABC):

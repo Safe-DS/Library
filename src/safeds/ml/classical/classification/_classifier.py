@@ -7,12 +7,12 @@ from typing import TYPE_CHECKING, Self
 from joblib._multiprocessing_helpers import mp
 
 from safeds.data.labeled.containers import TabularDataset
-from safeds.data.tabular.containers import Table
-from safeds.exceptions import DatasetMissesDataError, LearningError, ModelNotFittedError, PlainTableError
+from safeds.exceptions import DatasetMissesDataError, LearningError, ModelNotFittedError
 from safeds.ml.classical import SupervisedModel
 from safeds.ml.metrics import ClassificationMetrics, ClassifierMetric
 
 if TYPE_CHECKING:
+    from safeds.data.tabular.containers import Table
     from typing import Any
 
 
