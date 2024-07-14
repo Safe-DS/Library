@@ -33,3 +33,17 @@ def test_should_raise_if_column_contains_non_numerical_values() -> None:
 def test_should_fail_on_empty_table() -> None:
     with pytest.raises(NonNumericColumnError):
         Table().plot.box_plots()
+
+
+@pytest.mark.parametrize(
+    "table",
+    [
+        Table({"A": [1, 2, 3]}),
+        Table({"A": [1, 2, 3], "B": ["A", "A", "Bla"], "C": [True, True, False], "D": [1.0, 2.1, 4.5]}),
+        Table({"A": [1, 2, 3], "B": [1.0, 2.1, 4.5], "C": [1, 2, 3], "D": [1.0, 2.1, 4.5]}),
+    ],
+    ids=["one column", "four columns (some non-numeric)", "four columns (all numeric)"],
+)
+def test_should_match_snapshot_dark(table: Table, snapshot_png_image: SnapshotAssertion) -> None:
+    boxplots = table.plot.box_plots(theme="dark")
+    assert boxplots == snapshot_png_image

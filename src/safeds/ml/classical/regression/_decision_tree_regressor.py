@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError
+from safeds.data.image.containers import Image
+from safeds.exceptions._ml import ModelNotFittedError
 from safeds.ml.classical._bases import _DecisionTreeBase
 from safeds.ml.hyperparameters import Choice
 
@@ -95,3 +97,42 @@ class DecisionTreeRegressor(Regressor, _DecisionTreeBase):
             for msc in min_sample_count_choices:
                 models.append(DecisionTreeRegressor(max_depth=md, min_sample_count_in_leaves=msc))
         return models
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Plot
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def plot(self) -> Image:
+        """
+        Get the image of the decision tree.
+
+        Returns
+        -------
+        plot:
+            The decision tree figure as an image.
+
+        Raises
+        ------
+        ModelNotFittedError:
+            If model is not fitted.
+        """
+        if not self.is_fitted:
+            raise ModelNotFittedError
+
+        from io import BytesIO
+
+        import matplotlib.pyplot as plt
+        from sklearn.tree import plot_tree
+
+        plot_tree(self._wrapped_model)
+
+        # save plot fig bytes in buffer
+        with BytesIO() as buffer:
+            plt.savefig(buffer)
+            image = buffer.getvalue()
+
+        # prevent forced plot from sklearn showing
+        plt.close()
+
+        return Image.from_bytes(image)
+      
