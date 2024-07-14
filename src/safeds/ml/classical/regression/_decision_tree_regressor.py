@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError
 from safeds.data.image.containers import Image
+from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError
 from safeds.exceptions._ml import ModelNotFittedError
 from safeds.ml.classical._bases import _DecisionTreeBase
 from safeds.ml.hyperparameters import Choice
@@ -135,4 +135,3 @@ class DecisionTreeRegressor(Regressor, _DecisionTreeBase):
         plt.close()
 
         return Image.from_bytes(image)
-      
