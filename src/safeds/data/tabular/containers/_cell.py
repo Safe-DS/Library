@@ -32,7 +32,7 @@ class Cell(ABC, Generic[T_co]):
 
         Parameters
         ----------
-        cells: 
+        cells:
             The list of cells to be searched.
 
         Results
