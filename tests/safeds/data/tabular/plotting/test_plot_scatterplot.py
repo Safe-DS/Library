@@ -43,6 +43,44 @@ def test_should_match_snapshot(
 
 
 @pytest.mark.parametrize(
+    ("table", "x_name", "y_names"),
+    [
+        (Table({"A": [1, 2, 3], "B": [2, 4, 7]}), "A", ["B"]),
+        (
+            Table(
+                {
+                    "A": [1, 0.99, 0.99, 2],
+                    "B": [1, 0.99, 1.01, 2],
+                },
+            ),
+            "A",
+            ["B"],
+        ),
+        (
+            Table(
+                {"A": [1, 0.99, 0.99, 2], "B": [1, 0.99, 1.01, 2], "C": [2, 2.99, 2.01, 3]},
+            ),
+            "A",
+            ["B", "C"],
+        ),
+    ],
+    ids=[
+        "functional",
+        "overlapping",
+        "multiple",
+    ],
+)
+def test_should_match_snapshot_dark(
+    table: Table,
+    x_name: str,
+    y_names: list[str],
+    snapshot_png_image: SnapshotAssertion,
+) -> None:
+    scatterplot = table.plot.scatter_plot(x_name, y_names, theme="dark")
+    assert scatterplot == snapshot_png_image
+
+
+@pytest.mark.parametrize(
     ("table", "col1", "col2"),
     [
         (Table({"A": [1, 2, 3], "B": [2, 4, 7]}), "C", "A"),
