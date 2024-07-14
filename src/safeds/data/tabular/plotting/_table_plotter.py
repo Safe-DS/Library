@@ -41,7 +41,7 @@ class TablePlotter:
         Parameters
         ----------
         theme:
-            The theme to use for the plot. Either "dark" or "light".
+            The color theme of the plot. Default is "light".
 
         Returns
         -------

@@ -36,7 +36,7 @@ class ColumnPlotter:
         Parameters
         ----------
         theme:
-            The theme to use for the plot. Either "dark" or "light".
+            The color theme of the plot. Default is "light".
 
         Returns
         -------
@@ -136,7 +136,7 @@ class ColumnPlotter:
         max_bin_count:
             The maximum number of bins to use in the histogram. Default is 10.
         theme:
-            The theme for the plot, either "dark" or "light". Default is "light".
+            The color theme of the plot. Default is "light".
 
         Returns
         -------
@@ -175,7 +175,7 @@ class ColumnPlotter:
         lag:
             The amount of lag.
         theme:
-            The theme for the plot, either "dark" or "light". Default is "light
+            The color theme of the plot. Default is "light".
 
         Returns
         -------
