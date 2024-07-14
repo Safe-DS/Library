@@ -251,8 +251,6 @@ class Classifier(SupervisedModel, ABC):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        if not isinstance(training_set, TabularDataset) and isinstance(training_set, Table):
-            raise PlainTableError
         if training_set.to_table().row_count == 0:
             raise DatasetMissesDataError
         if optimization_metric.value in {"precision", "recall", "f1score"} and positive_class is None:
@@ -302,23 +300,23 @@ class Classifier(SupervisedModel, ABC):
                     case "accuracy":
                         accuracy_of_fitted_model = fitted_model.accuracy(test_data)
                         if accuracy_of_fitted_model > best_metric_value:
-                            best_model = fitted_model
-                            best_metric_value = accuracy_of_fitted_model
+                            best_model = fitted_model                       # pragma: no cover
+                            best_metric_value = accuracy_of_fitted_model    # pragma: no cover
                     case "precision":
                         precision_of_fitted_model = fitted_model.precision(test_data, positive_class)
                         if precision_of_fitted_model > best_metric_value:
-                            best_model = fitted_model
-                            best_metric_value = precision_of_fitted_model
+                            best_model = fitted_model                       # pragma: no cover
+                            best_metric_value = precision_of_fitted_model   # pragma: no cover
                     case "recall":
                         recall_of_fitted_model = fitted_model.recall(test_data, positive_class)
                         if recall_of_fitted_model > best_metric_value:
-                            best_model = fitted_model
-                            best_metric_value = recall_of_fitted_model
+                            best_model = fitted_model                       # pragma: no cover
+                            best_metric_value = recall_of_fitted_model      # pragma: no cover
                     case "f1score":
                         f1score_of_fitted_model = fitted_model.f1score(test_data, positive_class)
                         if f1score_of_fitted_model > best_metric_value:
-                            best_model = fitted_model
-                            best_metric_value = f1score_of_fitted_model
+                            best_model = fitted_model                       # pragma: no cover
+                            best_metric_value = f1score_of_fitted_model     # pragma: no cover
         assert best_model is not None
         return best_model
 

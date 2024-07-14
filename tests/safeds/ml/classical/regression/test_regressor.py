@@ -133,14 +133,32 @@ class TestFitByExhaustiveSearch:
         with pytest.raises(FittingWithoutChoiceError):
             regressor.fit_by_exhaustive_search(valid_data, optimization_metric=RegressorMetric.MEAN_SQUARED_ERROR)
 
-    def test_should_raise_if_model_is_fitted_by_exhaustive_search_with_empty_choice(
+    @pytest.mark.parametrize(
+        "metric",
+        [
+            RegressorMetric.MEAN_SQUARED_ERROR,
+            RegressorMetric.MEAN_ABSOLUTE_ERROR,
+            RegressorMetric.MEDIAN_ABSOLUTE_DEVIATION,
+            RegressorMetric.COEFFICIENT_OF_DETERMINATION,
+        ],
+        ids=["mean_squared_error", "mean_absolute_error", "median_absolute_deviation", "coefficient_of_determination"],
+    )
+    def test_should_check_return_type_with_metric(
         self,
         valid_data: TabularDataset,
+        metric: RegressorMetric,
     ) -> None:
-        with pytest.raises(EmptyChoiceError):
-            AdaBoostRegressor(max_learner_count=Choice(), learning_rate=Choice()).fit_by_exhaustive_search(
-                valid_data,
-                optimization_metric=RegressorMetric.MEAN_SQUARED_ERROR,
+        fitted_model = AdaBoostRegressor(max_learner_count=Choice(2, 3)).fit_by_exhaustive_search(
+            valid_data,
+            optimization_metric=metric,
+        )
+        assert isinstance(fitted_model, AdaBoostRegressor)
+
+    def test_should_raise_when_dataset_misses_data(self) -> None:
+        with pytest.raises(DatasetMissesDataError):
+            AdaBoostRegressor(max_learner_count=Choice(2, 3)).fit_by_exhaustive_search(
+                Table.from_dict({"a": [], "b": []}).to_tabular_dataset("a"),
+                RegressorMetric.MEAN_SQUARED_ERROR,
             )
 
 

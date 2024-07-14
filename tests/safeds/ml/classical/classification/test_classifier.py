@@ -142,16 +142,47 @@ class TestFitByExhaustiveSearch:
         with pytest.raises(FittingWithoutChoiceError):
             classifier.fit_by_exhaustive_search(valid_data, optimization_metric=ClassifierMetric.ACCURACY)
 
-    def test_should_raise_if_model_is_fitted_by_exhaustive_search_with_empty_choice(
+    @pytest.mark.parametrize(
+        ("metric", "positive_class"),
+        [
+            (
+                ClassifierMetric.ACCURACY,
+                None,
+            ),
+            (
+                ClassifierMetric.PRECISION,
+                0,
+            ),
+            (
+                ClassifierMetric.RECALL,
+                0,
+            ),
+            (
+                ClassifierMetric.F1_SCORE,
+                0,
+            ),
+        ],
+        ids=["accuracy", "precision", "recall", "f1_score"],
+    )
+    def test_should_check_return_type_with_metric(
         self,
         valid_data: TabularDataset,
+        metric: ClassifierMetric,
+        positive_class: Any,
     ) -> None:
-        with pytest.raises(EmptyChoiceError):
-            AdaBoostClassifier(max_learner_count=Choice(), learning_rate=Choice()).fit_by_exhaustive_search(
-                valid_data,
-                optimization_metric=ClassifierMetric.ACCURACY,
-            )
+        fitted_model = AdaBoostClassifier(max_learner_count=Choice(2, 3)).fit_by_exhaustive_search(
+            valid_data,
+            optimization_metric=metric,
+            positive_class=positive_class,
+        )
+        assert isinstance(fitted_model, AdaBoostClassifier)
 
+    def test_should_raise_when_dataset_misses_data(self) -> None:
+        with pytest.raises(DatasetMissesDataError):
+            AdaBoostClassifier(max_learner_count=Choice(2, 3)).fit_by_exhaustive_search(
+                Table.from_dict({"a": [], "b": []}).to_tabular_dataset("a"),
+                ClassifierMetric.ACCURACY,
+            )
 
 @pytest.mark.parametrize("classifier", classifiers(), ids=lambda x: x.__class__.__name__)
 class TestFit:

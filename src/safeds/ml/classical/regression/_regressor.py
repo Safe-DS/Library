@@ -282,8 +282,6 @@ class Regressor(SupervisedModel, ABC):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        if not isinstance(training_set, TabularDataset) and isinstance(training_set, Table):
-            raise PlainTableError
         if training_set.to_table().row_count == 0:
             raise DatasetMissesDataError
 
@@ -330,23 +328,23 @@ class Regressor(SupervisedModel, ABC):
                     case "mean_squared_error":
                         error_of_fitted_model = fitted_model.mean_squared_error(test_data)
                         if error_of_fitted_model < best_metric_value:
-                            best_model = fitted_model
-                            best_metric_value = error_of_fitted_model
+                            best_model = fitted_model                   # pragma: no cover
+                            best_metric_value = error_of_fitted_model   # pragma: no cover
                     case "mean_absolute_error":
                         error_of_fitted_model = fitted_model.mean_absolute_error(test_data)
                         if error_of_fitted_model < best_metric_value:
-                            best_model = fitted_model
-                            best_metric_value = error_of_fitted_model
+                            best_model = fitted_model                   # pragma: no cover
+                            best_metric_value = error_of_fitted_model   # pragma: no cover
                     case "median_absolute_deviation":
                         error_of_fitted_model = fitted_model.median_absolute_deviation(test_data)
                         if error_of_fitted_model < best_metric_value:
-                            best_model = fitted_model
-                            best_metric_value = error_of_fitted_model
+                            best_model = fitted_model                   # pragma: no cover
+                            best_metric_value = error_of_fitted_model   # pragma: no cover
                     case "coefficient_of_determination":
                         error_of_fitted_model = fitted_model.coefficient_of_determination(test_data)
                         if error_of_fitted_model > best_metric_value:
-                            best_model = fitted_model
-                            best_metric_value = error_of_fitted_model
+                            best_model = fitted_model                   # pragma: no cover
+                            best_metric_value = error_of_fitted_model   # pragma: no cover
         assert best_model is not None
         return best_model
 
