@@ -29,7 +29,7 @@ class Cell(ABC, Generic[T_co]):
     def first_not_none(cells: list[Cell]) -> Cell:
         """
         Return the first cell from the given list that is not None.
-        
+
         Parameters
         ----------
             cells: The list of cells to be searched.
@@ -38,7 +38,7 @@ class Cell(ABC, Generic[T_co]):
         -------
             Returns the contents of the first cell that is not None.
             If all cells in the list are None or the list is empty returns None.
-        
+
         """
         import polars as pl
 

@@ -18,7 +18,12 @@ class TestFirstNotNone:
             ([_LazyCell(None), _LazyCell(1), _LazyCell(None), _LazyCell(4)], _LazyCell(1)),
             ([_LazyCell(i) for i in range(5)], _LazyCell(1)),
             (
-                [_LazyCell(None), _LazyCell(None), _LazyCell(pl.lit("Hello, World!")), _LazyCell(pl.lit("Not returned"))],
+                [
+                    _LazyCell(None),
+                    _LazyCell(None),
+                    _LazyCell(pl.lit("Hello, World!")),
+                    _LazyCell(pl.lit("Not returned")),
+                ],
                 _LazyCell("Hello, World!"),
             ),
             ([_LazyCell(pl.lit(i)) for i in ["a", "b", "c", "d"]], _LazyCell(pl.lit("a"))),
