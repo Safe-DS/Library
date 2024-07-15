@@ -812,7 +812,7 @@ class TestRegressionModel:
                 [ForwardLayer(neuron_count=Choice(2, 4)), ForwardLayer(1)],
             ).fit_by_exhaustive_search(
                 Table.from_dict({"a": [1, 2, 3, 4], "b": [1.0, 2.0, 3.0, 4.0]}).to_tabular_dataset("b"),
-                "mean_squared_error"
+                "mean_squared_error",
             )
             assert model.input_size == 1
 
@@ -874,7 +874,9 @@ class TestRegressionModel:
         )
         def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type(
             self,
-            metric: Literal["mean_squared_error", "mean_absolute_error", "median_absolute_deviation", "coefficient_of_determination"],
+            metric: Literal[
+                "mean_squared_error", "mean_absolute_error", "median_absolute_deviation", "coefficient_of_determination",
+            ],
             device: Device,
         ) -> None:
             configure_test_with_device(device)
