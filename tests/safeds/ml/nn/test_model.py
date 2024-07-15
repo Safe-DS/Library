@@ -53,7 +53,7 @@ class TestClassificationModel:
             ).fit(
                 Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
             )
-            device.type #noqa
+            device.type # noqa: B018
             assert model.input_size == 1
 
         def test_should_raise_if_epoch_size_out_of_bounds(self, device: Device) -> None:
@@ -264,7 +264,7 @@ class TestClassificationModel:
                 Table.from_dict({"a": [1, 2, 3, 4], "b": [0, 1, 0, 1]}).to_tabular_dataset("b"),
                 "accuracy",
             )
-            device.type # noqa
+            device.type # noqa: B018
             assert model.input_size == 1
 
         def test_should_raise_if_epoch_size_out_of_bounds_when_fitting_by_exhaustive_search(
@@ -343,7 +343,7 @@ class TestClassificationModel:
                 optimization_metric=metric,
                 positive_class=positive_class,
             )
-            device.type #noqa
+            device.type # noqa: B018
             assert fitted_model.is_fitted
             assert isinstance(fitted_model, NeuralNetworkClassifier)
 
@@ -619,7 +619,7 @@ class TestRegressionModel:
             ).fit(
                 Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
             )
-            device.type # noqa
+            device.type # noqa: B018
             assert model.input_size == 1
 
         def test_should_raise_if_epoch_size_out_of_bounds(self, device: Device) -> None:
@@ -811,7 +811,7 @@ class TestRegressionModel:
                 Table.from_dict({"a": [1, 2, 3, 4], "b": [1.0, 2.0, 3.0, 4.0]}).to_tabular_dataset("b"),
                 "mean_squared_error",
             )
-            device.type # noqa
+            device.type # noqa: B018
             assert model.input_size == 1
 
         def test_should_raise_if_epoch_size_out_of_bounds_when_fitting_by_exhaustive_search(
@@ -886,7 +886,7 @@ class TestRegressionModel:
                 Table.from_dict({"a": [1, 2, 3, 4], "b": [1.0, 2.0, 3.0, 4.0]}).to_tabular_dataset("b"),
                 optimization_metric=metric,
             )
-            device.type 
+            device.type # noqa: B018
             assert fitted_model.is_fitted
             assert isinstance(fitted_model, NeuralNetworkRegressor)
 
