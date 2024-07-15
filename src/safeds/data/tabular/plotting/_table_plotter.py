@@ -572,6 +572,8 @@ class TablePlotter:
                 ylabel=y_name,
             )
             ax.legend()
+            if self._table.get_column(x_name).is_temporal and self._table.get_column(x_name).row_count<9:
+                ax.set_xticks(x_data)  # Set x-ticks to the x data points
             ax.set_xticks(ax.get_xticks())
             ax.set_xticklabels(
                 ax.get_xticklabels(),
