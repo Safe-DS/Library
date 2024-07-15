@@ -4,6 +4,7 @@ from typing import Any
 import pytest
 from safeds.data.image.typing import ImageSize
 from safeds.exceptions import OutOfBoundsError
+from safeds.ml.hyperparameters import Choice
 from safeds.ml.nn.layers import ForwardLayer
 from torch import nn
 
@@ -66,23 +67,21 @@ def test_should_raise_if_unknown_activation_function_is_passed(activation_functi
     "output_size",
     [
         0,
+        Choice(0),
     ],
-    ids=["output_size_out_of_bounds"],
+    ids=["invalid_int", "invalid_choice"],
 )
-def test_should_raise_if_output_size_out_of_bounds(output_size: int) -> None:
+def test_should_raise_if_output_size_out_of_bounds(output_size: int | Choice[int]) -> None:
     with pytest.raises(OutOfBoundsError):
         ForwardLayer(neuron_count=output_size)
 
 
 @pytest.mark.parametrize(
     "output_size",
-    [
-        1,
-        20,
-    ],
-    ids=["one", "twenty"],
+    [1, 20, Choice(1, 20)],
+    ids=["one", "twenty", "choice"],
 )
-def test_should_return_output_size(output_size: int) -> None:
+def test_should_return_output_size(output_size: int | Choice[int]) -> None:
     assert ForwardLayer(neuron_count=output_size).output_size == output_size
 
 
@@ -114,8 +113,23 @@ def test_should_raise_if_activation_function_not_set() -> None:
             ForwardLayer(neuron_count=1),
             False,
         ),
+        (
+            ForwardLayer(neuron_count=Choice(2)),
+            ForwardLayer(neuron_count=Choice(2)),
+            True,
+        ),
+        (
+            ForwardLayer(neuron_count=Choice(2)),
+            ForwardLayer(neuron_count=Choice(1)),
+            False,
+        ),
+        (
+            ForwardLayer(neuron_count=Choice(2)),
+            ForwardLayer(neuron_count=2),
+            False,
+        ),
     ],
-    ids=["equal", "not equal"],
+    ids=["equal", "not equal", "equal choices", "not equal choices", "choice and int"],
 )
 def test_should_compare_forward_layers(layer1: ForwardLayer, layer2: ForwardLayer, equal: bool) -> None:
     assert (layer1.__eq__(layer2)) == equal
@@ -177,3 +191,10 @@ def test_should_assert_that_different_forward_layers_have_different_hash(
 )
 def test_should_assert_that_layer_size_is_greater_than_normal_object(layer: ForwardLayer) -> None:
     assert sys.getsizeof(layer) > sys.getsizeof(object())
+
+
+def test_should_get_all_possible_combinations_of_forward_layer() -> None:
+    layer = ForwardLayer(Choice(1, 2))
+    possible_layers = layer._get_layers_for_all_choices()
+    assert possible_layers[0] == ForwardLayer(1)
+    assert possible_layers[1] == ForwardLayer(2)
