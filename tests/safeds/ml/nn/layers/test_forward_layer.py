@@ -7,7 +7,6 @@ from safeds.exceptions import OutOfBoundsError
 from safeds.ml.nn.layers import ForwardLayer
 from torch import nn
 
-
 # TODO: Should be tested on a model, not a layer, since input size gets inferred
 # @pytest.mark.parametrize(
 #     "input_size",
