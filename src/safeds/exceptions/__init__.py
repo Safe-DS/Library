@@ -17,7 +17,10 @@ from ._data import (
 from ._ml import (
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
+    EmptyChoiceError,
     FeatureDataMismatchError,
+    FittingWithChoiceError,
+    FittingWithoutChoiceError,
     InputSizeError,
     InvalidFitDataError,
     InvalidModelStructureError,
@@ -72,8 +75,10 @@ __all__ = [
     # ML exceptions
     "DatasetMissesDataError",
     "DatasetMissesFeaturesError",
-    "TargetDataMismatchError",
+    "EmptyChoiceError",
     "FeatureDataMismatchError",
+    "FittingWithChoiceError",
+    "FittingWithoutChoiceError",
     "InvalidFitDataError",
     "InputSizeError",
     "InvalidModelStructureError",
@@ -81,4 +86,5 @@ __all__ = [
     "ModelNotFittedError",
     "PlainTableError",
     "PredictionError",
+    "TargetDataMismatchError",
 ]

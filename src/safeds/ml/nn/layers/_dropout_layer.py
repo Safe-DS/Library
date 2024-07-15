@@ -87,6 +87,12 @@ class DropoutLayer(Layer):
     def _set_input_size(self, input_size: int | ModelImageSize) -> None:
         self._input_size = input_size
 
+    def _contains_choices(self) -> bool:
+        return False
+
+    def _get_layers_for_all_choices(self) -> list[DropoutLayer]:
+        raise NotImplementedError  # pragma: no cover
+
     def __hash__(self) -> int:
         return _structural_hash(self._input_size, self._probability)
 
