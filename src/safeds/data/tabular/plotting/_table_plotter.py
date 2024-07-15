@@ -555,33 +555,32 @@ class TablePlotter:
                         f"or drop the missing values. For a moving average no missing values are allowed.",
                     )
 
-        # Calculate the moving average
-        mean_col = pl.col(y_name).mean().alias(y_name)
-        grouped = self._table._lazy_frame.sort(x_name).group_by(x_name).agg(mean_col).collect()
-        data = grouped
-        moving_average = data.select([pl.col(y_name).rolling_mean(window_size).alias("moving_average")])
-        # set up the arrays for plotting
-        y_data_with_nan = moving_average["moving_average"].to_numpy()
-        nan_mask = ~np.isnan(y_data_with_nan)
-        y_data = y_data_with_nan[nan_mask]
-        x_data = data[x_name].to_numpy()[nan_mask]
-        fig, ax = plt.subplots()
-        ax.plot(x_data, y_data, label="moving average")
-        ax.set(
-            xlabel=x_name,
-            ylabel=y_name,
-        )
-        ax.legend()
-        ax.set_xticks(ax.get_xticks())
-        ax.set_xticklabels(
-            ax.get_xticklabels(),
-            rotation=45,
-            horizontalalignment="right",
-        )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
+            # Calculate the moving average
+            mean_col = pl.col(y_name).mean().alias(y_name)
+            grouped = self._table._lazy_frame.sort(x_name).group_by(x_name).agg(mean_col).collect()
+            data = grouped
+            moving_average = data.select([pl.col(y_name).rolling_mean(window_size).alias("moving_average")])
+            # set up the arrays for plotting
+            y_data_with_nan = moving_average["moving_average"].to_numpy()
+            nan_mask = ~np.isnan(y_data_with_nan)
+            y_data = y_data_with_nan[nan_mask]
+            x_data = data[x_name].to_numpy()[nan_mask]
+            fig, ax = plt.subplots()
+            ax.plot(x_data, y_data, label="moving average")
+            ax.set(
+                xlabel=x_name,
+                ylabel=y_name,
+            )
+            ax.legend()
+            ax.set_xticks(ax.get_xticks())
+            ax.set_xticklabels(
+                ax.get_xticklabels(),
+                rotation=45,
+                horizontalalignment="right",
+            )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
+            fig.tight_layout()
 
-        fig.tight_layout()
-
-        return _figure_to_image(fig)
+            return _figure_to_image(fig)
 
     def histogram_2d(
         self,
