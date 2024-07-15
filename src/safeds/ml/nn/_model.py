@@ -275,7 +275,36 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         batch_size: int = 1,
         learning_rate: float = 0.001,
     ) -> Self:
+        """
+        Use the hyperparameter choices to create multiple models and fit them.
 
+        **Note:** This model is not modified.
+
+        Parameters
+        ----------
+        train_data:
+            The data the network should be trained on.
+        optimization_metric:
+            The metric that should be used for determining the performance of a model.
+        epoch_size:
+            The number of times the training cycle should be done.
+        batch_size:
+            The size of data batches that should be loaded at one time.
+        learning_rate:
+            The learning rate of the neural network.
+
+        Returns
+        -------
+        best_model:
+            The model that performed the best out of all possible models given the Choices of hyperparameters.
+
+        Raises
+        ------
+        FittingWithoutChoiceError
+            When calling this method on a model without hyperparameter choices.
+        LearningError
+            If the training data contains invalid values or if the training failed. Currently raised, when calling this on RNNs or CNNs as well.
+        """
         _init_default_device()
 
         if not self._contains_choices():
@@ -696,7 +725,38 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         batch_size: int = 1,
         learning_rate: float = 0.001,
     ) -> Self:
+        """
+        Use the hyperparameter choices to create multiple models and fit them.
 
+        **Note:** This model is not modified.
+
+        Parameters
+        ----------
+        train_data:
+            The data the network should be trained on.
+        optimization_metric:
+            The metric that should be used for determining the performance of a model.
+        positive_class:
+            The class to be considered positive. Only needs to be provided when choosing precision, recall or f1_score as the optimization metric.
+        epoch_size:
+            The number of times the training cycle should be done.
+        batch_size:
+            The size of data batches that should be loaded at one time.
+        learning_rate:
+            The learning rate of the neural network.
+
+        Returns
+        -------
+        best_model:
+            The model that performed the best out of all possible models given the Choices of hyperparameters.
+
+        Raises
+        ------
+        FittingWithoutChoiceError
+            When calling this method on a model without hyperparameter choices.
+        LearningError
+            If the training data contains invalid values or if the training failed. Currently raised, when calling this on RNNs or CNNs as well.
+        """
         _init_default_device()
 
         if not self._contains_choices():
