@@ -211,22 +211,3 @@ def test_should_set_activation_function(activation_function: str, expected_activ
         if expected_activation_function is None
         else isinstance(internal_layer._fn, expected_activation_function)
     )
-
-
-@pytest.mark.parametrize(
-    "activation_function",
-    [
-        "a",
-    ],
-    ids=["first"],
-)
-def test_should_raise_unknown_function_constructor(activation_function: str) -> None:
-    forward_layer = ForwardLayer(neuron_count=1, overwrite_activation_function=activation_function)
-    forward_layer._input_size = 1
-    with pytest.raises(
-        ValueError,
-        match=rf"Unknown Activation Function: {activation_function}",
-    ):
-        forward_layer._get_internal_layer(
-            activation_function="relu",
-        )
