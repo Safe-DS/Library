@@ -20,7 +20,7 @@ from safeds.exceptions import (
     LearningError,
     ModelNotFittedError,
 )
-from safeds.ml.metrics import ClassificationMetrics, ClassifierMetric, RegressionMetrics, RegressorMetric
+from safeds.ml.metrics import ClassificationMetrics, RegressionMetrics
 from safeds.ml.nn.converters import (
     InputConversionImageToColumn,
     InputConversionImageToImage,

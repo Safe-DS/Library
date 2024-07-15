@@ -16,7 +16,6 @@ from safeds.exceptions import (
     OutOfBoundsError,
 )
 from safeds.ml.hyperparameters import Choice
-from safeds.ml.metrics import ClassifierMetric, RegressorMetric
 from safeds.ml.nn import (
     NeuralNetworkClassifier,
     NeuralNetworkRegressor,
