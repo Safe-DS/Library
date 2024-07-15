@@ -33,7 +33,11 @@ class ForwardLayer(Layer):
         If the given activation function does not exist
     """
 
-    def __init__(self, neuron_count: int | Choice[int], overwrite_activation_function: Literal["sigmoid", "relu", "softmax", "none", "notset"] = "notset") -> None:
+    def __init__(
+        self,
+        neuron_count: int | Choice[int],
+        overwrite_activation_function: Literal["sigmoid", "relu", "softmax", "none", "notset"] = "notset",
+    ) -> None:
         if isinstance(neuron_count, Choice):
             for val in neuron_count:
                 _check_bounds("neuron_count", val, lower_bound=_ClosedBound(1))
