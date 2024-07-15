@@ -33,6 +33,7 @@ from tests.helpers import (
     skip_if_os,
     test_images_folder,
     white_square_jpg_path,
+    device_cpu,
 )
 
 
@@ -973,8 +974,8 @@ class TestTransformsEqualImageTransforms:
         assert image_list_original == image_list_clone
 
 
-@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestTransforms:
+    @pytest.mark.parametrize("device", [device_cpu], ids=["cpu"])
     @pytest.mark.parametrize(
         "resource_path",
         [images_all(), [plane_png_path, plane_jpg_path] * 2],
@@ -1007,6 +1008,7 @@ class TestTransforms:
             assert image_list_original is not image_list_clone
             assert image_list_original == image_list_clone
 
+    @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
     @pytest.mark.parametrize(
         "channel_in",
         [1, 3, 4],

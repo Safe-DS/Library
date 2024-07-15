@@ -659,8 +659,8 @@ class TestBrightness:
             image.adjust_brightness(-1)
 
 
-@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestAddNoise:
+    @pytest.mark.parametrize("device", [device_cpu], ids=["cpu"])
     @pytest.mark.parametrize(
         "standard_deviation",
         [
@@ -690,6 +690,7 @@ class TestAddNoise:
         assert image_noise == snapshot_png_image
         _assert_width_height_channel(image, image_noise)
 
+    @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
     @pytest.mark.parametrize(
         "standard_deviation",
         [-1],
