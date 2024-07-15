@@ -3,7 +3,7 @@ from __future__ import annotations
 import copy
 import multiprocessing as mp
 from concurrent.futures import ALL_COMPLETED, ProcessPoolExecutor, wait
-from typing import TYPE_CHECKING, Any, Generic, Self, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, Self, TypeVar, Literal
 
 from safeds._config import _init_default_device
 from safeds._validation import _check_bounds, _ClosedBound
@@ -270,7 +270,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
     def fit_by_exhaustive_search(
         self,
         train_data: IFT,
-        optimization_metric: RegressorMetric,
+        optimization_metric: Literal["mean_squared_error", "mean_absolute_error", "median_absolute_deviation", "coefficient_of_determination"],
         epoch_size: int = 25,
         batch_size: int = 1,
         learning_rate: float = 0.001,
@@ -347,7 +347,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         for fitted_model in list_of_fitted_models:
             if best_model is None:
                 best_model = fitted_model
-                match optimization_metric.value:
+                match optimization_metric:
                     case "mean_squared_error":
                         best_metric_value = RegressionMetrics.mean_squared_error(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
                     case "mean_absolute_error":
@@ -357,7 +357,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
                     case "coefficient_of_determination":
                         best_metric_value = RegressionMetrics.coefficient_of_determination(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
             else:
-                match optimization_metric.value:
+                match optimization_metric:
                     case "mean_squared_error":
                         error_of_fitted_model = RegressionMetrics.mean_squared_error(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
                         if error_of_fitted_model < best_metric_value:
@@ -719,7 +719,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
     def fit_by_exhaustive_search(
         self,
         train_data: IFT,
-        optimization_metric: ClassifierMetric,
+        optimization_metric: Literal["accuracy", "precision", "recall", "f1_score"],
         positive_class: Any = None,
         epoch_size: int = 25,
         batch_size: int = 1,
@@ -799,7 +799,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         for fitted_model in list_of_fitted_models:
             if best_model is None:
                 best_model = fitted_model
-                match optimization_metric.value:
+                match optimization_metric:
                     case "accuracy":
                         best_metric_value = ClassificationMetrics.accuracy(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
                     case "precision":
@@ -809,7 +809,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
                     case "f1_score":
                         best_metric_value = ClassificationMetrics.f1_score(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)  # type: ignore[arg-type]
             else:
-                match optimization_metric.value:
+                match optimization_metric:
                     case "accuracy":
                         error_of_fitted_model = ClassificationMetrics.accuracy(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:

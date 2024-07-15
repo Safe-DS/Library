@@ -1,6 +1,6 @@
 import pickle
 import re
-from typing import Any
+from typing import Any, Literal
 
 import pytest
 from safeds.data.image.typing import ImageSize
@@ -265,7 +265,7 @@ class TestClassificationModel:
                 [ForwardLayer(neuron_count=Choice(2, 4)), ForwardLayer(1)],
             ).fit_by_exhaustive_search(
                 Table.from_dict({"a": [1, 2, 3, 4], "b": [0, 1, 0, 1]}).to_tabular_dataset("b"),
-                ClassifierMetric.ACCURACY,
+                "accuracy",
             )
             assert model.input_size == 1
 
@@ -281,7 +281,7 @@ class TestClassificationModel:
                     [ForwardLayer(Choice(2, 4)), ForwardLayer(1)],
                 ).fit_by_exhaustive_search(
                     Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("b"),
-                    ClassifierMetric.ACCURACY,
+                    "accuracy",
                     epoch_size=invalid_epoch_size,
                 )
 
@@ -297,7 +297,7 @@ class TestClassificationModel:
                     [ForwardLayer(neuron_count=Choice(2, 4)), ForwardLayer(1)],
                 ).fit_by_exhaustive_search(
                     Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("b"),
-                    ClassifierMetric.ACCURACY,
+                    "accuracy",
                     batch_size=invalid_batch_size,
                 )
 
@@ -307,34 +307,34 @@ class TestClassificationModel:
             with pytest.raises(FittingWithoutChoiceError):
                 model.fit_by_exhaustive_search(
                     Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("b"),
-                    ClassifierMetric.ACCURACY,
+                    "accuracy",
                 )
 
         @pytest.mark.parametrize(
             ("metric", "positive_class"),
             [
                 (
-                    ClassifierMetric.ACCURACY,
+                    "accuracy",
                     None,
                 ),
                 (
-                    ClassifierMetric.PRECISION,
+                    "precision",
                     0,
                 ),
                 (
-                    ClassifierMetric.F1_SCORE,
+                    "recall",
                     0,
                 ),
                 (
-                    ClassifierMetric.RECALL,
+                    "f1_score",
                     0,
                 ),
             ],
-            ids=["accuracy", "precision", "f1score", "recall"],
+            ids=["accuracy", "precision", "recall", "f1_score"],
         )
         def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type(
             self,
-            metric: ClassifierMetric,
+            metric: Literal["accuracy", "precision", "recall", "f1_score"],
             positive_class: Any,
             device: Device,
         ) -> None:
@@ -813,7 +813,7 @@ class TestRegressionModel:
                 [ForwardLayer(neuron_count=Choice(2, 4)), ForwardLayer(1)],
             ).fit_by_exhaustive_search(
                 Table.from_dict({"a": [1, 2, 3, 4], "b": [1.0, 2.0, 3.0, 4.0]}).to_tabular_dataset("b"),
-                RegressorMetric.MEAN_SQUARED_ERROR,
+                "mean_squared_error"
             )
             assert model.input_size == 1
 
@@ -829,7 +829,7 @@ class TestRegressionModel:
                     [ForwardLayer(Choice(1, 3))],
                 ).fit_by_exhaustive_search(
                     Table.from_dict({"a": [1], "b": [1.0]}).to_tabular_dataset("b"),
-                    RegressorMetric.MEAN_SQUARED_ERROR,
+                    "mean_squared_error",
                     epoch_size=invalid_epoch_size,
                 )
 
@@ -845,7 +845,7 @@ class TestRegressionModel:
                     [ForwardLayer(neuron_count=Choice(1, 3))],
                 ).fit_by_exhaustive_search(
                     Table.from_dict({"a": [1], "b": [1.0]}).to_tabular_dataset("b"),
-                    RegressorMetric.MEAN_SQUARED_ERROR,
+                    "mean_squared_error",
                     batch_size=invalid_batch_size,
                 )
 
@@ -855,16 +855,16 @@ class TestRegressionModel:
             with pytest.raises(FittingWithoutChoiceError):
                 model.fit_by_exhaustive_search(
                     Table.from_dict({"a": [1], "b": [1.0]}).to_tabular_dataset("b"),
-                    RegressorMetric.MEAN_SQUARED_ERROR,
+                    "mean_squared_error",
                 )
 
         @pytest.mark.parametrize(
             "metric",
             [
-                RegressorMetric.MEAN_SQUARED_ERROR,
-                RegressorMetric.MEAN_ABSOLUTE_ERROR,
-                RegressorMetric.MEDIAN_ABSOLUTE_DEVIATION,
-                RegressorMetric.COEFFICIENT_OF_DETERMINATION,
+                "mean_squared_error",
+                "mean_absolute_error",
+                "median_absolute_deviation",
+                "coefficient_of_determination",
             ],
             ids=[
                 "mean_squared_error",
@@ -875,7 +875,7 @@ class TestRegressionModel:
         )
         def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type(
             self,
-            metric: RegressorMetric,
+            metric: Literal["mean_squared_error", "mean_absolute_error", "median_absolute_deviation", "coefficient_of_determination"],
             device: Device,
         ) -> None:
             configure_test_with_device(device)
