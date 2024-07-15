@@ -18,6 +18,7 @@ from torch.types import Device
 
 from tests.helpers import (
     configure_test_with_device,
+    device_cpu,
     get_devices,
     get_devices_ids,
     grayscale_jpg_path,
@@ -33,7 +34,6 @@ from tests.helpers import (
     skip_if_os,
     test_images_folder,
     white_square_jpg_path,
-    device_cpu,
 )
 
 
