@@ -271,7 +271,10 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         self,
         train_data: IFT,
         optimization_metric: Literal[
-            "mean_squared_error", "mean_absolute_error", "median_absolute_deviation", "coefficient_of_determination",
+            "mean_squared_error",
+            "mean_absolute_error",
+            "median_absolute_deviation",
+            "coefficient_of_determination",
         ],
         epoch_size: int = 25,
         batch_size: int = 1,

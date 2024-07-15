@@ -875,7 +875,10 @@ class TestRegressionModel:
         def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type(
             self,
             metric: Literal[
-                "mean_squared_error", "mean_absolute_error", "median_absolute_deviation", "coefficient_of_determination",
+                "mean_squared_error",
+                "mean_absolute_error",
+                "median_absolute_deviation",
+                "coefficient_of_determination",
             ],
             device: Device,
         ) -> None:
