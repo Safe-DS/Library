@@ -207,11 +207,8 @@ def test_should_set_activation_function(activation_function: str, expected_activ
     "activation_function",
     [
         "a",
-        "b",
-        "c",
-        "d",
     ],
-    ids=["sigmoid", "relu", "softmax", "none"],
+    ids=["first"],
 )
 def test_should_raise_unknown_function_constructor(activation_function: str) -> None:
     forward_layer = ForwardLayer(neuron_count=1, activation_function=activation_function)

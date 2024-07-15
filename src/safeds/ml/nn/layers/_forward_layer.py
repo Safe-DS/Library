@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _ClosedBound
@@ -20,26 +20,25 @@ class ForwardLayer(Layer):
     ----------
     neuron_count:
         The number of neurons in this layer
-
-    activation_function:
-        The activation function used in the forward layer
+    overwrite_activation_function:
+        The activation function used in the forward layer, if not set the activation will be set automatically
 
     Raises
     ------
     OutOfBoundsError
         If input_size < 1
         If output_size < 1
-
     ValueError
         If the given activation function does not exist
     """
 
-    def __init__(self, neuron_count: int, activation_function: str = "notset"):
+    def __init__(self, neuron_count: int,
+                 overwrite_activation_function: Literal["sigmoid", "relu", "softmax", "none", "notset"] = "notset"):
         _check_bounds("neuron_count", neuron_count, lower_bound=_ClosedBound(1))
 
         self._input_size: int | None = None
         self._output_size = neuron_count
-        self._activation_function: str = activation_function
+        self._activation_function: str = overwrite_activation_function
 
     def _get_internal_layer(self, **kwargs: Any) -> nn.Module:
         from ._internal_layers import _InternalForwardLayer  # Slow import on global level
@@ -92,16 +91,18 @@ class ForwardLayer(Layer):
         self._input_size = input_size
 
     def __hash__(self) -> int:
-        return _structural_hash(self._input_size, self._output_size)
+        return _structural_hash(self._input_size, self._output_size, self._activation_function)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, ForwardLayer):
             return NotImplemented
         if self is other:
             return True
-        return self._input_size == other._input_size and self._output_size == other._output_size
+        return (self._input_size == other._input_size and self._output_size == other._output_size
+                and self._activation_function == other._activation_function)
 
     def __sizeof__(self) -> int:
         import sys
 
-        return sys.getsizeof(self._input_size) + sys.getsizeof(self._output_size)
+        return (sys.getsizeof(self._input_size) + sys.getsizeof(self._output_size)
+                + sys.getsizeof(self._activation_function))
