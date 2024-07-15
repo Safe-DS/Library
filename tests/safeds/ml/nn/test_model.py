@@ -46,8 +46,7 @@ from tests.helpers import configure_test_with_device, get_devices, get_devices_i
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestClassificationModel:
     class TestFit:
-        def test_should_return_input_size(self, device: Device) -> None:
-            #configure_test_with_device(device)
+        def test_should_return_input_size(self) -> None:
             model = NeuralNetworkClassifier(
                 InputConversionTable(),
                 [ForwardLayer(neuron_count=1)],
@@ -257,8 +256,7 @@ class TestClassificationModel:
             assert obj.callback_was_called() is True
 
     class TestFitByExhaustiveSearch:
-        def test_should_return_input_size(self, device: Device) -> None:
-            #configure_test_with_device(device)
+        def test_should_return_input_size(self) -> None:
             model = NeuralNetworkClassifier(
                 InputConversionTable(),
                 [ForwardLayer(neuron_count=Choice(2, 4)), ForwardLayer(1)],
@@ -335,9 +333,7 @@ class TestClassificationModel:
             self,
             metric: Literal["accuracy", "precision", "recall", "f1_score"],
             positive_class: Any,
-            device: Device,
         ) -> None:
-            #configure_test_with_device(device)
             model = NeuralNetworkClassifier(InputConversionTable(), [ForwardLayer(Choice(2, 4)), ForwardLayer(1)])
             assert not model.is_fitted
             fitted_model = model.fit_by_exhaustive_search(
@@ -613,8 +609,7 @@ class TestClassificationModel:
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestRegressionModel:
     class TestFit:
-        def test_should_return_input_size(self, device: Device) -> None:
-            #configure_test_with_device(device)
+        def test_should_return_input_size(self) -> None:
             model = NeuralNetworkRegressor(
                 InputConversionTable(),
                 [ForwardLayer(neuron_count=1)],
@@ -805,8 +800,7 @@ class TestRegressionModel:
             assert obj.callback_was_called() is True
 
     class TestFitByExhaustiveSearch:
-        def test_should_return_input_size(self, device: Device) -> None:
-            #configure_test_with_device(device)
+        def test_should_return_input_size(self) -> None:
             model = NeuralNetworkRegressor(
                 InputConversionTable(),
                 [ForwardLayer(neuron_count=Choice(2, 4)), ForwardLayer(1)],
@@ -880,9 +874,7 @@ class TestRegressionModel:
                 "median_absolute_deviation",
                 "coefficient_of_determination",
             ],
-            device: Device,
         ) -> None:
-            #configure_test_with_device(device)
             model = NeuralNetworkRegressor(InputConversionTable(), [ForwardLayer(Choice(2, 4)), ForwardLayer(1)])
             assert not model.is_fitted
             fitted_model = model.fit_by_exhaustive_search(
