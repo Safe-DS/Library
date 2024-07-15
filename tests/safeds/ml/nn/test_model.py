@@ -886,7 +886,7 @@ class TestRegressionModel:
                 Table.from_dict({"a": [1, 2, 3, 4], "b": [1.0, 2.0, 3.0, 4.0]}).to_tabular_dataset("b"),
                 optimization_metric=metric,
             )
-            device.type #noqa
+            device.type 
             assert fitted_model.is_fitted
             assert isinstance(fitted_model, NeuralNetworkRegressor)
 
