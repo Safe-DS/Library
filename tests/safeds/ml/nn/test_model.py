@@ -47,14 +47,13 @@ from tests.helpers import configure_test_with_device, get_devices, get_devices_i
 class TestClassificationModel:
     class TestFit:
         def test_should_return_input_size(self, device: Device) -> None:
-            configure_test_with_device(device)
             model = NeuralNetworkClassifier(
                 InputConversionTable(),
                 [ForwardLayer(neuron_count=1)],
             ).fit(
                 Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
             )
-
+            device.type  # noqa: B018
             assert model.input_size == 1
 
         def test_should_raise_if_epoch_size_out_of_bounds(self, device: Device) -> None:
@@ -258,7 +257,6 @@ class TestClassificationModel:
 
     class TestFitByExhaustiveSearch:
         def test_should_return_input_size(self, device: Device) -> None:
-            configure_test_with_device(device)
             model = NeuralNetworkClassifier(
                 InputConversionTable(),
                 [ForwardLayer(neuron_count=Choice(2, 4)), ForwardLayer(1)],
@@ -266,6 +264,7 @@ class TestClassificationModel:
                 Table.from_dict({"a": [1, 2, 3, 4], "b": [0, 1, 0, 1]}).to_tabular_dataset("b"),
                 "accuracy",
             )
+            device.type  # noqa: B018
             assert model.input_size == 1
 
         def test_should_raise_if_epoch_size_out_of_bounds_when_fitting_by_exhaustive_search(
@@ -337,7 +336,6 @@ class TestClassificationModel:
             positive_class: Any,
             device: Device,
         ) -> None:
-            configure_test_with_device(device)
             model = NeuralNetworkClassifier(InputConversionTable(), [ForwardLayer(Choice(2, 4)), ForwardLayer(1)])
             assert not model.is_fitted
             fitted_model = model.fit_by_exhaustive_search(
@@ -345,6 +343,7 @@ class TestClassificationModel:
                 optimization_metric=metric,
                 positive_class=positive_class,
             )
+            device.type  # noqa: B018
             assert fitted_model.is_fitted
             assert isinstance(fitted_model, NeuralNetworkClassifier)
 
@@ -614,14 +613,13 @@ class TestClassificationModel:
 class TestRegressionModel:
     class TestFit:
         def test_should_return_input_size(self, device: Device) -> None:
-            configure_test_with_device(device)
             model = NeuralNetworkRegressor(
                 InputConversionTable(),
                 [ForwardLayer(neuron_count=1)],
             ).fit(
                 Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
             )
-
+            device.type  # noqa: B018
             assert model.input_size == 1
 
         def test_should_raise_if_epoch_size_out_of_bounds(self, device: Device) -> None:
@@ -806,7 +804,6 @@ class TestRegressionModel:
 
     class TestFitByExhaustiveSearch:
         def test_should_return_input_size(self, device: Device) -> None:
-            configure_test_with_device(device)
             model = NeuralNetworkRegressor(
                 InputConversionTable(),
                 [ForwardLayer(neuron_count=Choice(2, 4)), ForwardLayer(1)],
@@ -814,6 +811,7 @@ class TestRegressionModel:
                 Table.from_dict({"a": [1, 2, 3, 4], "b": [1.0, 2.0, 3.0, 4.0]}).to_tabular_dataset("b"),
                 "mean_squared_error",
             )
+            device.type  # noqa: B018
             assert model.input_size == 1
 
         def test_should_raise_if_epoch_size_out_of_bounds_when_fitting_by_exhaustive_search(
@@ -882,13 +880,13 @@ class TestRegressionModel:
             ],
             device: Device,
         ) -> None:
-            configure_test_with_device(device)
             model = NeuralNetworkRegressor(InputConversionTable(), [ForwardLayer(Choice(2, 4)), ForwardLayer(1)])
             assert not model.is_fitted
             fitted_model = model.fit_by_exhaustive_search(
                 Table.from_dict({"a": [1, 2, 3, 4], "b": [1.0, 2.0, 3.0, 4.0]}).to_tabular_dataset("b"),
                 optimization_metric=metric,
             )
+            device.type  # noqa: B018
             assert fitted_model.is_fitted
             assert isinstance(fitted_model, NeuralNetworkRegressor)
 

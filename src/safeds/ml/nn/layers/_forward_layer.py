@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _ClosedBound
@@ -21,15 +21,23 @@ class ForwardLayer(Layer):
     ----------
     neuron_count:
         The number of neurons in this layer
+    overwrite_activation_function:
+        The activation function used in the forward layer, if not set the activation will be set automatically
 
     Raises
     ------
     OutOfBoundsError
         If input_size < 1
         If output_size < 1
+    ValueError
+        If the given activation function does not exist
     """
 
-    def __init__(self, neuron_count: int | Choice[int]) -> None:
+    def __init__(
+        self,
+        neuron_count: int | Choice[int],
+        overwrite_activation_function: Literal["sigmoid", "relu", "softmax", "none", "notset"] = "notset",
+    ) -> None:
         if isinstance(neuron_count, Choice):
             for val in neuron_count:
                 _check_bounds("neuron_count", val, lower_bound=_ClosedBound(1))
@@ -38,6 +46,7 @@ class ForwardLayer(Layer):
 
         self._input_size: int | None = None
         self._output_size = neuron_count
+        self._activation_function: str = overwrite_activation_function
 
     def _get_internal_layer(self, **kwargs: Any) -> nn.Module:
         assert not self._contains_choices()
@@ -48,8 +57,10 @@ class ForwardLayer(Layer):
             raise ValueError(
                 "The activation_function is not set. The internal layer can only be created when the activation_function is provided in the kwargs.",
             )
-        else:
+        elif self._activation_function == "notset":
             activation_function: str = kwargs["activation_function"]
+        else:
+            activation_function = self._activation_function
 
         if self._input_size is None:
             raise ValueError("The input_size is not yet set.")
@@ -101,16 +112,24 @@ class ForwardLayer(Layer):
         return layers
 
     def __hash__(self) -> int:
-        return _structural_hash(self._input_size, self._output_size)
+        return _structural_hash(self._input_size, self._output_size, self._activation_function)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, ForwardLayer):
             return NotImplemented
         if self is other:
             return True
-        return self._input_size == other._input_size and self._output_size == other._output_size
+        return (
+            self._input_size == other._input_size
+            and self._output_size == other._output_size
+            and self._activation_function == other._activation_function
+        )
 
     def __sizeof__(self) -> int:
         import sys
 
-        return sys.getsizeof(self._input_size) + sys.getsizeof(self._output_size)
+        return (
+            sys.getsizeof(self._input_size)
+            + sys.getsizeof(self._output_size)
+            + sys.getsizeof(self._activation_function)
+        )
