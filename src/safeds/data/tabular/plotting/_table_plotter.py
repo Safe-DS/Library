@@ -581,7 +581,7 @@ class TablePlotter:
 
         fig.tight_layout()
 
-            return _figure_to_image(fig)
+        return _figure_to_image(fig)
 
     def histogram_2d(
         self,

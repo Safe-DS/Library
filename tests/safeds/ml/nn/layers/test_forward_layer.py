@@ -190,7 +190,7 @@ def test_should_assert_that_layer_size_is_greater_than_normal_object(layer: Forw
     ids=["sigmoid", "relu", "softmax", "none"],
 )
 def test_should_set_activation_function(activation_function: str, expected_activation_function: type | None) -> None:
-    forward_layer = ForwardLayer(neuron_count=1, activation_function=activation_function)
+    forward_layer = ForwardLayer(neuron_count=1, overwrite_activation_function=activation_function)
     forward_layer._input_size = 1
     internal_layer = forward_layer._get_internal_layer(
         activation_function="relu",
@@ -211,7 +211,7 @@ def test_should_set_activation_function(activation_function: str, expected_activ
     ids=["first"],
 )
 def test_should_raise_unknown_function_constructor(activation_function: str) -> None:
-    forward_layer = ForwardLayer(neuron_count=1, activation_function=activation_function)
+    forward_layer = ForwardLayer(neuron_count=1, overwrite_activation_function=activation_function)
     forward_layer._input_size = 1
     with pytest.raises(
         ValueError,
