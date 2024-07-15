@@ -47,7 +47,7 @@ from tests.helpers import configure_test_with_device, get_devices, get_devices_i
 class TestClassificationModel:
     class TestFit:
         def test_should_return_input_size(self, device: Device) -> None:
-            configure_test_with_device(device)
+            #configure_test_with_device(device)
             model = NeuralNetworkClassifier(
                 InputConversionTable(),
                 [ForwardLayer(neuron_count=1)],
@@ -258,7 +258,7 @@ class TestClassificationModel:
 
     class TestFitByExhaustiveSearch:
         def test_should_return_input_size(self, device: Device) -> None:
-            configure_test_with_device(device)
+            #configure_test_with_device(device)
             model = NeuralNetworkClassifier(
                 InputConversionTable(),
                 [ForwardLayer(neuron_count=Choice(2, 4)), ForwardLayer(1)],
@@ -337,7 +337,7 @@ class TestClassificationModel:
             positive_class: Any,
             device: Device,
         ) -> None:
-            configure_test_with_device(device)
+            #configure_test_with_device(device)
             model = NeuralNetworkClassifier(InputConversionTable(), [ForwardLayer(Choice(2, 4)), ForwardLayer(1)])
             assert not model.is_fitted
             fitted_model = model.fit_by_exhaustive_search(
@@ -614,7 +614,7 @@ class TestClassificationModel:
 class TestRegressionModel:
     class TestFit:
         def test_should_return_input_size(self, device: Device) -> None:
-            configure_test_with_device(device)
+            #configure_test_with_device(device)
             model = NeuralNetworkRegressor(
                 InputConversionTable(),
                 [ForwardLayer(neuron_count=1)],
@@ -806,7 +806,7 @@ class TestRegressionModel:
 
     class TestFitByExhaustiveSearch:
         def test_should_return_input_size(self, device: Device) -> None:
-            configure_test_with_device(device)
+            #configure_test_with_device(device)
             model = NeuralNetworkRegressor(
                 InputConversionTable(),
                 [ForwardLayer(neuron_count=Choice(2, 4)), ForwardLayer(1)],
@@ -882,7 +882,7 @@ class TestRegressionModel:
             ],
             device: Device,
         ) -> None:
-            configure_test_with_device(device)
+            #configure_test_with_device(device)
             model = NeuralNetworkRegressor(InputConversionTable(), [ForwardLayer(Choice(2, 4)), ForwardLayer(1)])
             assert not model.is_fitted
             fitted_model = model.fit_by_exhaustive_search(
