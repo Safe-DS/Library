@@ -331,7 +331,10 @@ class TestClassificationModel:
             ids=["accuracy", "precision", "recall", "f1_score"],
         )
         def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type(
-            self, metric: Literal["accuracy", "precision", "recall", "f1_score"], positive_class: Any, device: Device,
+            self,
+            metric: Literal["accuracy", "precision", "recall", "f1_score"],
+            positive_class: Any,
+            device: Device,
         ) -> None:
             model = NeuralNetworkClassifier(InputConversionTable(), [ForwardLayer(Choice(2, 4)), ForwardLayer(1)])
             assert not model.is_fitted
