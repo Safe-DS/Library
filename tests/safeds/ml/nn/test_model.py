@@ -46,14 +46,14 @@ from tests.helpers import configure_test_with_device, get_devices, get_devices_i
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestClassificationModel:
     class TestFit:
-        def test_should_return_input_size(self) -> None:
+        def test_should_return_input_size(self, device: Device) -> None:
             model = NeuralNetworkClassifier(
                 InputConversionTable(),
                 [ForwardLayer(neuron_count=1)],
             ).fit(
                 Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
             )
-
+            device.type
             assert model.input_size == 1
 
         def test_should_raise_if_epoch_size_out_of_bounds(self, device: Device) -> None:
@@ -256,7 +256,7 @@ class TestClassificationModel:
             assert obj.callback_was_called() is True
 
     class TestFitByExhaustiveSearch:
-        def test_should_return_input_size(self) -> None:
+        def test_should_return_input_size(self, device: Device) -> None:
             model = NeuralNetworkClassifier(
                 InputConversionTable(),
                 [ForwardLayer(neuron_count=Choice(2, 4)), ForwardLayer(1)],
@@ -264,6 +264,7 @@ class TestClassificationModel:
                 Table.from_dict({"a": [1, 2, 3, 4], "b": [0, 1, 0, 1]}).to_tabular_dataset("b"),
                 "accuracy",
             )
+            device.type
             assert model.input_size == 1
 
         def test_should_raise_if_epoch_size_out_of_bounds_when_fitting_by_exhaustive_search(
@@ -609,14 +610,14 @@ class TestClassificationModel:
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestRegressionModel:
     class TestFit:
-        def test_should_return_input_size(self) -> None:
+        def test_should_return_input_size(self, device: Device) -> None:
             model = NeuralNetworkRegressor(
                 InputConversionTable(),
                 [ForwardLayer(neuron_count=1)],
             ).fit(
                 Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
             )
-
+            device.type
             assert model.input_size == 1
 
         def test_should_raise_if_epoch_size_out_of_bounds(self, device: Device) -> None:
@@ -800,7 +801,7 @@ class TestRegressionModel:
             assert obj.callback_was_called() is True
 
     class TestFitByExhaustiveSearch:
-        def test_should_return_input_size(self) -> None:
+        def test_should_return_input_size(self, device: Device) -> None:
             model = NeuralNetworkRegressor(
                 InputConversionTable(),
                 [ForwardLayer(neuron_count=Choice(2, 4)), ForwardLayer(1)],
@@ -808,6 +809,7 @@ class TestRegressionModel:
                 Table.from_dict({"a": [1, 2, 3, 4], "b": [1.0, 2.0, 3.0, 4.0]}).to_tabular_dataset("b"),
                 "mean_squared_error",
             )
+            device.type
             assert model.input_size == 1
 
         def test_should_raise_if_epoch_size_out_of_bounds_when_fitting_by_exhaustive_search(
