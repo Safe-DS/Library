@@ -53,7 +53,7 @@ class TestClassificationModel:
             ).fit(
                 Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
             )
-            device.type # noqa: B018
+            device.type  # noqa: B018
             assert model.input_size == 1
 
         def test_should_raise_if_epoch_size_out_of_bounds(self, device: Device) -> None:
@@ -264,7 +264,7 @@ class TestClassificationModel:
                 Table.from_dict({"a": [1, 2, 3, 4], "b": [0, 1, 0, 1]}).to_tabular_dataset("b"),
                 "accuracy",
             )
-            device.type # noqa: B018
+            device.type  # noqa: B018
             assert model.input_size == 1
 
         def test_should_raise_if_epoch_size_out_of_bounds_when_fitting_by_exhaustive_search(
@@ -331,10 +331,7 @@ class TestClassificationModel:
             ids=["accuracy", "precision", "recall", "f1_score"],
         )
         def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type(
-            self,
-            metric: Literal["accuracy", "precision", "recall", "f1_score"],
-            positive_class: Any,
-            device: Device
+            self, metric: Literal["accuracy", "precision", "recall", "f1_score"], positive_class: Any, device: Device,
         ) -> None:
             model = NeuralNetworkClassifier(InputConversionTable(), [ForwardLayer(Choice(2, 4)), ForwardLayer(1)])
             assert not model.is_fitted
@@ -343,7 +340,7 @@ class TestClassificationModel:
                 optimization_metric=metric,
                 positive_class=positive_class,
             )
-            device.type # noqa: B018
+            device.type  # noqa: B018
             assert fitted_model.is_fitted
             assert isinstance(fitted_model, NeuralNetworkClassifier)
 
@@ -619,7 +616,7 @@ class TestRegressionModel:
             ).fit(
                 Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
             )
-            device.type # noqa: B018
+            device.type  # noqa: B018
             assert model.input_size == 1
 
         def test_should_raise_if_epoch_size_out_of_bounds(self, device: Device) -> None:
@@ -811,7 +808,7 @@ class TestRegressionModel:
                 Table.from_dict({"a": [1, 2, 3, 4], "b": [1.0, 2.0, 3.0, 4.0]}).to_tabular_dataset("b"),
                 "mean_squared_error",
             )
-            device.type # noqa: B018
+            device.type  # noqa: B018
             assert model.input_size == 1
 
         def test_should_raise_if_epoch_size_out_of_bounds_when_fitting_by_exhaustive_search(
@@ -878,7 +875,7 @@ class TestRegressionModel:
                 "median_absolute_deviation",
                 "coefficient_of_determination",
             ],
-            device: Device
+            device: Device,
         ) -> None:
             model = NeuralNetworkRegressor(InputConversionTable(), [ForwardLayer(Choice(2, 4)), ForwardLayer(1)])
             assert not model.is_fitted
@@ -886,7 +883,7 @@ class TestRegressionModel:
                 Table.from_dict({"a": [1, 2, 3, 4], "b": [1.0, 2.0, 3.0, 4.0]}).to_tabular_dataset("b"),
                 optimization_metric=metric,
             )
-            device.type # noqa: B018
+            device.type  # noqa: B018
             assert fitted_model.is_fitted
             assert isinstance(fitted_model, NeuralNetworkRegressor)
 
