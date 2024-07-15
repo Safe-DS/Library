@@ -32,8 +32,11 @@ class ForwardLayer(Layer):
         If the given activation function does not exist
     """
 
-    def __init__(self, neuron_count: int,
-                 overwrite_activation_function: Literal["sigmoid", "relu", "softmax", "none", "notset"] = "notset"):
+    def __init__(
+        self,
+        neuron_count: int,
+        overwrite_activation_function: Literal["sigmoid", "relu", "softmax", "none", "notset"] = "notset",
+    ):
         _check_bounds("neuron_count", neuron_count, lower_bound=_ClosedBound(1))
 
         self._input_size: int | None = None
@@ -98,11 +101,17 @@ class ForwardLayer(Layer):
             return NotImplemented
         if self is other:
             return True
-        return (self._input_size == other._input_size and self._output_size == other._output_size
-                and self._activation_function == other._activation_function)
+        return (
+            self._input_size == other._input_size
+            and self._output_size == other._output_size
+            and self._activation_function == other._activation_function
+        )
 
     def __sizeof__(self) -> int:
         import sys
 
-        return (sys.getsizeof(self._input_size) + sys.getsizeof(self._output_size)
-                + sys.getsizeof(self._activation_function))
+        return (
+            sys.getsizeof(self._input_size)
+            + sys.getsizeof(self._output_size)
+            + sys.getsizeof(self._activation_function)
+        )
