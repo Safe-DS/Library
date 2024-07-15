@@ -57,7 +57,6 @@ from syrupy import SnapshotAssertion
                         datetime.date(2022, 1, 15),
                         datetime.date(2022, 1, 16),
                         datetime.date(2022, 1, 17),
-
                     ],
                     "A": [10, 5, 20, 2, 15, 1, 10, 5, 20],
                 },
