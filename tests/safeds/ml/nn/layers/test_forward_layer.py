@@ -7,6 +7,7 @@ from safeds.exceptions import OutOfBoundsError
 from safeds.ml.nn.layers import ForwardLayer
 from torch import nn
 
+
 # TODO: Should be tested on a model, not a layer, since input size gets inferred
 # @pytest.mark.parametrize(
 #     "input_size",
@@ -190,7 +191,16 @@ def test_should_assert_that_layer_size_is_greater_than_normal_object(layer: Forw
     ids=["sigmoid", "relu", "softmax", "none"],
 )
 def test_should_set_activation_function(activation_function: str, expected_activation_function: type | None) -> None:
-    forward_layer = ForwardLayer(neuron_count=1, overwrite_activation_function=activation_function)
+    if expected_activation_function == "sigmoid":
+        forward_layer = ForwardLayer(neuron_count=1, overwrite_activation_function="sigmoid")
+    elif expected_activation_function == "sigmoid":
+        forward_layer = ForwardLayer(neuron_count=1, overwrite_activation_function="relu")
+    elif expected_activation_function == "sigmoid":
+        forward_layer = ForwardLayer(neuron_count=1, overwrite_activation_function="softmax")
+    elif expected_activation_function == "sigmoid":
+        forward_layer = ForwardLayer(neuron_count=1, overwrite_activation_function="none")
+    else:
+        forward_layer: ForwardLayer | None = None
     forward_layer._input_size = 1
     internal_layer = forward_layer._get_internal_layer(
         activation_function="relu",
