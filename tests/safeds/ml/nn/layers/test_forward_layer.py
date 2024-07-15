@@ -200,7 +200,7 @@ def test_should_set_activation_function(activation_function: str, expected_activ
     elif activation_function == "none":
         forward_layer = ForwardLayer(neuron_count=1, overwrite_activation_function="none")
     else:
-        forward_layer: ForwardLayer|None = None
+        forward_layer = None
     forward_layer._input_size = 1
     internal_layer = forward_layer._get_internal_layer(
         activation_function="relu",
