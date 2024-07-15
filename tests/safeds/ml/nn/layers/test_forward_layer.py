@@ -191,14 +191,15 @@ def test_should_assert_that_layer_size_is_greater_than_normal_object(layer: Forw
 )
 def test_should_set_activation_function(activation_function: str, expected_activation_function: type | None) -> None:
     forward_layer: ForwardLayer = ForwardLayer(1)
-    if activation_function == "sigmoid":
-        forward_layer = ForwardLayer(neuron_count=1, overwrite_activation_function="sigmoid")
-    elif activation_function == "relu":
-        forward_layer = ForwardLayer(neuron_count=1, overwrite_activation_function="relu")
-    elif activation_function == "softmax":
-        forward_layer = ForwardLayer(neuron_count=1, overwrite_activation_function="softmax")
-    elif activation_function == "none":
-        forward_layer = ForwardLayer(neuron_count=1, overwrite_activation_function="none")
+    match activation_function:
+        case "sigmoid":
+            forward_layer = ForwardLayer(neuron_count=1, overwrite_activation_function="sigmoid")
+        case "relu":
+            forward_layer = ForwardLayer(neuron_count=1, overwrite_activation_function="relu")
+        case "softmax":
+            forward_layer = ForwardLayer(neuron_count=1, overwrite_activation_function="softmax")
+        case "none":
+            forward_layer = ForwardLayer(neuron_count=1, overwrite_activation_function="none")
     assert forward_layer is not None
     forward_layer._input_size = 1
     internal_layer = forward_layer._get_internal_layer(
