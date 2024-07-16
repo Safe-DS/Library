@@ -504,6 +504,8 @@ class TablePlotter:
             The name of the column to be plotted on the x-axis.
         y_name:
             The name of the column to be plotted on the y-axis.
+        window_size:
+            The size of the moving average window
         theme:
             The color theme of the plot. Default is "light".
 
