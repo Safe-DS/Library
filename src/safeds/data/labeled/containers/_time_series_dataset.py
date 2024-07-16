@@ -50,7 +50,6 @@ class TimeSeriesDataset(Dataset[Table, Column]):
     ValueError
         If no feature column remains.
 
-
     Examples
     --------
     >>> from safeds.data.labeled.containers import TabularDataset
