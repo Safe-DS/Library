@@ -21,6 +21,7 @@ if TYPE_CHECKING:
 class TimeSeriesDataset(Dataset[Table, Column]):
     """
     A time series dataset maps feature to a target column. It can be used to train machine learning models.
+    
     Data can be segmented into windows when loading it into the models.
 
 
