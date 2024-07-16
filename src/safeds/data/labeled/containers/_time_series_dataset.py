@@ -186,7 +186,7 @@ class TimeSeriesDataset(Dataset[Table, Column]):
     @property
     def extras(self) -> Table:
         """
-        Additional columns of the time series dataset that are neither features, target.
+        Additional columns of the time series dataset that are neither features nor target.
 
         These can be used to store additional information about instances, such as IDs.
         """
