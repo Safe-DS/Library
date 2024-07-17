@@ -3,10 +3,17 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pytest
+from safeds.exceptions import EmptyChoiceError
 from safeds.ml.hyperparameters import Choice
 
 if TYPE_CHECKING:
     from typing import Any
+
+
+class TestInit:
+    def test_should_iterate_values(self) -> None:
+        with pytest.raises(EmptyChoiceError):
+            Choice()
 
 
 class TestContains:
@@ -35,11 +42,9 @@ class TestIter:
     @pytest.mark.parametrize(
         ("choice", "expected"),
         [
-            (Choice(), []),
             (Choice(1, 2, 3), [1, 2, 3]),
         ],
         ids=[
-            "empty",
             "non-empty",
         ],
     )
@@ -51,13 +56,37 @@ class TestLen:
     @pytest.mark.parametrize(
         ("choice", "expected"),
         [
-            (Choice(), 0),
             (Choice(1, 2, 3), 3),
         ],
         ids=[
-            "empty",
             "non-empty",
         ],
     )
     def test_should_return_number_of_values(self, choice: Choice, expected: int) -> None:
         assert len(choice) == expected
+
+
+class TestEq:
+    @pytest.mark.parametrize(
+        ("choice1", "choice2", "equal"),
+        [
+            (
+                Choice(1),
+                Choice(1),
+                True,
+            ),
+            (
+                Choice(1),
+                Choice(2),
+                False,
+            ),
+            (
+                Choice(1, 2, 3),
+                Choice(1, 2, 3),
+                True,
+            ),
+        ],
+        ids=["equal", "not_equal", "equal with multiple values"],
+    )
+    def test_should_compare_choices(self, choice1: Choice[int], choice2: Choice[int], equal: bool) -> None:
+        assert (choice1.__eq__(choice2)) == equal

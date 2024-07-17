@@ -20,9 +20,10 @@ if TYPE_CHECKING:
 
 class TimeSeriesDataset(Dataset[Table, Column]):
     """
-    A time series dataset maps feature and time columns to a target column.
+    A time series dataset maps feature to a target column. It can be used to train machine learning models.
 
-    Unlike a TabularDataset, a TimeSeries needs to contain one target and one time column, but can have empty features.
+    Data can be segmented into windows when loading it into the models.
+
 
     Parameters
     ----------
@@ -37,6 +38,8 @@ class TimeSeriesDataset(Dataset[Table, Column]):
         the target column are used as features.
     forecast_horizon:
         The number of time steps to predict into the future.
+    continuous
+        Whether or not to continue the forecast in the steps before forecast horizon.
 
     Raises
     ------
@@ -183,7 +186,7 @@ class TimeSeriesDataset(Dataset[Table, Column]):
     @property
     def extras(self) -> Table:
         """
-        Additional columns of the time series dataset that are neither features, target nor time.
+        Additional columns of the time series dataset that are neither features nor target.
 
         These can be used to store additional information about instances, such as IDs.
         """
@@ -195,14 +198,14 @@ class TimeSeriesDataset(Dataset[Table, Column]):
 
     def to_table(self) -> Table:
         """
-        Return a new `Table` containing the feature columns, the target column, the time column and the extra columns.
+        Return a new `Table` containing the feature columns, the target column and the extra columns.
 
         The original `TimeSeriesDataset` is not modified.
 
         Returns
         -------
         table:
-            A table containing the feature columns, the target column, the time column and the extra columns.
+            A table containing the feature columns, the target column and the extra columns.
         """
         return self._table
 

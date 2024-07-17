@@ -1,4 +1,5 @@
 import copy
+import multiprocessing as mp
 from concurrent.futures import ALL_COMPLETED, wait
 from typing import Self
 
@@ -34,8 +35,11 @@ class BaselineClassifier:
 
     Get a baseline by fitting data on multiple different models and comparing the best metrics.
 
-    Parameters ---------- extended_search: If set to true, an extended set of models will be used to fit the
-    classifier. This might result in significantly higher runtime.
+    Parameters
+    ----------
+    extended_search:
+        If set to true, an extended set of models will be used to fit the classifier.
+        This might result in significantly higher runtime.
     """
 
     def __init__(self, extended_search: bool = False):
@@ -86,7 +90,10 @@ class BaselineClassifier:
 
         copied_model = copy.deepcopy(self)
 
-        with ProcessPoolExecutor(max_workers=len(self._list_of_model_types)) as executor:
+        with ProcessPoolExecutor(
+            max_workers=len(self._list_of_model_types),
+            mp_context=mp.get_context("spawn"),
+        ) as executor:
             futures = []
             for model in self._list_of_model_types:
                 futures.append(executor.submit(_fit_single_model, model, train_data))
@@ -149,7 +156,10 @@ class BaselineClassifier:
             raise DatasetMissesDataError
         _check_columns_are_numeric(test_data_as_table, test_data.features.add_columns(test_data.target).column_names)
 
-        with ProcessPoolExecutor(max_workers=len(self._list_of_model_types)) as executor:
+        with ProcessPoolExecutor(
+            max_workers=len(self._list_of_model_types),
+            mp_context=mp.get_context("spawn"),
+        ) as executor:
             results = []
             futures = []
             for model in self._fitted_models:
