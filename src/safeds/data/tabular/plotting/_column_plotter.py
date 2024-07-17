@@ -126,7 +126,7 @@ class ColumnPlotter:
 
             return _figure_to_image(fig)
 
-    def violin_plot(self, theme: Literal["dark", "light"] = "light") -> Image:
+    def violin_plot(self, *, theme: Literal["dark", "light"] = "light") -> Image:
         """
         Create a violin plot for the values in the column. This is only possible for numeric columns.
 
