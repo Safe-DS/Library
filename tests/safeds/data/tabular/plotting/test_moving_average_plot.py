@@ -10,6 +10,79 @@ from syrupy import SnapshotAssertion
     ("table", "x_name", "y_name", "window_size"),
     [
         (Table({"A": [1, 2, 3], "B": [2, 4, 7]}), "A", "B", 2),
+        (
+            Table(
+                {
+                    "time": [
+                        datetime.date(2022, 1, 10),
+                        datetime.date(2022, 1, 10),
+                        datetime.date(2022, 1, 11),
+                        datetime.date(2022, 1, 11),
+                        datetime.date(2022, 1, 12),
+                        datetime.date(2022, 1, 12),
+                    ],
+                    "A": [10, 5, 20, 2, 1, 1],
+                },
+            ),
+            "time",
+            "A",
+            2,
+        ),
+        (
+            Table(
+                {
+                    "time": [
+                        datetime.date(2022, 1, 9),
+                        datetime.date(2022, 1, 10),
+                        datetime.date(2022, 1, 11),
+                        datetime.date(2022, 1, 12),
+                    ],
+                    "A": [10, 5, 20, 2],
+                },
+            ),
+            "time",
+            "A",
+            2,
+        ),
+        (
+            Table(
+                {
+                    "time": [
+                        datetime.date(2022, 1, 9),
+                        datetime.date(2022, 1, 10),
+                        datetime.date(2022, 1, 11),
+                        datetime.date(2022, 1, 12),
+                        datetime.date(2022, 1, 13),
+                        datetime.date(2022, 1, 14),
+                        datetime.date(2022, 1, 15),
+                        datetime.date(2022, 1, 16),
+                        datetime.date(2022, 1, 17),
+                    ],
+                    "A": [10, 5, 20, 2, 15, 1, 10, 5, 20],
+                },
+            ),
+            "time",
+            "A",
+            2,
+        ),
+    ],
+    ids=["numerical", "date grouped", "date", "more than 8"],
+)
+def test_should_match_snapshot(
+    table: Table,
+    x_name: str,
+    y_name: str,
+    window_size: int,
+    snapshot_png_image: SnapshotAssertion,
+) -> None:
+    line_plot = table.plot.moving_average_plot(x_name, y_name, window_size)
+    assert line_plot == snapshot_png_image
+
+
+@pytest.mark.parametrize(
+    ("table", "x_name", "y_name", "window_size"),
+    [
+        (Table({"A": [1, 2, 3], "B": [2, 4, 7]}), "A", "B", 2),
         # (Table({"A": [1, 1, 2, 2, 3, 3, 4, 4, 5, 5], "B": [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]}), "A", "B", 2),
         (
             Table(
@@ -48,14 +121,14 @@ from syrupy import SnapshotAssertion
     ],
     ids=["numerical", "date grouped", "date"],
 )
-def test_should_match_snapshot(
+def test_should_match_snapshot_dark(
     table: Table,
     x_name: str,
     y_name: str,
     window_size: int,
     snapshot_png_image: SnapshotAssertion,
 ) -> None:
-    line_plot = table.plot.moving_average_plot(x_name, y_name, window_size)
+    line_plot = table.plot.moving_average_plot(x_name, y_name, window_size, theme="dark")
     assert line_plot == snapshot_png_image
 
 

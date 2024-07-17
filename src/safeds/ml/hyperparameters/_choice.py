@@ -3,6 +3,8 @@ from __future__ import annotations
 from collections.abc import Collection
 from typing import TYPE_CHECKING, TypeVar
 
+from safeds.exceptions import EmptyChoiceError
+
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from typing import Any
@@ -15,7 +17,7 @@ class Choice(Collection[T]):
 
     def __init__(self, *args: T) -> None:
         """
-        Create a new choice.
+        Create a new choice. Duplicate values will be removed.
 
         Parameters
         ----------
@@ -23,6 +25,9 @@ class Choice(Collection[T]):
             The values to choose from.
         """
         self.elements = list(args)
+        if len(args) < 1:
+            raise EmptyChoiceError
+        self.elements = list(dict.fromkeys(args))
 
     def __contains__(self, value: Any) -> bool:
         """
@@ -61,3 +66,10 @@ class Choice(Collection[T]):
             The number of values in this choice.
         """
         return len(self.elements)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Choice):
+            return NotImplemented
+        if self is other:
+            return True
+        return (self is other) or (self.elements == other.elements)

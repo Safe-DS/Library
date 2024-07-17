@@ -42,6 +42,33 @@ class DatasetMissesDataError(ValueError):
         super().__init__("Dataset contains no rows")
 
 
+class EmptyChoiceError(ValueError):
+    """Raised when a choice object is created, but no arguments are provided."""
+
+    def __init__(self) -> None:
+        super().__init__("Please provide at least one Value in a Choice Parameter")
+
+
+class FittingWithChoiceError(Exception):
+    """Raised when a model is fitted with a choice object as a parameter."""
+
+    def __init__(self) -> None:
+        super().__init__(
+            "Error occurred while fitting: Trying to fit with a Choice Parameter. Please use "
+            "fit_by_exhaustive_search() instead.",
+        )
+
+
+class FittingWithoutChoiceError(Exception):
+    """Raised when a model is fitted by exhaustive search without a choice object as a parameter."""
+
+    def __init__(self) -> None:
+        super().__init__(
+            "Error occurred while fitting: Trying to fit by exhaustive search without a Choice "
+            "Parameter. Please use fit() instead.",
+        )
+
+
 class InvalidFitDataError(Exception):
     """Raised when a Neural Network is fitted on invalid data."""
 
