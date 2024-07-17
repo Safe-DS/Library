@@ -142,7 +142,7 @@ class TablePlotter:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
-        >>> table = Table({"a":[1, 2], "b": [3, 42]})
+        >>> table = Table({"a": [1, 2], "b": [3, 42]})
         >>> image = table.plot.violin_plots()
         """
         numerical_table = self._table.remove_non_numeric_columns()
