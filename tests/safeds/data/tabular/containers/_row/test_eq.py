@@ -24,3 +24,34 @@ def test_should_return_whether_two_rows_are_equal(table1: Table, table2: Table, 
     row1: Row[any] = _LazyVectorizedRow(table=table1)
     row2: Row[any] = _LazyVectorizedRow(table=table2)
     assert (row1.__eq__(row2)) == expected
+
+@pytest.mark.parametrize(
+    ("table", "expected"),
+    [
+        (Table({"col1": []}), True),
+        (Table({"col1": [1, 2]}), True),
+    ],
+    ids=[
+        "empty table",
+        "filled table",
+    ],
+)
+def test_should_return_true_if_rows_are_strict_equal(table: Table, expected: bool) -> None:
+    row1: Row[any] = _LazyVectorizedRow(table=table)
+    assert (row1.__eq__(row1)) == expected
+
+
+@pytest.mark.parametrize(
+    ("table1", "table2"),
+    [
+        (Table({"col1": []}), Table({"col1": []})),
+        (Table({"col1": [1, 2]}), Table({"col1": [1, 2]})),
+    ],
+    ids=[
+        "empty tables",
+        "filled tables",
+    ],
+)
+def test_should_return_false_if_object_is_other_instance(table1: Table, table2: Table) -> None:
+    row1: Row[any] = _LazyVectorizedRow(table=table1)
+    assert (row1.__eq__(table2)) == NotImplemented
