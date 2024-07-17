@@ -25,6 +25,7 @@ def test_should_return_whether_two_rows_are_equal(table1: Table, table2: Table, 
     row2: Row[any] = _LazyVectorizedRow(table=table2)
     assert (row1.__eq__(row2)) == expected
 
+
 @pytest.mark.parametrize(
     ("table", "expected"),
     [
