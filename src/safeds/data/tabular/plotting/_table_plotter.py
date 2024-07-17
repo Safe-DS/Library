@@ -119,6 +119,8 @@ class TablePlotter:
                     fig.delaxes(axs[number_of_rows - 1, i])
 
             fig.tight_layout()
+            return _figure_to_image(fig)
+
 
     def violin_plots(self, *, theme: Literal["dark", "light"] = "light") -> Image:
         """
