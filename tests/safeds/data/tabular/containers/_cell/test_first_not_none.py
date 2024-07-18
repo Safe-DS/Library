@@ -52,6 +52,6 @@ class TestFirstNotNone:
             "empty_list",
         ],
     )
-    def test_should_pass(self, list_of_cells: list[Cell], expected: Cell) -> None:
+    def test_should_return_first_non_none_value(self, list_of_cells: list[Cell], expected: Cell) -> None:
         res = Cell.first_not_none(list_of_cells)
         assert res.eq(expected)
