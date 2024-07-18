@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import copy
-from typing import TYPE_CHECKING, Generic, Self, TypeVar
+import multiprocessing as mp
+from concurrent.futures import ALL_COMPLETED, ProcessPoolExecutor, wait
+from typing import TYPE_CHECKING, Any, Generic, Literal, Self, TypeVar
 
 from safeds._config import _init_default_device
 from safeds._validation import _check_bounds, _ClosedBound
@@ -12,9 +14,13 @@ from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.exceptions import (
     FeatureDataMismatchError,
+    FittingWithChoiceError,
+    FittingWithoutChoiceError,
     InvalidModelStructureError,
+    LearningError,
     ModelNotFittedError,
 )
+from safeds.ml.metrics import ClassificationMetrics, RegressionMetrics
 from safeds.ml.nn.converters import (
     InputConversionImageToColumn,
     InputConversionImageToImage,
@@ -210,6 +216,9 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
 
         _init_default_device()
 
+        if self._contains_choices():
+            raise FittingWithChoiceError
+
         if not self._input_conversion._is_fit_data_valid(train_data):
             raise FeatureDataMismatchError
 
@@ -257,6 +266,149 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         copied_model._is_fitted = True
         copied_model._model.eval()
         return copied_model
+
+    def fit_by_exhaustive_search(
+        self,
+        train_data: IFT,
+        optimization_metric: Literal[
+            "mean_squared_error",
+            "mean_absolute_error",
+            "median_absolute_deviation",
+            "coefficient_of_determination",
+        ],
+        epoch_size: int = 25,
+        batch_size: int = 1,
+        learning_rate: float = 0.001,
+    ) -> Self:
+        """
+        Use the hyperparameter choices to create multiple models and fit them.
+
+        **Note:** This model is not modified.
+
+        Parameters
+        ----------
+        train_data:
+            The data the network should be trained on.
+        optimization_metric:
+            The metric that should be used for determining the performance of a model.
+        epoch_size:
+            The number of times the training cycle should be done.
+        batch_size:
+            The size of data batches that should be loaded at one time.
+        learning_rate:
+            The learning rate of the neural network.
+
+        Returns
+        -------
+        best_model:
+            The model that performed the best out of all possible models given the Choices of hyperparameters.
+
+        Raises
+        ------
+        FittingWithoutChoiceError
+            When calling this method on a model without hyperparameter choices.
+        LearningError
+            If the training data contains invalid values or if the training failed. Currently raised, when calling this on RNNs or CNNs as well.
+        """
+        _init_default_device()
+
+        if not self._contains_choices():
+            raise FittingWithoutChoiceError
+
+        if isinstance(train_data, TimeSeriesDataset):
+            raise LearningError("RNN-Hyperparameter optimization is currently not supported.")  # pragma: no cover
+        if isinstance(train_data, ImageDataset):
+            raise LearningError("CNN-Hyperparameter optimization is currently not supported.")  # pragma: no cover
+
+        _check_bounds("epoch_size", epoch_size, lower_bound=_ClosedBound(1))
+        _check_bounds("batch_size", batch_size, lower_bound=_ClosedBound(1))
+
+        list_of_models = self._get_models_for_all_choices()
+        list_of_fitted_models: list[Self] = []
+
+        with ProcessPoolExecutor(max_workers=len(list_of_models), mp_context=mp.get_context("spawn")) as executor:
+            futures = []
+            for model in list_of_models:
+                futures.append(executor.submit(model.fit, train_data, epoch_size, batch_size, learning_rate))
+            [done, _] = wait(futures, return_when=ALL_COMPLETED)
+            for future in done:
+                list_of_fitted_models.append(future.result())
+        executor.shutdown()
+
+        # Cross Validation
+        [train_split, test_split] = train_data.to_table().split_rows(0.75)
+        train_data = train_split.to_tabular_dataset(
+            target_name=train_data.target.name,
+            extra_names=train_data.extras.column_names,
+        )
+        test_data = test_split.to_tabular_dataset(
+            target_name=train_data.target.name,
+            extra_names=train_data.extras.column_names,
+        ).features
+        target_col = train_data.target
+
+        best_model = None
+        best_metric_value = None
+        for fitted_model in list_of_fitted_models:
+            if best_model is None:
+                best_model = fitted_model
+                match optimization_metric:
+                    case "mean_squared_error":
+                        best_metric_value = RegressionMetrics.mean_squared_error(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
+                    case "mean_absolute_error":
+                        best_metric_value = RegressionMetrics.mean_absolute_error(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
+                    case "median_absolute_deviation":
+                        best_metric_value = RegressionMetrics.median_absolute_deviation(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
+                    case "coefficient_of_determination":
+                        best_metric_value = RegressionMetrics.coefficient_of_determination(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
+            else:
+                match optimization_metric:
+                    case "mean_squared_error":
+                        error_of_fitted_model = RegressionMetrics.mean_squared_error(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
+                        if error_of_fitted_model < best_metric_value:
+                            best_model = fitted_model  # pragma: no cover
+                            best_metric_value = error_of_fitted_model  # pragma: no cover
+                    case "mean_absolute_error":
+                        error_of_fitted_model = RegressionMetrics.mean_absolute_error(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
+                        if error_of_fitted_model < best_metric_value:
+                            best_model = fitted_model  # pragma: no cover
+                            best_metric_value = error_of_fitted_model  # pragma: no cover
+                    case "median_absolute_deviation":
+                        error_of_fitted_model = RegressionMetrics.median_absolute_deviation(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
+                        if error_of_fitted_model < best_metric_value:
+                            best_model = fitted_model  # pragma: no cover
+                            best_metric_value = error_of_fitted_model  # pragma: no cover
+                    case "coefficient_of_determination":
+                        error_of_fitted_model = RegressionMetrics.coefficient_of_determination(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
+                        if error_of_fitted_model > best_metric_value:
+                            best_model = fitted_model  # pragma: no cover
+                            best_metric_value = error_of_fitted_model  # pragma: no cover
+        assert best_model is not None  # just for linter
+        best_model._is_fitted = True
+        return best_model
+
+    def _get_models_for_all_choices(self) -> list[Self]:
+
+        all_possible_layer_combinations: list[list] = [[]]
+        for layer in self._layers:
+            if not layer._contains_choices():
+                for item in all_possible_layer_combinations:
+                    item.append(layer)
+            else:
+                updated_combinations = []
+                versions_of_one_layer = layer._get_layers_for_all_choices()
+                for version in versions_of_one_layer:
+                    copy_of_all_current_possible_combinations = copy.deepcopy(all_possible_layer_combinations)
+                    for combination in copy_of_all_current_possible_combinations:
+                        combination.append(version)
+                        updated_combinations.append(combination)
+                all_possible_layer_combinations = updated_combinations
+
+        models = []
+        for combination in all_possible_layer_combinations:
+            new_model = NeuralNetworkRegressor(input_conversion=self._input_conversion, layers=combination)
+            models.append(new_model)
+        return models  # type: ignore[return-value]
 
     def predict(self, test_data: IPT) -> IFT:
         """
@@ -312,6 +464,10 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         """The input size of the model."""
         # TODO: raise if not fitted, don't return None
         return self._input_size
+
+    def _contains_choices(self) -> bool:
+        """Whether the model contains choices in any layer."""
+        return any(layer._contains_choices() for layer in self._layers)
 
 
 class NeuralNetworkClassifier(Generic[IFT, IPT]):
@@ -505,6 +661,9 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
 
         _init_default_device()
 
+        if self._contains_choices():
+            raise FittingWithChoiceError
+
         if not self._input_conversion._is_fit_data_valid(train_data):
             raise FeatureDataMismatchError
 
@@ -561,6 +720,147 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         copied_model._is_fitted = True
         copied_model._model.eval()
         return copied_model
+
+    def fit_by_exhaustive_search(
+        self,
+        train_data: IFT,
+        optimization_metric: Literal["accuracy", "precision", "recall", "f1_score"],
+        positive_class: Any = None,
+        epoch_size: int = 25,
+        batch_size: int = 1,
+        learning_rate: float = 0.001,
+    ) -> Self:
+        """
+        Use the hyperparameter choices to create multiple models and fit them.
+
+        **Note:** This model is not modified.
+
+        Parameters
+        ----------
+        train_data:
+            The data the network should be trained on.
+        optimization_metric:
+            The metric that should be used for determining the performance of a model.
+        positive_class:
+            The class to be considered positive. Only needs to be provided when choosing precision, recall or f1_score as the optimization metric.
+        epoch_size:
+            The number of times the training cycle should be done.
+        batch_size:
+            The size of data batches that should be loaded at one time.
+        learning_rate:
+            The learning rate of the neural network.
+
+        Returns
+        -------
+        best_model:
+            The model that performed the best out of all possible models given the Choices of hyperparameters.
+
+        Raises
+        ------
+        FittingWithoutChoiceError
+            When calling this method on a model without hyperparameter choices.
+        LearningError
+            If the training data contains invalid values or if the training failed. Currently raised, when calling this on RNNs or CNNs as well.
+        """
+        _init_default_device()
+
+        if not self._contains_choices():
+            raise FittingWithoutChoiceError
+
+        if isinstance(train_data, TimeSeriesDataset):
+            raise LearningError("RNN-Hyperparameter optimization is currently not supported.")  # pragma: no cover
+        if isinstance(train_data, ImageDataset):
+            raise LearningError("CNN-Hyperparameter optimization is currently not supported.")  # pragma: no cover
+
+        _check_bounds("epoch_size", epoch_size, lower_bound=_ClosedBound(1))
+        _check_bounds("batch_size", batch_size, lower_bound=_ClosedBound(1))
+
+        list_of_models = self._get_models_for_all_choices()
+        list_of_fitted_models: list[Self] = []
+
+        with ProcessPoolExecutor(max_workers=len(list_of_models), mp_context=mp.get_context("spawn")) as executor:
+            futures = []
+            for model in list_of_models:
+                futures.append(executor.submit(model.fit, train_data, epoch_size, batch_size, learning_rate))
+            [done, _] = wait(futures, return_when=ALL_COMPLETED)
+            for future in done:
+                list_of_fitted_models.append(future.result())
+        executor.shutdown()
+
+        # Cross Validation
+        [train_split, test_split] = train_data.to_table().split_rows(0.75)
+        train_data = train_split.to_tabular_dataset(
+            target_name=train_data.target.name,
+            extra_names=train_data.extras.column_names,
+        )
+        test_data = test_split.to_tabular_dataset(
+            target_name=train_data.target.name,
+            extra_names=train_data.extras.column_names,
+        ).features
+        target_col = train_data.target
+
+        best_model = None
+        best_metric_value = None
+        for fitted_model in list_of_fitted_models:
+            if best_model is None:
+                best_model = fitted_model
+                match optimization_metric:
+                    case "accuracy":
+                        best_metric_value = ClassificationMetrics.accuracy(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
+                    case "precision":
+                        best_metric_value = ClassificationMetrics.precision(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)  # type: ignore[arg-type]
+                    case "recall":
+                        best_metric_value = ClassificationMetrics.recall(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)  # type: ignore[arg-type]
+                    case "f1_score":
+                        best_metric_value = ClassificationMetrics.f1_score(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)  # type: ignore[arg-type]
+            else:
+                match optimization_metric:
+                    case "accuracy":
+                        error_of_fitted_model = ClassificationMetrics.accuracy(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
+                        if error_of_fitted_model > best_metric_value:
+                            best_model = fitted_model  # pragma: no cover
+                            best_metric_value = error_of_fitted_model  # pragma: no cover
+                    case "precision":
+                        error_of_fitted_model = ClassificationMetrics.precision(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)  # type: ignore[arg-type]
+                        if error_of_fitted_model > best_metric_value:
+                            best_model = fitted_model  # pragma: no cover
+                            best_metric_value = error_of_fitted_model  # pragma: no cover
+                    case "recall":
+                        error_of_fitted_model = ClassificationMetrics.recall(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)  # type: ignore[arg-type]
+                        if error_of_fitted_model > best_metric_value:
+                            best_model = fitted_model  # pragma: no cover
+                            best_metric_value = error_of_fitted_model  # pragma: no cover
+                    case "f1_score":
+                        error_of_fitted_model = ClassificationMetrics.f1_score(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)  # type: ignore[arg-type]
+                        if error_of_fitted_model > best_metric_value:
+                            best_model = fitted_model  # pragma: no cover
+                            best_metric_value = error_of_fitted_model  # pragma: no cover
+        assert best_model is not None  # just for linter
+        best_model._is_fitted = True
+        return best_model
+
+    def _get_models_for_all_choices(self) -> list[Self]:
+
+        all_possible_layer_combinations: list[list] = [[]]
+        for layer in self._layers:
+            if not layer._contains_choices():
+                for item in all_possible_layer_combinations:
+                    item.append(layer)
+            else:
+                updated_combinations = []
+                versions_of_one_layer = layer._get_layers_for_all_choices()
+                for version in versions_of_one_layer:
+                    copy_of_all_current_possible_combinations = copy.deepcopy(all_possible_layer_combinations)
+                    for combination in copy_of_all_current_possible_combinations:
+                        combination.append(version)
+                        updated_combinations.append(combination)
+                all_possible_layer_combinations = updated_combinations
+
+        models = []
+        for combination in all_possible_layer_combinations:
+            new_model = NeuralNetworkClassifier(input_conversion=self._input_conversion, layers=combination)
+            models.append(new_model)
+        return models  # type: ignore[return-value]
 
     def predict(self, test_data: IPT) -> IFT:
         """
@@ -619,3 +919,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         """The input size of the model."""
         # TODO: raise if not fitted, don't return None
         return self._input_size
+
+    def _contains_choices(self) -> bool:
+        """Whether the model contains choices in any layer."""
+        return any(layer._contains_choices() for layer in self._layers)

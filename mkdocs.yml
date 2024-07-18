@@ -18,6 +18,7 @@ nav:
     - Regression: tutorials/regression.ipynb
     - Machine Learning: tutorials/machine_learning.ipynb
     - Image Classification with Convolutional Neural Networks: tutorials/convolutional_neural_network_for_image_classification.ipynb
+    - Time series forecasting: tutorials/time_series_forecasting.ipynb
   - API Reference: reference/
   - Glossary: glossary.md
   - Development:

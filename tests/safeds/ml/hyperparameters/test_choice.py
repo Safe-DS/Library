@@ -64,3 +64,29 @@ class TestLen:
     )
     def test_should_return_number_of_values(self, choice: Choice, expected: int) -> None:
         assert len(choice) == expected
+
+
+class TestEq:
+    @pytest.mark.parametrize(
+        ("choice1", "choice2", "equal"),
+        [
+            (
+                Choice(1),
+                Choice(1),
+                True,
+            ),
+            (
+                Choice(1),
+                Choice(2),
+                False,
+            ),
+            (
+                Choice(1, 2, 3),
+                Choice(1, 2, 3),
+                True,
+            ),
+        ],
+        ids=["equal", "not_equal", "equal with multiple values"],
+    )
+    def test_should_compare_choices(self, choice1: Choice[int], choice2: Choice[int], equal: bool) -> None:
+        assert (choice1.__eq__(choice2)) == equal

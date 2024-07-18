@@ -75,7 +75,6 @@ __all__ = [
     # ML exceptions
     "DatasetMissesDataError",
     "DatasetMissesFeaturesError",
-    "TargetDataMismatchError",
     "EmptyChoiceError",
     "FeatureDataMismatchError",
     "FittingWithChoiceError",
@@ -87,4 +86,5 @@ __all__ = [
     "ModelNotFittedError",
     "PlainTableError",
     "PredictionError",
+    "TargetDataMismatchError",
 ]
