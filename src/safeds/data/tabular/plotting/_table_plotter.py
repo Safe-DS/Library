@@ -119,20 +119,102 @@ class TablePlotter:
                     fig.delaxes(axs[number_of_rows - 1, i])
 
             fig.tight_layout()
+            return _figure_to_image(fig)
 
-            style = "dark_background" if theme == "dark" else "default"
-            with plt.style.context(style):
-                if theme == "dark":
-                    plt.rcParams.update(
-                        {
-                            "text.color": "white",
-                            "axes.labelcolor": "white",
-                            "axes.edgecolor": "white",
-                            "xtick.color": "white",
-                            "ytick.color": "white",
-                        },
+    def violin_plots(self, *, theme: Literal["dark", "light"] = "light") -> Image:
+        """
+        Create a violin plot for every numerical column.
+
+        Parameters
+        ----------
+        theme:
+            The color theme of the plot. Default is "light".
+
+        Returns
+        -------
+        plot:
+            The violin plot(s) as an image.
+
+        Raises
+        ------
+        NonNumericColumnError
+            If the table contains only non-numerical columns.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"a": [1, 2], "b": [3, 42]})
+        >>> image = table.plot.violin_plots()
+        """
+        numerical_table = self._table.remove_non_numeric_columns()
+        if numerical_table.column_count == 0:
+            raise NonNumericColumnError("This table contains only non-numerical columns.")
+        from math import ceil
+
+        import matplotlib.pyplot as plt
+
+        style = "dark_background" if theme == "dark" else "default"
+        with plt.style.context(style):
+            if theme == "dark":
+                plt.rcParams.update(
+                    {
+                        "text.color": "white",
+                        "axes.labelcolor": "white",
+                        "axes.edgecolor": "white",
+                        "xtick.color": "white",
+                        "ytick.color": "white",
+                        "grid.color": "gray",
+                        "grid.linewidth": 0.5,
+                    },
+                )
+            else:
+                plt.rcParams.update(
+                    {
+                        "grid.linewidth": 0.5,
+                    },
+                )
+
+            columns = numerical_table.to_columns()
+            columns = [column._series.drop_nulls() for column in columns]
+            max_width = 3
+            number_of_columns = len(columns) if len(columns) <= max_width else max_width
+            number_of_rows = ceil(len(columns) / number_of_columns)
+
+            fig, axs = plt.subplots(nrows=number_of_rows, ncols=number_of_columns)
+            line = 0
+            for i, column in enumerate(columns):
+                data = column.to_list()
+
+                if i % number_of_columns == 0 and i != 0:
+                    line += 1
+
+                if number_of_columns == 1:
+                    axs.violinplot(
+                        data,
                     )
-                return _figure_to_image(fig)
+                    axs.set_title(numerical_table.column_names[i])
+                    break
+
+                if number_of_rows == 1:
+                    axs[i].violinplot(
+                        data,
+                    )
+                    axs[i].set_title(numerical_table.column_names[i])
+
+                else:
+                    axs[line, i % number_of_columns].violinplot(
+                        data,
+                    )
+                    axs[line, i % number_of_columns].set_title(numerical_table.column_names[i])
+
+            # removes unused ax indices, so there wont be empty plots
+            last_filled_ax_index = len(columns) % number_of_columns
+            for i in range(last_filled_ax_index, number_of_columns):
+                if number_of_rows != 1 and last_filled_ax_index != 0:
+                    fig.delaxes(axs[number_of_rows - 1, i])
+
+            fig.tight_layout()
+            return _figure_to_image(fig)
 
     def correlation_heatmap(self, *, theme: Literal["dark", "light"] = "light") -> Image:
         """

@@ -56,7 +56,6 @@ class ColumnPlotter:
         """
         if self._column.row_count > 0:
             _check_column_is_numeric(self._column, operation="create a box plot")
-
         import matplotlib.pyplot as plt
 
         def _set_boxplot_colors(box: dict, theme: str) -> None:
@@ -122,6 +121,73 @@ class ColumnPlotter:
 
             ax.set(title=self._column.name)
             ax.set_xticks([])
+            ax.yaxis.grid(visible=True)
+            fig.tight_layout()
+
+            return _figure_to_image(fig)
+
+    def violin_plot(self, *, theme: Literal["dark", "light"] = "light") -> Image:
+        """
+        Create a violin plot for the values in the column. This is only possible for numeric columns.
+
+        Parameters
+        ----------
+        theme:
+            The color theme of the plot. Default is "light".
+
+        Returns
+        -------
+        plot:
+            The violin plot as an image.
+
+        Raises
+        ------
+        TypeError
+            If the column is not numeric.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
+        >>> violinplot = column.plot.violin_plot()
+        """
+        if self._column.row_count > 0:
+            _check_column_is_numeric(self._column, operation="create a violin plot")
+        from math import nan
+
+        import matplotlib.pyplot as plt
+
+        style = "dark_background" if theme == "dark" else "default"
+        with plt.style.context(style):
+            if theme == "dark":
+                plt.rcParams.update(
+                    {
+                        "text.color": "white",
+                        "axes.labelcolor": "white",
+                        "axes.edgecolor": "white",
+                        "xtick.color": "white",
+                        "ytick.color": "white",
+                        "grid.color": "gray",
+                        "grid.linewidth": 0.5,
+                    },
+                )
+            else:
+                plt.rcParams.update(
+                    {
+                        "grid.linewidth": 0.5,
+                    },
+                )
+
+            fig, ax = plt.subplots()
+            data = self._column._series.drop_nulls()
+            if len(data) == 0:
+                data = [nan, nan]
+            ax.violinplot(
+                data,
+            )
+
+            ax.set(title=self._column.name)
+
             ax.yaxis.grid(visible=True)
             fig.tight_layout()
 
