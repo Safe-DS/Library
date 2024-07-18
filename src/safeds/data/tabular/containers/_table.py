@@ -1721,18 +1721,18 @@ class Table:
 
         Parameters
         ----------
-        right_table: Table
+        right_table:
             The other table which is to be joined to the current table.
-        left_names: str or list of str
+        left_names:
             Name or list of names of columns from the current table on which to join right_table.
-        right_names: str or list of str
+        right_names:
             Name or list of names of columns from right_table on which to join the current table.
-        mode: str
+        mode:
             Specify which type of join you want to use. Options include 'inner', 'outer', 'left', 'right'.
 
         Returns
         -------
-        new_table: Table
+        new_table:
             The table with the joined table.
 
         Examples
