@@ -149,7 +149,7 @@ class TablePlotter:
         numerical_table = self._table.remove_non_numeric_columns()
         if numerical_table.column_count == 0:
             raise NonNumericColumnError("This table contains only non-numerical columns.")
-        from math import ceil, nan
+        from math import ceil
 
         import matplotlib.pyplot as plt
 
@@ -184,8 +184,7 @@ class TablePlotter:
             line = 0
             for i, column in enumerate(columns):
                 data = column.to_list()
-                if len(column) == 0:
-                    data = [nan, nan]
+
                 if i % number_of_columns == 0 and i != 0:
                     line += 1
 
