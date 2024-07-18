@@ -53,6 +53,6 @@ def test_should_return_true_if_rows_are_strict_equal(table: Table, expected: boo
         "filled tables",
     ],
 )
-def test_should_return_false_if_object_is_other_instance(table1: Table, table2: Table) -> None:
+def test_should_return_false_if_object_is_other_type(table1: Table, table2: Table) -> None:
     row1: Row[any] = _LazyVectorizedRow(table=table1)
     assert (row1.__eq__(table2)) == NotImplemented
