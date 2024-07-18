@@ -22,6 +22,32 @@ class Cell(ABC, Generic[T_co]):
     """
 
     # ------------------------------------------------------------------------------------------------------------------
+    # Static methods
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @staticmethod
+    def first_not_none(cells: list[Cell]) -> Cell:
+        """
+        Return the first cell from the given list that is not None.
+
+        Parameters
+        ----------
+        cells:
+            The list of cells to be searched.
+
+        Returns
+        -------
+        cell:
+            Returns the contents of the first cell that is not None.
+            If all cells in the list are None or the list is empty returns None.
+        """
+        import polars as pl
+
+        from ._lazy_cell import _LazyCell  # circular import
+
+        return _LazyCell(pl.coalesce([cell._polars_expression for cell in cells]))
+
+    # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
