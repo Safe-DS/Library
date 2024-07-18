@@ -86,14 +86,10 @@ def regressors_with_choices() -> list[Regressor]:
                 LinearRegressor.Penalty.linear(),
             ),
         ),
+        LinearRegressor(penalty=LinearRegressor.Penalty.lasso(alpha=Choice(0.25, 0.75))),
+        LinearRegressor(penalty=LinearRegressor.Penalty.ridge(alpha=Choice(0.25, 0.75))),
         LinearRegressor(
-            penalty=LinearRegressor.Penalty.lasso(alpha=Choice(0.25, 0.75))
-        ),
-        LinearRegressor(
-            penalty=LinearRegressor.Penalty.ridge(alpha=Choice(0.25, 0.75))
-        ),
-        LinearRegressor(
-            penalty=LinearRegressor.Penalty.elastic_net(alpha=Choice(1.0, 2.0), lasso_ratio=Choice(0.1, 0.9))
+            penalty=LinearRegressor.Penalty.elastic_net(alpha=Choice(1.0, 2.0), lasso_ratio=Choice(0.1, 0.9)),
         ),
         RandomForestRegressor(tree_count=Choice(1, 2), max_depth=Choice(1, 2), min_sample_count_in_leaves=Choice(1, 2)),
         SupportVectorRegressor(kernel=Choice(None, SupportVectorRegressor.Kernel.linear()), c=Choice(0.5, 1.0)),
