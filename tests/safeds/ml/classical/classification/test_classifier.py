@@ -9,7 +9,6 @@ from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
-    EmptyChoiceError,
     FittingWithChoiceError,
     FittingWithoutChoiceError,
     LearningError,
@@ -183,6 +182,7 @@ class TestFitByExhaustiveSearch:
                 Table.from_dict({"a": [], "b": []}).to_tabular_dataset("a"),
                 ClassifierMetric.ACCURACY,
             )
+
 
 @pytest.mark.parametrize("classifier", classifiers(), ids=lambda x: x.__class__.__name__)
 class TestFit:
