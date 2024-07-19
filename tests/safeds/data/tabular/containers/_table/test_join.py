@@ -76,7 +76,7 @@ def test_should_raise_if_columns_are_mismatched() -> None:
         (Table({"a": [1, 2], "b": [3, 4]}), Table({"d": [1, 5], "e": [5, 6]}), ["c"], ["d"]),
         (Table({"a": [1, 2], "b": [3, 4]}), Table({"d": [1, 5], "e": [5, 6]}), ["a"], ["f"]),
     ],
-    id=[
+    ids=[
         "wrong_left_name",
         "wrong_right_name",
     ],
