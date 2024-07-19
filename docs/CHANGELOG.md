@@ -1,3 +1,44 @@
+## [0.27.0](https://github.com/Safe-DS/Library/compare/v0.26.0...v0.27.0) (2024-07-19)
+
+### Features
+
+*  join ([#870](https://github.com/Safe-DS/Library/issues/870)) ([5764441](https://github.com/Safe-DS/Library/commit/57644413b876d7d1263601b8db014b46a306fb5d)), closes [#745](https://github.com/Safe-DS/Library/issues/745)
+* activation function for forward layer ([#891](https://github.com/Safe-DS/Library/issues/891)) ([5b5bb3f](https://github.com/Safe-DS/Library/commit/5b5bb3fd1a16811ede503fb10014e8e81cb2af31)), closes [#889](https://github.com/Safe-DS/Library/issues/889)
+* add `ImageDataset.split` ([#846](https://github.com/Safe-DS/Library/issues/846)) ([3878751](https://github.com/Safe-DS/Library/commit/387875128d570a758b180886ba07f9a93f0a6431)), closes [#831](https://github.com/Safe-DS/Library/issues/831)
+* add FunctionalTableTransformer ([#901](https://github.com/Safe-DS/Library/issues/901)) ([37905be](https://github.com/Safe-DS/Library/commit/37905beec73ac6076b017d21dfab12e8ae3c9efb)), closes [#858](https://github.com/Safe-DS/Library/issues/858)
+* add InvalidFitDataError ([#824](https://github.com/Safe-DS/Library/issues/824)) ([487854c](https://github.com/Safe-DS/Library/commit/487854cdd5d26f0995f89c0470425b618cb381ff)), closes [#655](https://github.com/Safe-DS/Library/issues/655)
+* add KNearestNeighborsImputer ([#864](https://github.com/Safe-DS/Library/issues/864)) ([fcdfecf](https://github.com/Safe-DS/Library/commit/fcdfecfded473a233f0764b4f6aceb981f3d3553)), closes [#743](https://github.com/Safe-DS/Library/issues/743)
+* add moving average plot ([#836](https://github.com/Safe-DS/Library/issues/836)) ([abcf68a](https://github.com/Safe-DS/Library/commit/abcf68a4cf13c4d067dfbb46c69958e0c169e9cc))
+* add RobustScaler ([#874](https://github.com/Safe-DS/Library/issues/874)) ([62320a3](https://github.com/Safe-DS/Library/commit/62320a385e4383a492125c453a34aa98d26358a6)), closes [#650](https://github.com/Safe-DS/Library/issues/650) [#873](https://github.com/Safe-DS/Library/issues/873)
+* add SequentialTableTransformer ([#893](https://github.com/Safe-DS/Library/issues/893)) ([e93299f](https://github.com/Safe-DS/Library/commit/e93299f3a977e8e52d18ba7c865d51f0b48c5ab7)), closes [#802](https://github.com/Safe-DS/Library/issues/802)
+* add temporal operations ([#832](https://github.com/Safe-DS/Library/issues/832)) ([06eab77](https://github.com/Safe-DS/Library/commit/06eab77ac5d0512dff38cf4d8aa181dd0032fe63))
+* added 'histogram_2d' in TablePlotter  ([#903](https://github.com/Safe-DS/Library/issues/903)) ([4e65ba9](https://github.com/Safe-DS/Library/commit/4e65ba9bc752d4e357e90055829514cfde75c079)), closes [#869](https://github.com/Safe-DS/Library/issues/869) [#798](https://github.com/Safe-DS/Library/issues/798)
+* added from_str_to_temporal and continues prediction ([#767](https://github.com/Safe-DS/Library/issues/767)) ([35f468a](https://github.com/Safe-DS/Library/commit/35f468a8a4e4f428f41cdc32026c9bc22684771c)), closes [#806](https://github.com/Safe-DS/Library/issues/806) [#765](https://github.com/Safe-DS/Library/issues/765) [#740](https://github.com/Safe-DS/Library/issues/740) [#773](https://github.com/Safe-DS/Library/issues/773)
+* added GRU layer ([#845](https://github.com/Safe-DS/Library/issues/845)) ([d33cb5d](https://github.com/Safe-DS/Library/commit/d33cb5d3987db7665cb7eb99423cc991537819cd))
+* Adds Dropout Layer ([#868](https://github.com/Safe-DS/Library/issues/868)) ([a76f0a1](https://github.com/Safe-DS/Library/commit/a76f0a16adc1c42e8fed753c057d103fb6e26925)), closes [#848](https://github.com/Safe-DS/Library/issues/848)
+* dark mode for plots ([#911](https://github.com/Safe-DS/Library/issues/911)) ([5447551](https://github.com/Safe-DS/Library/commit/5447551940727352d480bf46478679c17c1bc496)), closes [#798](https://github.com/Safe-DS/Library/issues/798)
+* easily create a baseline model ([#811](https://github.com/Safe-DS/Library/issues/811)) ([8e1b995](https://github.com/Safe-DS/Library/commit/8e1b995859915a007871f33763fe329fe47eb111)), closes [#710](https://github.com/Safe-DS/Library/issues/710)
+* get first cell with value other than `None` ([#904](https://github.com/Safe-DS/Library/issues/904)) ([5a0cdb3](https://github.com/Safe-DS/Library/commit/5a0cdb384404b930bfc283f43312ad2dd5c54970)), closes [#799](https://github.com/Safe-DS/Library/issues/799)
+* hyperparameter optimization for fnn models ([#897](https://github.com/Safe-DS/Library/issues/897)) ([c1f66e5](https://github.com/Safe-DS/Library/commit/c1f66e55c75baec038a4d03df77b2d0c65932d5e)), closes [#861](https://github.com/Safe-DS/Library/issues/861)
+* implement violin plots ([#900](https://github.com/Safe-DS/Library/issues/900)) ([9f5992a](https://github.com/Safe-DS/Library/commit/9f5992ac28a88cc6dd3838a2d009a8a6f43609d4)), closes [#867](https://github.com/Safe-DS/Library/issues/867)
+* plot decision tree ([#876](https://github.com/Safe-DS/Library/issues/876)) ([d3f81dc](https://github.com/Safe-DS/Library/commit/d3f81dc2f93aa208bd1a09339527e92099c1b15f)), closes [#856](https://github.com/Safe-DS/Library/issues/856)
+* prediction no longer takes a time series dataset only table ([#838](https://github.com/Safe-DS/Library/issues/838)) ([762e5c2](https://github.com/Safe-DS/Library/commit/762e5c255de7d3dd66599fff59a919a7e8e0b80c)), closes [#837](https://github.com/Safe-DS/Library/issues/837)
+* raise if `remove_colums` is called with unknown column by default ([#852](https://github.com/Safe-DS/Library/issues/852)) ([8f78163](https://github.com/Safe-DS/Library/commit/8f78163f4e33f4dc5b5bf8e2b33694a1051bde68)), closes [#807](https://github.com/Safe-DS/Library/issues/807)
+* regularization strength for logistic classifier ([#866](https://github.com/Safe-DS/Library/issues/866)) ([9f74e92](https://github.com/Safe-DS/Library/commit/9f74e92a1ac8f00b033c1d1611403743575d7a14)), closes [#750](https://github.com/Safe-DS/Library/issues/750)
+* reorders parameters of RangeScaler and makes them keyword-only ([#847](https://github.com/Safe-DS/Library/issues/847)) ([2b82db7](https://github.com/Safe-DS/Library/commit/2b82db75ac4686611d6b4607c647a734a7e0616e)), closes [#809](https://github.com/Safe-DS/Library/issues/809)
+* replace seaborn with matplotlib for box_plot ([#863](https://github.com/Safe-DS/Library/issues/863)) ([4ef078e](https://github.com/Safe-DS/Library/commit/4ef078e943a9a24c131053347c421d8f8bdb61e6)), closes [#805](https://github.com/Safe-DS/Library/issues/805) [#849](https://github.com/Safe-DS/Library/issues/849)
+* replaced seaborn with matplotlib for correlation_heatmap ([#850](https://github.com/Safe-DS/Library/issues/850)) ([d4680d4](https://github.com/Safe-DS/Library/commit/d4680d4afe0e2f7400d2fdf68269038fb0ed51a2)), closes [#800](https://github.com/Safe-DS/Library/issues/800) [#849](https://github.com/Safe-DS/Library/issues/849)
+
+### Bug Fixes
+
+* **deps:** bump urllib3 from 2.2.1 to 2.2.2 ([#842](https://github.com/Safe-DS/Library/issues/842)) ([b81bcd6](https://github.com/Safe-DS/Library/commit/b81bcd6b43564c1470571ddc86b9c0c698e399e4)), closes [#3122](https://github.com/Safe-DS/Library/issues/3122) [#3363](https://github.com/Safe-DS/Library/issues/3363) [#3122](https://github.com/Safe-DS/Library/issues/3122) [#3363](https://github.com/Safe-DS/Library/issues/3363) [#3406](https://github.com/Safe-DS/Library/issues/3406) [#3398](https://github.com/Safe-DS/Library/issues/3398) [#3399](https://github.com/Safe-DS/Library/issues/3399) [#3396](https://github.com/Safe-DS/Library/issues/3396) [#3394](https://github.com/Safe-DS/Library/issues/3394) [#3391](https://github.com/Safe-DS/Library/issues/3391) [#3316](https://github.com/Safe-DS/Library/issues/3316) [#3387](https://github.com/Safe-DS/Library/issues/3387) [#3386](https://github.com/Safe-DS/Library/issues/3386)
+* labels of correlation heatmap ([#894](https://github.com/Safe-DS/Library/issues/894)) ([a88a609](https://github.com/Safe-DS/Library/commit/a88a609931494b50dbb740f2fa71bed3e3571f0a)), closes [#871](https://github.com/Safe-DS/Library/issues/871)
+* make multi-processing in baseline models more consistent ([#909](https://github.com/Safe-DS/Library/issues/909)) ([fa24560](https://github.com/Safe-DS/Library/commit/fa245609da84cbdee64c82e537b41ce7d39f2215)), closes [#907](https://github.com/Safe-DS/Library/issues/907)
+
+### Performance Improvements
+
+* improved performance in various methods in `Image` and `ImageList` ([#879](https://github.com/Safe-DS/Library/issues/879)) ([134e7d8](https://github.com/Safe-DS/Library/commit/134e7d86bbf462b2f257310df0593222483175d7))
+
 ## [0.26.0](https://github.com/Safe-DS/Library/compare/v0.25.0...v0.26.0) (2024-05-29)
 
 
