@@ -50,7 +50,7 @@ from safeds.exceptions import ColumnNotFoundError
         ),
     ],
 )
-def test_join(
+def test_should_join_two_tables(
     table_left: Table,
     table_right: Table,
     left_names: list[str],
@@ -61,7 +61,7 @@ def test_join(
     assert table_left.join(table_right, left_names, right_names, mode=mode) == table_expected
 
 
-def test_join_mismatched_columns() -> None:
+def test_should_raise_if_columns_are_mismatched() -> None:
     table_left = Table({"a": [1, 2], "b": [3, 4]})
     table_right = Table({"d": [1, 5], "e": [5, 6]})
     left_names = ["a"]
@@ -70,7 +70,7 @@ def test_join_mismatched_columns() -> None:
         table_left.join(table_right, left_names, right_names)
 
 
-def test_join_check_columns_exist() -> None:
+def test_should_raise_if_columns_are_missing() -> None:
     table_left = Table({"a": [1, 2], "b": [3, 4]})
     table_right = Table({"d": [1, 5], "e": [5, 6]})
     left_names = ["a", "c"]
