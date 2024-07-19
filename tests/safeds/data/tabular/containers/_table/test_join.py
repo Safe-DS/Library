@@ -70,15 +70,22 @@ def test_should_raise_if_columns_are_mismatched() -> None:
         table_left.join(table_right, left_names, right_names)
 
 
-def test_should_raise_if_columns_are_missing() -> None:
-    table_left = Table({"a": [1, 2], "b": [3, 4]})
-    table_right = Table({"d": [1, 5], "e": [5, 6]})
-    left_names = ["a", "c"]
-    right_names = ["d", "e"]
-    mode: Literal["inner", "left", "outer"] = "inner"
+@pytest.mark.parametrize(
+    ("table_left", "table_right", "left_names", "right_names"),
+    [
+        (Table({"a": [1, 2], "b": [3, 4]}), Table({"d": [1, 5], "e": [5, 6]}), ["c"], ["d"]),
+        (Table({"a": [1, 2], "b": [3, 4]}), Table({"d": [1, 5], "e": [5, 6]}), ["a"], ["f"]),
+    ],
+    id=[
+        "wrong_left_name",
+        "wrong_right_name",
+    ],
+)
+def test_should_raise_if_columns_are_missing(
+    table_left: Table,
+    table_right: Table,
+    left_names: list[str],
+    right_names: list[str],
+) -> None:
     with pytest.raises(ColumnNotFoundError):
-        table_left.join(table_right, left_names=left_names, right_names=right_names, mode=mode)
-    left_names = ["a"]
-    right_names = ["d", "f"]
-    with pytest.raises(ColumnNotFoundError):
-        table_left.join(table_right, left_names=left_names, right_names=right_names, mode=mode)
+        table_left.join(table_right, left_names=left_names, right_names=right_names)
