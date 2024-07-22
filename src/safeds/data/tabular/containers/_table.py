@@ -1708,6 +1708,65 @@ class Table:
         """
         return fitted_transformer.inverse_transform(self)
 
+    def join(
+        self,
+        right_table: Table,
+        left_names: str | list[str],
+        right_names: str | list[str],
+        *,
+        mode: Literal["inner", "left", "outer"] = "inner",
+    ) -> Table:
+        """
+        Join a table with the current table and return the result.
+
+        Parameters
+        ----------
+        right_table:
+            The other table which is to be joined to the current table.
+        left_names:
+            Name or list of names of columns from the current table on which to join right_table.
+        right_names:
+            Name or list of names of columns from right_table on which to join the current table.
+        mode:
+            Specify which type of join you want to use. Options include 'inner', 'outer', 'left', 'right'.
+
+        Returns
+        -------
+        new_table:
+            The table with the joined table.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table1 = Table({"a": [1, 2], "b": [3, 4]})
+        >>> table2 = Table({"d": [1, 5], "e": [5, 6]})
+        >>> table1.join(table2, "a", "d", mode="left")
+        +-----+-----+------+
+        |   a |   b |    e |
+        | --- | --- |  --- |
+        | i64 | i64 |  i64 |
+        +==================+
+        |   1 |   3 |    5 |
+        |   2 |   4 | null |
+        +-----+-----+------+
+        """
+        # Validation
+        _check_columns_exist(self, left_names)
+        _check_columns_exist(right_table, right_names)
+
+        if len(left_names) != len(right_names):
+            raise ValueError("The number of columns to join on must be the same in both tables.")
+
+        # Implementation
+        return self._from_polars_lazy_frame(
+            self._lazy_frame.join(
+                right_table._lazy_frame,
+                left_on=left_names,
+                right_on=right_names,
+                how=mode,
+            ),
+        )
+
     def transform_table(self, fitted_transformer: TableTransformer) -> Table:
         """
         Return a new table transformed by a **fitted** transformer.
