@@ -10,7 +10,7 @@ from safeds._validation import _check_bounds, _ClosedBound
 from safeds.data.image.containers import ImageList
 from safeds.data.labeled.containers import ImageDataset, TabularDataset, TimeSeriesDataset
 from safeds.data.labeled.containers._image_dataset import _ColumnAsTensor
-from safeds.data.tabular.containers import Table
+from safeds.data.tabular.containers import Table, Column
 from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.exceptions import (
     FeatureDataMismatchError,
@@ -315,8 +315,8 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         if not self._contains_choices():
             raise FittingWithoutChoiceError
 
-        if isinstance(train_data, TimeSeriesDataset):
-            raise LearningError("RNN-Hyperparameter optimization is currently not supported.")  # pragma: no cover
+        #if isinstance(train_data, TimeSeriesDataset):
+        #    raise LearningError("RNN-Hyperparameter optimization is currently not supported.")  # pragma: no cover
         if isinstance(train_data, ImageDataset):
             raise LearningError("CNN-Hyperparameter optimization is currently not supported.")  # pragma: no cover
 
@@ -326,27 +326,61 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         list_of_models = self._get_models_for_all_choices()
         list_of_fitted_models: list[Self] = []
 
+        if isinstance(train_data, TabularDataset):
+            (train_set, test_features, test_target) = self._data_split_table(train_data)
+
+        elif isinstance(train_data, TimeSeriesDataset):
+            (train_set, test_features, test_target) = self._data_split_time_series(train_data)
+        else:
+            # Image Cross Validation
+            pass
+
         with ProcessPoolExecutor(max_workers=len(list_of_models), mp_context=mp.get_context("spawn")) as executor:
             futures = []
             for model in list_of_models:
-                futures.append(executor.submit(model.fit, train_data, epoch_size, batch_size, learning_rate))
+                futures.append(executor.submit(model.fit, train_set, epoch_size, batch_size, learning_rate))
             [done, _] = wait(futures, return_when=ALL_COMPLETED)
             for future in done:
                 list_of_fitted_models.append(future.result())
         executor.shutdown()
 
-        # Cross Validation
-        [train_split, test_split] = train_data.to_table().split_rows(0.75)
+        if isinstance(train_data, TabularDataset):
+            return self._get_best_fnn_model(list_of_fitted_models, test_features, test_target)
+
+        elif isinstance(train_data, TimeSeriesDataset):
+            (train_set, test_features, test_target) = self._data_split_time_series(train_data)
+        else:
+            # Image Cross Validation
+            test_data = train_data
+            pass
+
+
+    def _data_split_table(self, data: TabularDataset) -> (TabularDataset, Table, Column):
+        [train_split, test_split] = data.to_table().split_rows(0.75)
         train_data = train_split.to_tabular_dataset(
+            target_name=data.target.name,
+            extra_names=data.extras.column_names,
+        )
+        test_dataset = test_split.to_tabular_dataset(
             target_name=train_data.target.name,
             extra_names=train_data.extras.column_names,
         )
-        test_data = test_split.to_tabular_dataset(
-            target_name=train_data.target.name,
-            extra_names=train_data.extras.column_names,
-        ).features
-        target_col = train_data.target
+        test_features = test_dataset.features
+        test_target = test_dataset.target
+        return (train_data, test_features, test_target)
 
+    def _get_best_fnn_model(
+        self,
+        list_of_fitted_models: list[Self],
+        test_features: Table,
+        test_target: Column,
+        optimization_metric: Literal[
+            "mean_squared_error",
+            "mean_absolute_error",
+            "median_absolute_deviation",
+            "coefficient_of_determination",
+        ],
+    ) -> Self:
         best_model = None
         best_metric_value = None
         for fitted_model in list_of_fitted_models:
@@ -354,38 +388,61 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
                 best_model = fitted_model
                 match optimization_metric:
                     case "mean_squared_error":
-                        best_metric_value = RegressionMetrics.mean_squared_error(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
+                        best_metric_value = RegressionMetrics.mean_squared_error(
+                            predicted=fitted_model.predict(test_features), expected=test_target)  # type: ignore[arg-type]
                     case "mean_absolute_error":
-                        best_metric_value = RegressionMetrics.mean_absolute_error(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
+                        best_metric_value = RegressionMetrics.mean_absolute_error(
+                            predicted=fitted_model.predict(test_features), expected=test_target)  # type: ignore[arg-type]
                     case "median_absolute_deviation":
-                        best_metric_value = RegressionMetrics.median_absolute_deviation(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
+                        best_metric_value = RegressionMetrics.median_absolute_deviation(
+                            predicted=fitted_model.predict(test_features), expected=test_target)  # type: ignore[arg-type]
                     case "coefficient_of_determination":
-                        best_metric_value = RegressionMetrics.coefficient_of_determination(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
+                        best_metric_value = RegressionMetrics.coefficient_of_determination(
+                            predicted=fitted_model.predict(test_features), expected=test_target)  # type: ignore[arg-type]
             else:
                 match optimization_metric:
                     case "mean_squared_error":
-                        error_of_fitted_model = RegressionMetrics.mean_squared_error(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
+                        error_of_fitted_model = RegressionMetrics.mean_squared_error(
+                            predicted=fitted_model.predict(test_features), expected=test_target)  # type: ignore[arg-type]
                         if error_of_fitted_model < best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "mean_absolute_error":
-                        error_of_fitted_model = RegressionMetrics.mean_absolute_error(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
+                        error_of_fitted_model = RegressionMetrics.mean_absolute_error(
+                            predicted=fitted_model.predict(test_features), expected=test_target)  # type: ignore[arg-type]
                         if error_of_fitted_model < best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "median_absolute_deviation":
-                        error_of_fitted_model = RegressionMetrics.median_absolute_deviation(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
+                        error_of_fitted_model = RegressionMetrics.median_absolute_deviation(
+                            predicted=fitted_model.predict(test_features), expected=test_target)  # type: ignore[arg-type]
                         if error_of_fitted_model < best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "coefficient_of_determination":
-                        error_of_fitted_model = RegressionMetrics.coefficient_of_determination(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
+                        error_of_fitted_model = RegressionMetrics.coefficient_of_determination(
+                            predicted=fitted_model.predict(test_features), expected=test_target)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = error_of_fitted_model  # pragma: no cover
         assert best_model is not None  # just for linter
         best_model._is_fitted = True
         return best_model
+
+    def _data_split_time_series(self, data: TimeSeriesDataset) -> (TimeSeriesDataset, Table):
+        [train_split, test_split] = data.to_table().split_rows(0.75)
+        train_data = train_split.to_time_series_dataset(
+            target_name=data.target.name,
+            window_size=data.window_size,
+            extra_names=data.extras.column_names,
+            continuous=data.continuous,
+            forecast_horizon=data.forecast_horizon
+        )
+        test_data = test_split
+        return (train_data, test_data)
+
+    def _data_split_image(self):
+        pass
 
     def _get_models_for_all_choices(self) -> list[Self]:
 
@@ -806,32 +863,46 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
                 best_model = fitted_model
                 match optimization_metric:
                     case "accuracy":
-                        best_metric_value = ClassificationMetrics.accuracy(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
+                        best_metric_value = ClassificationMetrics.accuracy(predicted=fitted_model.predict(test_data),
+                                                                           expected=target_col)  # type: ignore[arg-type]
                     case "precision":
-                        best_metric_value = ClassificationMetrics.precision(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)  # type: ignore[arg-type]
+                        best_metric_value = ClassificationMetrics.precision(predicted=fitted_model.predict(test_data),
+                                                                            expected=target_col,
+                                                                            positive_class=positive_class)  # type: ignore[arg-type]
                     case "recall":
-                        best_metric_value = ClassificationMetrics.recall(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)  # type: ignore[arg-type]
+                        best_metric_value = ClassificationMetrics.recall(predicted=fitted_model.predict(test_data),
+                                                                         expected=target_col,
+                                                                         positive_class=positive_class)  # type: ignore[arg-type]
                     case "f1_score":
-                        best_metric_value = ClassificationMetrics.f1_score(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)  # type: ignore[arg-type]
+                        best_metric_value = ClassificationMetrics.f1_score(predicted=fitted_model.predict(test_data),
+                                                                           expected=target_col,
+                                                                           positive_class=positive_class)  # type: ignore[arg-type]
             else:
                 match optimization_metric:
                     case "accuracy":
-                        error_of_fitted_model = ClassificationMetrics.accuracy(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
+                        error_of_fitted_model = ClassificationMetrics.accuracy(
+                            predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "precision":
-                        error_of_fitted_model = ClassificationMetrics.precision(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)  # type: ignore[arg-type]
+                        error_of_fitted_model = ClassificationMetrics.precision(
+                            predicted=fitted_model.predict(test_data), expected=target_col,
+                            positive_class=positive_class)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "recall":
-                        error_of_fitted_model = ClassificationMetrics.recall(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)  # type: ignore[arg-type]
+                        error_of_fitted_model = ClassificationMetrics.recall(predicted=fitted_model.predict(test_data),
+                                                                             expected=target_col,
+                                                                             positive_class=positive_class)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "f1_score":
-                        error_of_fitted_model = ClassificationMetrics.f1_score(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)  # type: ignore[arg-type]
+                        error_of_fitted_model = ClassificationMetrics.f1_score(
+                            predicted=fitted_model.predict(test_data), expected=target_col,
+                            positive_class=positive_class)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = error_of_fitted_model  # pragma: no cover
