@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from safeds.data.labeled.containers import TabularDataset
+from safeds.data.labeled.containers import TabularDataset, TimeSeriesDataset
 from safeds.data.tabular.containers import Column, Table
 from safeds.exceptions import ColumnLengthMismatchError
 
@@ -14,7 +14,7 @@ class RegressionMetrics(ABC):
     def __init__(self) -> None: ...
 
     @staticmethod
-    def summarize(predicted: Column | TabularDataset, expected: Column | TabularDataset) -> Table:
+    def summarize(predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset) -> Table:
         """
         Summarize regression metrics on the given data.
 
@@ -57,7 +57,7 @@ class RegressionMetrics(ABC):
         )
 
     @staticmethod
-    def coefficient_of_determination(predicted: Column | TabularDataset, expected: Column | TabularDataset) -> float:
+    def coefficient_of_determination(predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset) -> float:
         """
         Compute the coefficient of determination (R²) on the given data.
 
@@ -92,6 +92,17 @@ class RegressionMetrics(ABC):
         predicted = _extract_target(predicted)
         _check_equal_length(predicted, expected)
 
+        # For TimeSeries Predictions, where the output is a list of values.
+        # Expected results are internally converted to a column containing multiple Columns for each prediction window
+        # Currently only used in fit_by_exhaustive_search, where prediction metrics have to be calculated internally.
+        if isinstance(expected.get_value(0), Column):
+            sum_of_coefficient_of_determination = 0.0
+            for i in range(0, expected.row_count):
+                predicted_row_as_col = Column("predicted", predicted[i])
+                expected_row_as_col = expected.get_value(i)
+                sum_of_coefficient_of_determination += RegressionMetrics.coefficient_of_determination(predicted_row_as_col, expected_row_as_col)
+            return sum_of_coefficient_of_determination / expected.row_count
+
         residual_sum_of_squares = (expected._series - predicted._series).pow(2).sum()
         total_sum_of_squares = (expected._series - expected._series.mean()).pow(2).sum()
 
@@ -104,7 +115,7 @@ class RegressionMetrics(ABC):
         return 1 - residual_sum_of_squares / total_sum_of_squares
 
     @staticmethod
-    def mean_absolute_error(predicted: Column | TabularDataset, expected: Column | TabularDataset) -> float:
+    def mean_absolute_error(predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset) -> float:
         """
         Compute the mean absolute error (MAE) on the given data.
 
@@ -131,10 +142,21 @@ class RegressionMetrics(ABC):
         if expected.row_count == 0:
             return 0.0  # Everything was predicted correctly (since there is nothing to predict)
 
+        # For TimeSeries Predictions, where the output is a list of values.
+        # Expected results are internally converted to a column containing multiple Columns for each prediction window
+        # Currently only used in fit_by_exhaustive_search, where prediction metrics have to be calculated internally.
+        if isinstance(expected.get_value(0), Column):
+            sum_of_mean_absolute_errors = 0.0
+            for i in range(0, expected.row_count):
+                predicted_row_as_col = Column("predicted", predicted[i])
+                expected_row_as_col = expected.get_value(i)
+                sum_of_mean_absolute_errors += RegressionMetrics.mean_absolute_error(predicted_row_as_col, expected_row_as_col)
+            return sum_of_mean_absolute_errors / expected.row_count
+
         return (expected._series - predicted._series).abs().mean()
 
     @staticmethod
-    def mean_directional_accuracy(predicted: Column | TabularDataset, expected: Column | TabularDataset) -> float:
+    def mean_directional_accuracy(predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset) -> float:
         """
         Compute the mean directional accuracy (MDA) on the given data.
 
@@ -165,6 +187,18 @@ class RegressionMetrics(ABC):
         if expected.row_count == 0:
             return 1.0
 
+        # For TimeSeries Predictions, where the output is a list of values.
+        # Expected results are internally converted to a column containing multiple Columns for each prediction window
+        # Currently only used in fit_by_exhaustive_search, where prediction metrics have to be calculated internally.
+        if isinstance(expected.get_value(0), Column):
+            sum_of_mean_directional_accuracy = 0.0
+            for i in range(0, expected.row_count):
+                predicted_row_as_col = Column("predicted", predicted[i])
+                expected_row_as_col = expected.get_value(i)
+                sum_of_mean_directional_accuracy += RegressionMetrics.mean_directional_accuracy(predicted_row_as_col, expected_row_as_col)
+            return sum_of_mean_directional_accuracy / expected.row_count
+
+
         # Calculate the differences between the target values
         predicted_directions = predicted._series.diff().sign()
         expected_directions = expected._series.diff().sign()
@@ -172,7 +206,7 @@ class RegressionMetrics(ABC):
         return predicted_directions.eq(expected_directions).mean()
 
     @staticmethod
-    def mean_squared_error(predicted: Column | TabularDataset, expected: Column | TabularDataset) -> float:
+    def mean_squared_error(predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset) -> float:
         """
         Compute the mean squared error (MSE) on the given data.
 
@@ -201,10 +235,21 @@ class RegressionMetrics(ABC):
         if expected.row_count == 0:
             return 0.0  # Everything was predicted correctly (since there is nothing to predict)
 
+        # For TimeSeries Predictions, where the output is a list of values.
+        # Expected results are internally converted to a column containing multiple Columns for each prediction window
+        # Currently only used in fit_by_exhaustive_search, where prediction metrics have to be calculated internally.
+        if isinstance(expected.get_value(0), Column):
+            sum_of_mean_squared_errors = 0.0
+            for i in range(0, expected.row_count):
+                predicted_row_as_col = Column("predicted", predicted[i])
+                expected_row_as_col = expected.get_value(i)
+                sum_of_mean_squared_errors += RegressionMetrics.mean_squared_error(predicted_row_as_col, expected_row_as_col)
+            return sum_of_mean_squared_errors / expected.row_count
+
         return (expected._series - predicted._series).pow(2).mean()
 
     @staticmethod
-    def median_absolute_deviation(predicted: Column | TabularDataset, expected: Column | TabularDataset) -> float:
+    def median_absolute_deviation(predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset) -> float:
         """
         Compute the median absolute deviation (MAD) on the given data.
 
@@ -231,12 +276,24 @@ class RegressionMetrics(ABC):
         if expected.row_count == 0:
             return 0.0
 
+        # For TimeSeries Predictions, where the output is a list of values.
+        # Expected results are internally converted to a column containing multiple Columns for each prediction window
+        # Currently only used in fit_by_exhaustive_search, where prediction metrics have to be calculated internally.
+        if isinstance(expected.get_value(0), Column):
+            sum_of_median_absolute_deviation = 0.0
+            for i in range(0, expected.row_count):
+                predicted_row_as_col = Column("predicted", predicted[i])
+                expected_row_as_col = expected.get_value(i)
+                sum_of_median_absolute_deviation += RegressionMetrics.median_absolute_deviation(predicted_row_as_col,
+                                                                                   expected_row_as_col)
+            return sum_of_median_absolute_deviation / expected.row_count
+
         return (expected._series - predicted._series).abs().median()
 
 
-def _extract_target(column_or_dataset: Column | TabularDataset) -> Column:
+def _extract_target(column_or_dataset: Column | TabularDataset | TimeSeriesDataset) -> Column:
     """Extract the target column from the given column or dataset."""
-    if isinstance(column_or_dataset, TabularDataset):
+    if isinstance(column_or_dataset, TabularDataset) or isinstance(column_or_dataset, TimeSeriesDataset):
         return column_or_dataset.target
     else:
         return column_or_dataset

@@ -327,12 +327,12 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         list_of_fitted_models: list[Self] = []
 
         if isinstance(train_data, TabularDataset):
-            (train_set, test_features, test_target) = self._data_split_table(train_data)
+            (train_set, test_set) = self._data_split_table(train_data)
 
         elif isinstance(train_data, TimeSeriesDataset):
-            (train_set, test_features, test_target) = self._data_split_time_series(train_data)
-        else:
-            # Image Cross Validation
+            (train_set, test_set) = self._data_split_time_series(train_data)
+        else:   # train_data is ImageDataset
+            (train_set, test_set) = self._data_split_image(train_data)
             pass
 
         with ProcessPoolExecutor(max_workers=len(list_of_models), mp_context=mp.get_context("spawn")) as executor:
@@ -345,17 +345,16 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         executor.shutdown()
 
         if isinstance(train_data, TabularDataset):
-            return self._get_best_fnn_model(list_of_fitted_models, test_features, test_target)
-
+            return self._get_best_fnn_model(list_of_fitted_models, test_set, optimization_metric)
         elif isinstance(train_data, TimeSeriesDataset):
-            (train_set, test_features, test_target) = self._data_split_time_series(train_data)
+            return self._get_best_rnn_model(list_of_fitted_models, train_set, test_set, optimization_metric)
         else:
             # Image Cross Validation
             test_data = train_data
             pass
 
 
-    def _data_split_table(self, data: TabularDataset) -> (TabularDataset, Table, Column):
+    def _data_split_table(self, data: TabularDataset) -> (TabularDataset, TabularDataset):
         [train_split, test_split] = data.to_table().split_rows(0.75)
         train_data = train_split.to_tabular_dataset(
             target_name=data.target.name,
@@ -365,15 +364,12 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
             target_name=train_data.target.name,
             extra_names=train_data.extras.column_names,
         )
-        test_features = test_dataset.features
-        test_target = test_dataset.target
-        return (train_data, test_features, test_target)
+        return (train_data, test_dataset)
 
     def _get_best_fnn_model(
         self,
         list_of_fitted_models: list[Self],
-        test_features: Table,
-        test_target: Column,
+        test_data: TabularDataset,
         optimization_metric: Literal[
             "mean_squared_error",
             "mean_absolute_error",
@@ -381,6 +377,8 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
             "coefficient_of_determination",
         ],
     ) -> Self:
+        test_features = test_data.features
+        test_target = test_data.target
         best_model = None
         best_metric_value = None
         for fitted_model in list_of_fitted_models:
@@ -430,7 +428,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         return best_model
 
     def _data_split_time_series(self, data: TimeSeriesDataset) -> (TimeSeriesDataset, Table):
-        [train_split, test_split] = data.to_table().split_rows(0.75)
+        (train_split, test_split) = data.to_table().split_rows(0.75)
         train_data = train_split.to_time_series_dataset(
             target_name=data.target.name,
             window_size=data.window_size,
@@ -438,14 +436,94 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
             continuous=data.continuous,
             forecast_horizon=data.forecast_horizon
         )
-        test_data = test_split
-        return (train_data, test_data)
+        return train_data, test_split
 
-    def _data_split_image(self):
+    def _get_best_rnn_model(
+        self,
+        list_of_fitted_models: list[Self],
+        train_data: TimeSeriesDataset,
+        test_data: Table,
+        optimization_metric: Literal[
+            "mean_squared_error",
+            "mean_absolute_error",
+            "median_absolute_deviation",
+            "coefficient_of_determination",
+        ],
+    ) -> Self:
+        #test_features = test_data.remove_columns_except(train_data.features.column_names)
+        test_features = test_data
+        test_target = test_data.get_column(train_data.target.name)
+        best_model = None
+        best_metric_value = None
+
+        size = test_target.row_count
+        expected_values = []
+        for i in range(size - (train_data.forecast_horizon + train_data.window_size)):
+            if train_data.continuous:
+                label = test_target[i + train_data.window_size: i + train_data.window_size + train_data.forecast_horizon]
+            else:
+                label = test_target[i + train_data.window_size + train_data.forecast_horizon]
+            expected_values.append(label)
+        expected_values_as_col = Column("expected", expected_values)
+
+        for fitted_model in list_of_fitted_models:
+            if best_model is None:
+                best_model = fitted_model
+                match optimization_metric:
+                    case "mean_squared_error":
+                        best_metric_value = RegressionMetrics.mean_squared_error(
+                            predicted=fitted_model.predict(test_features),
+                            expected=expected_values_as_col)  # type: ignore[arg-type]
+                    case "mean_absolute_error":
+                        best_metric_value = RegressionMetrics.mean_absolute_error(
+                            predicted=fitted_model.predict(test_features),
+                            expected=expected_values_as_col)  # type: ignore[arg-type]
+                    case "median_absolute_deviation":
+                        best_metric_value = RegressionMetrics.median_absolute_deviation(
+                            predicted=fitted_model.predict(test_features),
+                            expected=expected_values_as_col)  # type: ignore[arg-type]
+                    case "coefficient_of_determination":
+                        best_metric_value = RegressionMetrics.coefficient_of_determination(
+                            predicted=fitted_model.predict(test_features),
+                            expected=expected_values_as_col)  # type: ignore[arg-type]
+            else:
+                match optimization_metric:
+                    case "mean_squared_error":
+                        error_of_fitted_model = RegressionMetrics.mean_squared_error(
+                            predicted=fitted_model.predict(test_features),
+                            expected=expected_values_as_col)  # type: ignore[arg-type]
+                        if error_of_fitted_model < best_metric_value:
+                            best_model = fitted_model  # pragma: no cover
+                            best_metric_value = error_of_fitted_model  # pragma: no cover
+                    case "mean_absolute_error":
+                        error_of_fitted_model = RegressionMetrics.mean_absolute_error(
+                            predicted=fitted_model.predict(test_features),
+                            expected=expected_values_as_col)  # type: ignore[arg-type]
+                        if error_of_fitted_model < best_metric_value:
+                            best_model = fitted_model  # pragma: no cover
+                            best_metric_value = error_of_fitted_model  # pragma: no cover
+                    case "median_absolute_deviation":
+                        error_of_fitted_model = RegressionMetrics.median_absolute_deviation(
+                            predicted=fitted_model.predict(test_features),
+                            expected=expected_values_as_col)  # type: ignore[arg-type]
+                        if error_of_fitted_model < best_metric_value:
+                            best_model = fitted_model  # pragma: no cover
+                            best_metric_value = error_of_fitted_model  # pragma: no cover
+                    case "coefficient_of_determination":
+                        error_of_fitted_model = RegressionMetrics.coefficient_of_determination(
+                            predicted=fitted_model.predict(test_features),
+                            expected=expected_values_as_col)  # type: ignore[arg-type]
+                        if error_of_fitted_model > best_metric_value:
+                            best_model = fitted_model  # pragma: no cover
+                            best_metric_value = error_of_fitted_model  # pragma: no cover
+        assert best_model is not None  # just for linter
+        best_model._is_fitted = True
+        return best_model
+
+    def _data_split_image(self, train_data: ImageDataset) -> (ImageDataset, ImageDataset):
         pass
 
     def _get_models_for_all_choices(self) -> list[Self]:
-
         all_possible_layer_combinations: list[list] = [[]]
         for layer in self._layers:
             if not layer._contains_choices():
