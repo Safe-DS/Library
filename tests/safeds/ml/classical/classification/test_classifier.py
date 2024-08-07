@@ -9,6 +9,9 @@ from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
+    FittingWithChoiceError,
+    FittingWithoutChoiceError,
+    LearningError,
     MissingValuesColumnError,
     ModelNotFittedError,
     NonNumericColumnError,
@@ -24,6 +27,8 @@ from safeds.ml.classical.classification import (
     RandomForestClassifier,
     SupportVectorClassifier,
 )
+from safeds.ml.hyperparameters import Choice
+from safeds.ml.metrics import ClassifierMetric
 
 if TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest
@@ -53,16 +58,130 @@ def classifiers() -> list[Classifier]:
     ]
 
 
+def classifiers_with_choices() -> list[Classifier]:
+    """
+    Return the list of classifiers with Choices as Parameters to test choice functionality.
+
+    After you implemented a new classifier, add it to this list to ensure its `fit_by_exhaustive_search` method works as
+    expected. Place tests of methods that are specific to your classifier in a separate test file.
+
+    Returns
+    -------
+    classifiers : list[Classifier]
+        The list of classifiers to test.
+    """
+    return [
+        AdaBoostClassifier(
+            learner=Choice(AdaBoostClassifier(), None),
+            max_learner_count=Choice(1, 2),
+            learning_rate=Choice(0.1, 0.2),
+        ),
+        DecisionTreeClassifier(max_depth=Choice(1, 2), min_sample_count_in_leaves=Choice(1, 2)),
+        GradientBoostingClassifier(tree_count=Choice(1, 2), learning_rate=Choice(0.1, 0.2)),
+        KNearestNeighborsClassifier(neighbor_count=Choice(1, 2)),
+        RandomForestClassifier(
+            tree_count=Choice(1, 2),
+            max_depth=Choice(1, 2),
+            min_sample_count_in_leaves=Choice(1, 2),
+        ),
+        SupportVectorClassifier(kernel=Choice(None, SupportVectorClassifier.Kernel.linear()), c=Choice(0.5, 1.0)),
+    ]
+
+
 @pytest.fixture()
 def valid_data() -> TabularDataset:
     return Table(
         {
-            "id": [1, 4],
-            "feat1": [2, 5],
-            "feat2": [3, 6],
-            "target": [0, 1],
+            "id": [1, 4, 7, 10],
+            "feat1": [2, 5, 8, 11],
+            "feat2": [3, 6, 9, 12],
+            "target": [0, 1, 0, 1],
         },
     ).to_tabular_dataset(target_name="target", extra_names=["id"])
+
+
+@pytest.mark.parametrize("classifier_with_choice", classifiers_with_choices(), ids=lambda x: x.__class__.__name__)
+class TestChoiceClassifiers:
+
+    def test_should_raise_if_model_is_fitted_with_choice(
+        self,
+        classifier_with_choice: Classifier,
+        valid_data: TabularDataset,
+    ) -> None:
+        with pytest.raises(FittingWithChoiceError):
+            classifier_with_choice.fit(valid_data)
+
+    def test_should_raise_if_no_positive_class_is_provided(
+        self,
+        classifier_with_choice: Classifier,
+        valid_data: TabularDataset,
+    ) -> None:
+        with pytest.raises(LearningError):
+            classifier_with_choice.fit_by_exhaustive_search(valid_data, optimization_metric=ClassifierMetric.PRECISION)
+
+    def test_workflow_with_choice_parameter(
+        self,
+        classifier_with_choice: Classifier,
+        valid_data: TabularDataset,
+    ) -> None:
+        model = classifier_with_choice.fit_by_exhaustive_search(valid_data, ClassifierMetric.ACCURACY)
+        assert isinstance(model, type(classifier_with_choice))
+        pred = model.predict(valid_data)
+        assert isinstance(pred, TabularDataset)
+
+
+class TestFitByExhaustiveSearch:
+
+    @pytest.mark.parametrize("classifier", classifiers(), ids=lambda x: x.__class__.__name__)
+    def test_should_raise_if_model_is_fitted_by_exhaustive_search_without_choice(
+        self,
+        classifier: Classifier,
+        valid_data: TabularDataset,
+    ) -> None:
+        with pytest.raises(FittingWithoutChoiceError):
+            classifier.fit_by_exhaustive_search(valid_data, optimization_metric=ClassifierMetric.ACCURACY)
+
+    @pytest.mark.parametrize(
+        ("metric", "positive_class"),
+        [
+            (
+                ClassifierMetric.ACCURACY,
+                None,
+            ),
+            (
+                ClassifierMetric.PRECISION,
+                0,
+            ),
+            (
+                ClassifierMetric.RECALL,
+                0,
+            ),
+            (
+                ClassifierMetric.F1_SCORE,
+                0,
+            ),
+        ],
+        ids=["accuracy", "precision", "recall", "f1_score"],
+    )
+    def test_should_check_return_type_with_metric(
+        self,
+        valid_data: TabularDataset,
+        metric: ClassifierMetric,
+        positive_class: Any,
+    ) -> None:
+        fitted_model = AdaBoostClassifier(max_learner_count=Choice(2, 3)).fit_by_exhaustive_search(
+            valid_data,
+            optimization_metric=metric,
+            positive_class=positive_class,
+        )
+        assert isinstance(fitted_model, AdaBoostClassifier)
+
+    def test_should_raise_when_dataset_misses_data(self) -> None:
+        with pytest.raises(DatasetMissesDataError):
+            AdaBoostClassifier(max_learner_count=Choice(2, 3)).fit_by_exhaustive_search(
+                Table.from_dict({"a": [], "b": []}).to_tabular_dataset("a"),
+                ClassifierMetric.ACCURACY,
+            )
 
 
 @pytest.mark.parametrize("classifier", classifiers(), ids=lambda x: x.__class__.__name__)

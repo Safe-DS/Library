@@ -3,6 +3,7 @@ from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import OutOfBoundsError
 from safeds.ml.classical.regression import KNearestNeighborsRegressor
+from safeds.ml.hyperparameters import Choice
 
 
 @pytest.fixture()
@@ -21,8 +22,8 @@ class TestNeighborCount:
         assert fitted_model._wrapped_model is not None
         assert fitted_model._wrapped_model.n_neighbors == 2
 
-    @pytest.mark.parametrize("neighbor_count", [-1, 0], ids=["minus_one", "zero"])
-    def test_should_raise_if_less_than_or_equal_to_0(self, neighbor_count: int) -> None:
+    @pytest.mark.parametrize("neighbor_count", [-1, 0, Choice(-1)], ids=["minus_one", "zero", "invalid_choice"])
+    def test_should_raise_if_less_than_or_equal_to_0(self, neighbor_count: int | Choice[int]) -> None:
         with pytest.raises(OutOfBoundsError):
             KNearestNeighborsRegressor(neighbor_count=neighbor_count)
 

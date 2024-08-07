@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from safeds._utils import _get_random_seed, _structural_hash
 from safeds._validation import _check_bounds, _OpenBound
+from safeds.exceptions import FittingWithoutChoiceError
 
 from ._classifier import Classifier
 
@@ -63,3 +64,6 @@ class LogisticClassifier(Classifier):
             n_jobs=-1,
             C=self.c,
         )
+
+    def _check_additional_fit_by_exhaustive_search_preconditions(self) -> None:
+        raise FittingWithoutChoiceError

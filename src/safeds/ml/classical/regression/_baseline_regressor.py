@@ -14,13 +14,10 @@ from safeds.exceptions import (
 from safeds.ml.classical.regression import (
     AdaBoostRegressor,
     DecisionTreeRegressor,
-    ElasticNetRegressor,
     GradientBoostingRegressor,
-    LassoRegressor,
     LinearRegressor,
     RandomForestRegressor,
     Regressor,
-    RidgeRegressor,
     SupportVectorRegressor,
 )
 
@@ -52,14 +49,18 @@ class BaselineRegressor:
             AdaBoostRegressor(),
             DecisionTreeRegressor(),
             LinearRegressor(),
+            LinearRegressor(LinearRegressor.Penalty.ridge()),
             RandomForestRegressor(),
-            RidgeRegressor(),
             SupportVectorRegressor(),
         ]
 
         if extended_search:
             self._list_of_model_types.extend(
-                [ElasticNetRegressor(), LassoRegressor(), GradientBoostingRegressor()],
+                [
+                    LinearRegressor(LinearRegressor.Penalty.elastic_net()),
+                    LinearRegressor(LinearRegressor.Penalty.lasso()),
+                    GradientBoostingRegressor(),
+                ],
             )  # pragma: no cover
 
         self._fitted_models: list[Regressor] = []
