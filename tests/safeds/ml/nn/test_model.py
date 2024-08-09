@@ -25,7 +25,7 @@ from safeds.ml.nn.converters import (
     InputConversionImageToColumn,
     InputConversionImageToImage,
     InputConversionImageToTable,
-    InputConversionTable,
+    InputConversionTable, InputConversionTimeSeries,
 )
 from safeds.ml.nn.layers import (
     AveragePooling2DLayer,
@@ -347,8 +347,36 @@ class TestClassificationModel:
             assert fitted_model.is_fitted
             assert isinstance(fitted_model, NeuralNetworkClassifier)
 
-    class TestPredict:
+        def test_should_check_time_series_workflow(self, device: Device) -> None:
+            from tests.helpers import configure_test_with_device, get_devices, get_devices_ids, resolve_resource_path
+            from safeds.data.tabular.transformation import RangeScaler
+            _inflation_path = "_datas/US_Inflation_rates.csv"
+            table = Table.from_csv_file(path=resolve_resource_path(_inflation_path))
+            rs = RangeScaler(column_names="value")
+            _, table = rs.fit_and_transform(table)
+            train_table, test_table = table.split_rows(0.8)
+            model = NeuralNetworkClassifier(
+                InputConversionTimeSeries(),
+                [ForwardLayer(neuron_count=Choice(128, 256)), LSTMLayer(neuron_count=1)],
+            )
+            trained_model = model.fit_by_exhaustive_search(
+                train_table.to_time_series_dataset(
+                    "value",
+                    window_size=7,
+                    forecast_horizon=12,
+                    continuous=False,
+                    extra_names=["date"],),
+                "accuracy",
+                epoch_size=15,
+            )
+            print("Exhaustive Model Prediction:")
+            exhaustive_prediction = trained_model.predict(train_table).target
+            print(exhaustive_prediction)
 
+            print("Actual Values:")
+            print(test_table)
+
+    class TestPredict:
         @pytest.mark.parametrize(
             "batch_size",
             [
