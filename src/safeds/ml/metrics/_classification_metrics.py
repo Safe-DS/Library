@@ -3,12 +3,9 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 
-from safeds.data.labeled.containers import TabularDataset
-from safeds.data.tabular.containers import Table
+from safeds.data.labeled.containers import TabularDataset, TimeSeriesDataset
+from safeds.data.tabular.containers import Table, Column
 from safeds.exceptions import ColumnLengthMismatchError
-
-if TYPE_CHECKING:
-    from safeds.data.tabular.containers import Column
 
 
 class ClassificationMetrics(ABC):
@@ -18,7 +15,7 @@ class ClassificationMetrics(ABC):
     def __init__(self) -> None: ...
 
     @staticmethod
-    def summarize(predicted: Column | TabularDataset, expected: Column | TabularDataset, positive_class: Any) -> Table:
+    def summarize(predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset, positive_class: Any) -> Table:
         """
         Summarize classification metrics on the given data.
 
@@ -53,7 +50,7 @@ class ClassificationMetrics(ABC):
         )
 
     @staticmethod
-    def accuracy(predicted: Column | TabularDataset, expected: Column | TabularDataset) -> float:
+    def accuracy(predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset) -> float:
         """
         Compute the accuracy on the given data.
 
@@ -81,13 +78,26 @@ class ClassificationMetrics(ABC):
         if expected.row_count == 0:
             return 1.0  # Everything was predicted correctly (since there is nothing to predict)
 
+        # For TimeSeries Predictions, where the output is a list of values.
+        # Expected results are internally converted to a column containing multiple Columns for each prediction window
+        # Currently only used in fit_by_exhaustive_search, where prediction metrics have to be calculated internally.
+        if isinstance(expected.get_value(0), Column):
+            sum_of_accuracies = 0.0
+            for i in range(0, expected.row_count):
+                predicted_row_as_col = Column("predicted", predicted[i])
+                expected_row_as_col = expected.get_value(i)
+                sum_of_accuracies += ClassificationMetrics.accuracy(
+                    predicted_row_as_col,
+                    expected_row_as_col)
+            return sum_of_accuracies / expected.row_count
+
         try:
             return expected._series.eq_missing(predicted._series).mean()
         except ComputeError:
             return 0.0  # Types are not compatible, so no prediction can be correct
 
     @staticmethod
-    def f1_score(predicted: Column | TabularDataset, expected: Column | TabularDataset, positive_class: Any) -> float:
+    def f1_score(predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset, positive_class: Any) -> float:
         """
         Compute the F₁ score on the given data.
 
@@ -112,6 +122,19 @@ class ClassificationMetrics(ABC):
         expected = _extract_target(expected)
         _check_equal_length(predicted, expected)
 
+        # For TimeSeries Predictions, where the output is a list of values.
+        # Expected results are internally converted to a column containing multiple Columns for each prediction window
+        # Currently only used in fit_by_exhaustive_search, where prediction metrics have to be calculated internally.
+        if isinstance(expected.get_value(0), Column):
+            sum_of_f1scores = 0.0
+            for i in range(0, expected.row_count):
+                predicted_row_as_col = Column("predicted", predicted[i])
+                expected_row_as_col = expected.get_value(i)
+                sum_of_f1scores += ClassificationMetrics.f1_score(
+                    predicted_row_as_col,
+                    expected_row_as_col, positive_class)
+            return sum_of_f1scores / expected.row_count
+
         true_positives = (expected._series.eq(positive_class) & predicted._series.eq(positive_class)).sum()
         false_positives = (expected._series.ne(positive_class) & predicted._series.eq(positive_class)).sum()
         false_negatives = (expected._series.eq(positive_class) & predicted._series.ne(positive_class)).sum()
@@ -122,7 +145,7 @@ class ClassificationMetrics(ABC):
         return 2 * true_positives / (2 * true_positives + false_positives + false_negatives)
 
     @staticmethod
-    def precision(predicted: Column | TabularDataset, expected: Column | TabularDataset, positive_class: Any) -> float:
+    def precision(predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset, positive_class: Any) -> float:
         """
         Compute the precision on the given data.
 
@@ -147,6 +170,19 @@ class ClassificationMetrics(ABC):
         predicted = _extract_target(predicted)
         _check_equal_length(predicted, expected)
 
+        # For TimeSeries Predictions, where the output is a list of values.
+        # Expected results are internally converted to a column containing multiple Columns for each prediction window
+        # Currently only used in fit_by_exhaustive_search, where prediction metrics have to be calculated internally.
+        if isinstance(expected.get_value(0), Column):
+            sum_of_precisions = 0.0
+            for i in range(0, expected.row_count):
+                predicted_row_as_col = Column("predicted", predicted[i])
+                expected_row_as_col = expected.get_value(i)
+                sum_of_precisions += ClassificationMetrics.precision(
+                    predicted_row_as_col,
+                    expected_row_as_col, positive_class)
+            return sum_of_precisions / expected.row_count
+
         true_positives = (expected._series.eq(positive_class) & predicted._series.eq(positive_class)).sum()
         predicted_positives = predicted._series.eq(positive_class).sum()
 
@@ -156,7 +192,7 @@ class ClassificationMetrics(ABC):
         return true_positives / predicted_positives
 
     @staticmethod
-    def recall(predicted: Column | TabularDataset, expected: Column | TabularDataset, positive_class: Any) -> float:
+    def recall(predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset, positive_class: Any) -> float:
         """
         Compute the recall on the given data.
 
@@ -181,6 +217,19 @@ class ClassificationMetrics(ABC):
         predicted = _extract_target(predicted)
         _check_equal_length(predicted, expected)
 
+        # For TimeSeries Predictions, where the output is a list of values.
+        # Expected results are internally converted to a column containing multiple Columns for each prediction window
+        # Currently only used in fit_by_exhaustive_search, where prediction metrics have to be calculated internally.
+        if isinstance(expected.get_value(0), Column):
+            sum_of_recalls = 0.0
+            for i in range(0, expected.row_count):
+                predicted_row_as_col = Column("predicted", predicted[i])
+                expected_row_as_col = expected.get_value(i)
+                sum_of_recalls += ClassificationMetrics.recall(
+                    predicted_row_as_col,
+                    expected_row_as_col, positive_class)
+            return sum_of_recalls / expected.row_count
+
         true_positives = (expected._series.eq(positive_class) & predicted._series.eq(positive_class)).sum()
         actual_positives = expected._series.eq(positive_class).sum()
 
@@ -192,7 +241,7 @@ class ClassificationMetrics(ABC):
 
 def _extract_target(column_or_dataset: Column | TabularDataset) -> Column:
     """Extract the target column from the given column or dataset."""
-    if isinstance(column_or_dataset, TabularDataset):
+    if isinstance(column_or_dataset, TabularDataset) or isinstance(column_or_dataset, TimeSeriesDataset):
         return column_or_dataset.target
     else:
         return column_or_dataset
