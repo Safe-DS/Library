@@ -84,7 +84,7 @@ class ClassificationMetrics(ABC):
         if isinstance(expected.get_value(0), Column):
             sum_of_accuracies = 0.0
             for i in range(0, expected.row_count):
-                predicted_row_as_col = Column("predicted", predicted[i])
+                predicted_row_as_col: Column = Column("predicted", predicted[i])
                 expected_row_as_col = expected.get_value(i)
                 sum_of_accuracies += ClassificationMetrics.accuracy(
                     predicted_row_as_col,
@@ -128,7 +128,7 @@ class ClassificationMetrics(ABC):
         if isinstance(expected.get_value(0), Column):
             sum_of_f1scores = 0.0
             for i in range(0, expected.row_count):
-                predicted_row_as_col = Column("predicted", predicted[i])
+                predicted_row_as_col: Column = Column("predicted", predicted[i])
                 expected_row_as_col = expected.get_value(i)
                 sum_of_f1scores += ClassificationMetrics.f1_score(
                     predicted_row_as_col,
@@ -176,7 +176,7 @@ class ClassificationMetrics(ABC):
         if isinstance(expected.get_value(0), Column):
             sum_of_precisions = 0.0
             for i in range(0, expected.row_count):
-                predicted_row_as_col = Column("predicted", predicted[i])
+                predicted_row_as_col: Column = Column("predicted", predicted[i])
                 expected_row_as_col = expected.get_value(i)
                 sum_of_precisions += ClassificationMetrics.precision(
                     predicted_row_as_col,
@@ -223,7 +223,7 @@ class ClassificationMetrics(ABC):
         if isinstance(expected.get_value(0), Column):
             sum_of_recalls = 0.0
             for i in range(0, expected.row_count):
-                predicted_row_as_col = Column("predicted", predicted[i])
+                predicted_row_as_col: Column = Column("predicted", predicted[i])
                 expected_row_as_col = expected.get_value(i)
                 sum_of_recalls += ClassificationMetrics.recall(
                     predicted_row_as_col,
@@ -239,7 +239,7 @@ class ClassificationMetrics(ABC):
         return true_positives / actual_positives
 
 
-def _extract_target(column_or_dataset: Column | TabularDataset) -> Column:
+def _extract_target(column_or_dataset: Column | TabularDataset | TimeSeriesDataset) -> Column:
     """Extract the target column from the given column or dataset."""
     if isinstance(column_or_dataset, (TabularDataset, TimeSeriesDataset)):
         return column_or_dataset.target

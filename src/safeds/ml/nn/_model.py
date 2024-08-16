@@ -3,7 +3,7 @@ from __future__ import annotations
 import copy
 import multiprocessing as mp
 from concurrent.futures import ALL_COMPLETED, ProcessPoolExecutor, wait
-from typing import TYPE_CHECKING, Any, Generic, Literal, Self, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, Literal, Self, TypeVar, Tuple
 
 from safeds._config import _init_default_device
 from safeds._validation import _check_bounds, _ClosedBound
@@ -348,7 +348,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
             return self._get_best_rnn_model(list_of_fitted_models, train_set, test_set, optimization_metric)
         #else: # Image Data Splitting necessary
 
-    def _data_split_table(self, data: TabularDataset) -> (TabularDataset, TabularDataset):
+    def _data_split_table(self, data: TabularDataset) -> Tuple[TabularDataset, TabularDataset]:
         [train_split, test_split] = data.to_table().split_rows(0.75)
         train_data = train_split.to_tabular_dataset(
             target_name=data.target.name,
@@ -358,7 +358,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
             target_name=train_data.target.name,
             extra_names=train_data.extras.column_names,
         )
-        return (train_data, test_dataset)
+        return train_data, test_dataset
 
     def _get_best_fnn_model(
         self,
@@ -381,46 +381,46 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
                 match optimization_metric:
                     case "mean_squared_error":
                         best_metric_value = RegressionMetrics.mean_squared_error(
-                            predicted=fitted_model.predict(test_features),
+                            predicted=fitted_model.predict(test_features),  # type: ignore[arg-type]
                             expected=test_target)  # type: ignore[arg-type]
                     case "mean_absolute_error":
                         best_metric_value = RegressionMetrics.mean_absolute_error(
-                            predicted=fitted_model.predict(test_features),
+                            predicted=fitted_model.predict(test_features),  # type: ignore[arg-type]
                             expected=test_target)  # type: ignore[arg-type]
                     case "median_absolute_deviation":
                         best_metric_value = RegressionMetrics.median_absolute_deviation(
-                            predicted=fitted_model.predict(test_features),
+                            predicted=fitted_model.predict(test_features),  # type: ignore[arg-type]
                             expected=test_target)  # type: ignore[arg-type]
                     case "coefficient_of_determination":
                         best_metric_value = RegressionMetrics.coefficient_of_determination(
-                            predicted=fitted_model.predict(test_features),
+                            predicted=fitted_model.predict(test_features),  # type: ignore[arg-type]
                             expected=test_target)  # type: ignore[arg-type]
             else:
                 match optimization_metric:
                     case "mean_squared_error":
                         error_of_fitted_model = RegressionMetrics.mean_squared_error(
-                            predicted=fitted_model.predict(test_features),
+                            predicted=fitted_model.predict(test_features),  # type: ignore[arg-type]
                             expected=test_target)  # type: ignore[arg-type]
                         if error_of_fitted_model < best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "mean_absolute_error":
                         error_of_fitted_model = RegressionMetrics.mean_absolute_error(
-                            predicted=fitted_model.predict(test_features),
+                            predicted=fitted_model.predict(test_features),  # type: ignore[arg-type]
                             expected=test_target)  # type: ignore[arg-type]
                         if error_of_fitted_model < best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "median_absolute_deviation":
                         error_of_fitted_model = RegressionMetrics.median_absolute_deviation(
-                            predicted=fitted_model.predict(test_features),
+                            predicted=fitted_model.predict(test_features),  # type: ignore[arg-type]
                             expected=test_target)  # type: ignore[arg-type]
                         if error_of_fitted_model < best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "coefficient_of_determination":
                         error_of_fitted_model = RegressionMetrics.coefficient_of_determination(
-                            predicted=fitted_model.predict(test_features),
+                            predicted=fitted_model.predict(test_features),  # type: ignore[arg-type]
                             expected=test_target)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
@@ -429,7 +429,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         best_model._is_fitted = True
         return best_model
 
-    def _data_split_time_series(self, data: TimeSeriesDataset) -> (TimeSeriesDataset, Table):
+    def _data_split_time_series(self, data: TimeSeriesDataset) -> Tuple[TimeSeriesDataset, Table]:
         (train_split, test_split) = data.to_table().split_rows(0.75)
         train_data = train_split.to_time_series_dataset(
             target_name=data.target.name,
@@ -944,7 +944,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
             else:  # ImageToTable
                 return self._get_best_cnn_model_table(list_of_fitted_models, train_set, optimization_metric,
                                                       positive_class)
-    def _data_split_table(self, data: TabularDataset) -> (TabularDataset, TabularDataset):
+    def _data_split_table(self, data: TabularDataset) -> Tuple[TabularDataset, TabularDataset]:
         [train_split, test_split] = data.to_table().split_rows(0.75)
         train_data = train_split.to_tabular_dataset(
             target_name=data.target.name,
@@ -956,7 +956,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         )
         return (train_data, test_data)
 
-    def _data_split_time_series(self, data: TimeSeriesDataset) -> (TimeSeriesDataset, Table):
+    def _data_split_time_series(self, data: TimeSeriesDataset) -> Tuple[TimeSeriesDataset, Table]:
         (train_split, test_split) = data.to_table().split_rows(0.75)
         train_data = train_split.to_time_series_dataset(
             target_name=data.target.name,
@@ -967,7 +967,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         )
         return train_data, test_split
 
-    def _data_split_image(self, train_data: ImageDataset) -> (ImageDataset, ImageDataset):
+    def _data_split_image(self, train_data: ImageDataset) -> Tuple[ImageDataset, ImageDataset]:
         return train_data.split(0.75)
 
     def _get_best_fnn_model(
@@ -987,41 +987,41 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
                 match optimization_metric:
                     case "accuracy":
                         best_metric_value = ClassificationMetrics.accuracy(
-                            predicted=fitted_model.predict(test_features),
+                            predicted=fitted_model.predict(test_features),  # type: ignore[arg-type]
                             expected=test_target)  # type: ignore[arg-type]
                     case "precision":
                         best_metric_value = ClassificationMetrics.precision(
-                            predicted=fitted_model.predict(test_features),
-                            expected=test_target,
+                            predicted=fitted_model.predict(test_features),  # type: ignore[arg-type]
+                            expected=test_target,   # type: ignore[arg-type]
                             positive_class=positive_class)  # type: ignore[arg-type]
                     case "recall":
-                        best_metric_value = ClassificationMetrics.recall(predicted=fitted_model.predict(test_features),
-                                                                         expected=test_target,
+                        best_metric_value = ClassificationMetrics.recall(predicted=fitted_model.predict(test_features), # type: ignore[arg-type]
+                                                                         expected=test_target,  # type: ignore[arg-type]
                                                                          positive_class=positive_class)  # type: ignore[arg-type]
                     case "f1_score":
                         best_metric_value = ClassificationMetrics.f1_score(
-                            predicted=fitted_model.predict(test_features),
-                            expected=test_target,
+                            predicted=fitted_model.predict(test_features),  # type: ignore[arg-type]
+                            expected=test_target,   # type: ignore[arg-type]
                             positive_class=positive_class)  # type: ignore[arg-type]
             else:
                 match optimization_metric:
                     case "accuracy":
                         error_of_fitted_model = ClassificationMetrics.accuracy(
-                            predicted=fitted_model.predict(test_features),
-                            expected=test_target)  # type: ignore[arg-type]
+                            predicted=fitted_model.predict(test_features),  # type: ignore[arg-type]
+                            expected=test_target)
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "precision":
                         error_of_fitted_model = ClassificationMetrics.precision(
-                            predicted=fitted_model.predict(test_features), expected=test_target,
+                            predicted=fitted_model.predict(test_features), expected=test_target,    # type: ignore[arg-type]
                             positive_class=positive_class)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "recall":
                         error_of_fitted_model = ClassificationMetrics.recall(
-                            predicted=fitted_model.predict(test_features),
+                            predicted=fitted_model.predict(test_features),  # type: ignore[arg-type]
                             expected=test_target,
                             positive_class=positive_class)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
@@ -1029,7 +1029,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "f1_score":
                         error_of_fitted_model = ClassificationMetrics.f1_score(
-                            predicted=fitted_model.predict(test_features), expected=test_target,
+                            predicted=fitted_model.predict(test_features), expected=test_target,    # type: ignore[arg-type]
                             positive_class=positive_class)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
@@ -1063,41 +1063,41 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
                 match optimization_metric:
                     case "accuracy":
                         best_metric_value = ClassificationMetrics.accuracy(
-                            predicted=fitted_model.predict(test_data),
+                            predicted=fitted_model.predict(test_data),  # type: ignore[arg-type]
                             expected=expected_values_as_col)  # type: ignore[arg-type]
                     case "precision":
                         best_metric_value = ClassificationMetrics.precision(
-                            predicted=fitted_model.predict(test_data),
+                            predicted=fitted_model.predict(test_data),  # type: ignore[arg-type]
                             expected=expected_values_as_col,
                             positive_class=positive_class)  # type: ignore[arg-type]
                     case "recall":
-                        best_metric_value = ClassificationMetrics.recall(predicted=fitted_model.predict(test_data),
+                        best_metric_value = ClassificationMetrics.recall(predicted=fitted_model.predict(test_data), # type: ignore[arg-type]
                                                                          expected=expected_values_as_col,
                                                                          positive_class=positive_class)  # type: ignore[arg-type]
                     case "f1_score":
                         best_metric_value = ClassificationMetrics.f1_score(
-                            predicted=fitted_model.predict(test_data),
+                            predicted=fitted_model.predict(test_data),  # type: ignore[arg-type]
                             expected=expected_values_as_col,
                             positive_class=positive_class)  # type: ignore[arg-type]
             else:
                 match optimization_metric:
                     case "accuracy":
                         error_of_fitted_model = ClassificationMetrics.accuracy(
-                            predicted=fitted_model.predict(test_data),
+                            predicted=fitted_model.predict(test_data),  # type: ignore[arg-type]
                             expected=expected_values_as_col)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "precision":
                         error_of_fitted_model = ClassificationMetrics.precision(
-                            predicted=fitted_model.predict(test_data), expected=expected_values_as_col,
+                            predicted=fitted_model.predict(test_data), expected=expected_values_as_col, # type: ignore[arg-type]
                             positive_class=positive_class)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "recall":
                         error_of_fitted_model = ClassificationMetrics.recall(
-                            predicted=fitted_model.predict(test_data),
+                            predicted=fitted_model.predict(test_data),  # type: ignore[arg-type]
                             expected=expected_values_as_col,
                             positive_class=positive_class)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
@@ -1105,7 +1105,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "f1_score":
                         error_of_fitted_model = ClassificationMetrics.f1_score(
-                            predicted=fitted_model.predict(test_data), expected=expected_values_as_col,
+                            predicted=fitted_model.predict(test_data), expected=expected_values_as_col, # type: ignore[arg-type]
                             positive_class=positive_class)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
@@ -1131,41 +1131,41 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
                 match optimization_metric:
                     case "accuracy":
                         best_metric_value = ClassificationMetrics.accuracy(
-                            predicted=fitted_model.predict(input_data),
+                            predicted=fitted_model.predict(input_data), # type: ignore[arg-type]
                             expected=expected)  # type: ignore[arg-type]
                     case "precision":
                         best_metric_value = ClassificationMetrics.precision(
-                            predicted=fitted_model.predict(input_data),
+                            predicted=fitted_model.predict(input_data), # type: ignore[arg-type]
                             expected=expected,
                             positive_class=positive_class)  # type: ignore[arg-type]
                     case "recall":
-                        best_metric_value = ClassificationMetrics.recall(predicted=fitted_model.predict(input_data),
+                        best_metric_value = ClassificationMetrics.recall(predicted=fitted_model.predict(input_data),    # type: ignore[arg-type]
                                                                          expected=expected,
                                                                          positive_class=positive_class)  # type: ignore[arg-type]
                     case "f1_score":
                         best_metric_value = ClassificationMetrics.f1_score(
-                            predicted=fitted_model.predict(input_data),
+                            predicted=fitted_model.predict(input_data), # type: ignore[arg-type]
                             expected=expected,
                             positive_class=positive_class)  # type: ignore[arg-type]
             else:
                 match optimization_metric:
                     case "accuracy":
                         error_of_fitted_model = ClassificationMetrics.accuracy(
-                            predicted=fitted_model.predict(input_data),
+                            predicted=fitted_model.predict(input_data), # type: ignore[arg-type]
                             expected=expected)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "precision":
                         error_of_fitted_model = ClassificationMetrics.precision(
-                            predicted=fitted_model.predict(input_data), expected=expected,
+                            predicted=fitted_model.predict(input_data), expected=expected,  # type: ignore[arg-type]
                             positive_class=positive_class)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "recall":
                         error_of_fitted_model = ClassificationMetrics.recall(
-                            predicted=fitted_model.predict(input_data),
+                            predicted=fitted_model.predict(input_data), # type: ignore[arg-type]
                             expected=expected,
                             positive_class=positive_class)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
@@ -1173,7 +1173,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "f1_score":
                         error_of_fitted_model = ClassificationMetrics.f1_score(
-                            predicted=fitted_model.predict(input_data), expected=expected,
+                            predicted=fitted_model.predict(input_data), expected=expected,  # type: ignore[arg-type]
                             positive_class=positive_class)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
@@ -1203,47 +1203,47 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         best_model = None
         best_metric_value = None
         for fitted_model in list_of_fitted_models:
-            prediction = self._inverse_one_hot_encode_by_index_of_column(fitted_model.predict(input_data).get_output())
+            prediction = self._inverse_one_hot_encode_by_index_of_column(fitted_model.predict(input_data).get_output()) # type: ignore[arg-type]
             if best_model is None:
                 best_model = fitted_model
                 match optimization_metric:
                     case "accuracy":
                         best_metric_value = ClassificationMetrics.accuracy(
-                            predicted=prediction,
+                            predicted=prediction,   # type: ignore[arg-type]
                             expected=expected)  # type: ignore[arg-type]
                     case "precision":
                         best_metric_value = ClassificationMetrics.precision(
-                            predicted=prediction,
+                            predicted=prediction,   # type: ignore[arg-type]
                             expected=expected,
                             positive_class=positive_class)  # type: ignore[arg-type]
                     case "recall":
-                        best_metric_value = ClassificationMetrics.recall(predicted=prediction,
+                        best_metric_value = ClassificationMetrics.recall(predicted=prediction,  # type: ignore[arg-type]
                                                                          expected=expected,
                                                                          positive_class=positive_class)  # type: ignore[arg-type]
                     case "f1_score":
                         best_metric_value = ClassificationMetrics.f1_score(
-                            predicted=prediction,
+                            predicted=prediction,   # type: ignore[arg-type]
                             expected=expected,
                             positive_class=positive_class)  # type: ignore[arg-type]
             else:
                 match optimization_metric:
                     case "accuracy":
                         error_of_fitted_model = ClassificationMetrics.accuracy(
-                            predicted=prediction,
+                            predicted=prediction,   # type: ignore[arg-type]
                             expected=expected)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "precision":
                         error_of_fitted_model = ClassificationMetrics.precision(
-                            predicted=prediction, expected=expected,
+                            predicted=prediction, expected=expected,    # type: ignore[arg-type]
                             positive_class=positive_class)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "recall":
                         error_of_fitted_model = ClassificationMetrics.recall(
-                            predicted=prediction,
+                            predicted=prediction,   # type: ignore[arg-type]
                             expected=expected,
                             positive_class=positive_class)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
@@ -1251,7 +1251,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "f1_score":
                         error_of_fitted_model = ClassificationMetrics.f1_score(
-                            predicted=prediction, expected=expected,
+                            predicted=prediction, expected=expected,    # type: ignore[arg-type]
                             positive_class=positive_class)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
