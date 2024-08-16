@@ -834,9 +834,6 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
             for x, y in iter(dataloader):
                 optimizer.zero_grad()
                 pred = copied_model._model(x)
-                print(f"pred: {pred}")
-                print("--")
-                print(f"label: {y}")
                 loss = loss_fn(pred, y)
                 loss_sum += loss.item()
                 amount_of_loss_values_calculated += 1
@@ -907,8 +904,8 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
 
         if isinstance(train_data, TimeSeriesDataset) and train_data.continuous:
             raise NotImplementedError("Continuous Predictions are currently not supported for Time Series Classification.")
-        if isinstance(train_data, ImageDataset):
-            raise LearningError("CNN-Hyperparameter optimization is currently not supported.")  # pragma: no cover
+        #if isinstance(train_data, ImageDataset):
+        #    raise LearningError("CNN-Hyperparameter optimization is currently not supported.")  # pragma: no cover
 
         _check_bounds("epoch_size", epoch_size, lower_bound=_ClosedBound(1))
         _check_bounds("batch_size", batch_size, lower_bound=_ClosedBound(1))
@@ -938,8 +935,12 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         elif isinstance(train_data, TimeSeriesDataset):
             return self._get_best_rnn_model(list_of_fitted_models, train_set, test_set, optimization_metric, positive_class)
         else:
-            return self._get_best_cnn_model(list_of_fitted_models, train_set, optimization_metric, positive_class)
-            pass
+            if isinstance(self._input_conversion, InputConversionImageToColumn):
+                return self._get_best_cnn_model_column(list_of_fitted_models, train_set, optimization_metric, positive_class)
+            elif isinstance(self._input_conversion, InputConversionImageToTable):
+                return self._get_best_cnn_model_table(list_of_fitted_models, train_set, optimization_metric, positive_class)
+            else: # ImageToImage
+                raise NotImplementedError("Hyperparameter Optimization for Image to Image is currently not supported.")
 
     def _data_split_table(self, data: TabularDataset) -> (TabularDataset, TabularDataset):
         [train_split, test_split] = data.to_table().split_rows(0.75)
@@ -1114,6 +1115,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         optimization_metric: Literal["accuracy", "precision", "recall", "f1_score"],
         positive_class: Any = None,
     ) -> Self:
+        input_data = test_data.get_input()
         expected = test_data.get_output()
         best_model = None
         best_metric_value = None
@@ -1123,41 +1125,41 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
                 match optimization_metric:
                     case "accuracy":
                         best_metric_value = ClassificationMetrics.accuracy(
-                            predicted=fitted_model.predict(test_data),
+                            predicted=fitted_model.predict(input_data),
                             expected=expected)  # type: ignore[arg-type]
                     case "precision":
                         best_metric_value = ClassificationMetrics.precision(
-                            predicted=fitted_model.predict(test_data),
+                            predicted=fitted_model.predict(input_data),
                             expected=expected,
                             positive_class=positive_class)  # type: ignore[arg-type]
                     case "recall":
-                        best_metric_value = ClassificationMetrics.recall(predicted=fitted_model.predict(test_data),
+                        best_metric_value = ClassificationMetrics.recall(predicted=fitted_model.predict(input_data),
                                                                          expected=expected,
                                                                          positive_class=positive_class)  # type: ignore[arg-type]
                     case "f1_score":
                         best_metric_value = ClassificationMetrics.f1_score(
-                            predicted=fitted_model.predict(test_data),
+                            predicted=fitted_model.predict(input_data),
                             expected=expected,
                             positive_class=positive_class)  # type: ignore[arg-type]
             else:
                 match optimization_metric:
                     case "accuracy":
                         error_of_fitted_model = ClassificationMetrics.accuracy(
-                            predicted=fitted_model.predict(test_data),
+                            predicted=fitted_model.predict(input_data),
                             expected=expected)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "precision":
                         error_of_fitted_model = ClassificationMetrics.precision(
-                            predicted=fitted_model.predict(test_data), expected=expected,
+                            predicted=fitted_model.predict(input_data), expected=expected,
                             positive_class=positive_class)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "recall":
                         error_of_fitted_model = ClassificationMetrics.recall(
-                            predicted=fitted_model.predict(test_data),
+                            predicted=fitted_model.predict(input_data),
                             expected=expected,
                             positive_class=positive_class)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
@@ -1165,7 +1167,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "f1_score":
                         error_of_fitted_model = ClassificationMetrics.f1_score(
-                            predicted=fitted_model.predict(test_data), expected=expected,
+                            predicted=fitted_model.predict(input_data), expected=expected,
                             positive_class=positive_class)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
@@ -1181,51 +1183,61 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         optimization_metric: Literal["accuracy", "precision", "recall", "f1_score"],
         positive_class: Any = None,
     ) -> Self:
-        expected = test_data.get_output()
+        input_data = test_data.get_input()
+        labels = test_data.get_output()
+        expected = self._inverse_one_hot_encode_by_index_of_column(labels)
+
+        #Set positive class to index of positive column, to be able to calculate Classification Metrics
+        if positive_class is not None:
+            for column_index in range(labels.column_count):
+                if labels.column_names[column_index] == positive_class:
+                    positive_class = labels.column_names[column_index]
+                    break
 
         best_model = None
         best_metric_value = None
         for fitted_model in list_of_fitted_models:
+            prediction = self._inverse_one_hot_encode_by_index_of_column(fitted_model.predict(input_data).get_output())
             if best_model is None:
                 best_model = fitted_model
                 match optimization_metric:
                     case "accuracy":
                         best_metric_value = ClassificationMetrics.accuracy(
-                            predicted=fitted_model.predict(test_data),
+                            predicted=prediction,
                             expected=expected)  # type: ignore[arg-type]
                     case "precision":
                         best_metric_value = ClassificationMetrics.precision(
-                            predicted=fitted_model.predict(test_data),
+                            predicted=prediction,
                             expected=expected,
                             positive_class=positive_class)  # type: ignore[arg-type]
                     case "recall":
-                        best_metric_value = ClassificationMetrics.recall(predicted=fitted_model.predict(test_data),
+                        best_metric_value = ClassificationMetrics.recall(predicted=prediction,
                                                                          expected=expected,
                                                                          positive_class=positive_class)  # type: ignore[arg-type]
                     case "f1_score":
                         best_metric_value = ClassificationMetrics.f1_score(
-                            predicted=fitted_model.predict(test_data),
+                            predicted=prediction,
                             expected=expected,
                             positive_class=positive_class)  # type: ignore[arg-type]
             else:
                 match optimization_metric:
                     case "accuracy":
                         error_of_fitted_model = ClassificationMetrics.accuracy(
-                            predicted=fitted_model.predict(test_data),
+                            predicted=prediction,
                             expected=expected)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "precision":
                         error_of_fitted_model = ClassificationMetrics.precision(
-                            predicted=fitted_model.predict(test_data), expected=expected,
+                            predicted=prediction, expected=expected,
                             positive_class=positive_class)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "recall":
                         error_of_fitted_model = ClassificationMetrics.recall(
-                            predicted=fitted_model.predict(test_data),
+                            predicted=prediction,
                             expected=expected,
                             positive_class=positive_class)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
@@ -1233,7 +1245,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "f1_score":
                         error_of_fitted_model = ClassificationMetrics.f1_score(
-                            predicted=fitted_model.predict(test_data), expected=expected,
+                            predicted=prediction, expected=expected,
                             positive_class=positive_class)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
@@ -1242,6 +1254,14 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         best_model._is_fitted = True
         return best_model
 
+    def _inverse_one_hot_encode_by_index_of_column(self, table: Table) -> Column:
+        indices = []
+        for row_index in range(table.row_count):
+            for column_index in range(table.column_count):
+                if table.get_column(table.column_names[column_index]).get_value(row_index) == 1.0:
+                    indices.append(column_index)
+                    break
+        return Column("class_index", indices)
 
     def _get_models_for_all_choices(self) -> list[Self]:
         all_possible_layer_combinations: list[list] = [[]]
