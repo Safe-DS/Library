@@ -369,12 +369,7 @@ class TestClassificationModel:
                 "accuracy",
                 epoch_size=15,
             )
-            print("Exhaustive Model Prediction:")
             exhaustive_prediction = trained_model.predict(train_table).target
-            print(exhaustive_prediction)
-
-            print("Actual Values:")
-            print(test_table)
 
     class TestPredict:
         @pytest.mark.parametrize(

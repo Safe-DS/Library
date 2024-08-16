@@ -98,7 +98,7 @@ class RegressionMetrics(ABC):
         if isinstance(expected.get_value(0), Column):
             sum_of_coefficient_of_determination = 0.0
             for i in range(0, expected.row_count):
-                predicted_row_as_col = Column("predicted", predicted[i])
+                predicted_row_as_col: Column = Column("predicted", predicted[i])
                 expected_row_as_col = expected.get_value(i)
                 sum_of_coefficient_of_determination += RegressionMetrics.coefficient_of_determination(predicted_row_as_col, expected_row_as_col)
             return sum_of_coefficient_of_determination / expected.row_count
@@ -148,7 +148,7 @@ class RegressionMetrics(ABC):
         if isinstance(expected.get_value(0), Column):
             sum_of_mean_absolute_errors = 0.0
             for i in range(0, expected.row_count):
-                predicted_row_as_col = Column("predicted", predicted[i])
+                predicted_row_as_col: Column = Column("predicted", predicted[i])
                 expected_row_as_col = expected.get_value(i)
                 sum_of_mean_absolute_errors += RegressionMetrics.mean_absolute_error(predicted_row_as_col, expected_row_as_col)
             return sum_of_mean_absolute_errors / expected.row_count
@@ -193,7 +193,7 @@ class RegressionMetrics(ABC):
         if isinstance(expected.get_value(0), Column):
             sum_of_mean_directional_accuracy = 0.0
             for i in range(0, expected.row_count):
-                predicted_row_as_col = Column("predicted", predicted[i])
+                predicted_row_as_col: Column = Column("predicted", predicted[i])
                 expected_row_as_col = expected.get_value(i)
                 sum_of_mean_directional_accuracy += RegressionMetrics.mean_directional_accuracy(predicted_row_as_col, expected_row_as_col)
             return sum_of_mean_directional_accuracy / expected.row_count
@@ -241,7 +241,7 @@ class RegressionMetrics(ABC):
         if isinstance(expected.get_value(0), Column):
             sum_of_mean_squared_errors = 0.0
             for i in range(0, expected.row_count):
-                predicted_row_as_col = Column("predicted", predicted[i])
+                predicted_row_as_col: Column = Column("predicted", predicted[i])
                 expected_row_as_col = expected.get_value(i)
                 sum_of_mean_squared_errors += RegressionMetrics.mean_squared_error(predicted_row_as_col, expected_row_as_col)
             return sum_of_mean_squared_errors / expected.row_count
@@ -282,7 +282,7 @@ class RegressionMetrics(ABC):
         if isinstance(expected.get_value(0), Column):
             sum_of_median_absolute_deviation = 0.0
             for i in range(0, expected.row_count):
-                predicted_row_as_col = Column("predicted", predicted[i])
+                predicted_row_as_col: Column = Column("predicted", predicted[i])
                 expected_row_as_col = expected.get_value(i)
                 sum_of_median_absolute_deviation += RegressionMetrics.median_absolute_deviation(predicted_row_as_col,
                                                                                    expected_row_as_col)
@@ -293,7 +293,7 @@ class RegressionMetrics(ABC):
 
 def _extract_target(column_or_dataset: Column | TabularDataset | TimeSeriesDataset) -> Column:
     """Extract the target column from the given column or dataset."""
-    if isinstance(column_or_dataset, TabularDataset) or isinstance(column_or_dataset, TimeSeriesDataset):
+    if isinstance(column_or_dataset, (TabularDataset, TimeSeriesDataset)):
         return column_or_dataset.target
     else:
         return column_or_dataset
