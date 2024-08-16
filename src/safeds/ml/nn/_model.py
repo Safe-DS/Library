@@ -908,8 +908,6 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
 
         if isinstance(train_data, TimeSeriesDataset) and train_data.continuous:
             raise NotImplementedError("Continuous Predictions are currently not supported for Time Series Classification.")
-        if isinstance(train_data, ImageDataset) and isinstance(self._input_conversion, InputConversionImageToImage):
-            raise NotImplementedError("Hyperparameter Optimization for Images as Output is currently not supported.")
 
         _check_bounds("epoch_size", epoch_size, lower_bound=_ClosedBound(1))
         _check_bounds("batch_size", batch_size, lower_bound=_ClosedBound(1))
