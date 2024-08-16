@@ -182,7 +182,6 @@ class ClassificationMetrics(ABC):
                     predicted_row_as_col,
                     expected_row_as_col, positive_class)
             return sum_of_precisions / expected.row_count
-
         true_positives = (expected._series.eq(positive_class) & predicted._series.eq(positive_class)).sum()
         predicted_positives = predicted._series.eq(positive_class).sum()
 

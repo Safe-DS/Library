@@ -935,8 +935,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         if isinstance(train_data, TabularDataset):
             return self._get_best_fnn_model(list_of_fitted_models, test_set, optimization_metric, positive_class)
         elif isinstance(train_data, TimeSeriesDataset):
-            return self._get_best_rnn_model(list_of_fitted_models, train_set, test_set, optimization_metric,
-                                            positive_class)
+            return self._get_best_rnn_model(list_of_fitted_models, train_set, test_set, optimization_metric, positive_class)
         else:
             if isinstance(self._input_conversion, InputConversionImageToColumn):
                 return self._get_best_cnn_model_column(list_of_fitted_models, train_set, optimization_metric,
