@@ -335,7 +335,11 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
             for model in list_of_models:
                 futures.append(
                     executor.submit(
-                        model.fit, train_set, epoch_size, batch_size, learning_rate,  # type: ignore[arg-type]
+                        model.fit,
+                        train_set,
+                        epoch_size,
+                        batch_size,
+                        learning_rate,  # type: ignore[arg-type]
                     ),
                 )  # type: ignore[arg-type]
             [done, _] = wait(futures, return_when=ALL_COMPLETED)
@@ -347,7 +351,10 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
             return self._get_best_fnn_model(list_of_fitted_models, test_set, optimization_metric)
         else:  # train_data is TimeSeriesDataset
             return self._get_best_rnn_model(
-                list_of_fitted_models, train_set, test_set, optimization_metric,  # type: ignore[arg-type]
+                list_of_fitted_models,
+                train_set,
+                test_set,
+                optimization_metric,  # type: ignore[arg-type]
             )  # type: ignore[arg-type]
 
     def _data_split_table(self, data: TabularDataset) -> tuple[TabularDataset, TabularDataset]:
@@ -949,7 +956,11 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
             for model in list_of_models:
                 futures.append(
                     executor.submit(
-                        model.fit, train_set, epoch_size, batch_size, learning_rate,  # type: ignore[arg-type]
+                        model.fit,
+                        train_set,
+                        epoch_size,
+                        batch_size,
+                        learning_rate,  # type: ignore[arg-type]
                     ),
                 )  # type: ignore[arg-type]
             [done, _] = wait(futures, return_when=ALL_COMPLETED)
@@ -963,17 +974,23 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
             return self._get_best_rnn_model(
                 list_of_fitted_models,
                 train_set,  # type: ignore[arg-type]
-                test_set,   # type: ignore[arg-type]
+                test_set,  # type: ignore[arg-type]
                 optimization_metric,  # type: ignore[arg-type]
                 positive_class,
             )  # type: ignore[arg-type]
         elif isinstance(self._input_conversion, InputConversionImageToColumn):
             return self._get_best_cnn_model_column(
-                list_of_fitted_models, train_set, optimization_metric, positive_class,  # type: ignore[arg-type]
+                list_of_fitted_models,
+                train_set,
+                optimization_metric,
+                positive_class,  # type: ignore[arg-type]
             )  # type: ignore[arg-type]
         else:  # ImageToTable
             return self._get_best_cnn_model_table(
-                list_of_fitted_models, train_set, optimization_metric, positive_class,  # type: ignore[arg-type]
+                list_of_fitted_models,
+                train_set,
+                optimization_metric,
+                positive_class,  # type: ignore[arg-type]
             )  # type: ignore[arg-type]
 
     def _data_split_table(self, data: TabularDataset) -> tuple[TabularDataset, TabularDataset]:
@@ -1194,15 +1211,21 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
                         best_metric_value = ClassificationMetrics.accuracy(predicted=prediction, expected=expected)
                     case "precision":
                         best_metric_value = ClassificationMetrics.precision(
-                            predicted=prediction, expected=expected, positive_class=positive_class,
+                            predicted=prediction,
+                            expected=expected,
+                            positive_class=positive_class,
                         )
                     case "recall":
                         best_metric_value = ClassificationMetrics.recall(
-                            predicted=prediction, expected=expected, positive_class=positive_class,
+                            predicted=prediction,
+                            expected=expected,
+                            positive_class=positive_class,
                         )
                     case "f1_score":
                         best_metric_value = ClassificationMetrics.f1_score(
-                            predicted=prediction, expected=expected, positive_class=positive_class,
+                            predicted=prediction,
+                            expected=expected,
+                            positive_class=positive_class,
                         )
             else:
                 match optimization_metric:
@@ -1213,21 +1236,27 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "precision":
                         error_of_fitted_model = ClassificationMetrics.precision(
-                            predicted=prediction, expected=expected, positive_class=positive_class,
+                            predicted=prediction,
+                            expected=expected,
+                            positive_class=positive_class,
                         )
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "recall":
                         error_of_fitted_model = ClassificationMetrics.recall(
-                            predicted=prediction, expected=expected, positive_class=positive_class,
+                            predicted=prediction,
+                            expected=expected,
+                            positive_class=positive_class,
                         )
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "f1_score":
                         error_of_fitted_model = ClassificationMetrics.f1_score(
-                            predicted=prediction, expected=expected, positive_class=positive_class,
+                            predicted=prediction,
+                            expected=expected,
+                            positive_class=positive_class,
                         )
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
@@ -1266,7 +1295,8 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
                 match optimization_metric:
                     case "accuracy":
                         best_metric_value = ClassificationMetrics.accuracy(
-                            predicted=prediction, expected=expected,  # type: ignore[arg-type]
+                            predicted=prediction,
+                            expected=expected,  # type: ignore[arg-type]
                         )  # type: ignore[arg-type]
                     case "precision":
                         best_metric_value = ClassificationMetrics.precision(
@@ -1290,7 +1320,8 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
                 match optimization_metric:
                     case "accuracy":
                         error_of_fitted_model = ClassificationMetrics.accuracy(
-                            predicted=prediction, expected=expected,  # type: ignore[arg-type]
+                            predicted=prediction,
+                            expected=expected,  # type: ignore[arg-type]
                         )  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover

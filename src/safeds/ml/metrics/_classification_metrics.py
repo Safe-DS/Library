@@ -55,7 +55,8 @@ class ClassificationMetrics(ABC):
 
     @staticmethod
     def accuracy(
-        predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset,
+        predicted: Column | TabularDataset | TimeSeriesDataset,
+        expected: Column | TabularDataset | TimeSeriesDataset,
     ) -> float:
         """
         Compute the accuracy on the given data.

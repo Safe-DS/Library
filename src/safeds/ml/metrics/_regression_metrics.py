@@ -15,7 +15,8 @@ class RegressionMetrics(ABC):
 
     @staticmethod
     def summarize(
-        predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset,
+        predicted: Column | TabularDataset | TimeSeriesDataset,
+        expected: Column | TabularDataset | TimeSeriesDataset,
     ) -> Table:
         """
         Summarize regression metrics on the given data.
@@ -60,7 +61,8 @@ class RegressionMetrics(ABC):
 
     @staticmethod
     def coefficient_of_determination(
-        predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset,
+        predicted: Column | TabularDataset | TimeSeriesDataset,
+        expected: Column | TabularDataset | TimeSeriesDataset,
     ) -> float:
         """
         Compute the coefficient of determination (R²) on the given data.
@@ -105,7 +107,8 @@ class RegressionMetrics(ABC):
                 predicted_row_as_col: Column = Column("predicted", predicted[i])
                 expected_row_as_col = expected.get_value(i)
                 sum_of_coefficient_of_determination += RegressionMetrics.coefficient_of_determination(
-                    predicted_row_as_col, expected_row_as_col,
+                    predicted_row_as_col,
+                    expected_row_as_col,
                 )
             return sum_of_coefficient_of_determination / expected.row_count
 
@@ -122,7 +125,8 @@ class RegressionMetrics(ABC):
 
     @staticmethod
     def mean_absolute_error(
-        predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset,
+        predicted: Column | TabularDataset | TimeSeriesDataset,
+        expected: Column | TabularDataset | TimeSeriesDataset,
     ) -> float:
         """
         Compute the mean absolute error (MAE) on the given data.
@@ -159,7 +163,8 @@ class RegressionMetrics(ABC):
                 predicted_row_as_col: Column = Column("predicted", predicted[i])
                 expected_row_as_col = expected.get_value(i)
                 sum_of_mean_absolute_errors += RegressionMetrics.mean_absolute_error(
-                    predicted_row_as_col, expected_row_as_col,
+                    predicted_row_as_col,
+                    expected_row_as_col,
                 )
             return sum_of_mean_absolute_errors / expected.row_count
 
@@ -167,7 +172,8 @@ class RegressionMetrics(ABC):
 
     @staticmethod
     def mean_directional_accuracy(
-        predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset,
+        predicted: Column | TabularDataset | TimeSeriesDataset,
+        expected: Column | TabularDataset | TimeSeriesDataset,
     ) -> float:
         """
         Compute the mean directional accuracy (MDA) on the given data.
@@ -207,7 +213,8 @@ class RegressionMetrics(ABC):
 
     @staticmethod
     def mean_squared_error(
-        predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset,
+        predicted: Column | TabularDataset | TimeSeriesDataset,
+        expected: Column | TabularDataset | TimeSeriesDataset,
     ) -> float:
         """
         Compute the mean squared error (MSE) on the given data.
@@ -246,7 +253,8 @@ class RegressionMetrics(ABC):
                 predicted_row_as_col: Column = Column("predicted", predicted[i])
                 expected_row_as_col = expected.get_value(i)
                 sum_of_mean_squared_errors += RegressionMetrics.mean_squared_error(
-                    predicted_row_as_col, expected_row_as_col,
+                    predicted_row_as_col,
+                    expected_row_as_col,
                 )
             return sum_of_mean_squared_errors / expected.row_count
 
@@ -254,7 +262,8 @@ class RegressionMetrics(ABC):
 
     @staticmethod
     def median_absolute_deviation(
-        predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset,
+        predicted: Column | TabularDataset | TimeSeriesDataset,
+        expected: Column | TabularDataset | TimeSeriesDataset,
     ) -> float:
         """
         Compute the median absolute deviation (MAD) on the given data.
@@ -291,7 +300,8 @@ class RegressionMetrics(ABC):
                 predicted_row_as_col: Column = Column("predicted", predicted[i])
                 expected_row_as_col = expected.get_value(i)
                 sum_of_median_absolute_deviation += RegressionMetrics.median_absolute_deviation(
-                    predicted_row_as_col, expected_row_as_col,
+                    predicted_row_as_col,
+                    expected_row_as_col,
                 )
             return sum_of_median_absolute_deviation / expected.row_count
 

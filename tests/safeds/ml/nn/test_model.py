@@ -212,7 +212,9 @@ class TestClassificationModel:
         def test_should_raise_when_time_series_classification_with_continuous_data(self, device: Device) -> None:
             configure_test_with_device(device)
             data = Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, 1, 0]}).to_time_series_dataset(
-                "c", 1, continuous=True,
+                "c",
+                1,
+                continuous=True,
             )
             model = NeuralNetworkClassifier(
                 InputConversionTimeSeries(),
@@ -331,7 +333,9 @@ class TestClassificationModel:
         def test_should_raise_when_time_series_classification_with_continuous_data(self, device: Device) -> None:
             configure_test_with_device(device)
             data = Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, 1, 0]}).to_time_series_dataset(
-                "c", 1, continuous=True,
+                "c",
+                1,
+                continuous=True,
             )
             model = NeuralNetworkClassifier(
                 InputConversionTimeSeries(),
@@ -432,7 +436,10 @@ class TestClassificationModel:
             assert not model.is_fitted
 
             fitted_model = model.fit_by_exhaustive_search(
-                train_table, optimization_metric=metric, positive_class=positive_class, epoch_size=2,
+                train_table,
+                optimization_metric=metric,
+                positive_class=positive_class,
+                epoch_size=2,
             )
 
             assert fitted_model.is_fitted
@@ -493,7 +500,10 @@ class TestClassificationModel:
             )
             assert not model.is_fitted
             fitted_model = model.fit_by_exhaustive_search(
-                image_dataset, epoch_size=2, optimization_metric=metric, positive_class=positive_class,
+                image_dataset,
+                epoch_size=2,
+                optimization_metric=metric,
+                positive_class=positive_class,
             )
 
             assert fitted_model.is_fitted
@@ -554,7 +564,10 @@ class TestClassificationModel:
             )
             assert not model.is_fitted
             fitted_model = model.fit_by_exhaustive_search(
-                image_dataset, epoch_size=2, optimization_metric=metric, positive_class=positive_class,
+                image_dataset,
+                epoch_size=2,
+                optimization_metric=metric,
+                positive_class=positive_class,
             )
 
             assert fitted_model.is_fitted
