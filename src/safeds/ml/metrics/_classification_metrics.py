@@ -240,7 +240,7 @@ class ClassificationMetrics(ABC):
 
 def _extract_target(column_or_dataset: Column | TabularDataset | TimeSeriesDataset) -> Column:
     """Extract the target column from the given column or dataset."""
-    if isinstance(column_or_dataset, (TabularDataset, TimeSeriesDataset)):
+    if isinstance(column_or_dataset, TabularDataset | TimeSeriesDataset):
         return column_or_dataset.target
     else:
         return column_or_dataset

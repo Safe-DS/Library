@@ -8,7 +8,7 @@ from safeds.data.image.containers import ImageList
 from safeds.data.image.typing import ImageSize
 from safeds.data.labeled.containers import TabularDataset, ImageDataset
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.transformation import RangeScaler, OneHotEncoder
+from safeds.data.tabular.transformation import RangeScaler, OneHotEncoder, LabelEncoder
 from safeds.exceptions import (
     FeatureDataMismatchError,
     FittingWithChoiceError,
@@ -260,6 +260,8 @@ class TestClassificationModel:
 
     class TestFitByExhaustiveSearch:
         def test_should_return_input_size(self, device: Device) -> None:
+            configure_test_with_device(device)
+
             model = NeuralNetworkClassifier(
                 InputConversionTable(),
                 [ForwardLayer(neuron_count=Choice(2, 4)), ForwardLayer(1)],
@@ -267,7 +269,6 @@ class TestClassificationModel:
                 Table.from_dict({"a": [1, 2, 3, 4], "b": [0, 1, 0, 1]}).to_tabular_dataset("b"),
                 "accuracy",
             )
-            device.type  # noqa: B018
             assert model.input_size == 1
 
         def test_should_raise_if_epoch_size_out_of_bounds_when_fitting_by_exhaustive_search(
@@ -333,12 +334,14 @@ class TestClassificationModel:
             ],
             ids=["accuracy", "precision", "recall", "f1_score"],
         )
-        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type_for_FNNs(
+        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type_for_fnns(
             self,
             metric: Literal["accuracy", "precision", "recall", "f1_score"],
             positive_class: Any,
             device: Device,
         ) -> None:
+            configure_test_with_device(device)
+
             model = NeuralNetworkClassifier(InputConversionTable(), [ForwardLayer(Choice(2, 4)), ForwardLayer(1)])
             assert not model.is_fitted
             fitted_model = model.fit_by_exhaustive_search(
@@ -346,7 +349,6 @@ class TestClassificationModel:
                 optimization_metric=metric,
                 positive_class=positive_class,
             )
-            device.type  # noqa: B018
             assert fitted_model.is_fitted
             assert isinstance(fitted_model, NeuralNetworkClassifier)
 
@@ -372,7 +374,7 @@ class TestClassificationModel:
             ],
             ids=["accuracy", "precision", "recall", "f1_score"],
         )
-        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type_for_RNNs(
+        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type_for_rnns(
             self,
             metric: Literal["accuracy", "precision", "recall", "f1_score"],
             positive_class: Any,
@@ -400,7 +402,7 @@ class TestClassificationModel:
 
             fitted_model = model.fit_by_exhaustive_search(train_table, optimization_metric=metric, positive_class=positive_class, epoch_size=2)
 
-            device.type  # noqa: B018
+            #device.type  # noqa: B018
             assert fitted_model.is_fitted
             assert isinstance(fitted_model, NeuralNetworkClassifier)
 
@@ -426,7 +428,62 @@ class TestClassificationModel:
             ],
             ids=["accuracy", "precision", "recall", "f1_score"],
         )
-        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type_for_CNNs(
+        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type_for_cnns_Column_Output(
+            self,
+            metric: Literal["accuracy", "precision", "recall", "f1_score"],
+            positive_class: Any,
+            device: Device,
+        ) -> None:
+            configure_test_with_device(device)
+
+            image_list, filenames = ImageList.from_files(resolve_resource_path(images_all()), return_filenames=True)
+            image_list = image_list.resize(20, 20)
+            classes = []
+            for filename in filenames:
+                groups = re.search(r"(.*)[\\/](.*)\.", filename)
+                if groups is not None:
+                    classes.append(groups.group(2))
+            image_classes = Table({"class": classes})
+            label_encoder = LabelEncoder()
+            (_, image_classes_label_encoded) = label_encoder.fit_and_transform(image_classes)
+            image_dataset = ImageDataset(image_list, image_classes_label_encoded.get_column("class"))
+            num_of_classes: int = image_dataset.output_size if isinstance(image_dataset.output_size, int) else 0
+            layers = [Convolutional2DLayer(1, 2), MaxPooling2DLayer(10), FlattenLayer(), ForwardLayer(Choice(10, 20)),
+                      ForwardLayer(num_of_classes)]
+            model = NeuralNetworkClassifier(
+                InputConversionImageToColumn(image_dataset.input_size),
+                layers,
+            )
+            assert not model.is_fitted
+            fitted_model = model.fit_by_exhaustive_search(image_dataset, epoch_size=2, optimization_metric=metric,
+                                                          positive_class=positive_class)
+
+            assert fitted_model.is_fitted
+            assert isinstance(fitted_model, NeuralNetworkClassifier)
+
+        @pytest.mark.parametrize(
+            ("metric", "positive_class"),
+            [
+                (
+                    "accuracy",
+                    None,
+                ),
+                (
+                    "precision",
+                    0,
+                ),
+                (
+                    "recall",
+                    0,
+                ),
+                (
+                    "f1_score",
+                    0,
+                ),
+            ],
+            ids=["accuracy", "precision", "recall", "f1_score"],
+        )
+        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type_for_cnns_Table_Output(
             self,
             metric: Literal["accuracy", "precision", "recall", "f1_score"],
             positive_class: Any,
@@ -454,7 +511,6 @@ class TestClassificationModel:
             assert not model.is_fitted
             fitted_model = model.fit_by_exhaustive_search(image_dataset, epoch_size=2, optimization_metric=metric, positive_class=positive_class)
 
-            device.type  # noqa: B018
             assert fitted_model.is_fitted
             assert isinstance(fitted_model, NeuralNetworkClassifier)
 
@@ -981,7 +1037,7 @@ class TestRegressionModel:
                 "coefficient_of_determination",
             ],
         )
-        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type_for_FNNs(
+        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type_for_fnns(
             self,
             metric: Literal[
                 "mean_squared_error",
@@ -1016,7 +1072,7 @@ class TestRegressionModel:
                 "coefficient_of_determination",
             ],
         )
-        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type_for_RNNs(
+        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type_for_rnns(
             self,
             metric: Literal[
                 "mean_squared_error",
