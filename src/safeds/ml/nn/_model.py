@@ -336,10 +336,10 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
                 futures.append(
                     executor.submit(
                         model.fit,
-                        train_set,
+                        train_set,  # type: ignore[arg-type]
                         epoch_size,
                         batch_size,
-                        learning_rate,  # type: ignore[arg-type]
+                        learning_rate,
                     ),
                 )  # type: ignore[arg-type]
             [done, _] = wait(futures, return_when=ALL_COMPLETED)
@@ -352,10 +352,10 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         else:  # train_data is TimeSeriesDataset
             return self._get_best_rnn_model(
                 list_of_fitted_models,
-                train_set,
-                test_set,
-                optimization_metric,  # type: ignore[arg-type]
-            )  # type: ignore[arg-type]
+                train_set,  # type: ignore[arg-type]
+                test_set,   # type: ignore[arg-type]
+                optimization_metric,
+            )
 
     def _data_split_table(self, data: TabularDataset) -> tuple[TabularDataset, TabularDataset]:
         [train_split, test_split] = data.to_table().split_rows(0.75)
@@ -957,10 +957,10 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
                 futures.append(
                     executor.submit(
                         model.fit,
-                        train_set,
+                        train_set,  # type: ignore[arg-type]
                         epoch_size,
                         batch_size,
-                        learning_rate,  # type: ignore[arg-type]
+                        learning_rate,
                     ),
                 )  # type: ignore[arg-type]
             [done, _] = wait(futures, return_when=ALL_COMPLETED)
@@ -975,23 +975,23 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
                 list_of_fitted_models,
                 train_set,  # type: ignore[arg-type]
                 test_set,  # type: ignore[arg-type]
-                optimization_metric,  # type: ignore[arg-type]
+                optimization_metric,
                 positive_class,
-            )  # type: ignore[arg-type]
+            )
         elif isinstance(self._input_conversion, InputConversionImageToColumn):
             return self._get_best_cnn_model_column(
                 list_of_fitted_models,
-                train_set,
+                train_set,  # type: ignore[arg-type]
                 optimization_metric,
-                positive_class,  # type: ignore[arg-type]
-            )  # type: ignore[arg-type]
+                positive_class,
+            )
         else:  # ImageToTable
             return self._get_best_cnn_model_table(
                 list_of_fitted_models,
-                train_set,
+                train_set,  # type: ignore[arg-type]
                 optimization_metric,
-                positive_class,  # type: ignore[arg-type]
-            )  # type: ignore[arg-type]
+                positive_class,
+            )
 
     def _data_split_table(self, data: TabularDataset) -> tuple[TabularDataset, TabularDataset]:
         [train_split, test_split] = data.to_table().split_rows(0.75)
