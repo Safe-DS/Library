@@ -3,12 +3,11 @@ import re
 from typing import Any, Literal
 
 import pytest
-
 from safeds.data.image.containers import ImageList
 from safeds.data.image.typing import ImageSize
-from safeds.data.labeled.containers import TabularDataset, ImageDataset
+from safeds.data.labeled.containers import ImageDataset, TabularDataset
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.transformation import RangeScaler, OneHotEncoder, LabelEncoder
+from safeds.data.tabular.transformation import LabelEncoder, OneHotEncoder, RangeScaler
 from safeds.exceptions import (
     FeatureDataMismatchError,
     FittingWithChoiceError,
@@ -28,7 +27,8 @@ from safeds.ml.nn.converters import (
     InputConversionImageToColumn,
     InputConversionImageToImage,
     InputConversionImageToTable,
-    InputConversionTable, InputConversionTimeSeries,
+    InputConversionTable,
+    InputConversionTimeSeries,
 )
 from safeds.ml.nn.layers import (
     AveragePooling2DLayer,
@@ -36,14 +36,15 @@ from safeds.ml.nn.layers import (
     ConvolutionalTranspose2DLayer,
     FlattenLayer,
     ForwardLayer,
+    GRULayer,
     Layer,
     LSTMLayer,
-    MaxPooling2DLayer, GRULayer,
+    MaxPooling2DLayer,
 )
 from safeds.ml.nn.typing import VariableImageSize
 from torch.types import Device
 
-from tests.helpers import configure_test_with_device, get_devices, get_devices_ids, resolve_resource_path, images_all
+from tests.helpers import configure_test_with_device, get_devices, get_devices_ids, images_all, resolve_resource_path
 
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
@@ -210,14 +211,16 @@ class TestClassificationModel:
 
         def test_should_raise_when_time_series_classification_with_continuous_data(self, device: Device) -> None:
             configure_test_with_device(device)
-            data = Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, 1, 0]}).to_time_series_dataset("c",1,continuous=True)
+            data = Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, 1, 0]}).to_time_series_dataset(
+                "c", 1, continuous=True,
+            )
             model = NeuralNetworkClassifier(
                 InputConversionTimeSeries(),
                 [ForwardLayer(neuron_count=4), LSTMLayer(neuron_count=1)],
             )
             with pytest.raises(
                 NotImplementedError,
-                match="Continuous Predictions are currently not supported for Time Series Classification."
+                match="Continuous Predictions are currently not supported for Time Series Classification.",
             ):
                 model.fit(data)
 
@@ -327,14 +330,16 @@ class TestClassificationModel:
 
         def test_should_raise_when_time_series_classification_with_continuous_data(self, device: Device) -> None:
             configure_test_with_device(device)
-            data = Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, 1, 0]}).to_time_series_dataset("c",1,continuous=True)
+            data = Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, 1, 0]}).to_time_series_dataset(
+                "c", 1, continuous=True,
+            )
             model = NeuralNetworkClassifier(
                 InputConversionTimeSeries(),
                 [ForwardLayer(neuron_count=Choice(2, 4)), LSTMLayer(neuron_count=1)],
             )
             with pytest.raises(
                 NotImplementedError,
-                match="Continuous Predictions are currently not supported for Time Series Classification."
+                match="Continuous Predictions are currently not supported for Time Series Classification.",
             ):
                 model.fit_by_exhaustive_search(data, "accuracy")
 
@@ -422,11 +427,13 @@ class TestClassificationModel:
             )
             model = NeuralNetworkClassifier(
                 InputConversionTimeSeries(),
-                [ForwardLayer(neuron_count=Choice(128,256)), GRULayer(128), LSTMLayer(neuron_count=1)],
+                [ForwardLayer(neuron_count=Choice(128, 256)), GRULayer(128), LSTMLayer(neuron_count=1)],
             )
             assert not model.is_fitted
 
-            fitted_model = model.fit_by_exhaustive_search(train_table, optimization_metric=metric, positive_class=positive_class, epoch_size=2)
+            fitted_model = model.fit_by_exhaustive_search(
+                train_table, optimization_metric=metric, positive_class=positive_class, epoch_size=2,
+            )
 
             assert fitted_model.is_fitted
             assert isinstance(fitted_model, NeuralNetworkClassifier)
@@ -473,15 +480,21 @@ class TestClassificationModel:
             (_, image_classes_label_encoded) = label_encoder.fit_and_transform(image_classes)
             image_dataset = ImageDataset(image_list, image_classes_label_encoded.get_column("class"))
             num_of_classes: int = image_dataset.output_size if isinstance(image_dataset.output_size, int) else 0
-            layers = [Convolutional2DLayer(1, 2), MaxPooling2DLayer(10), FlattenLayer(), ForwardLayer(Choice(10, 20)),
-                      ForwardLayer(num_of_classes)]
+            layers = [
+                Convolutional2DLayer(1, 2),
+                MaxPooling2DLayer(10),
+                FlattenLayer(),
+                ForwardLayer(Choice(10, 20)),
+                ForwardLayer(num_of_classes),
+            ]
             model = NeuralNetworkClassifier(
                 InputConversionImageToColumn(image_dataset.input_size),
                 layers,
             )
             assert not model.is_fitted
-            fitted_model = model.fit_by_exhaustive_search(image_dataset, epoch_size=2, optimization_metric=metric,
-                                                          positive_class=positive_class)
+            fitted_model = model.fit_by_exhaustive_search(
+                image_dataset, epoch_size=2, optimization_metric=metric, positive_class=positive_class,
+            )
 
             assert fitted_model.is_fitted
             assert isinstance(fitted_model, NeuralNetworkClassifier)
@@ -528,17 +541,24 @@ class TestClassificationModel:
             image_classes_one_hot_encoded = one_hot_encoder.transform(image_classes)
             image_dataset = ImageDataset(image_list, image_classes_one_hot_encoded)
             num_of_classes: int = image_dataset.output_size if isinstance(image_dataset.output_size, int) else 0
-            layers = [Convolutional2DLayer(1, 2), MaxPooling2DLayer(10), FlattenLayer(), ForwardLayer(Choice(10,20)), ForwardLayer(num_of_classes)]
+            layers = [
+                Convolutional2DLayer(1, 2),
+                MaxPooling2DLayer(10),
+                FlattenLayer(),
+                ForwardLayer(Choice(10, 20)),
+                ForwardLayer(num_of_classes),
+            ]
             model = NeuralNetworkClassifier(
                 InputConversionImageToTable(image_dataset.input_size),
                 layers,
             )
             assert not model.is_fitted
-            fitted_model = model.fit_by_exhaustive_search(image_dataset, epoch_size=2, optimization_metric=metric, positive_class=positive_class)
+            fitted_model = model.fit_by_exhaustive_search(
+                image_dataset, epoch_size=2, optimization_metric=metric, positive_class=positive_class,
+            )
 
             assert fitted_model.is_fitted
             assert isinstance(fitted_model, NeuralNetworkClassifier)
-
 
     class TestPredict:
         @pytest.mark.parametrize(

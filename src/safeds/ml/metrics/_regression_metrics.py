@@ -14,7 +14,9 @@ class RegressionMetrics(ABC):
     def __init__(self) -> None: ...
 
     @staticmethod
-    def summarize(predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset) -> Table:
+    def summarize(
+        predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset,
+    ) -> Table:
         """
         Summarize regression metrics on the given data.
 
@@ -57,7 +59,9 @@ class RegressionMetrics(ABC):
         )
 
     @staticmethod
-    def coefficient_of_determination(predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset) -> float:
+    def coefficient_of_determination(
+        predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset,
+    ) -> float:
         """
         Compute the coefficient of determination (R²) on the given data.
 
@@ -97,10 +101,12 @@ class RegressionMetrics(ABC):
         # Currently only used in fit_by_exhaustive_search, where prediction metrics have to be calculated internally.
         if isinstance(expected.get_value(0), Column):
             sum_of_coefficient_of_determination = 0.0
-            for i in range(0, expected.row_count):
+            for i in range(expected.row_count):
                 predicted_row_as_col: Column = Column("predicted", predicted[i])
                 expected_row_as_col = expected.get_value(i)
-                sum_of_coefficient_of_determination += RegressionMetrics.coefficient_of_determination(predicted_row_as_col, expected_row_as_col)
+                sum_of_coefficient_of_determination += RegressionMetrics.coefficient_of_determination(
+                    predicted_row_as_col, expected_row_as_col,
+                )
             return sum_of_coefficient_of_determination / expected.row_count
 
         residual_sum_of_squares = (expected._series - predicted._series).pow(2).sum()
@@ -115,7 +121,9 @@ class RegressionMetrics(ABC):
         return 1 - residual_sum_of_squares / total_sum_of_squares
 
     @staticmethod
-    def mean_absolute_error(predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset) -> float:
+    def mean_absolute_error(
+        predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset,
+    ) -> float:
         """
         Compute the mean absolute error (MAE) on the given data.
 
@@ -147,16 +155,20 @@ class RegressionMetrics(ABC):
         # Currently only used in fit_by_exhaustive_search, where prediction metrics have to be calculated internally.
         if isinstance(expected.get_value(0), Column):
             sum_of_mean_absolute_errors = 0.0
-            for i in range(0, expected.row_count):
+            for i in range(expected.row_count):
                 predicted_row_as_col: Column = Column("predicted", predicted[i])
                 expected_row_as_col = expected.get_value(i)
-                sum_of_mean_absolute_errors += RegressionMetrics.mean_absolute_error(predicted_row_as_col, expected_row_as_col)
+                sum_of_mean_absolute_errors += RegressionMetrics.mean_absolute_error(
+                    predicted_row_as_col, expected_row_as_col,
+                )
             return sum_of_mean_absolute_errors / expected.row_count
 
         return (expected._series - predicted._series).abs().mean()
 
     @staticmethod
-    def mean_directional_accuracy(predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset) -> float:
+    def mean_directional_accuracy(
+        predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset,
+    ) -> float:
         """
         Compute the mean directional accuracy (MDA) on the given data.
 
@@ -194,7 +206,9 @@ class RegressionMetrics(ABC):
         return predicted_directions.eq(expected_directions).mean()
 
     @staticmethod
-    def mean_squared_error(predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset) -> float:
+    def mean_squared_error(
+        predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset,
+    ) -> float:
         """
         Compute the mean squared error (MSE) on the given data.
 
@@ -228,16 +242,20 @@ class RegressionMetrics(ABC):
         # Currently only used in fit_by_exhaustive_search, where prediction metrics have to be calculated internally.
         if isinstance(expected.get_value(0), Column):
             sum_of_mean_squared_errors = 0.0
-            for i in range(0, expected.row_count):
+            for i in range(expected.row_count):
                 predicted_row_as_col: Column = Column("predicted", predicted[i])
                 expected_row_as_col = expected.get_value(i)
-                sum_of_mean_squared_errors += RegressionMetrics.mean_squared_error(predicted_row_as_col, expected_row_as_col)
+                sum_of_mean_squared_errors += RegressionMetrics.mean_squared_error(
+                    predicted_row_as_col, expected_row_as_col,
+                )
             return sum_of_mean_squared_errors / expected.row_count
 
         return (expected._series - predicted._series).pow(2).mean()
 
     @staticmethod
-    def median_absolute_deviation(predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset) -> float:
+    def median_absolute_deviation(
+        predicted: Column | TabularDataset | TimeSeriesDataset, expected: Column | TabularDataset | TimeSeriesDataset,
+    ) -> float:
         """
         Compute the median absolute deviation (MAD) on the given data.
 
@@ -269,11 +287,12 @@ class RegressionMetrics(ABC):
         # Currently only used in fit_by_exhaustive_search, where prediction metrics have to be calculated internally.
         if isinstance(expected.get_value(0), Column):
             sum_of_median_absolute_deviation = 0.0
-            for i in range(0, expected.row_count):
+            for i in range(expected.row_count):
                 predicted_row_as_col: Column = Column("predicted", predicted[i])
                 expected_row_as_col = expected.get_value(i)
-                sum_of_median_absolute_deviation += RegressionMetrics.median_absolute_deviation(predicted_row_as_col,
-                                                                                   expected_row_as_col)
+                sum_of_median_absolute_deviation += RegressionMetrics.median_absolute_deviation(
+                    predicted_row_as_col, expected_row_as_col,
+                )
             return sum_of_median_absolute_deviation / expected.row_count
 
         return (expected._series - predicted._series).abs().median()
