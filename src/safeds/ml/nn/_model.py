@@ -353,7 +353,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
             return self._get_best_rnn_model(
                 list_of_fitted_models,
                 train_set,  # type: ignore[arg-type]
-                test_set,   # type: ignore[arg-type]
+                test_set,  # type: ignore[arg-type]
                 optimization_metric,
             )
 
