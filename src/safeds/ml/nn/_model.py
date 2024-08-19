@@ -1189,7 +1189,8 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         #Set positive class to index of positive column, to be able to calculate Classification Metrics
         if positive_class is not None:
             for column_index in range(labels.column_count):
-                if labels.column_names[column_index] == positive_class:
+                #TODO Find out if a column is the positive class, maybe by the column name?
+                #if labels.column_names[column_index] == positive_class:
                     positive_class = labels.column_names[column_index]
                     break
 

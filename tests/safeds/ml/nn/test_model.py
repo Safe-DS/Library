@@ -208,6 +208,19 @@ class TestClassificationModel:
             ):
                 model.fit(table)
 
+        def test_should_raise_when_time_series_classification_with_continuous_data(self, device: Device) -> None:
+            configure_test_with_device(device)
+            data = Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, 1, 0]}).to_time_series_dataset("c",1,continuous=True)
+            model = NeuralNetworkClassifier(
+                InputConversionTimeSeries(),
+                [ForwardLayer(neuron_count=4), LSTMLayer(neuron_count=1)],
+            )
+            with pytest.raises(
+                NotImplementedError,
+                match="Continuous Predictions are currently not supported for Time Series Classification."
+            ):
+                model.fit(data)
+
         def test_should_raise_if_fit_doesnt_batch_callback(self, device: Device) -> None:
             configure_test_with_device(device)
             model = NeuralNetworkClassifier(
@@ -311,6 +324,19 @@ class TestClassificationModel:
                     Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("b"),
                     "accuracy",
                 )
+
+        def test_should_raise_when_time_series_classification_with_continuous_data(self, device: Device) -> None:
+            configure_test_with_device(device)
+            data = Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, 1, 0]}).to_time_series_dataset("c",1,continuous=True)
+            model = NeuralNetworkClassifier(
+                InputConversionTimeSeries(),
+                [ForwardLayer(neuron_count=Choice(2, 4)), LSTMLayer(neuron_count=1)],
+            )
+            with pytest.raises(
+                NotImplementedError,
+                match="Continuous Predictions are currently not supported for Time Series Classification."
+            ):
+                model.fit_by_exhaustive_search(data, "accuracy")
 
         @pytest.mark.parametrize(
             ("metric", "positive_class"),
