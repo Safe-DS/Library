@@ -218,7 +218,7 @@ class TestClassificationModel:
             )
             model = NeuralNetworkClassifier(
                 InputConversionTimeSeries(),
-                [ForwardLayer(neuron_count=4), LSTMLayer(neuron_count=1)],
+                [ForwardLayer(neuron_count=4), LSTMLayer(neuron_count=3)],
             )
             with pytest.raises(
                 NotImplementedError,
@@ -339,7 +339,7 @@ class TestClassificationModel:
             )
             model = NeuralNetworkClassifier(
                 InputConversionTimeSeries(),
-                [ForwardLayer(neuron_count=Choice(2, 4)), LSTMLayer(neuron_count=1)],
+                [ForwardLayer(neuron_count=Choice(2, 4)), LSTMLayer(neuron_count=3)],
             )
             with pytest.raises(
                 NotImplementedError,

@@ -1201,9 +1201,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         best_model = None
         best_metric_value = None
         for fitted_model in list_of_fitted_models:
-            prediction = self._inverse_one_hot_encode_by_index_of_column(
-                fitted_model.predict(input_data).get_output(),  # type: ignore[attr-defined, arg-type]
-            )
+            prediction = fitted_model.predict(input_data).get_output()  # type: ignore[attr-defined, arg-type]
             if best_model is None:
                 best_model = fitted_model
                 match optimization_metric:
@@ -1280,9 +1278,9 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         if positive_class is not None:
             for column_index in range(labels.column_count):
                 # TODO Find out if a column is the positive class, maybe by the column name?
-                # if labels.column_names[column_index] == positive_class:
-                positive_class = labels.column_names[column_index]
-                break
+                if labels.column_names[column_index] == positive_class:
+                    positive_class = labels.column_names[column_index]
+                    break
 
         best_model = None
         best_metric_value = None
