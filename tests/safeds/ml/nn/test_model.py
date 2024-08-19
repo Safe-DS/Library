@@ -50,13 +50,13 @@ from tests.helpers import configure_test_with_device, get_devices, get_devices_i
 class TestClassificationModel:
     class TestFit:
         def test_should_return_input_size(self, device: Device) -> None:
+            configure_test_with_device(device)
             model = NeuralNetworkClassifier(
                 InputConversionTable(),
                 [ForwardLayer(neuron_count=1)],
             ).fit(
                 Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
             )
-            device.type  # noqa: B018
             assert model.input_size == 1
 
         def test_should_raise_if_epoch_size_out_of_bounds(self, device: Device) -> None:
@@ -402,7 +402,6 @@ class TestClassificationModel:
 
             fitted_model = model.fit_by_exhaustive_search(train_table, optimization_metric=metric, positive_class=positive_class, epoch_size=2)
 
-            #device.type  # noqa: B018
             assert fitted_model.is_fitted
             assert isinstance(fitted_model, NeuralNetworkClassifier)
 
@@ -780,13 +779,13 @@ class TestClassificationModel:
 class TestRegressionModel:
     class TestFit:
         def test_should_return_input_size(self, device: Device) -> None:
+            configure_test_with_device(device)
             model = NeuralNetworkRegressor(
                 InputConversionTable(),
                 [ForwardLayer(neuron_count=1)],
             ).fit(
                 Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
             )
-            device.type  # noqa: B018
             assert model.input_size == 1
 
         def test_should_raise_if_epoch_size_out_of_bounds(self, device: Device) -> None:
@@ -971,6 +970,7 @@ class TestRegressionModel:
 
     class TestFitByExhaustiveSearch:
         def test_should_return_input_size(self, device: Device) -> None:
+            configure_test_with_device(device)
             model = NeuralNetworkRegressor(
                 InputConversionTable(),
                 [ForwardLayer(neuron_count=Choice(2, 4)), ForwardLayer(1)],
@@ -978,7 +978,6 @@ class TestRegressionModel:
                 Table.from_dict({"a": [1, 2, 3, 4], "b": [1.0, 2.0, 3.0, 4.0]}).to_tabular_dataset("b"),
                 "mean_squared_error",
             )
-            device.type  # noqa: B018
             assert model.input_size == 1
 
         def test_should_raise_if_epoch_size_out_of_bounds_when_fitting_by_exhaustive_search(
@@ -1098,13 +1097,62 @@ class TestRegressionModel:
             )
             model = NeuralNetworkRegressor(
                 InputConversionTimeSeries(),
-                [ForwardLayer(neuron_count=Choice(128,256)), GRULayer(128), LSTMLayer(neuron_count=1)],
+                [ForwardLayer(neuron_count=Choice(128, 256)), GRULayer(128), LSTMLayer(neuron_count=1)],
             )
             assert not model.is_fitted
 
             fitted_model = model.fit_by_exhaustive_search(train_table, optimization_metric=metric, epoch_size=2)
 
-            device.type  # noqa: B018
+            assert fitted_model.is_fitted
+            assert isinstance(fitted_model, NeuralNetworkRegressor)
+
+        @pytest.mark.parametrize(
+            "metric",
+            [
+                "mean_squared_error",
+                "mean_absolute_error",
+                "median_absolute_deviation",
+                "coefficient_of_determination",
+            ],
+            ids=[
+                "mean_squared_error",
+                "mean_absolute_error",
+                "median_absolute_deviation",
+                "coefficient_of_determination",
+            ],
+        )
+        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type_for_rnns_continuous(
+            self,
+            metric: Literal[
+                "mean_squared_error",
+                "mean_absolute_error",
+                "median_absolute_deviation",
+                "coefficient_of_determination",
+            ],
+            device: Device,
+        ) -> None:
+            configure_test_with_device(device)
+
+            # Create a DataFrame
+            _inflation_path = "_datas/US_Inflation_rates.csv"
+            table = Table.from_csv_file(path=resolve_resource_path(_inflation_path))
+            rs = RangeScaler(column_names="value")
+            _, table = rs.fit_and_transform(table)
+            train_table = table.to_time_series_dataset(
+                "value",
+                window_size=7,
+                forecast_horizon=12,
+                continuous=True,
+                extra_names=["date"],
+            )
+            model = NeuralNetworkRegressor(
+                InputConversionTimeSeries(),
+                [ForwardLayer(neuron_count=Choice(128, 256)), LSTMLayer(neuron_count=12)],
+            )
+            assert not model.is_fitted
+
+            fitted_model = model.fit_by_exhaustive_search(train_table, optimization_metric=metric, epoch_size=2)
+
             assert fitted_model.is_fitted
             assert isinstance(fitted_model, NeuralNetworkRegressor)
 

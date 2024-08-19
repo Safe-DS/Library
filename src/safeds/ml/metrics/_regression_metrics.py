@@ -187,18 +187,6 @@ class RegressionMetrics(ABC):
         if expected.row_count == 0:
             return 1.0
 
-        # For TimeSeries Predictions, where the output is a list of values.
-        # Expected results are internally converted to a column containing multiple Columns for each prediction window
-        # Currently only used in fit_by_exhaustive_search, where prediction metrics have to be calculated internally.
-        if isinstance(expected.get_value(0), Column):
-            sum_of_mean_directional_accuracy = 0.0
-            for i in range(0, expected.row_count):
-                predicted_row_as_col: Column = Column("predicted", predicted[i])
-                expected_row_as_col = expected.get_value(i)
-                sum_of_mean_directional_accuracy += RegressionMetrics.mean_directional_accuracy(predicted_row_as_col, expected_row_as_col)
-            return sum_of_mean_directional_accuracy / expected.row_count
-
-
         # Calculate the differences between the target values
         predicted_directions = predicted._series.diff().sign()
         expected_directions = expected._series.diff().sign()
