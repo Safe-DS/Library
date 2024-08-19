@@ -78,19 +78,6 @@ class ClassificationMetrics(ABC):
         if expected.row_count == 0:
             return 1.0  # Everything was predicted correctly (since there is nothing to predict)
 
-        # For TimeSeries Predictions, where the output is a list of values.
-        # Expected results are internally converted to a column containing multiple Columns for each prediction window
-        # Currently only used in fit_by_exhaustive_search, where prediction metrics have to be calculated internally.
-        if isinstance(expected.get_value(0), Column):
-            sum_of_accuracies = 0.0
-            for i in range(0, expected.row_count):
-                predicted_row_as_col: Column = Column("predicted", predicted[i])
-                expected_row_as_col = expected.get_value(i)
-                sum_of_accuracies += ClassificationMetrics.accuracy(
-                    predicted_row_as_col,
-                    expected_row_as_col)
-            return sum_of_accuracies / expected.row_count
-
         try:
             return expected._series.eq_missing(predicted._series).mean()
         except ComputeError:
@@ -121,19 +108,6 @@ class ClassificationMetrics(ABC):
         predicted = _extract_target(predicted)
         expected = _extract_target(expected)
         _check_equal_length(predicted, expected)
-
-        # For TimeSeries Predictions, where the output is a list of values.
-        # Expected results are internally converted to a column containing multiple Columns for each prediction window
-        # Currently only used in fit_by_exhaustive_search, where prediction metrics have to be calculated internally.
-        if isinstance(expected.get_value(0), Column):
-            sum_of_f1scores = 0.0
-            for i in range(0, expected.row_count):
-                predicted_row_as_col: Column = Column("predicted", predicted[i])
-                expected_row_as_col = expected.get_value(i)
-                sum_of_f1scores += ClassificationMetrics.f1_score(
-                    predicted_row_as_col,
-                    expected_row_as_col, positive_class)
-            return sum_of_f1scores / expected.row_count
 
         true_positives = (expected._series.eq(positive_class) & predicted._series.eq(positive_class)).sum()
         false_positives = (expected._series.ne(positive_class) & predicted._series.eq(positive_class)).sum()
@@ -170,18 +144,6 @@ class ClassificationMetrics(ABC):
         predicted = _extract_target(predicted)
         _check_equal_length(predicted, expected)
 
-        # For TimeSeries Predictions, where the output is a list of values.
-        # Expected results are internally converted to a column containing multiple Columns for each prediction window
-        # Currently only used in fit_by_exhaustive_search, where prediction metrics have to be calculated internally.
-        if isinstance(expected.get_value(0), Column):
-            sum_of_precisions = 0.0
-            for i in range(0, expected.row_count):
-                predicted_row_as_col: Column = Column("predicted", predicted[i])
-                expected_row_as_col = expected.get_value(i)
-                sum_of_precisions += ClassificationMetrics.precision(
-                    predicted_row_as_col,
-                    expected_row_as_col, positive_class)
-            return sum_of_precisions / expected.row_count
         true_positives = (expected._series.eq(positive_class) & predicted._series.eq(positive_class)).sum()
         predicted_positives = predicted._series.eq(positive_class).sum()
 
@@ -215,19 +177,6 @@ class ClassificationMetrics(ABC):
         expected = _extract_target(expected)
         predicted = _extract_target(predicted)
         _check_equal_length(predicted, expected)
-
-        # For TimeSeries Predictions, where the output is a list of values.
-        # Expected results are internally converted to a column containing multiple Columns for each prediction window
-        # Currently only used in fit_by_exhaustive_search, where prediction metrics have to be calculated internally.
-        if isinstance(expected.get_value(0), Column):
-            sum_of_recalls = 0.0
-            for i in range(0, expected.row_count):
-                predicted_row_as_col: Column = Column("predicted", predicted[i])
-                expected_row_as_col = expected.get_value(i)
-                sum_of_recalls += ClassificationMetrics.recall(
-                    predicted_row_as_col,
-                    expected_row_as_col, positive_class)
-            return sum_of_recalls / expected.row_count
 
         true_positives = (expected._series.eq(positive_class) & predicted._series.eq(positive_class)).sum()
         actual_positives = expected._series.eq(positive_class).sum()
