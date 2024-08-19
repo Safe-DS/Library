@@ -323,19 +323,15 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
 
         list_of_models = self._get_models_for_all_choices()
         list_of_fitted_models: list[Self] = []
-
         if isinstance(train_data, TabularDataset):
             (train_set, test_set) = self._data_split_table(train_data)
-        #elif isinstance(train_data, TimeSeriesDataset):
-        else:  # train_data is TimeSeriesDataset
-            (train_set, test_set) = self._data_split_time_series(train_data)
-        #else:  # train_data is ImageDataset
-        #    (train_set, test_set) = self._data_split_image(train_data)
+        else:
+            (train_set, test_set) = self._data_split_time_series(train_data)    # type: ignore[assignment]
 
         with ProcessPoolExecutor(max_workers=len(list_of_models), mp_context=mp.get_context("spawn")) as executor:
             futures = []
             for model in list_of_models:
-                futures.append(executor.submit(model.fit, train_set, epoch_size, batch_size, learning_rate))
+                futures.append(executor.submit(model.fit, train_set, epoch_size, batch_size, learning_rate))    # type: ignore[arg-type]
             [done, _] = wait(futures, return_when=ALL_COMPLETED)
             for future in done:
                 list_of_fitted_models.append(future.result())
@@ -343,10 +339,8 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
 
         if isinstance(train_data, TabularDataset):
             return self._get_best_fnn_model(list_of_fitted_models, test_set, optimization_metric)
-        #elif isinstance(train_data, TimeSeriesDataset):
         else:  #train_data is TimeSeriesDataset
-            return self._get_best_rnn_model(list_of_fitted_models, train_set, test_set, optimization_metric)
-        #else: # Image Data Splitting necessary
+            return self._get_best_rnn_model(list_of_fitted_models, train_set, test_set, optimization_metric)    # type: ignore[arg-type]
 
     def _data_split_table(self, data: TabularDataset) -> Tuple[TabularDataset, TabularDataset]:
         [train_split, test_split] = data.to_table().split_rows(0.75)
@@ -473,46 +467,46 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
                 match optimization_metric:
                     case "mean_squared_error":
                         best_metric_value = RegressionMetrics.mean_squared_error(
-                            predicted=fitted_model.predict(test_data),
+                            predicted=fitted_model.predict(test_data),  # type: ignore[arg-type]
                             expected=expected_values_as_col)  # type: ignore[arg-type]
                     case "mean_absolute_error":
                         best_metric_value = RegressionMetrics.mean_absolute_error(
-                            predicted=fitted_model.predict(test_data),
+                            predicted=fitted_model.predict(test_data),  # type: ignore[arg-type]
                             expected=expected_values_as_col)  # type: ignore[arg-type]
                     case "median_absolute_deviation":
                         best_metric_value = RegressionMetrics.median_absolute_deviation(
-                            predicted=fitted_model.predict(test_data),
+                            predicted=fitted_model.predict(test_data),  # type: ignore[arg-type]
                             expected=expected_values_as_col)  # type: ignore[arg-type]
                     case "coefficient_of_determination":
                         best_metric_value = RegressionMetrics.coefficient_of_determination(
-                            predicted=fitted_model.predict(test_data),
+                            predicted=fitted_model.predict(test_data),  # type: ignore[arg-type]
                             expected=expected_values_as_col)  # type: ignore[arg-type]
             else:
                 match optimization_metric:
                     case "mean_squared_error":
                         error_of_fitted_model = RegressionMetrics.mean_squared_error(
-                            predicted=fitted_model.predict(test_data),
+                            predicted=fitted_model.predict(test_data),  # type: ignore[arg-type]
                             expected=expected_values_as_col)  # type: ignore[arg-type]
                         if error_of_fitted_model < best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "mean_absolute_error":
                         error_of_fitted_model = RegressionMetrics.mean_absolute_error(
-                            predicted=fitted_model.predict(test_data),
+                            predicted=fitted_model.predict(test_data),  # type: ignore[arg-type]
                             expected=expected_values_as_col)  # type: ignore[arg-type]
                         if error_of_fitted_model < best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "median_absolute_deviation":
                         error_of_fitted_model = RegressionMetrics.median_absolute_deviation(
-                            predicted=fitted_model.predict(test_data),
+                            predicted=fitted_model.predict(test_data),  # type: ignore[arg-type]
                             expected=expected_values_as_col)  # type: ignore[arg-type]
                         if error_of_fitted_model < best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = error_of_fitted_model  # pragma: no cover
                     case "coefficient_of_determination":
                         error_of_fitted_model = RegressionMetrics.coefficient_of_determination(
-                            predicted=fitted_model.predict(test_data),
+                            predicted=fitted_model.predict(test_data),  # type: ignore[arg-type]
                             expected=expected_values_as_col)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
@@ -918,15 +912,15 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         if isinstance(train_data, TabularDataset):
             (train_set, test_set) = self._data_split_table(train_data)
         elif isinstance(train_data, TimeSeriesDataset):
-            (train_set, test_set) = self._data_split_time_series(train_data)
+            (train_set, test_set) = self._data_split_time_series(train_data)    # type: ignore[assignment]
         else:  # train_data is ImageDataset
-            (train_set, test_set) = self._data_split_image(train_data)
+            (train_set, test_set) = self._data_split_image(train_data)  # type: ignore[assignment]
             pass
 
         with ProcessPoolExecutor(max_workers=len(list_of_models), mp_context=mp.get_context("spawn")) as executor:
             futures = []
             for model in list_of_models:
-                futures.append(executor.submit(model.fit, train_set, epoch_size, batch_size, learning_rate))
+                futures.append(executor.submit(model.fit, train_set, epoch_size, batch_size, learning_rate))    # type: ignore[arg-type]
             [done, _] = wait(futures, return_when=ALL_COMPLETED)
             for future in done:
                 list_of_fitted_models.append(future.result())
@@ -935,13 +929,13 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         if isinstance(train_data, TabularDataset):
             return self._get_best_fnn_model(list_of_fitted_models, test_set, optimization_metric, positive_class)
         elif isinstance(train_data, TimeSeriesDataset):
-            return self._get_best_rnn_model(list_of_fitted_models, train_set, test_set, optimization_metric, positive_class)
+            return self._get_best_rnn_model(list_of_fitted_models, train_set, test_set, optimization_metric, positive_class)    # type: ignore[arg-type]
         else:
             if isinstance(self._input_conversion, InputConversionImageToColumn):
-                return self._get_best_cnn_model_column(list_of_fitted_models, train_set, optimization_metric,
+                return self._get_best_cnn_model_column(list_of_fitted_models, train_set, optimization_metric,   # type: ignore[arg-type]
                                                        positive_class)
             else:  # ImageToTable
-                return self._get_best_cnn_model_table(list_of_fitted_models, train_set, optimization_metric,
+                return self._get_best_cnn_model_table(list_of_fitted_models, train_set, optimization_metric,    # type: ignore[arg-type]
                                                       positive_class)
     def _data_split_table(self, data: TabularDataset) -> Tuple[TabularDataset, TabularDataset]:
         [train_split, test_split] = data.to_table().split_rows(0.75)
@@ -1202,7 +1196,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         best_model = None
         best_metric_value = None
         for fitted_model in list_of_fitted_models:
-            prediction = self._inverse_one_hot_encode_by_index_of_column(fitted_model.predict(input_data).get_output()) # type: ignore[arg-type]
+            prediction = self._inverse_one_hot_encode_by_index_of_column(fitted_model.predict(input_data).get_output()) # type: ignore[arg-type] #type: ignore[attr-defined]
             if best_model is None:
                 best_model = fitted_model
                 match optimization_metric:
