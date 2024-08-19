@@ -962,8 +962,8 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         elif isinstance(train_data, TimeSeriesDataset):
             return self._get_best_rnn_model(
                 list_of_fitted_models,
-                train_set,
-                test_set,
+                train_set,  # type: ignore[arg-type]
+                test_set,   # type: ignore[arg-type]
                 optimization_metric,  # type: ignore[arg-type]
                 positive_class,
             )  # type: ignore[arg-type]
@@ -1185,8 +1185,8 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         best_metric_value = None
         for fitted_model in list_of_fitted_models:
             prediction = self._inverse_one_hot_encode_by_index_of_column(
-                fitted_model.predict(input_data).get_output(),
-            )  # type: ignore[attr-defined, arg-type]
+                fitted_model.predict(input_data).get_output(),  # type: ignore[attr-defined, arg-type]
+            )
             if best_model is None:
                 best_model = fitted_model
                 match optimization_metric:
@@ -1259,8 +1259,8 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         best_metric_value = None
         for fitted_model in list_of_fitted_models:
             prediction = self._inverse_one_hot_encode_by_index_of_column(
-                fitted_model.predict(input_data).get_output(),
-            )  # type: ignore[attr-defined, arg-type]
+                fitted_model.predict(input_data).get_output(),  # type: ignore[attr-defined, arg-type]
+            )
             if best_model is None:
                 best_model = fitted_model
                 match optimization_metric:
