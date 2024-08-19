@@ -428,7 +428,7 @@ class TestClassificationModel:
             ],
             ids=["accuracy", "precision", "recall", "f1_score"],
         )
-        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type_for_cnns_Column_Output(
+        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type_for_cnns_column_output(
             self,
             metric: Literal["accuracy", "precision", "recall", "f1_score"],
             positive_class: Any,
@@ -483,7 +483,7 @@ class TestClassificationModel:
             ],
             ids=["accuracy", "precision", "recall", "f1_score"],
         )
-        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type_for_cnns_Table_Output(
+        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type_for_cnns_table_output(
             self,
             metric: Literal["accuracy", "precision", "recall", "f1_score"],
             positive_class: Any,
