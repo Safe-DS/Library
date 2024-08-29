@@ -231,7 +231,7 @@ class TimeSeriesDataset(Dataset[Table, Column]):
         batch_size:
             The size of data batches that should be loaded at one time.
         continuous:
-            Whether or not to continue the forecast in the steps before forecast horizon.
+            Whether to continue the forecast in the steps before forecast horizon.
 
         Raises
         ------

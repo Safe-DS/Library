@@ -3,9 +3,11 @@ import re
 from typing import Any, Literal
 
 import pytest
+from safeds.data.image.containers import ImageList
 from safeds.data.image.typing import ImageSize
-from safeds.data.labeled.containers import TabularDataset
+from safeds.data.labeled.containers import ImageDataset, TabularDataset
 from safeds.data.tabular.containers import Table
+from safeds.data.tabular.transformation import LabelEncoder, OneHotEncoder, RangeScaler
 from safeds.exceptions import (
     FeatureDataMismatchError,
     FittingWithChoiceError,
@@ -26,6 +28,7 @@ from safeds.ml.nn.converters import (
     InputConversionImageToImage,
     InputConversionImageToTable,
     InputConversionTable,
+    InputConversionTimeSeries,
 )
 from safeds.ml.nn.layers import (
     AveragePooling2DLayer,
@@ -33,6 +36,7 @@ from safeds.ml.nn.layers import (
     ConvolutionalTranspose2DLayer,
     FlattenLayer,
     ForwardLayer,
+    GRULayer,
     Layer,
     LSTMLayer,
     MaxPooling2DLayer,
@@ -40,20 +44,20 @@ from safeds.ml.nn.layers import (
 from safeds.ml.nn.typing import VariableImageSize
 from torch.types import Device
 
-from tests.helpers import configure_test_with_device, get_devices, get_devices_ids
+from tests.helpers import configure_test_with_device, get_devices, get_devices_ids, images_all, resolve_resource_path
 
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestClassificationModel:
     class TestFit:
         def test_should_return_input_size(self, device: Device) -> None:
+            configure_test_with_device(device)
             model = NeuralNetworkClassifier(
                 InputConversionTable(),
                 [ForwardLayer(neuron_count=1)],
             ).fit(
                 Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
             )
-            device.type  # noqa: B018
             assert model.input_size == 1
 
         def test_should_raise_if_epoch_size_out_of_bounds(self, device: Device) -> None:
@@ -205,6 +209,23 @@ class TestClassificationModel:
             ):
                 model.fit(table)
 
+        def test_should_raise_when_time_series_classification_with_continuous_data(self, device: Device) -> None:
+            configure_test_with_device(device)
+            data = Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, 1, 0]}).to_time_series_dataset(
+                "c",
+                1,
+                continuous=True,
+            )
+            model = NeuralNetworkClassifier(
+                InputConversionTimeSeries(),
+                [ForwardLayer(neuron_count=4), LSTMLayer(neuron_count=3)],
+            )
+            with pytest.raises(
+                NotImplementedError,
+                match="Continuous Predictions are currently not supported for Time Series Classification.",
+            ):
+                model.fit(data)
+
         def test_should_raise_if_fit_doesnt_batch_callback(self, device: Device) -> None:
             configure_test_with_device(device)
             model = NeuralNetworkClassifier(
@@ -257,6 +278,8 @@ class TestClassificationModel:
 
     class TestFitByExhaustiveSearch:
         def test_should_return_input_size(self, device: Device) -> None:
+            configure_test_with_device(device)
+
             model = NeuralNetworkClassifier(
                 InputConversionTable(),
                 [ForwardLayer(neuron_count=Choice(2, 4)), ForwardLayer(1)],
@@ -264,7 +287,6 @@ class TestClassificationModel:
                 Table.from_dict({"a": [1, 2, 3, 4], "b": [0, 1, 0, 1]}).to_tabular_dataset("b"),
                 "accuracy",
             )
-            device.type  # noqa: B018
             assert model.input_size == 1
 
         def test_should_raise_if_epoch_size_out_of_bounds_when_fitting_by_exhaustive_search(
@@ -308,6 +330,23 @@ class TestClassificationModel:
                     "accuracy",
                 )
 
+        def test_should_raise_when_time_series_classification_with_continuous_data(self, device: Device) -> None:
+            configure_test_with_device(device)
+            data = Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, 1, 0]}).to_time_series_dataset(
+                "c",
+                1,
+                continuous=True,
+            )
+            model = NeuralNetworkClassifier(
+                InputConversionTimeSeries(),
+                [ForwardLayer(neuron_count=Choice(2, 4)), LSTMLayer(neuron_count=3)],
+            )
+            with pytest.raises(
+                NotImplementedError,
+                match="Continuous Predictions are currently not supported for Time Series Classification.",
+            ):
+                model.fit_by_exhaustive_search(data, "accuracy")
+
         @pytest.mark.parametrize(
             ("metric", "positive_class"),
             [
@@ -330,12 +369,14 @@ class TestClassificationModel:
             ],
             ids=["accuracy", "precision", "recall", "f1_score"],
         )
-        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type(
+        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type_for_fnns(
             self,
             metric: Literal["accuracy", "precision", "recall", "f1_score"],
             positive_class: Any,
             device: Device,
         ) -> None:
+            configure_test_with_device(device)
+
             model = NeuralNetworkClassifier(InputConversionTable(), [ForwardLayer(Choice(2, 4)), ForwardLayer(1)])
             assert not model.is_fitted
             fitted_model = model.fit_by_exhaustive_search(
@@ -343,12 +384,196 @@ class TestClassificationModel:
                 optimization_metric=metric,
                 positive_class=positive_class,
             )
-            device.type  # noqa: B018
+            assert fitted_model.is_fitted
+            assert isinstance(fitted_model, NeuralNetworkClassifier)
+
+        @pytest.mark.parametrize(
+            ("metric", "positive_class"),
+            [
+                (
+                    "accuracy",
+                    None,
+                ),
+                (
+                    "precision",
+                    0,
+                ),
+                (
+                    "recall",
+                    0,
+                ),
+                (
+                    "f1_score",
+                    0,
+                ),
+            ],
+            ids=["accuracy", "precision", "recall", "f1_score"],
+        )
+        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type_for_rnns(
+            self,
+            metric: Literal["accuracy", "precision", "recall", "f1_score"],
+            positive_class: Any,
+            device: Device,
+        ) -> None:
+            configure_test_with_device(device)
+
+            # Create a DataFrame
+            _inflation_path = "_datas/US_Inflation_rates.csv"
+            table = Table.from_csv_file(path=resolve_resource_path(_inflation_path))
+            rs = RangeScaler(column_names="value")
+            _, table = rs.fit_and_transform(table)
+            train_table = table.to_time_series_dataset(
+                "value",
+                window_size=7,
+                forecast_horizon=12,
+                continuous=False,
+                extra_names=["date"],
+            )
+            model = NeuralNetworkClassifier(
+                InputConversionTimeSeries(),
+                [ForwardLayer(neuron_count=Choice(128, 256)), GRULayer(128), LSTMLayer(neuron_count=1)],
+            )
+            assert not model.is_fitted
+
+            fitted_model = model.fit_by_exhaustive_search(
+                train_table,
+                optimization_metric=metric,
+                positive_class=positive_class,
+                epoch_size=2,
+            )
+
+            assert fitted_model.is_fitted
+            assert isinstance(fitted_model, NeuralNetworkClassifier)
+
+        @pytest.mark.parametrize(
+            ("metric", "positive_class"),
+            [
+                (
+                    "accuracy",
+                    None,
+                ),
+                (
+                    "precision",
+                    0,
+                ),
+                (
+                    "recall",
+                    0,
+                ),
+                (
+                    "f1_score",
+                    0,
+                ),
+            ],
+            ids=["accuracy", "precision", "recall", "f1_score"],
+        )
+        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type_for_cnns_column_output(
+            self,
+            metric: Literal["accuracy", "precision", "recall", "f1_score"],
+            positive_class: Any,
+            device: Device,
+        ) -> None:
+            configure_test_with_device(device)
+
+            image_list, filenames = ImageList.from_files(resolve_resource_path(images_all()), return_filenames=True)
+            image_list = image_list.resize(20, 20)
+            classes = []
+            for filename in filenames:
+                groups = re.search(r"(.*)[\\/](.*)\.", filename)
+                if groups is not None:
+                    classes.append(groups.group(2))
+            image_classes = Table({"class": classes})
+            label_encoder = LabelEncoder()
+            (_, image_classes_label_encoded) = label_encoder.fit_and_transform(image_classes)
+            image_dataset = ImageDataset(image_list, image_classes_label_encoded.get_column("class"))
+            num_of_classes: int = image_dataset.output_size if isinstance(image_dataset.output_size, int) else 0
+            layers = [
+                Convolutional2DLayer(1, 2),
+                MaxPooling2DLayer(10),
+                FlattenLayer(),
+                ForwardLayer(Choice(10, 20)),
+                ForwardLayer(num_of_classes),
+            ]
+            model = NeuralNetworkClassifier(
+                InputConversionImageToColumn(image_dataset.input_size),
+                layers,
+            )
+            assert not model.is_fitted
+            fitted_model = model.fit_by_exhaustive_search(
+                image_dataset,
+                epoch_size=2,
+                optimization_metric=metric,
+                positive_class=positive_class,
+            )
+
+            assert fitted_model.is_fitted
+            assert isinstance(fitted_model, NeuralNetworkClassifier)
+
+        @pytest.mark.parametrize(
+            ("metric", "positive_class"),
+            [
+                (
+                    "accuracy",
+                    None,
+                ),
+                (
+                    "precision",
+                    0,
+                ),
+                (
+                    "recall",
+                    0,
+                ),
+                (
+                    "f1_score",
+                    0,
+                ),
+            ],
+            ids=["accuracy", "precision", "recall", "f1_score"],
+        )
+        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type_for_cnns_table_output(
+            self,
+            metric: Literal["accuracy", "precision", "recall", "f1_score"],
+            positive_class: Any,
+            device: Device,
+        ) -> None:
+            configure_test_with_device(device)
+
+            image_list, filenames = ImageList.from_files(resolve_resource_path(images_all()), return_filenames=True)
+            image_list = image_list.resize(20, 20)
+            classes = []
+            for filename in filenames:
+                groups = re.search(r"(.*)[\\/](.*)\.", filename)
+                if groups is not None:
+                    classes.append(groups.group(2))
+            image_classes = Table({"class": classes})
+            one_hot_encoder = OneHotEncoder(column_names="class").fit(image_classes)
+            image_classes_one_hot_encoded = one_hot_encoder.transform(image_classes)
+            image_dataset = ImageDataset(image_list, image_classes_one_hot_encoded)
+            num_of_classes: int = image_dataset.output_size if isinstance(image_dataset.output_size, int) else 0
+            layers = [
+                Convolutional2DLayer(1, 2),
+                MaxPooling2DLayer(10),
+                FlattenLayer(),
+                ForwardLayer(Choice(10, 20)),
+                ForwardLayer(num_of_classes),
+            ]
+            model = NeuralNetworkClassifier(
+                InputConversionImageToTable(image_dataset.input_size),
+                layers,
+            )
+            assert not model.is_fitted
+            fitted_model = model.fit_by_exhaustive_search(
+                image_dataset,
+                epoch_size=2,
+                optimization_metric=metric,
+                positive_class=positive_class,
+            )
+
             assert fitted_model.is_fitted
             assert isinstance(fitted_model, NeuralNetworkClassifier)
 
     class TestPredict:
-
         @pytest.mark.parametrize(
             "batch_size",
             [
@@ -613,13 +838,13 @@ class TestClassificationModel:
 class TestRegressionModel:
     class TestFit:
         def test_should_return_input_size(self, device: Device) -> None:
+            configure_test_with_device(device)
             model = NeuralNetworkRegressor(
                 InputConversionTable(),
                 [ForwardLayer(neuron_count=1)],
             ).fit(
                 Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
             )
-            device.type  # noqa: B018
             assert model.input_size == 1
 
         def test_should_raise_if_epoch_size_out_of_bounds(self, device: Device) -> None:
@@ -804,6 +1029,7 @@ class TestRegressionModel:
 
     class TestFitByExhaustiveSearch:
         def test_should_return_input_size(self, device: Device) -> None:
+            configure_test_with_device(device)
             model = NeuralNetworkRegressor(
                 InputConversionTable(),
                 [ForwardLayer(neuron_count=Choice(2, 4)), ForwardLayer(1)],
@@ -811,7 +1037,6 @@ class TestRegressionModel:
                 Table.from_dict({"a": [1, 2, 3, 4], "b": [1.0, 2.0, 3.0, 4.0]}).to_tabular_dataset("b"),
                 "mean_squared_error",
             )
-            device.type  # noqa: B018
             assert model.input_size == 1
 
         def test_should_raise_if_epoch_size_out_of_bounds_when_fitting_by_exhaustive_search(
@@ -870,7 +1095,7 @@ class TestRegressionModel:
                 "coefficient_of_determination",
             ],
         )
-        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type(
+        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type_for_fnns(
             self,
             metric: Literal[
                 "mean_squared_error",
@@ -887,6 +1112,106 @@ class TestRegressionModel:
                 optimization_metric=metric,
             )
             device.type  # noqa: B018
+            assert fitted_model.is_fitted
+            assert isinstance(fitted_model, NeuralNetworkRegressor)
+
+        @pytest.mark.parametrize(
+            "metric",
+            [
+                "mean_squared_error",
+                "mean_absolute_error",
+                "median_absolute_deviation",
+                "coefficient_of_determination",
+            ],
+            ids=[
+                "mean_squared_error",
+                "mean_absolute_error",
+                "median_absolute_deviation",
+                "coefficient_of_determination",
+            ],
+        )
+        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type_for_rnns(
+            self,
+            metric: Literal[
+                "mean_squared_error",
+                "mean_absolute_error",
+                "median_absolute_deviation",
+                "coefficient_of_determination",
+            ],
+            device: Device,
+        ) -> None:
+            configure_test_with_device(device)
+
+            # Create a DataFrame
+            _inflation_path = "_datas/US_Inflation_rates.csv"
+            table = Table.from_csv_file(path=resolve_resource_path(_inflation_path))
+            rs = RangeScaler(column_names="value")
+            _, table = rs.fit_and_transform(table)
+            train_table = table.to_time_series_dataset(
+                "value",
+                window_size=7,
+                forecast_horizon=12,
+                continuous=False,
+                extra_names=["date"],
+            )
+            model = NeuralNetworkRegressor(
+                InputConversionTimeSeries(),
+                [ForwardLayer(neuron_count=Choice(128, 256)), GRULayer(128), LSTMLayer(neuron_count=1)],
+            )
+            assert not model.is_fitted
+
+            fitted_model = model.fit_by_exhaustive_search(train_table, optimization_metric=metric, epoch_size=2)
+
+            assert fitted_model.is_fitted
+            assert isinstance(fitted_model, NeuralNetworkRegressor)
+
+        @pytest.mark.parametrize(
+            "metric",
+            [
+                "mean_squared_error",
+                "mean_absolute_error",
+                "median_absolute_deviation",
+                "coefficient_of_determination",
+            ],
+            ids=[
+                "mean_squared_error",
+                "mean_absolute_error",
+                "median_absolute_deviation",
+                "coefficient_of_determination",
+            ],
+        )
+        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type_for_rnns_continuous(
+            self,
+            metric: Literal[
+                "mean_squared_error",
+                "mean_absolute_error",
+                "median_absolute_deviation",
+                "coefficient_of_determination",
+            ],
+            device: Device,
+        ) -> None:
+            configure_test_with_device(device)
+
+            # Create a DataFrame
+            _inflation_path = "_datas/US_Inflation_rates.csv"
+            table = Table.from_csv_file(path=resolve_resource_path(_inflation_path))
+            rs = RangeScaler(column_names="value")
+            _, table = rs.fit_and_transform(table)
+            train_table = table.to_time_series_dataset(
+                "value",
+                window_size=7,
+                forecast_horizon=12,
+                continuous=True,
+                extra_names=["date"],
+            )
+            model = NeuralNetworkRegressor(
+                InputConversionTimeSeries(),
+                [ForwardLayer(neuron_count=Choice(128, 256)), LSTMLayer(neuron_count=12)],
+            )
+            assert not model.is_fitted
+
+            fitted_model = model.fit_by_exhaustive_search(train_table, optimization_metric=metric, epoch_size=2)
+
             assert fitted_model.is_fitted
             assert isinstance(fitted_model, NeuralNetworkRegressor)
 
