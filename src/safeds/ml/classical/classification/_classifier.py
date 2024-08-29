@@ -314,7 +314,7 @@ class Classifier(SupervisedModel, ABC):
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = recall_of_fitted_model  # pragma: no cover
                     case "f1_score":
-                        f1score_of_fitted_model = fitted_model.f1score(test_data, positive_class)
+                        f1score_of_fitted_model = fitted_model.f1_score(test_data, positive_class)
                         if f1score_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = f1score_of_fitted_model  # pragma: no cover
