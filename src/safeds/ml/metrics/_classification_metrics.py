@@ -1,14 +1,11 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
-from safeds.data.labeled.containers import TabularDataset
-from safeds.data.tabular.containers import Table
+from safeds.data.labeled.containers import TabularDataset, TimeSeriesDataset
+from safeds.data.tabular.containers import Column, Table
 from safeds.exceptions import ColumnLengthMismatchError
-
-if TYPE_CHECKING:
-    from safeds.data.tabular.containers import Column
 
 
 class ClassificationMetrics(ABC):
@@ -18,7 +15,11 @@ class ClassificationMetrics(ABC):
     def __init__(self) -> None: ...
 
     @staticmethod
-    def summarize(predicted: Column | TabularDataset, expected: Column | TabularDataset, positive_class: Any) -> Table:
+    def summarize(
+        predicted: Column | TabularDataset | TimeSeriesDataset,
+        expected: Column | TabularDataset | TimeSeriesDataset,
+        positive_class: Any,
+    ) -> Table:
         """
         Summarize classification metrics on the given data.
 
@@ -53,7 +54,10 @@ class ClassificationMetrics(ABC):
         )
 
     @staticmethod
-    def accuracy(predicted: Column | TabularDataset, expected: Column | TabularDataset) -> float:
+    def accuracy(
+        predicted: Column | TabularDataset | TimeSeriesDataset,
+        expected: Column | TabularDataset | TimeSeriesDataset,
+    ) -> float:
         """
         Compute the accuracy on the given data.
 
@@ -87,7 +91,11 @@ class ClassificationMetrics(ABC):
             return 0.0  # Types are not compatible, so no prediction can be correct
 
     @staticmethod
-    def f1_score(predicted: Column | TabularDataset, expected: Column | TabularDataset, positive_class: Any) -> float:
+    def f1_score(
+        predicted: Column | TabularDataset | TimeSeriesDataset,
+        expected: Column | TabularDataset | TimeSeriesDataset,
+        positive_class: Any,
+    ) -> float:
         """
         Compute the F₁ score on the given data.
 
@@ -122,7 +130,11 @@ class ClassificationMetrics(ABC):
         return 2 * true_positives / (2 * true_positives + false_positives + false_negatives)
 
     @staticmethod
-    def precision(predicted: Column | TabularDataset, expected: Column | TabularDataset, positive_class: Any) -> float:
+    def precision(
+        predicted: Column | TabularDataset | TimeSeriesDataset,
+        expected: Column | TabularDataset | TimeSeriesDataset,
+        positive_class: Any,
+    ) -> float:
         """
         Compute the precision on the given data.
 
@@ -156,7 +168,11 @@ class ClassificationMetrics(ABC):
         return true_positives / predicted_positives
 
     @staticmethod
-    def recall(predicted: Column | TabularDataset, expected: Column | TabularDataset, positive_class: Any) -> float:
+    def recall(
+        predicted: Column | TabularDataset | TimeSeriesDataset,
+        expected: Column | TabularDataset | TimeSeriesDataset,
+        positive_class: Any,
+    ) -> float:
         """
         Compute the recall on the given data.
 
@@ -190,9 +206,9 @@ class ClassificationMetrics(ABC):
         return true_positives / actual_positives
 
 
-def _extract_target(column_or_dataset: Column | TabularDataset) -> Column:
+def _extract_target(column_or_dataset: Column | TabularDataset | TimeSeriesDataset) -> Column:
     """Extract the target column from the given column or dataset."""
-    if isinstance(column_or_dataset, TabularDataset):
+    if isinstance(column_or_dataset, TabularDataset | TimeSeriesDataset):
         return column_or_dataset.target
     else:
         return column_or_dataset
