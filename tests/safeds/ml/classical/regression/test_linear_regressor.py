@@ -117,7 +117,7 @@ class TestPenalty:
 
         def test_should_assert_alpha_is_set_correctly(self) -> None:
             alpha = 0.69
-            assert LinearRegressor.Penalty.ridge(alpha=alpha).alpha == alpha
+            assert LinearRegressor.Penalty.ridge(alpha=alpha).alpha == alpha    # type: ignore[attr-defined]
 
     class TestLasso:
         def test_str(self) -> None:
@@ -131,7 +131,7 @@ class TestPenalty:
 
         def test_should_assert_alpha_is_set_correctly(self) -> None:
             alpha = 0.69
-            assert LinearRegressor.Penalty.lasso(alpha=alpha).alpha == alpha
+            assert LinearRegressor.Penalty.lasso(alpha=alpha).alpha == alpha    # type: ignore[attr-defined]
 
     class TestElasticNet:
         def test_str(self) -> None:
@@ -156,6 +156,6 @@ class TestPenalty:
             alpha = 0.69
             lasso_ratio = 0.96
             elastic_pen = LinearRegressor.Penalty.elastic_net(alpha=alpha, lasso_ratio=lasso_ratio)
-            assert elastic_pen.alpha == alpha
-            assert elastic_pen.lasso_ratio == lasso_ratio
+            assert elastic_pen.alpha == alpha   # type: ignore[attr-defined]
+            assert elastic_pen.lasso_ratio == lasso_ratio   # type: ignore[attr-defined]
 
