@@ -115,6 +115,10 @@ class TestPenalty:
             with pytest.raises(OutOfBoundsError):
                 LinearRegressor(penalty=LinearRegressor.Penalty.ridge(alpha=alpha))
 
+        def test_should_assert_alpha_is_set_correctly(self) -> None:
+            alpha = 0.69
+            assert LinearRegressor.Penalty.ridge(alpha=alpha).alpha == alpha
+
     class TestLasso:
         def test_str(self) -> None:
             lasso_penalty = LinearRegressor.Penalty.lasso(0.5)
@@ -124,6 +128,10 @@ class TestPenalty:
         def test_should_raise_if_alpha_out_of_bounds_lasso(self, alpha: float | Choice[float]) -> None:
             with pytest.raises(OutOfBoundsError):
                 LinearRegressor(penalty=LinearRegressor.Penalty.lasso(alpha=alpha))
+
+        def test_should_assert_alpha_is_set_correctly(self) -> None:
+            alpha = 0.69
+            assert LinearRegressor.Penalty.lasso(alpha=alpha).alpha == alpha
 
     class TestElasticNet:
         def test_str(self) -> None:
@@ -143,3 +151,11 @@ class TestPenalty:
         def test_should_raise_if_lasso_ratio_out_of_bounds(self, lasso_ratio: float | Choice[float]) -> None:
             with pytest.raises(OutOfBoundsError):
                 LinearRegressor(penalty=LinearRegressor.Penalty.elastic_net(lasso_ratio=lasso_ratio))
+
+        def test_should_assert_alpha_is_set_correctly(self) -> None:
+            alpha = 0.69
+            lasso_ratio = 0.96
+            elastic_pen = LinearRegressor.Penalty.elastic_net(alpha=alpha, lasso_ratio=lasso_ratio)
+            assert elastic_pen.alpha == alpha
+            assert elastic_pen.lasso_ratio == lasso_ratio
+

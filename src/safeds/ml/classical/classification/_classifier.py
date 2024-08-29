@@ -294,7 +294,7 @@ class Classifier(SupervisedModel, ABC):
                         best_metric_value = fitted_model.precision(test_data, positive_class)
                     case "recall":
                         best_metric_value = fitted_model.recall(test_data, positive_class)
-                    case "f1score":
+                    case "f1_score":
                         best_metric_value = fitted_model.recall(test_data, positive_class)
             else:
                 match optimization_metric.value:
@@ -313,7 +313,7 @@ class Classifier(SupervisedModel, ABC):
                         if recall_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
                             best_metric_value = recall_of_fitted_model  # pragma: no cover
-                    case "f1score":
+                    case "f1_score":
                         f1score_of_fitted_model = fitted_model.f1score(test_data, positive_class)
                         if f1score_of_fitted_model > best_metric_value:
                             best_model = fitted_model  # pragma: no cover
