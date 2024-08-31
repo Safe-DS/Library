@@ -80,6 +80,12 @@ class SupervisedModel(ABC):
 
         Raises
         ------
+        PlainTableError
+            If a table is passed instead of a TabularDataset.
+        DatasetMissesDataError
+            If the given training set contains no data.
+        FittingWithChoiceError
+            When trying to call this method on a model with hyperparameter choices.
         LearningError
             If the training data contains invalid values or if the training failed.
         """
@@ -88,7 +94,8 @@ class SupervisedModel(ABC):
         if training_set.to_table().row_count == 0:
             raise DatasetMissesDataError
 
-        self._check_additional_fit_preconditions(training_set)
+        self._check_additional_fit_preconditions()
+        self._check_more_additional_fit_preconditions(training_set)
 
         wrapped_model = self._get_sklearn_model()
         _fit_sklearn_model_in_place(wrapped_model, training_set)
@@ -234,15 +241,14 @@ class SupervisedModel(ABC):
     # Template methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def _check_additional_fit_preconditions(self, training_set: TabularDataset) -> None:  # noqa: B027
-        """
-        Check additional preconditions for fitting the model and raise an error if any are violated.
+    def _check_additional_fit_preconditions(self) -> None:  # noqa: B027
+        """Check additional preconditions for fitting the model and raise an error if any are violated."""
 
-        Parameters
-        ----------
-        training_set:
-            The training data containing the features and target.
-        """
+    def _check_more_additional_fit_preconditions(self, training_set: TabularDataset) -> None:  # noqa: B027
+        """Check additional preconditions for fitting the model and raise an error if any are violated."""
+
+    def _check_additional_fit_by_exhaustive_search_preconditions(self) -> None:  # noqa: B027
+        """Check additional preconditions for fitting by exhaustive search and raise an error if any are violated."""
 
     def _check_additional_predict_preconditions(self, dataset: Table | TabularDataset) -> None:  # noqa: B027
         """
@@ -253,6 +259,10 @@ class SupervisedModel(ABC):
         dataset:
             The dataset containing at least the features.
         """
+
+    def _get_models_for_all_choices(self) -> list[Self]:
+        """Get a list of all possible models, given the Parameter Choices."""
+        raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
     def _clone(self) -> Self:

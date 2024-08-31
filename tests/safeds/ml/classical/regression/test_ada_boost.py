@@ -3,6 +3,7 @@ from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import OutOfBoundsError
 from safeds.ml.classical.regression import AdaBoostRegressor
+from safeds.ml.hyperparameters import Choice
 
 
 @pytest.fixture()
@@ -34,8 +35,8 @@ class TestMaxLearnerCount:
         assert fitted_model._wrapped_model is not None
         assert fitted_model._wrapped_model.n_estimators == 2
 
-    @pytest.mark.parametrize("max_learner_count", [-1, 0], ids=["minus_one", "zero"])
-    def test_should_raise_if_less_than_or_equal_to_0(self, max_learner_count: int) -> None:
+    @pytest.mark.parametrize("max_learner_count", [-1, 0, Choice(-1)], ids=["minus_one", "zero", "invalid_choice"])
+    def test_should_raise_if_less_than_or_equal_to_0(self, max_learner_count: int | Choice[int]) -> None:
         with pytest.raises(OutOfBoundsError):
             AdaBoostRegressor(max_learner_count=max_learner_count)
 
@@ -50,7 +51,7 @@ class TestLearningRate:
         assert fitted_model._wrapped_model is not None
         assert fitted_model._wrapped_model.learning_rate == 2
 
-    @pytest.mark.parametrize("learning_rate", [-1.0, 0.0], ids=["minus_one", "zero"])
-    def test_should_raise_if_less_than_or_equal_to_0(self, learning_rate: float) -> None:
+    @pytest.mark.parametrize("learning_rate", [-1.0, 0.0, Choice(-1.0)], ids=["minus_one", "zero", "invalid_choice"])
+    def test_should_raise_if_less_than_or_equal_to_0(self, learning_rate: float | Choice[float]) -> None:
         with pytest.raises(OutOfBoundsError):
             AdaBoostRegressor(learning_rate=learning_rate)

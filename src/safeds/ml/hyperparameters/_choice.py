@@ -19,12 +19,13 @@ class Choice(Collection[T]):
         """
         Create a new choice. Duplicate values will be removed.
 
+        Duplicate values will be removed.
+
         Parameters
         ----------
         *args:
             The values to choose from.
         """
-        self.elements = list(args)
         if len(args) < 1:
             raise EmptyChoiceError
         self.elements = list(dict.fromkeys(args))
