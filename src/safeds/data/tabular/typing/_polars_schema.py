@@ -26,8 +26,8 @@ class _PolarsSchema(Schema):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, schema: dict[str, pl.DataType]):
-        self._schema: dict[str, pl.DataType] = schema
+    def __init__(self, schema: pl.Schema):
+        self._schema: pl.Schema = schema
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, _PolarsSchema):
@@ -66,7 +66,7 @@ class _PolarsSchema(Schema):
 
     @property
     def column_names(self) -> list[str]:
-        return list(self._schema.keys())
+        return list(self._schema.names())
 
     # ------------------------------------------------------------------------------------------------------------------
     # Getters

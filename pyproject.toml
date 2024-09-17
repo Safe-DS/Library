@@ -16,15 +16,15 @@ packages = [
 python = "^3.11,<3.13"
 apipkg = "^3.0.2"
 matplotlib = "^3.6.3"
+numpy = "<3.0.0"
 pillow = ">=9.5,<11.0"
-polars = {extras = ["numpy", "pyarrow"], version = "^0.20.25"}
+polars = {extras = ["numpy", "pyarrow"], version = "^1.7.1"}
 scikit-learn = "^1.2.0"
 statsmodels = "^0.14.1"
-torch = "^2.3.0"
-torchvision = "^0.18.0"
-xxhash = "^3.4.1"
+torch = "^2.4.1"
+torchvision = "^0.19.1"
 transformers = "^4.40.2"
-numpy = "<2.0.0"
+xxhash = "^3.4.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.2.1,<9.0.0"
@@ -33,14 +33,14 @@ syrupy = "^4.6.0"
 torch = [
     # Install the CUDA version on Windows. Projects that depend on us always get their dependencies from PyPI, so
     # there's no point moving this to the main dependencies section.
-    { version = "^2.3.0", markers="sys_platform == 'win32'", source = "torch_cuda" },
-    { version = "^2.3.0", markers="sys_platform != 'win32'", source = "pypi" },
+    { version = "^2.4.1", markers="sys_platform == 'win32'", source = "torch_cuda" },
+    { version = "^2.4.1", markers="sys_platform != 'win32'", source = "pypi" },
 ]
 torchvision = [
     # Install the CUDA version on Windows. Projects that depend on us always get their dependencies from PyPI, so
     # there's no point moving this to the main dependencies section.
-    { version = "^0.18.0", markers="sys_platform == 'win32'", source = "torch_cuda" },
-    { version = "^0.18.0", markers="sys_platform != 'win32'", source = "pypi" },
+    { version = "^0.19.1", markers="sys_platform == 'win32'", source = "torch_cuda" },
+    { version = "^0.19.1", markers="sys_platform != 'win32'", source = "pypi" },
 ]
 
 [tool.poetry.group.docs.dependencies]

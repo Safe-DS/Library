@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import copy
-import multiprocessing as mp
-from concurrent.futures import ALL_COMPLETED, ProcessPoolExecutor, wait
 from typing import TYPE_CHECKING, Any, Generic, Literal, Self, TypeVar
 
 from safeds._config import _init_default_device
@@ -15,9 +13,7 @@ from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.exceptions import (
     FeatureDataMismatchError,
     FittingWithChoiceError,
-    FittingWithoutChoiceError,
     InvalidModelStructureError,
-    LearningError,
     ModelNotFittedError,
 )
 from safeds.ml.metrics import ClassificationMetrics, RegressionMetrics
@@ -267,95 +263,96 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         copied_model._model.eval()
         return copied_model
 
-    def fit_by_exhaustive_search(
-        self,
-        train_data: IFT,
-        optimization_metric: Literal[
-            "mean_squared_error",
-            "mean_absolute_error",
-            "median_absolute_deviation",
-            "coefficient_of_determination",
-        ],
-        epoch_size: int = 25,
-        batch_size: int = 1,
-        learning_rate: float = 0.001,
-    ) -> Self:
-        """
-        Use the hyperparameter choices to create multiple models and fit them.
-
-        **Note:** This model is not modified.
-
-        Parameters
-        ----------
-        train_data:
-            The data the network should be trained on.
-        optimization_metric:
-            The metric that should be used for determining the performance of a model.
-        epoch_size:
-            The number of times the training cycle should be done.
-        batch_size:
-            The size of data batches that should be loaded at one time.
-        learning_rate:
-            The learning rate of the neural network.
-
-        Returns
-        -------
-        best_model:
-            The model that performed the best out of all possible models given the Choices of hyperparameters.
-
-        Raises
-        ------
-        FittingWithoutChoiceError
-            When calling this method on a model without hyperparameter choices.
-        LearningError
-            If the training data contains invalid values or if the training failed. Currently raised, when calling this on RNNs or CNNs as well.
-        """
-        _init_default_device()
-
-        if not self._contains_choices():
-            raise FittingWithoutChoiceError
-
-        if isinstance(train_data, ImageDataset):
-            raise LearningError(
-                "Hyperparameter optimization is currently not supported for CNN Regression Tasks.",
-            )  # pragma: no cover
-
-        _check_bounds("epoch_size", epoch_size, lower_bound=_ClosedBound(1))
-        _check_bounds("batch_size", batch_size, lower_bound=_ClosedBound(1))
-
-        list_of_models = self._get_models_for_all_choices()
-        list_of_fitted_models: list[Self] = []
-        if isinstance(train_data, TabularDataset):
-            (train_set, test_set) = self._data_split_table(train_data)
-        else:
-            (train_set, test_set) = self._data_split_time_series(train_data)  # type: ignore[assignment]
-
-        with ProcessPoolExecutor(max_workers=len(list_of_models), mp_context=mp.get_context("spawn")) as executor:
-            futures = []
-            for model in list_of_models:
-                futures.append(
-                    executor.submit(
-                        model.fit,
-                        train_set,  # type: ignore[arg-type]
-                        epoch_size,
-                        batch_size,
-                        learning_rate,
-                    ),
-                )  # type: ignore[arg-type]
-            [done, _] = wait(futures, return_when=ALL_COMPLETED)
-            for future in done:
-                list_of_fitted_models.append(future.result())
-        executor.shutdown()
-
-        if isinstance(train_data, TabularDataset):
-            return self._get_best_fnn_model(list_of_fitted_models, test_set, optimization_metric)
-        else:  # train_data is TimeSeriesDataset
-            return self._get_best_rnn_model(
-                list_of_fitted_models,
-                train_set,  # type: ignore[arg-type]
-                test_set,  # type: ignore[arg-type]
-                optimization_metric,
-            )
+    # TODO: Does not work if tensorflow with CUDA is used
+    # def fit_by_exhaustive_search(
+    #     self,
+    #     train_data: IFT,
+    #     optimization_metric: Literal[
+    #         "mean_squared_error",
+    #         "mean_absolute_error",
+    #         "median_absolute_deviation",
+    #         "coefficient_of_determination",
+    #     ],
+    #     epoch_size: int = 25,
+    #     batch_size: int = 1,
+    #     learning_rate: float = 0.001,
+    # ) -> Self:
+    #     """
+    #     Use the hyperparameter choices to create multiple models and fit them.
+    #
+    #     **Note:** This model is not modified.
+    #
+    #     Parameters
+    #     ----------
+    #     train_data:
+    #         The data the network should be trained on.
+    #     optimization_metric:
+    #         The metric that should be used for determining the performance of a model.
+    #     epoch_size:
+    #         The number of times the training cycle should be done.
+    #     batch_size:
+    #         The size of data batches that should be loaded at one time.
+    #     learning_rate:
+    #         The learning rate of the neural network.
+    #
+    #     Returns
+    #     -------
+    #     best_model:
+    #         The model that performed the best out of all possible models given the Choices of hyperparameters.
+    #
+    #     Raises
+    #     ------
+    #     FittingWithoutChoiceError
+    #         When calling this method on a model without hyperparameter choices.
+    #     LearningError
+    #         If the training data contains invalid values or if the training failed. Currently raised, when calling this on RNNs or CNNs as well.
+    #     """
+    #     _init_default_device()
+    #
+    #     if not self._contains_choices():
+    #         raise FittingWithoutChoiceError
+    #
+    #     if isinstance(train_data, ImageDataset):
+    #         raise LearningError(
+    #             "Hyperparameter optimization is currently not supported for CNN Regression Tasks.",
+    #         )  # pragma: no cover
+    #
+    #     _check_bounds("epoch_size", epoch_size, lower_bound=_ClosedBound(1))
+    #     _check_bounds("batch_size", batch_size, lower_bound=_ClosedBound(1))
+    #
+    #     list_of_models = self._get_models_for_all_choices()
+    #     list_of_fitted_models: list[Self] = []
+    #     if isinstance(train_data, TabularDataset):
+    #         (train_set, test_set) = self._data_split_table(train_data)
+    #     else:
+    #         (train_set, test_set) = self._data_split_time_series(train_data)  # type: ignore[assignment]
+    #
+    #     with ProcessPoolExecutor(max_workers=len(list_of_models), mp_context=mp.get_context("spawn")) as executor:
+    #         futures = []
+    #         for model in list_of_models:
+    #             futures.append(
+    #                 executor.submit(
+    #                     model.fit,
+    #                     train_set,  # type: ignore[arg-type]
+    #                     epoch_size,
+    #                     batch_size,
+    #                     learning_rate,
+    #                 ),
+    #             )  # type: ignore[arg-type]
+    #         [done, _] = wait(futures, return_when=ALL_COMPLETED)
+    #         for future in done:
+    #             list_of_fitted_models.append(future.result())
+    #     executor.shutdown()
+    #
+    #     if isinstance(train_data, TabularDataset):
+    #         return self._get_best_fnn_model(list_of_fitted_models, test_set, optimization_metric)
+    #     else:  # train_data is TimeSeriesDataset
+    #         return self._get_best_rnn_model(
+    #             list_of_fitted_models,
+    #             train_set,  # type: ignore[arg-type]
+    #             test_set,  # type: ignore[arg-type]
+    #             optimization_metric,
+    #         )
 
     def _data_split_table(self, data: TabularDataset) -> tuple[TabularDataset, TabularDataset]:
         [train_split, test_split] = data.to_table().split_rows(0.75)
@@ -887,111 +884,112 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         copied_model._model.eval()
         return copied_model
 
-    def fit_by_exhaustive_search(
-        self,
-        train_data: IFT,
-        optimization_metric: Literal["accuracy", "precision", "recall", "f1_score"],
-        positive_class: Any = None,
-        epoch_size: int = 25,
-        batch_size: int = 1,
-        learning_rate: float = 0.001,
-    ) -> Self:
-        """
-        Use the hyperparameter choices to create multiple models and fit them.
-
-        **Note:** This model is not modified.
-
-        Parameters
-        ----------
-        train_data:
-            The data the network should be trained on.
-        optimization_metric:
-            The metric that should be used for determining the performance of a model.
-        positive_class:
-            The class to be considered positive. Only needs to be provided when choosing precision, recall or f1_score as the optimization metric.
-        epoch_size:
-            The number of times the training cycle should be done.
-        batch_size:
-            The size of data batches that should be loaded at one time.
-        learning_rate:
-            The learning rate of the neural network.
-
-        Returns
-        -------
-        best_model:
-            The model that performed the best out of all possible models given the Choices of hyperparameters.
-
-        Raises
-        ------
-        FittingWithoutChoiceError
-            When calling this method on a model without hyperparameter choices.
-        LearningError
-            If the training data contains invalid values or if the training failed.
-        """
-        _init_default_device()
-
-        if not self._contains_choices():
-            raise FittingWithoutChoiceError
-
-        if isinstance(train_data, TimeSeriesDataset) and train_data.continuous:
-            raise NotImplementedError(
-                "Continuous Predictions are currently not supported for Time Series Classification.",
-            )
-
-        _check_bounds("epoch_size", epoch_size, lower_bound=_ClosedBound(1))
-        _check_bounds("batch_size", batch_size, lower_bound=_ClosedBound(1))
-
-        list_of_models = self._get_models_for_all_choices()
-        list_of_fitted_models: list[Self] = []
-
-        if isinstance(train_data, TabularDataset):
-            (train_set, test_set) = self._data_split_table(train_data)
-        elif isinstance(train_data, TimeSeriesDataset):
-            (train_set, test_set) = self._data_split_time_series(train_data)  # type: ignore[assignment]
-        else:  # train_data is ImageDataset
-            (train_set, test_set) = self._data_split_image(train_data)  # type: ignore[assignment]
-
-        with ProcessPoolExecutor(max_workers=len(list_of_models), mp_context=mp.get_context("spawn")) as executor:
-            futures = []
-            for model in list_of_models:
-                futures.append(
-                    executor.submit(
-                        model.fit,
-                        train_set,  # type: ignore[arg-type]
-                        epoch_size,
-                        batch_size,
-                        learning_rate,
-                    ),
-                )  # type: ignore[arg-type]
-            [done, _] = wait(futures, return_when=ALL_COMPLETED)
-            for future in done:
-                list_of_fitted_models.append(future.result())
-        executor.shutdown()
-
-        if isinstance(train_data, TabularDataset):
-            return self._get_best_fnn_model(list_of_fitted_models, test_set, optimization_metric, positive_class)
-        elif isinstance(train_data, TimeSeriesDataset):
-            return self._get_best_rnn_model(
-                list_of_fitted_models,
-                train_set,  # type: ignore[arg-type]
-                test_set,  # type: ignore[arg-type]
-                optimization_metric,
-                positive_class,
-            )
-        elif isinstance(self._input_conversion, InputConversionImageToColumn):
-            return self._get_best_cnn_model_column(
-                list_of_fitted_models,
-                train_set,  # type: ignore[arg-type]
-                optimization_metric,
-                positive_class,
-            )
-        else:  # ImageToTable
-            return self._get_best_cnn_model_table(
-                list_of_fitted_models,
-                train_set,  # type: ignore[arg-type]
-                optimization_metric,
-                positive_class,
-            )
+    # TODO: Does not work if tensorflow with CUDA is used
+    # def fit_by_exhaustive_search(
+    #     self,
+    #     train_data: IFT,
+    #     optimization_metric: Literal["accuracy", "precision", "recall", "f1_score"],
+    #     positive_class: Any = None,
+    #     epoch_size: int = 25,
+    #     batch_size: int = 1,
+    #     learning_rate: float = 0.001,
+    # ) -> Self:
+    #     """
+    #     Use the hyperparameter choices to create multiple models and fit them.
+    #
+    #     **Note:** This model is not modified.
+    #
+    #     Parameters
+    #     ----------
+    #     train_data:
+    #         The data the network should be trained on.
+    #     optimization_metric:
+    #         The metric that should be used for determining the performance of a model.
+    #     positive_class:
+    #         The class to be considered positive. Only needs to be provided when choosing precision, recall or f1_score as the optimization metric.
+    #     epoch_size:
+    #         The number of times the training cycle should be done.
+    #     batch_size:
+    #         The size of data batches that should be loaded at one time.
+    #     learning_rate:
+    #         The learning rate of the neural network.
+    #
+    #     Returns
+    #     -------
+    #     best_model:
+    #         The model that performed the best out of all possible models given the Choices of hyperparameters.
+    #
+    #     Raises
+    #     ------
+    #     FittingWithoutChoiceError
+    #         When calling this method on a model without hyperparameter choices.
+    #     LearningError
+    #         If the training data contains invalid values or if the training failed.
+    #     """
+    #     _init_default_device()
+    #
+    #     if not self._contains_choices():
+    #         raise FittingWithoutChoiceError
+    #
+    #     if isinstance(train_data, TimeSeriesDataset) and train_data.continuous:
+    #         raise NotImplementedError(
+    #             "Continuous Predictions are currently not supported for Time Series Classification.",
+    #         )
+    #
+    #     _check_bounds("epoch_size", epoch_size, lower_bound=_ClosedBound(1))
+    #     _check_bounds("batch_size", batch_size, lower_bound=_ClosedBound(1))
+    #
+    #     list_of_models = self._get_models_for_all_choices()
+    #     list_of_fitted_models: list[Self] = []
+    #
+    #     if isinstance(train_data, TabularDataset):
+    #         (train_set, test_set) = self._data_split_table(train_data)
+    #     elif isinstance(train_data, TimeSeriesDataset):
+    #         (train_set, test_set) = self._data_split_time_series(train_data)  # type: ignore[assignment]
+    #     else:  # train_data is ImageDataset
+    #         (train_set, test_set) = self._data_split_image(train_data)  # type: ignore[assignment]
+    #
+    #     with ProcessPoolExecutor(max_workers=len(list_of_models), mp_context=mp.get_context("spawn")) as executor:
+    #         futures = []
+    #         for model in list_of_models:
+    #             futures.append(
+    #                 executor.submit(
+    #                     model.fit,
+    #                     train_set,  # type: ignore[arg-type]
+    #                     epoch_size,
+    #                     batch_size,
+    #                     learning_rate,
+    #                 ),
+    #             )  # type: ignore[arg-type]
+    #         [done, _] = wait(futures, return_when=ALL_COMPLETED)
+    #         for future in done:
+    #             list_of_fitted_models.append(future.result())
+    #     executor.shutdown()
+    #
+    #     if isinstance(train_data, TabularDataset):
+    #         return self._get_best_fnn_model(list_of_fitted_models, test_set, optimization_metric, positive_class)
+    #     elif isinstance(train_data, TimeSeriesDataset):
+    #         return self._get_best_rnn_model(
+    #             list_of_fitted_models,
+    #             train_set,  # type: ignore[arg-type]
+    #             test_set,  # type: ignore[arg-type]
+    #             optimization_metric,
+    #             positive_class,
+    #         )
+    #     elif isinstance(self._input_conversion, InputConversionImageToColumn):
+    #         return self._get_best_cnn_model_column(
+    #             list_of_fitted_models,
+    #             train_set,  # type: ignore[arg-type]
+    #             optimization_metric,
+    #             positive_class,
+    #         )
+    #     else:  # ImageToTable
+    #         return self._get_best_cnn_model_table(
+    #             list_of_fitted_models,
+    #             train_set,  # type: ignore[arg-type]
+    #             optimization_metric,
+    #             positive_class,
+    #         )
 
     def _data_split_table(self, data: TabularDataset) -> tuple[TabularDataset, TabularDataset]:
         [train_split, test_split] = data.to_table().split_rows(0.75)

@@ -242,7 +242,7 @@ class Table:
 
         try:
             return Table._from_polars_data_frame(pl.read_json(path))
-        except pl.PolarsPanicError:
+        except (pl.exceptions.PanicException, pl.exceptions.ComputeError):
             # Can happen if the JSON file is empty (https://github.com/pola-rs/polars/issues/10234)
             return Table()
 
@@ -322,7 +322,7 @@ class Table:
                 )
 
         # Implementation
-        self._lazy_frame: pl.LazyFrame = pl.LazyFrame(data)
+        self._lazy_frame: pl.LazyFrame = pl.LazyFrame(data, strict=False)
         self.__data_frame_cache: pl.DataFrame | None = None  # Scramble the name to prevent access from outside
 
     def __eq__(self, other: object) -> bool:
@@ -425,10 +425,10 @@ class Table:
         import polars as pl
 
         try:
-            return _PolarsSchema(self._lazy_frame.schema)
-        except (pl.NoDataError, pl.PolarsPanicError):
+            return _PolarsSchema(self._lazy_frame.collect_schema())
+        except (pl.exceptions.NoDataError, pl.exceptions.PanicException):
             # Can happen for some operations on empty tables (e.g. https://github.com/pola-rs/polars/issues/16202)
-            return _PolarsSchema({})
+            return _PolarsSchema(pl.Schema({}))
 
     # ------------------------------------------------------------------------------------------------------------------
     # Column operations
@@ -698,7 +698,7 @@ class Table:
             _check_columns_exist(self, names)
 
         return Table._from_polars_lazy_frame(
-            self._lazy_frame.drop(names),
+            self._lazy_frame.drop(names, strict=not ignore_unknown_names),
         )
 
     def remove_columns_except(
@@ -1919,8 +1919,6 @@ class Table:
     def to_json_file(
         self,
         path: str | Path,
-        *,
-        orientation: Literal["column", "row"] = "column",
     ) -> None:
         """
         Write the table to a JSON file.
@@ -1934,10 +1932,6 @@ class Table:
         ----------
         path:
             The path to the JSON file. If the file extension is omitted, it is assumed to be ".json".
-        orientation:
-            The orientation of the JSON file. If "column", the JSON file will be structured as a list of columns. If
-            "row", the JSON file will be structured as a list of rows. Row orientation is more human-readable, but
-            slower and less memory-efficient.
 
         Raises
         ------
@@ -1954,7 +1948,7 @@ class Table:
         path.parent.mkdir(parents=True, exist_ok=True)
 
         # Write JSON to file
-        self._data_frame.write_json(path, row_oriented=(orientation == "row"))
+        self._data_frame.write_json(path)
 
     def to_parquet_file(self, path: str | Path) -> None:
         """
