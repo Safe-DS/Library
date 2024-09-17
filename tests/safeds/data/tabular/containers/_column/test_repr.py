@@ -14,8 +14,8 @@ from safeds.data.tabular.containers import Column
             "+-----+\n|   a |\n| --- |\n| i64 |\n+=====+\n|   0 |\n+-----+",
         ),
         (
-            Column("a", [0, "1"]),
-            "+------+\n| a    |\n| ---  |\n| str  |\n+======+\n| null |\n| 1    |\n+------+",
+            Column("a", ["a", "b"]),
+            "+-----+\n| a   |\n| --- |\n| str |\n+=====+\n| a   |\n| b   |\n+-----+",
         ),
     ],
     ids=[
