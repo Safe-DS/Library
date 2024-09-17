@@ -18,7 +18,7 @@ apipkg = "^3.0.2"
 matplotlib = "^3.6.3"
 numpy = "<3.0.0"
 pillow = ">=9.5,<11.0"
-polars = {extras = ["numpy", "pyarrow"], version = "^0.20.25"}
+polars = {extras = ["numpy", "pyarrow"], version = "^1.7.1"}
 scikit-learn = "^1.2.0"
 statsmodels = "^0.14.1"
 torch = "^2.4.1"
