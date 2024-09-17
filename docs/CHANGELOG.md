@@ -3,7 +3,6 @@
 ### Features
 
 * hyperparameter optimization for classical models ([#843](https://github.com/Safe-DS/Library/issues/843)) ([d8f7491](https://github.com/Safe-DS/Library/commit/d8f7491fa556def596ce7b006053a4c03e6b9e3d)), closes [#264](https://github.com/Safe-DS/Library/issues/264)
-* hyperparamteroptimization for rnns and cnns ([#923](https://github.com/Safe-DS/Library/issues/923)) ([b1e8933](https://github.com/Safe-DS/Library/commit/b1e8933b0cf9ac2a30dc0ecec4a51fd76ab0fc40)), closes [#912](https://github.com/Safe-DS/Library/issues/912)
 
 ## [0.27.0](https://github.com/Safe-DS/Library/compare/v0.26.0...v0.27.0) (2024-07-19)
 
