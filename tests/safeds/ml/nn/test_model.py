@@ -1,17 +1,13 @@
 import pickle
 import re
-from typing import Any, Literal
 
 import pytest
-from safeds.data.image.containers import ImageList
 from safeds.data.image.typing import ImageSize
-from safeds.data.labeled.containers import ImageDataset, TabularDataset
+from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.transformation import LabelEncoder, OneHotEncoder, RangeScaler
 from safeds.exceptions import (
     FeatureDataMismatchError,
     FittingWithChoiceError,
-    FittingWithoutChoiceError,
     InvalidFitDataError,
     InvalidModelStructureError,
     ModelNotFittedError,
@@ -36,7 +32,6 @@ from safeds.ml.nn.layers import (
     ConvolutionalTranspose2DLayer,
     FlattenLayer,
     ForwardLayer,
-    GRULayer,
     Layer,
     LSTMLayer,
     MaxPooling2DLayer,
@@ -44,7 +39,7 @@ from safeds.ml.nn.layers import (
 from safeds.ml.nn.typing import VariableImageSize
 from torch.types import Device
 
-from tests.helpers import configure_test_with_device, get_devices, get_devices_ids, images_all, resolve_resource_path
+from tests.helpers import configure_test_with_device, get_devices, get_devices_ids
 
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
@@ -1113,7 +1108,7 @@ class TestRegressionModel:
     #             Table.from_dict({"a": [1, 2, 3, 4], "b": [1.0, 2.0, 3.0, 4.0]}).to_tabular_dataset("b"),
     #             optimization_metric=metric,
     #         )
-    #         device.type  # noqa: B018
+    #         device.type
     #         assert fitted_model.is_fitted
     #         assert isinstance(fitted_model, NeuralNetworkRegressor)
     #
