@@ -39,21 +39,27 @@ class _LazyCell(Cell[T]):
         return _wrap(self._expression.cast(pl.Boolean).__invert__())
 
     def __and__(self, other: bool | Cell[bool]) -> Cell[bool]:
+        other = _unwrap(other)
         return _wrap(self._expression.__and__(other))
 
     def __rand__(self, other: bool | Cell[bool]) -> Cell[bool]:
+        other = _unwrap(other)
         return _wrap(self._expression.__rand__(other))
 
     def __or__(self, other: bool | Cell[bool]) -> Cell[bool]:
+        other = _unwrap(other)
         return _wrap(self._expression.__or__(other))
 
     def __ror__(self, other: bool | Cell[bool]) -> Cell[bool]:
+        other = _unwrap(other)
         return _wrap(self._expression.__ror__(other))
 
     def __xor__(self, other: bool | Cell[bool]) -> Cell[bool]:
+        other = _unwrap(other)
         return _wrap(self._expression.__xor__(other))
 
     def __rxor__(self, other: bool | Cell[bool]) -> Cell[bool]:
+        other = _unwrap(other)
         return _wrap(self._expression.__rxor__(other))
 
     # Comparison ---------------------------------------------------------------

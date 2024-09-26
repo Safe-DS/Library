@@ -599,6 +599,36 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__eq__(other)
 
+    def neq(self, other: Any) -> Cell[bool]:
+        """
+        Check if not equal to a value. This is equivalent to the `!=` operator.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", [1, 2])
+        >>> column.transform(lambda cell: cell.neq(2))
+        +---------+
+        | example |
+        | ---     |
+        | bool    |
+        +=========+
+        | true    |
+        | false   |
+        +---------+
+
+        >>> column.transform(lambda cell: cell != 2)
+        +---------+
+        | example |
+        | ---     |
+        | bool    |
+        +=========+
+        | true    |
+        | false   |
+        +---------+
+        """
+        return self.__ne__(other)
+
     def ge(self, other: Any) -> Cell[bool]:
         """
         Check if greater than or equal to a value. This is equivalent to the `>=` operator.
