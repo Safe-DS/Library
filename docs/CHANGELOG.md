@@ -1,3 +1,9 @@
+## [0.28.1](https://github.com/Safe-DS/Library/compare/v0.28.0...v0.28.1) (2024-09-26)
+
+### Bug Fixes
+
+* unwrap operators of cell operations ([#932](https://github.com/Safe-DS/Library/issues/932)) ([533a966](https://github.com/Safe-DS/Library/commit/533a966624bbac2deeb84491d743f84d01512e50))
+
 ## [0.28.0](https://github.com/Safe-DS/Library/compare/v0.27.0...v0.28.0) (2024-09-17)
 
 ### Features
