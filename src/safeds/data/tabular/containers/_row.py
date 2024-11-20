@@ -28,7 +28,7 @@ class Row(ABC, Mapping[str, Any]):
     def __eq__(self, other: object) -> bool: ...
 
     def __getitem__(self, name: str) -> Cell:
-        return self.get_value(name)
+        return self.get_cell(name)
 
     @abstractmethod
     def __hash__(self) -> int: ...
@@ -66,9 +66,9 @@ class Row(ABC, Mapping[str, Any]):
     # ------------------------------------------------------------------------------------------------------------------
 
     @abstractmethod
-    def get_value(self, name: str) -> Cell:
+    def get_cell(self, name: str) -> Cell:
         """
-        Get the value of the specified column. This is equivalent to using the `[]` operator (indexed access).
+        Get the cell in the specified column. This is equivalent to using the `[]` operator (indexed access).
 
         Parameters
         ----------
@@ -77,8 +77,8 @@ class Row(ABC, Mapping[str, Any]):
 
         Returns
         -------
-        value:
-            The value of the column.
+        cell:
+            The cell in the specified column.
 
         Raises
         ------
@@ -89,7 +89,7 @@ class Row(ABC, Mapping[str, Any]):
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"col1": [1, 2], "col2": [3, 4]})
-        >>> table.remove_rows(lambda row: row.get_value("col1") == 1)
+        >>> table.remove_rows(lambda row: row.get_cell("col1") == 1)
         +------+------+
         | col1 | col2 |
         |  --- |  --- |

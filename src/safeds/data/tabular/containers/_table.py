@@ -527,7 +527,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
-        >>> table.add_computed_column("c", lambda row: row.get_value("a") + row.get_value("b"))
+        >>> table.add_computed_column("c", lambda row: row["a"] + row["b"])
         +-----+-----+-----+
         |   a |   b |   c |
         | --- | --- | --- |
@@ -1135,7 +1135,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
-        >>> table.remove_rows(lambda row: row.get_value("a") == 2)
+        >>> table.remove_rows(lambda row: row["a"] == 2)
         +-----+-----+
         |   a |   b |
         | --- | --- |
@@ -1428,7 +1428,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"a": [2, 1, 3], "b": [1, 1, 2]})
-        >>> table.sort_rows(lambda row: row.get_value("a") - row.get_value("b"))
+        >>> table.sort_rows(lambda row: row["a"] - row["b"])
         +-----+-----+
         |   a |   b |
         | --- | --- |

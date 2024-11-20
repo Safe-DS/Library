@@ -22,7 +22,7 @@ from tests.helpers import assert_row_operation_works
 def test_should_get_correct_item(table_data: dict, column_name: str, target: int, expected: dict) -> None:
     assert_row_operation_works(
         table_data,
-        lambda table: table.remove_rows(lambda row: row.get_value(column_name).eq(target)),
+        lambda table: table.remove_rows(lambda row: row.get_cell(column_name).eq(target)),
         expected,
     )
 
@@ -43,4 +43,4 @@ def test_should_get_correct_item(table_data: dict, column_name: str, target: int
 def test_should_raise_column_not_found_error(table: Table, column_name: str) -> None:
     row: Row[any] = _LazyVectorizedRow(table=table)
     with pytest.raises(ColumnNotFoundError, match=re.escape(f"Could not find column(s):\n    - '{column_name}'")):
-        row.get_value(column_name)
+        row.get_cell(column_name)
