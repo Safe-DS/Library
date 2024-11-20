@@ -502,9 +502,9 @@ class Image:
         _check_crop_warnings(x, y, self.width, self.height, plural=False)
         return Image(func2.crop(self._image_tensor, y, x, height, width))
 
-    def flip_vertically(self) -> Image:
+    def flip_top_and_bottom(self) -> Image:
         """
-        Return a new `Image` that is flipped vertically (horizontal axis, flips up-down and vice versa).
+        Return a new `Image` where top and bottom are flipped along a horizontal axis.
 
         The original image is not modified.
 
@@ -519,9 +519,9 @@ class Image:
 
         return Image(func2.vertical_flip(self._image_tensor))
 
-    def flip_horizontally(self) -> Image:
+    def flip_left_and_right(self) -> Image:
         """
-        Return a new `Image` that is flipped horizontally (vertical axis, flips left-right and vice versa).
+        Return a new `Image` where left and right sides are flipped along a vertical axis.
 
         The original image is not modified.
 

@@ -557,16 +557,16 @@ class _MultiSizeImageList(ImageList):
         image_list._indices_to_tensor_positions = image_list._calc_new_indices_to_tensor_positions()
         return image_list
 
-    def flip_vertically(self) -> ImageList:
+    def flip_top_and_bottom(self) -> ImageList:
         image_list = self._clone_without_image_dict()
         for image_list_key, image_list_original in self._image_list_dict.items():
-            image_list._image_list_dict[image_list_key] = image_list_original.flip_vertically()
+            image_list._image_list_dict[image_list_key] = image_list_original.flip_top_and_bottom()
         return image_list
 
-    def flip_horizontally(self) -> ImageList:
+    def flip_left_and_right(self) -> ImageList:
         image_list = self._clone_without_image_dict()
         for image_list_key, image_list_original in self._image_list_dict.items():
-            image_list._image_list_dict[image_list_key] = image_list_original.flip_horizontally()
+            image_list._image_list_dict[image_list_key] = image_list_original.flip_left_and_right()
         return image_list
 
     def adjust_brightness(self, factor: float) -> ImageList:
