@@ -1,10 +1,10 @@
 import re
 
 import pytest
-from safeds.data.tabular.containers import Row, Table
+
+from safeds.data.tabular.containers import Table
 from safeds.data.tabular.containers._lazy_vectorized_row import _LazyVectorizedRow
 from safeds.exceptions import ColumnNotFoundError
-
 from tests.helpers import assert_row_operation_works
 
 
