@@ -41,6 +41,6 @@ def test_should_get_correct_item(table_data: dict, column_name: str, target: int
     ],
 )
 def test_should_raise_column_not_found_error(table: Table, column_name: str) -> None:
-    row: Row[any] = _LazyVectorizedRow(table=table)
+    row = _LazyVectorizedRow(table=table)
     with pytest.raises(ColumnNotFoundError, match=re.escape(f"Could not find column(s):\n    - '{column_name}'")):
         row.get_cell(column_name)
