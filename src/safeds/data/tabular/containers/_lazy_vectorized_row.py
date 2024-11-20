@@ -64,7 +64,7 @@ class _LazyVectorizedRow(Row):
     # Column operations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def get_value(self, name: str) -> _LazyCell:
+    def get_cell(self, name: str) -> _LazyCell:
         import polars as pl
 
         _check_columns_exist(self._table, name)

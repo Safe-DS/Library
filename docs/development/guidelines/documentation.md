@@ -111,7 +111,7 @@ Examples
 --------
 >>> from safeds.data.tabular.containers import Row
 >>> row = Row({"a": 1, "b": 2})
->>> row.get_value("a")
+>>> row.get_cell("a")
 1
 """
 ```

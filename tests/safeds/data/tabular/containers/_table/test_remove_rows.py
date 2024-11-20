@@ -1,6 +1,7 @@
 from typing import Any
 
 import pytest
+
 from safeds.data.tabular.containers import Table
 
 
@@ -26,6 +27,6 @@ from safeds.data.tabular.containers import Table
     ],
 )
 def test_should_remove_rows(table1: Table, filter_column: str, filter_value: Any, table2: Table) -> None:
-    table1 = table1.remove_rows(lambda row: row.get_value(filter_column) == filter_value)
+    table1 = table1.remove_rows(lambda row: row[filter_column] == filter_value)
     assert table1.schema == table2.schema
     assert table2 == table1

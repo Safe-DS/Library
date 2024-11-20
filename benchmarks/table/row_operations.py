@@ -1,9 +1,9 @@
 from timeit import timeit
 
 import polars as pl
-from safeds.data.tabular.containers import Table
 
 from benchmarks.table.utils import create_synthetic_table
+from safeds.data.tabular.containers import Table
 
 REPETITIONS = 10
 
@@ -21,7 +21,7 @@ def _run_remove_rows_with_outliers() -> None:
 
 
 def _run_remove_rows() -> None:
-    table.remove_rows(lambda row: row.get_value("column_0") % 2 == 0)._lazy_frame.collect()
+    table.remove_rows(lambda row: row["column_0"] % 2 == 0)._lazy_frame.collect()
 
 
 def _run_remove_rows_by_column() -> None:
@@ -37,7 +37,7 @@ def _run_slice_rows() -> None:
 
 
 def _run_sort_rows() -> None:
-    table.sort_rows(lambda row: row.get_value("column_0"))._lazy_frame.collect()
+    table.sort_rows(lambda row: row["column_0"])._lazy_frame.collect()
 
 
 def _run_sort_rows_by_column() -> None:
