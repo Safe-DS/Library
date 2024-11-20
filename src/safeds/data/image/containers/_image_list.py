@@ -222,8 +222,7 @@ class ImageList(metaclass=ABCMeta):
             im = pil_image_open(filename)
             im_channel = len(im.getbands())
             im_size = (im.width, im.height)
-            if im_channel > max_channel:
-                max_channel = im_channel
+            max_channel = max(im_channel, max_channel)
             if im_size not in image_sizes:
                 image_sizes[im_size] = {im_channel: [filename]}
                 image_indices[im_size] = {im_channel: [i]}

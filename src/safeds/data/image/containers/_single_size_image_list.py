@@ -140,8 +140,7 @@ class _SingleSizeImageList(ImageList):
         max_channel = 0
         for image, index in zip(images, indices, strict=False):
             current_channel = image.size(dim=-3)
-            if max_channel < current_channel:
-                max_channel = current_channel
+            max_channel = max(max_channel, current_channel)
             if current_channel not in images_with_channels:
                 images_with_channels[current_channel] = [image]
                 indices_with_channels[current_channel] = [index]
@@ -575,8 +574,7 @@ class _SingleSizeImageList(ImageList):
             for image in images:
                 current_size = (image.width, image.height)
                 current_channel = image.channel
-                if max_channel < current_channel:
-                    max_channel = current_channel
+                max_channel = max(max_channel, current_channel)
                 if current_size not in images_with_sizes_with_channel:
                     images_with_sizes_with_channel[current_size] = {}
                     indices_with_sizes_with_channel[current_size] = {}

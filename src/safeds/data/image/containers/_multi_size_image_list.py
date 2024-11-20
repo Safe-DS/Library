@@ -365,8 +365,7 @@ class _MultiSizeImageList(ImageList):
                     + new_indices,
                 )
             elif isinstance(ims, _SingleSizeImageList):
-                if smallest_channel > ims.channel:
-                    smallest_channel = ims.channel
+                smallest_channel = min(smallest_channel, ims.channel)
                 fixed_ims = ims
                 old_indices = list(fixed_ims._indices_to_tensor_positions.items())
                 fixed_ims._tensor_positions_to_indices = [
@@ -383,8 +382,7 @@ class _MultiSizeImageList(ImageList):
                     [im._image_tensor for im in ims],
                     new_indices,
                 )
-                if smallest_channel > image_list._image_list_dict[size].channel:
-                    smallest_channel = image_list._image_list_dict[size].channel
+                smallest_channel = min(smallest_channel, image_list._image_list_dict[size].channel)
             for i in new_indices:
                 image_list._indices_to_image_size_dict[i] = size
             max_channel = max(max_channel, image_list._image_list_dict[size].channel)
