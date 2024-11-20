@@ -6,16 +6,16 @@ from pathlib import Path
 
 import pytest
 import torch
+from syrupy import SnapshotAssertion
+from torch import Tensor
+from torch.types import Device
+
 from safeds.data.image.containers import Image, ImageList
 from safeds.data.image.containers._empty_image_list import _EmptyImageList
 from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import DuplicateIndexError, IllegalFormatError, IndexOutOfBoundsError, OutOfBoundsError
-from syrupy import SnapshotAssertion
-from torch import Tensor
-from torch.types import Device
-
 from tests.helpers import (
     configure_test_with_device,
     device_cpu,
@@ -892,8 +892,8 @@ class TestTransformsEqualImageTransforms:
             ("resize", [700, 400]),
             ("convert_to_grayscale", None),
             ("crop", [0, 0, 100, 100]),
-            ("flip_vertically", None),
-            ("flip_horizontally", None),
+            ("flip_top_and_bottom", None),
+            ("flip_left_and_right", None),
             ("adjust_brightness", [0]),
             ("adjust_brightness", [0.5]),
             ("adjust_brightness", [10]),
@@ -917,8 +917,8 @@ class TestTransformsEqualImageTransforms:
             "resize-(700, 400)",
             "grayscale",
             "crop-(0, 0, 100, 100)",
-            "flip_vertically",
-            "flip_horizontally",
+            "flip_top_and_bottom",
+            "flip_left_and_right",
             "adjust_brightness-zero factor",
             "adjust_brightness-small factor",
             "adjust_brightness-large factor",
@@ -1631,8 +1631,8 @@ class TestEmptyImageList:
             ("resize", [700, 400]),
             ("convert_to_grayscale", None),
             ("crop", [0, 0, 100, 100]),
-            ("flip_vertically", None),
-            ("flip_horizontally", None),
+            ("flip_top_and_bottom", None),
+            ("flip_left_and_right", None),
             ("adjust_brightness", [0]),
             ("adjust_brightness", [0.5]),
             ("adjust_brightness", [10]),
@@ -1663,8 +1663,8 @@ class TestEmptyImageList:
             "resize-(700, 400)",
             "grayscale",
             "crop-(0, 0, 100, 100)",
-            "flip_vertically",
-            "flip_horizontally",
+            "flip_top_and_bottom",
+            "flip_left_and_right",
             "adjust_brightness-zero factor",
             "adjust_brightness-small factor",
             "adjust_brightness-large factor",

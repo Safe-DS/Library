@@ -7,14 +7,14 @@ import numpy as np
 import PIL.Image
 import pytest
 import torch
+from syrupy import SnapshotAssertion
+from torch.types import Device
+
 from safeds._config import _get_device
 from safeds.data.image.containers import Image
 from safeds.data.image.typing import ImageSize
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import IllegalFormatError, OutOfBoundsError
-from syrupy import SnapshotAssertion
-from torch.types import Device
-
 from tests.helpers import (
     configure_test_with_device,
     device_cpu,
@@ -547,13 +547,13 @@ class TestCrop:
 
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
-class TestFlipVertically:
+class TestFlipTopAndBottom:
     @pytest.mark.parametrize(
         "resource_path",
         images_asymmetric(),
         ids=images_asymmetric_ids(),
     )
-    def test_should_flip_vertically(
+    def test_should_flip_top_and_bottom(
         self,
         resource_path: str,
         snapshot_png_image: SnapshotAssertion,
@@ -561,7 +561,7 @@ class TestFlipVertically:
     ) -> None:
         configure_test_with_device(device)
         image = Image.from_file(resolve_resource_path(resource_path))
-        image_flip_v = image.flip_vertically()
+        image_flip_v = image.flip_top_and_bottom()
         assert image != image_flip_v
         assert image_flip_v == snapshot_png_image
         _assert_width_height_channel(image, image_flip_v)
@@ -574,18 +574,18 @@ class TestFlipVertically:
     def test_should_be_original(self, resource_path: str, device: Device) -> None:
         configure_test_with_device(device)
         image = Image.from_file(resolve_resource_path(resource_path))
-        image_flip_v_v = image.flip_vertically().flip_vertically()
+        image_flip_v_v = image.flip_top_and_bottom().flip_top_and_bottom()
         assert image == image_flip_v_v
 
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
-class TestFlipHorizontally:
+class TestFlipLeftAndRight:
     @pytest.mark.parametrize(
         "resource_path",
         images_asymmetric(),
         ids=images_asymmetric_ids(),
     )
-    def test_should_flip_horizontally(
+    def test_should_flip_left_and_right(
         self,
         resource_path: str,
         snapshot_png_image: SnapshotAssertion,
@@ -593,7 +593,7 @@ class TestFlipHorizontally:
     ) -> None:
         configure_test_with_device(device)
         image = Image.from_file(resolve_resource_path(resource_path))
-        image_flip_h = image.flip_horizontally()
+        image_flip_h = image.flip_left_and_right()
         assert image != image_flip_h
         assert image_flip_h == snapshot_png_image
         _assert_width_height_channel(image, image_flip_h)
@@ -606,7 +606,7 @@ class TestFlipHorizontally:
     def test_should_be_original(self, resource_path: str, device: Device) -> None:
         configure_test_with_device(device)
         image = Image.from_file(resolve_resource_path(resource_path))
-        image_flip_h_h = image.flip_horizontally().flip_horizontally()
+        image_flip_h_h = image.flip_left_and_right().flip_left_and_right()
         assert image == image_flip_h_h
 
 
@@ -1011,8 +1011,8 @@ class TestRotate:
         image = Image.from_file(resolve_resource_path(resource_path))
         image_left_rotated = image.rotate_left().rotate_left()
         image_right_rotated = image.rotate_right().rotate_right()
-        image_flipped_h_v = image.flip_horizontally().flip_vertically()
-        image_flipped_v_h = image.flip_horizontally().flip_vertically()
+        image_flipped_h_v = image.flip_left_and_right().flip_top_and_bottom()
+        image_flipped_v_h = image.flip_left_and_right().flip_top_and_bottom()
         assert image_left_rotated == image_right_rotated
         assert image_left_rotated == image_flipped_h_v
         assert image_left_rotated == image_flipped_v_h

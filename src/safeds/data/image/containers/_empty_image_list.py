@@ -164,11 +164,11 @@ class _EmptyImageList(ImageList):
         _check_crop_errors(x, y, width, height)
         return _EmptyImageList()
 
-    def flip_vertically(self) -> ImageList:
+    def flip_top_and_bottom(self) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
-    def flip_horizontally(self) -> ImageList:
+    def flip_left_and_right(self) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 

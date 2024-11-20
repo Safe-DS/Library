@@ -140,8 +140,7 @@ class _SingleSizeImageList(ImageList):
         max_channel = 0
         for image, index in zip(images, indices, strict=False):
             current_channel = image.size(dim=-3)
-            if max_channel < current_channel:
-                max_channel = current_channel
+            max_channel = max(max_channel, current_channel)
             if current_channel not in images_with_channels:
                 images_with_channels[current_channel] = [image]
                 indices_with_channels[current_channel] = [index]
@@ -575,8 +574,7 @@ class _SingleSizeImageList(ImageList):
             for image in images:
                 current_size = (image.width, image.height)
                 current_channel = image.channel
-                if max_channel < current_channel:
-                    max_channel = current_channel
+                max_channel = max(max_channel, current_channel)
                 if current_size not in images_with_sizes_with_channel:
                     images_with_sizes_with_channel[current_size] = {}
                     indices_with_sizes_with_channel[current_size] = {}
@@ -965,7 +963,7 @@ class _SingleSizeImageList(ImageList):
         image_list._tensor = func2.crop(self._tensor, x, y, height, width)
         return image_list
 
-    def flip_vertically(self) -> ImageList:
+    def flip_top_and_bottom(self) -> ImageList:
         from torchvision.transforms.v2 import functional as func2
 
         _init_default_device()
@@ -974,7 +972,7 @@ class _SingleSizeImageList(ImageList):
         image_list._tensor = func2.vertical_flip(self._tensor)
         return image_list
 
-    def flip_horizontally(self) -> ImageList:
+    def flip_left_and_right(self) -> ImageList:
         from torchvision.transforms.v2 import functional as func2
 
         _init_default_device()

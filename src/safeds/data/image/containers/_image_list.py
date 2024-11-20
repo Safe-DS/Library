@@ -222,8 +222,7 @@ class ImageList(metaclass=ABCMeta):
             im = pil_image_open(filename)
             im_channel = len(im.getbands())
             im_size = (im.width, im.height)
-            if im_channel > max_channel:
-                max_channel = im_channel
+            max_channel = max(im_channel, max_channel)
             if im_size not in image_sizes:
                 image_sizes[im_size] = {im_channel: [filename]}
                 image_indices[im_size] = {im_channel: [i]}
@@ -917,9 +916,9 @@ class ImageList(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def flip_vertically(self) -> ImageList:
+    def flip_top_and_bottom(self) -> ImageList:
         """
-        Return a new `ImageList` with all images flipped vertically (horizontal axis, flips up-down and vice versa).
+        Return a new `ImageList` where top and bottom of all images are flipped along a horizontal axis.
 
         The original image list is not modified.
 
@@ -930,9 +929,9 @@ class ImageList(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def flip_horizontally(self) -> ImageList:
+    def flip_left_and_right(self) -> ImageList:
         """
-        Return a new `ImageList` with all images flipped horizontally (vertical axis, flips left-right and vice versa).
+        Return a new `ImageList` where left and right sides of all images are flipped along a vertical axis.
 
         The original image list is not modified.
 
