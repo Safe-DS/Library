@@ -9,7 +9,6 @@ from safeds._utils._random import _get_random_seed
 from safeds._validation import _check_bounds, _check_columns_exist, _ClosedBound, _normalize_and_check_file_path
 from safeds._validation._check_columns_dont_exist import _check_columns_dont_exist
 from safeds.data.tabular.plotting import TablePlotter
-from safeds.data.tabular.typing._polars_data_type import _PolarsDataType
 from safeds.data.tabular.typing._polars_schema import _PolarsSchema
 from safeds.exceptions import (
     ColumnLengthMismatchError,
