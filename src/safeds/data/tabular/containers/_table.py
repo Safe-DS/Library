@@ -390,13 +390,7 @@ class Table:
         >>> table.column_count
         2
         """
-        import polars as pl
-
-        try:
-            return self._lazy_frame.width
-        except (pl.NoDataError, pl.PolarsPanicError):
-            # Can happen for some operations on empty tables (e.g. https://github.com/pola-rs/polars/issues/16202)
-            return 0
+        return len(self.column_names)
 
     @property
     def row_count(self) -> int:
@@ -612,8 +606,7 @@ class Table:
         >>> table.get_column_type("a")
         Int64
         """
-        _check_columns_exist(self, name)
-        return _PolarsDataType(self._lazy_frame.schema[name])
+        return self.schema.get_column_type(name)
 
     def has_column(self, name: str) -> bool:
         """
@@ -636,7 +629,7 @@ class Table:
         >>> table.has_column("a")
         True
         """
-        return name in self.column_names
+        return self.schema.has_column(name)
 
     def remove_columns(
         self,
