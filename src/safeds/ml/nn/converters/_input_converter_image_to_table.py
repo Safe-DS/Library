@@ -33,9 +33,9 @@ class InputConversionImageToTable(_InputConversionImage):
         output = torch.zeros(len(input_data), len(column_names))
         output[torch.arange(len(input_data)), output_data] = 1
 
-        im_dataset: ImageDataset[Table] = ImageDataset[Table].__new__(ImageDataset)
+        im_dataset: ImageDataset[Table] = object.__new__(ImageDataset)
         im_dataset._output = _TableAsTensor._from_tensor(output, column_names)
-        im_dataset._shuffle_tensor_indices = torch.LongTensor(list(range(len(input_data))))
+        im_dataset._shuffle_tensor_indices = torch.arange(len(input_data))
         im_dataset._shuffle_after_epoch = False
         im_dataset._batch_size = 1
         im_dataset._next_batch_index = 0

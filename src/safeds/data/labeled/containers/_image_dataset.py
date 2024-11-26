@@ -356,6 +356,8 @@ class ImageDataset(Dataset[ImageList, Out_co]):
             upper_bound=_ClosedBound(1),
         )
 
+        _init_default_device()
+
         first_dataset: ImageDataset[Out_co] = copy.copy(self)
         second_dataset: ImageDataset[Out_co] = copy.copy(self)
 
