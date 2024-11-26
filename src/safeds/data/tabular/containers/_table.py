@@ -472,7 +472,7 @@ class Table:
         |   3 |   6 |
         +-----+-----+
         """
-        import polars as pl
+        from polars.exceptions import DuplicateError
 
         if isinstance(columns, Column):
             columns = [columns]
@@ -484,7 +484,7 @@ class Table:
             return Table._from_polars_data_frame(
                 self._data_frame.hstack([column._series for column in columns]),
             )
-        except pl.DuplicateError:
+        except DuplicateError:
             # polars already validates this, so we don't need to do it again upfront (performance)
             _check_columns_dont_exist(self, [column.name for column in columns])
             return Table()  # pragma: no cover
