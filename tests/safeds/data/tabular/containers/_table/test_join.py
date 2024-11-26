@@ -29,6 +29,14 @@ from safeds.exceptions import ColumnNotFoundError
             Table({"d": [1, 5], "e": [5, 6]}),
             ["a"],
             ["d"],
+            "right",
+            Table({"b": [3, None], "d": [1, 5], "e": [5, 6]}),
+        ),
+        (
+            Table({"a": [1, 2], "b": [3, 4]}),
+            Table({"d": [1, 5], "e": [5, 6]}),
+            ["a"],
+            ["d"],
             "inner",
             Table({"a": [1], "b": [3], "e": [5]}),
         ),
@@ -55,7 +63,7 @@ def test_should_join_two_tables(
     table_right: Table,
     left_names: list[str],
     right_names: list[str],
-    mode: Literal["inner", "left", "outer"],
+    mode: Literal["inner", "left", "right", "outer"],
     table_expected: Table,
 ) -> None:
     assert table_left.join(table_right, left_names, right_names, mode=mode) == table_expected
