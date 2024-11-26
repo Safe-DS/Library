@@ -1,4 +1,5 @@
 import pytest
+
 from safeds.data.tabular.containers import Table
 
 
@@ -30,7 +31,7 @@ def test_should_handle_boolean_logic(
     expected: int,
 ) -> None:
     table = Table({"a": values})
-    assert table.count_row_if(lambda row: row["a"] < 2) == expected
+    assert table.count_rows_if(lambda row: row["a"] < 2) == expected
 
 
 @pytest.mark.parametrize(
@@ -61,4 +62,4 @@ def test_should_handle_kleene_logic(
     expected: int | None,
 ) -> None:
     table = Table({"a": values})
-    assert table.count_row_if(lambda row: row["a"] < 2, ignore_unknown=False) == expected
+    assert table.count_rows_if(lambda row: row["a"] < 2, ignore_unknown=False) == expected
