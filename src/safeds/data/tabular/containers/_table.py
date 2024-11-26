@@ -472,7 +472,7 @@ class Table:
         |   3 |   6 |
         +-----+-----+
         """
-        import polars as pl
+        from polars.exceptions import DuplicateError
 
         if isinstance(columns, Column):
             columns = [columns]
@@ -484,7 +484,7 @@ class Table:
             return Table._from_polars_data_frame(
                 self._data_frame.hstack([column._series for column in columns]),
             )
-        except pl.DuplicateError:
+        except DuplicateError:
             # polars already validates this, so we don't need to do it again upfront (performance)
             _check_columns_dont_exist(self, [column.name for column in columns])
             return Table()  # pragma: no cover
@@ -1706,7 +1706,7 @@ class Table:
         left_names: str | list[str],
         right_names: str | list[str],
         *,
-        mode: Literal["inner", "left", "outer"] = "inner",
+        mode: Literal["inner", "left", "right", "outer"] = "inner",
     ) -> Table:
         """
         Join a table with the current table and return the result.
@@ -1720,7 +1720,7 @@ class Table:
         right_names:
             Name or list of names of columns from right_table on which to join the current table.
         mode:
-            Specify which type of join you want to use. Options include 'inner', 'outer', 'left', 'right'.
+            Specify which type of join you want to use.
 
         Returns
         -------
@@ -1750,12 +1750,17 @@ class Table:
             raise ValueError("The number of columns to join on must be the same in both tables.")
 
         # Implementation
+        if mode == "outer":
+            polars_mode = "full"
+        else:
+            polars_mode = mode
+
         return self._from_polars_lazy_frame(
             self._lazy_frame.join(
                 right_table._lazy_frame,
                 left_on=left_names,
                 right_on=right_names,
-                how=mode,
+                how=polars_mode,
             ),
         )
 

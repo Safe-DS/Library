@@ -1,5 +1,6 @@
 import pytest
-from safeds.data.tabular.containers import Row, Table
+
+from safeds.data.tabular.containers import Table
 from safeds.data.tabular.containers._lazy_vectorized_row import _LazyVectorizedRow
 
 
@@ -21,8 +22,8 @@ from safeds.data.tabular.containers._lazy_vectorized_row import _LazyVectorizedR
     ],
 )
 def test_should_return_whether_two_rows_are_equal(table1: Table, table2: Table, expected: bool) -> None:
-    row1: Row[any] = _LazyVectorizedRow(table=table1)
-    row2: Row[any] = _LazyVectorizedRow(table=table2)
+    row1 = _LazyVectorizedRow(table=table1)
+    row2 = _LazyVectorizedRow(table=table2)
     assert (row1.__eq__(row2)) == expected
 
 
@@ -38,7 +39,7 @@ def test_should_return_whether_two_rows_are_equal(table1: Table, table2: Table, 
     ],
 )
 def test_should_return_true_if_rows_are_strict_equal(table: Table, expected: bool) -> None:
-    row1: Row[any] = _LazyVectorizedRow(table=table)
+    row1 = _LazyVectorizedRow(table=table)
     assert (row1.__eq__(row1)) == expected
 
 
@@ -54,5 +55,5 @@ def test_should_return_true_if_rows_are_strict_equal(table: Table, expected: boo
     ],
 )
 def test_should_return_false_if_object_is_other_type(table1: Table, table2: Table) -> None:
-    row1: Row[any] = _LazyVectorizedRow(table=table1)
+    row1 = _LazyVectorizedRow(table=table1)
     assert (row1.__eq__(table2)) == NotImplemented
