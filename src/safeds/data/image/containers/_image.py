@@ -23,7 +23,6 @@ from safeds.data.image.typing import ImageSize
 from safeds.exceptions import IllegalFormatError
 
 if TYPE_CHECKING:
-    from numpy import dtype, ndarray
     from torch import Tensor
 
 
@@ -173,25 +172,6 @@ class Image:
             Size of this object in bytes.
         """
         return sys.getsizeof(self._image_tensor) + self._image_tensor.element_size() * self._image_tensor.nelement()
-
-    def __array__(self, numpy_dtype: str | dtype | None = None) -> ndarray:
-        """
-        Return the image as a numpy array.
-
-        Returns
-        -------
-        numpy_array:
-            The image as numpy array.
-        """
-        from numpy import uint8
-
-        return (
-            self._image_tensor.permute(1, 2, 0)
-            .detach()
-            .cpu()
-            .numpy()
-            .astype(uint8 if numpy_dtype is None else numpy_dtype)
-        )
 
     def _repr_jpeg_(self) -> bytes | None:
         """
