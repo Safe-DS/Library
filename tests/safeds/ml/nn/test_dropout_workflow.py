@@ -1,4 +1,6 @@
 import pytest
+from torch.types import Device
+
 from safeds._config import _get_device
 from safeds.data.tabular.containers import Table
 from safeds.ml.nn import (
@@ -11,8 +13,6 @@ from safeds.ml.nn.layers import (
     DropoutLayer,
     ForwardLayer,
 )
-from torch.types import Device
-
 from tests.helpers import configure_test_with_device, get_devices, get_devices_ids
 
 
