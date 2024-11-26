@@ -6,7 +6,6 @@ from safeds._config import _init_default_device
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 from safeds.data.labeled.containers import ImageDataset
 from safeds.data.labeled.containers._image_dataset import _TableAsTensor
-from safeds.data.tabular.containers import Table
 
 from ._input_converter_image import _InputConversionImage
 
@@ -14,6 +13,7 @@ if TYPE_CHECKING:
     from torch import Tensor
 
     from safeds.data.image.containers import ImageList
+    from safeds.data.tabular.containers import Table
 
 
 class InputConversionImageToTable(_InputConversionImage):
