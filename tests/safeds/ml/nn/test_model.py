@@ -55,8 +55,8 @@ class TestClassificationModel:
             )
             assert model.input_size == 1
 
-        def test_should_raise_if_epoch_size_out_of_bounds(self, device: Device) -> None:
-            invalid_epoch_size = 0
+        def test_should_raise_if_epoch_count_out_of_bounds(self, device: Device) -> None:
+            invalid_epoch_count = 0
             configure_test_with_device(device)
             with pytest.raises(OutOfBoundsError):
                 NeuralNetworkClassifier(
@@ -64,7 +64,7 @@ class TestClassificationModel:
                     [ForwardLayer(1)],
                 ).fit(
                     Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
-                    epoch_size=invalid_epoch_size,
+                    epoch_count=invalid_epoch_count,
                 )
 
         def test_should_raise_if_batch_size_out_of_bounds(self, device: Device) -> None:
@@ -285,11 +285,11 @@ class TestClassificationModel:
     #         )
     #         assert model.input_size == 1
     #
-    #     def test_should_raise_if_epoch_size_out_of_bounds_when_fitting_by_exhaustive_search(
+    #     def test_should_raise_if_epoch_count_out_of_bounds_when_fitting_by_exhaustive_search(
     #         self,
     #         device: Device,
     #     ) -> None:
-    #         invalid_epoch_size = 0
+    #         invalid_epoch_count = 0
     #         configure_test_with_device(device)
     #         with pytest.raises(OutOfBoundsError):
     #             NeuralNetworkClassifier(
@@ -298,7 +298,7 @@ class TestClassificationModel:
     #             ).fit_by_exhaustive_search(
     #                 Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("b"),
     #                 "accuracy",
-    #                 epoch_size=invalid_epoch_size,
+    #                 epoch_count=invalid_epoch_count,
     #             )
     #
     #     def test_should_raise_if_batch_size_out_of_bounds_when_fitting_by_exhaustive_search(
@@ -435,7 +435,7 @@ class TestClassificationModel:
     #             train_table,
     #             optimization_metric=metric,
     #             positive_class=positive_class,
-    #             epoch_size=2,
+    #             epoch_count=2,
     #         )
     #
     #         assert fitted_model.is_fitted
@@ -497,7 +497,7 @@ class TestClassificationModel:
     #         assert not model.is_fitted
     #         fitted_model = model.fit_by_exhaustive_search(
     #             image_dataset,
-    #             epoch_size=2,
+    #             epoch_count=2,
     #             optimization_metric=metric,
     #             positive_class=positive_class,
     #         )
@@ -561,7 +561,7 @@ class TestClassificationModel:
     #         assert not model.is_fitted
     #         fitted_model = model.fit_by_exhaustive_search(
     #             image_dataset,
-    #             epoch_size=2,
+    #             epoch_count=2,
     #             optimization_metric=metric,
     #             positive_class=positive_class,
     #         )
@@ -843,8 +843,8 @@ class TestRegressionModel:
             )
             assert model.input_size == 1
 
-        def test_should_raise_if_epoch_size_out_of_bounds(self, device: Device) -> None:
-            invalid_epoch_size = 0
+        def test_should_raise_if_epoch_count_out_of_bounds(self, device: Device) -> None:
+            invalid_epoch_count = 0
             configure_test_with_device(device)
             with pytest.raises(OutOfBoundsError):
                 NeuralNetworkRegressor(
@@ -852,7 +852,7 @@ class TestRegressionModel:
                     [ForwardLayer(neuron_count=1)],
                 ).fit(
                     Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
-                    epoch_size=invalid_epoch_size,
+                    epoch_count=invalid_epoch_count,
                 )
 
         def test_should_raise_if_batch_size_out_of_bounds(self, device: Device) -> None:
@@ -1036,11 +1036,11 @@ class TestRegressionModel:
     #         )
     #         assert model.input_size == 1
     #
-    #     def test_should_raise_if_epoch_size_out_of_bounds_when_fitting_by_exhaustive_search(
+    #     def test_should_raise_if_epoch_count_out_of_bounds_when_fitting_by_exhaustive_search(
     #         self,
     #         device: Device,
     #     ) -> None:
-    #         invalid_epoch_size = 0
+    #         invalid_epoch_count = 0
     #         configure_test_with_device(device)
     #         with pytest.raises(OutOfBoundsError):
     #             NeuralNetworkRegressor(
@@ -1049,7 +1049,7 @@ class TestRegressionModel:
     #             ).fit_by_exhaustive_search(
     #                 Table.from_dict({"a": [1], "b": [1.0]}).to_tabular_dataset("b"),
     #                 "mean_squared_error",
-    #                 epoch_size=invalid_epoch_size,
+    #                 epoch_count=invalid_epoch_count,
     #             )
     #
     #     def test_should_raise_if_batch_size_out_of_bounds_when_fitting_by_exhaustive_search(
@@ -1157,7 +1157,7 @@ class TestRegressionModel:
     #         )
     #         assert not model.is_fitted
     #
-    #         fitted_model = model.fit_by_exhaustive_search(train_table, optimization_metric=metric, epoch_size=2)
+    #         fitted_model = model.fit_by_exhaustive_search(train_table, optimization_metric=metric, epoch_count=2)
     #
     #         assert fitted_model.is_fitted
     #         assert isinstance(fitted_model, NeuralNetworkRegressor)
@@ -1207,7 +1207,7 @@ class TestRegressionModel:
     #         )
     #         assert not model.is_fitted
     #
-    #         fitted_model = model.fit_by_exhaustive_search(train_table, optimization_metric=metric, epoch_size=2)
+    #         fitted_model = model.fit_by_exhaustive_search(train_table, optimization_metric=metric, epoch_count=2)
     #
     #         assert fitted_model.is_fitted
     #         assert isinstance(fitted_model, NeuralNetworkRegressor)

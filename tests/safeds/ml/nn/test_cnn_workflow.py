@@ -88,7 +88,7 @@ class TestImageToTableClassifier:
             InputConversionImageToTable(image_dataset.input_size),
             layers,
         )
-        nn = nn_original.fit(image_dataset, epoch_size=2)
+        nn = nn_original.fit(image_dataset, epoch_count=2)
         assert nn_original._model is not nn._model
         prediction: ImageDataset = nn.predict(image_dataset.get_input())
         assert one_hot_encoder.inverse_transform(prediction.get_output()) == Table({"class": prediction_label})
@@ -147,7 +147,7 @@ class TestImageToColumnClassifier:
             InputConversionImageToColumn(image_dataset.input_size),
             layers,
         )
-        nn = nn_original.fit(image_dataset, epoch_size=2)
+        nn = nn_original.fit(image_dataset, epoch_count=2)
         assert nn_original._model is not nn._model
         prediction: ImageDataset = nn.predict(image_dataset.get_input())
         assert prediction.get_output() == Column("class", prediction_label)
@@ -188,7 +188,7 @@ class TestImageToImageRegressor:
             InputConversionImageToImage(image_dataset.input_size),
             layers,
         )
-        nn = nn_original.fit(image_dataset, epoch_size=20)
+        nn = nn_original.fit(image_dataset, epoch_count=20)
         assert nn_original._model is not nn._model
         prediction = nn.predict(image_dataset.get_input())
         assert isinstance(prediction.get_output(), ImageList)
@@ -229,7 +229,7 @@ class TestImageToImageRegressor:
             InputConversionImageToImage(VariableImageSize.from_image_size(image_dataset.input_size)),
             layers,
         )
-        nn = nn_original.fit(image_dataset, epoch_size=20)
+        nn = nn_original.fit(image_dataset, epoch_count=20)
         assert nn_original._model is not nn._model
         prediction = nn.predict(
             image_dataset.get_input().resize(

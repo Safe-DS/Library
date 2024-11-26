@@ -32,6 +32,6 @@ def test_forward_model(device: Device) -> None:
         [ForwardLayer(neuron_count=1), DropoutLayer(probability=0.5)],
     )
 
-    fitted_model = model.fit(train_table.to_tabular_dataset("value"), epoch_size=1, learning_rate=0.01)
+    fitted_model = model.fit(train_table.to_tabular_dataset("value"), epoch_count=1, learning_rate=0.01)
     assert fitted_model._model is not None
     assert fitted_model._model.state_dict()["_pytorch_layers.0._layer.weight"].device == _get_device()

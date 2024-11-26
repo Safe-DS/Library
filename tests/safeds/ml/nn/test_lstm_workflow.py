@@ -45,7 +45,7 @@ def test_lstm_model(device: Device) -> None:
             continuous=True,
             extra_names=["date"],
         ),
-        epoch_size=1,
+        epoch_count=1,
     )
 
     trained_model.predict(test_table)
@@ -57,7 +57,7 @@ def test_lstm_model(device: Device) -> None:
             continuous=False,
             extra_names=["date"],
         ),
-        epoch_size=1,
+        epoch_count=1,
     )
 
     trained_model_2.predict(test_table)
