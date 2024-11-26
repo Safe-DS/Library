@@ -1007,7 +1007,7 @@ class Table:
     # ------------------------------------------------------------------------------------------------------------------
 
     @overload
-    def count_row_if(
+    def count_rows_if(
         self,
         predicate: Callable[[Row], Cell[bool | None]],
         *,
@@ -1015,14 +1015,14 @@ class Table:
     ) -> int: ...
 
     @overload
-    def count_row_if(
+    def count_rows_if(
         self,
         predicate: Callable[[Row], Cell[bool | None]],
         *,
         ignore_unknown: bool,
     ) -> int | None: ...
 
-    def count_row_if(
+    def count_rows_if(
         self,
         predicate: Callable[[Row], Cell[bool | None]],
         *,
@@ -1059,10 +1059,10 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"col1": [1, 2, 3], "col2": [1, 3, 3]})
-        >>> table.count_row_if(lambda row: row["col1"] == row["col2"])
+        >>> table.count_rows_if(lambda row: row["col1"] == row["col2"])
         2
 
-        >>> table.count_row_if(lambda row: row["col1"] > row["col2"])
+        >>> table.count_rows_if(lambda row: row["col1"] > row["col2"])
         0
         """
         expression = predicate(_LazyVectorizedRow(self))._polars_expression
