@@ -9,7 +9,6 @@ from safeds._utils._random import _get_random_seed
 from safeds._validation import _check_bounds, _check_columns_exist, _ClosedBound, _normalize_and_check_file_path
 from safeds._validation._check_columns_dont_exist import _check_columns_dont_exist
 from safeds.data.tabular.plotting import TablePlotter
-from safeds.data.tabular.typing._polars_data_type import _PolarsDataType
 from safeds.data.tabular.typing._polars_schema import _PolarsSchema
 from safeds.exceptions import (
     ColumnLengthMismatchError,
@@ -390,13 +389,7 @@ class Table:
         >>> table.column_count
         2
         """
-        import polars as pl
-
-        try:
-            return self._lazy_frame.width
-        except (pl.NoDataError, pl.PolarsPanicError):
-            # Can happen for some operations on empty tables (e.g. https://github.com/pola-rs/polars/issues/16202)
-            return 0
+        return len(self.column_names)
 
     @property
     def row_count(self) -> int:
@@ -612,8 +605,7 @@ class Table:
         >>> table.get_column_type("a")
         Int64
         """
-        _check_columns_exist(self, name)
-        return _PolarsDataType(self._lazy_frame.schema[name])
+        return self.schema.get_column_type(name)
 
     def has_column(self, name: str) -> bool:
         """
@@ -636,7 +628,7 @@ class Table:
         >>> table.has_column("a")
         True
         """
-        return name in self.column_names
+        return self.schema.has_column(name)
 
     def remove_columns(
         self,

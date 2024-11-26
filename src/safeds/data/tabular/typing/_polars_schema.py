@@ -73,7 +73,7 @@ class _PolarsSchema(Schema):
     # ------------------------------------------------------------------------------------------------------------------
 
     def get_column_type(self, name: str) -> DataType:
-        _check_columns_exist(self, [name])
+        _check_columns_exist(self, name)
 
         return _PolarsDataType(self._schema[name])
 
