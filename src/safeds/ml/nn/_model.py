@@ -111,7 +111,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         self._total_number_of_epochs_done = 0
 
     @staticmethod
-    def load_pretrained_model(huggingface_repo: str) -> NeuralNetworkRegressor:  # pragma: no cover
+    def from_pretrained_model(huggingface_repo: str) -> NeuralNetworkRegressor:  # pragma: no cover
         """
         Load a pretrained model from a [Huggingface repository](https://huggingface.co/models/).
 
@@ -703,7 +703,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         self._total_number_of_epochs_done = 0
 
     @staticmethod
-    def load_pretrained_model(huggingface_repo: str) -> NeuralNetworkClassifier:  # pragma: no cover
+    def from_pretrained_model(huggingface_repo: str) -> NeuralNetworkClassifier:  # pragma: no cover
         """
         Load a pretrained model from a [Huggingface repository](https://huggingface.co/models/).
 
