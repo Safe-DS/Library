@@ -3,6 +3,8 @@ from typing import TYPE_CHECKING
 
 import pytest
 import torch
+from torch.types import Device
+
 from safeds._config import _get_device
 from safeds.data.image.containers import ImageList
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
@@ -27,8 +29,6 @@ from safeds.ml.nn.layers import (
     MaxPooling2DLayer,
 )
 from safeds.ml.nn.typing import VariableImageSize
-from torch.types import Device
-
 from tests.helpers import configure_test_with_device, device_cpu, device_cuda, images_all, resolve_resource_path
 
 if TYPE_CHECKING:
@@ -88,7 +88,7 @@ class TestImageToTableClassifier:
             InputConversionImageToTable(image_dataset.input_size),
             layers,
         )
-        nn = nn_original.fit(image_dataset, epoch_size=2)
+        nn = nn_original.fit(image_dataset, epoch_count=2)
         assert nn_original._model is not nn._model
         prediction: ImageDataset = nn.predict(image_dataset.get_input())
         assert one_hot_encoder.inverse_transform(prediction.get_output()) == Table({"class": prediction_label})
@@ -147,7 +147,7 @@ class TestImageToColumnClassifier:
             InputConversionImageToColumn(image_dataset.input_size),
             layers,
         )
-        nn = nn_original.fit(image_dataset, epoch_size=2)
+        nn = nn_original.fit(image_dataset, epoch_count=2)
         assert nn_original._model is not nn._model
         prediction: ImageDataset = nn.predict(image_dataset.get_input())
         assert prediction.get_output() == Column("class", prediction_label)
@@ -188,7 +188,7 @@ class TestImageToImageRegressor:
             InputConversionImageToImage(image_dataset.input_size),
             layers,
         )
-        nn = nn_original.fit(image_dataset, epoch_size=20)
+        nn = nn_original.fit(image_dataset, epoch_count=20)
         assert nn_original._model is not nn._model
         prediction = nn.predict(image_dataset.get_input())
         assert isinstance(prediction.get_output(), ImageList)
@@ -229,7 +229,7 @@ class TestImageToImageRegressor:
             InputConversionImageToImage(VariableImageSize.from_image_size(image_dataset.input_size)),
             layers,
         )
-        nn = nn_original.fit(image_dataset, epoch_size=20)
+        nn = nn_original.fit(image_dataset, epoch_count=20)
         assert nn_original._model is not nn._model
         prediction = nn.predict(
             image_dataset.get_input().resize(

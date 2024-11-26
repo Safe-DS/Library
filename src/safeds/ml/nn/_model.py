@@ -166,7 +166,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
     def fit(
         self,
         train_data: IFT,
-        epoch_size: int = 25,
+        epoch_count: int = 25,
         batch_size: int = 1,
         learning_rate: float = 0.001,
         callback_on_batch_completion: Callable[[int, float], None] | None = None,
@@ -181,7 +181,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         ----------
         train_data:
             The data the network should be trained on.
-        epoch_size:
+        epoch_count:
             The number of times the training cycle should be done.
         batch_size:
             The size of data batches that should be loaded at one time.
@@ -202,7 +202,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         Raises
         ------
         OutOfBoundsError
-            If epoch_size < 1
+            If epoch_count < 1
             If batch_size < 1
         """
         import torch
@@ -218,7 +218,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         if not self._input_conversion._is_fit_data_valid(train_data):
             raise FeatureDataMismatchError
 
-        _check_bounds("epoch_size", epoch_size, lower_bound=_ClosedBound(1))
+        _check_bounds("epoch_count", epoch_count, lower_bound=_ClosedBound(1))
         _check_bounds("batch_size", batch_size, lower_bound=_ClosedBound(1))
 
         copied_model = copy.deepcopy(self)
@@ -236,7 +236,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         loss_fn = nn.MSELoss()
 
         optimizer = torch.optim.SGD(copied_model._model.parameters(), lr=learning_rate)
-        for _ in range(epoch_size):
+        for _ in range(epoch_count):
             loss_sum = 0.0
             amount_of_loss_values_calculated = 0
             for x, y in iter(dataloader):
@@ -273,7 +273,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
     #         "median_absolute_deviation",
     #         "coefficient_of_determination",
     #     ],
-    #     epoch_size: int = 25,
+    #     epoch_count: int = 25,
     #     batch_size: int = 1,
     #     learning_rate: float = 0.001,
     # ) -> Self:
@@ -288,7 +288,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
     #         The data the network should be trained on.
     #     optimization_metric:
     #         The metric that should be used for determining the performance of a model.
-    #     epoch_size:
+    #     epoch_count:
     #         The number of times the training cycle should be done.
     #     batch_size:
     #         The size of data batches that should be loaded at one time.
@@ -317,7 +317,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
     #             "Hyperparameter optimization is currently not supported for CNN Regression Tasks.",
     #         )  # pragma: no cover
     #
-    #     _check_bounds("epoch_size", epoch_size, lower_bound=_ClosedBound(1))
+    #     _check_bounds("epoch_count", epoch_count, lower_bound=_ClosedBound(1))
     #     _check_bounds("batch_size", batch_size, lower_bound=_ClosedBound(1))
     #
     #     list_of_models = self._get_models_for_all_choices()
@@ -334,7 +334,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
     #                 executor.submit(
     #                     model.fit,
     #                     train_set,  # type: ignore[arg-type]
-    #                     epoch_size,
+    #                     epoch_count,
     #                     batch_size,
     #                     learning_rate,
     #                 ),
@@ -774,7 +774,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
     def fit(
         self,
         train_data: IFT,
-        epoch_size: int = 25,
+        epoch_count: int = 25,
         batch_size: int = 1,
         learning_rate: float = 0.001,
         callback_on_batch_completion: Callable[[int, float], None] | None = None,
@@ -789,7 +789,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         ----------
         train_data:
             The data the network should be trained on.
-        epoch_size:
+        epoch_count:
             The number of times the training cycle should be done.
         batch_size:
             The size of data batches that should be loaded at one time.
@@ -810,7 +810,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         Raises
         ------
         ValueError
-            If epoch_size < 1
+            If epoch_count < 1
             If batch_size < 1
         """
         import torch
@@ -831,7 +831,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         if not self._input_conversion._is_fit_data_valid(train_data):
             raise FeatureDataMismatchError
 
-        _check_bounds("epoch_size", epoch_size, lower_bound=_ClosedBound(1))
+        _check_bounds("epoch_count", epoch_count, lower_bound=_ClosedBound(1))
         _check_bounds("batch_size", batch_size, lower_bound=_ClosedBound(1))
 
         copied_model = copy.deepcopy(self)
@@ -856,7 +856,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
             loss_fn = nn.BCELoss()
 
         optimizer = torch.optim.SGD(copied_model._model.parameters(), lr=learning_rate)
-        for _ in range(epoch_size):
+        for _ in range(epoch_count):
             loss_sum = 0.0
             amount_of_loss_values_calculated = 0
             for x, y in iter(dataloader):
@@ -890,7 +890,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
     #     train_data: IFT,
     #     optimization_metric: Literal["accuracy", "precision", "recall", "f1_score"],
     #     positive_class: Any = None,
-    #     epoch_size: int = 25,
+    #     epoch_count: int = 25,
     #     batch_size: int = 1,
     #     learning_rate: float = 0.001,
     # ) -> Self:
@@ -907,7 +907,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
     #         The metric that should be used for determining the performance of a model.
     #     positive_class:
     #         The class to be considered positive. Only needs to be provided when choosing precision, recall or f1_score as the optimization metric.
-    #     epoch_size:
+    #     epoch_count:
     #         The number of times the training cycle should be done.
     #     batch_size:
     #         The size of data batches that should be loaded at one time.
@@ -936,7 +936,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
     #             "Continuous Predictions are currently not supported for Time Series Classification.",
     #         )
     #
-    #     _check_bounds("epoch_size", epoch_size, lower_bound=_ClosedBound(1))
+    #     _check_bounds("epoch_count", epoch_count, lower_bound=_ClosedBound(1))
     #     _check_bounds("batch_size", batch_size, lower_bound=_ClosedBound(1))
     #
     #     list_of_models = self._get_models_for_all_choices()
@@ -956,7 +956,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
     #                 executor.submit(
     #                     model.fit,
     #                     train_set,  # type: ignore[arg-type]
-    #                     epoch_size,
+    #                     epoch_count,
     #                     batch_size,
     #                     learning_rate,
     #                 ),

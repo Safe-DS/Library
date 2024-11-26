@@ -1,4 +1,6 @@
 import pytest
+from torch.types import Device
+
 from safeds._config import _get_device
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import RangeScaler
@@ -13,8 +15,6 @@ from safeds.ml.nn.layers import (
     GRULayer,
     LSTMLayer,
 )
-from torch.types import Device
-
 from tests.helpers import configure_test_with_device, get_devices, get_devices_ids, resolve_resource_path
 
 
@@ -45,7 +45,7 @@ def test_lstm_model(device: Device) -> None:
             continuous=True,
             extra_names=["date"],
         ),
-        epoch_size=1,
+        epoch_count=1,
     )
 
     trained_model.predict(test_table)
@@ -57,7 +57,7 @@ def test_lstm_model(device: Device) -> None:
             continuous=False,
             extra_names=["date"],
         ),
-        epoch_size=1,
+        epoch_count=1,
     )
 
     trained_model_2.predict(test_table)
