@@ -1,7 +1,7 @@
 import re
 
 import pytest
-from safeds.data.tabular.containers import Row, Table
+from safeds.data.tabular.containers import Table
 from safeds.data.tabular.containers._lazy_vectorized_row import _LazyVectorizedRow
 from safeds.exceptions import ColumnNotFoundError
 
@@ -41,6 +41,6 @@ def test_should_get_correct_item(table_data: dict, column_name: str, target: int
     ],
 )
 def test_should_raise_column_not_found_error(table: Table, column_name: str) -> None:
-    row: Row[any] = _LazyVectorizedRow(table=table)
+    row = _LazyVectorizedRow(table=table)
     with pytest.raises(ColumnNotFoundError, match=re.escape(f"Could not find column(s):\n    - '{column_name}'")):
         row[column_name]

@@ -1,5 +1,5 @@
 import pytest
-from safeds.data.tabular.containers import Row, Table
+from safeds.data.tabular.containers import Table
 from safeds.data.tabular.containers._lazy_vectorized_row import _LazyVectorizedRow
 
 
@@ -17,6 +17,6 @@ from safeds.data.tabular.containers._lazy_vectorized_row import _LazyVectorizedR
     ],
 )
 def test_should_return_same_list_of_column_name_with_iter(table: Table, expected: list) -> None:
-    row: Row[any] = _LazyVectorizedRow(table=table)
+    row = _LazyVectorizedRow(table=table)
     iterable = iter(row)
     assert list(iterable) == expected

@@ -1,5 +1,5 @@
 import pytest
-from safeds.data.tabular.containers import Row, Table
+from safeds.data.tabular.containers import Table
 from safeds.data.tabular.containers._lazy_vectorized_row import _LazyVectorizedRow
 from safeds.data.tabular.typing import DataType
 
@@ -16,5 +16,5 @@ from safeds.data.tabular.typing import DataType
     ],
 )
 def test_should_return_the_type_of_the_column(table: Table, column_name: str, expected: DataType) -> None:
-    row: Row[any] = _LazyVectorizedRow(table=table)
+    row = _LazyVectorizedRow(table=table)
     assert str(row.get_column_type(column_name)) == expected

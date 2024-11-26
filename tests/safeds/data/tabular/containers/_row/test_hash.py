@@ -1,5 +1,5 @@
 import pytest
-from safeds.data.tabular.containers import Row, Table
+from safeds.data.tabular.containers import Table
 from safeds.data.tabular.containers._lazy_vectorized_row import _LazyVectorizedRow
 
 
@@ -19,6 +19,6 @@ from safeds.data.tabular.containers._lazy_vectorized_row import _LazyVectorizedR
     ],
 )
 def test_should_return_consistent_hashes(table1: Table, table2: Table, expected: bool) -> None:
-    row1: Row[any] = _LazyVectorizedRow(table=table1)
-    row2: Row[any] = _LazyVectorizedRow(table=table2)
+    row1 = _LazyVectorizedRow(table=table1)
+    row2 = _LazyVectorizedRow(table=table2)
     assert (hash(row1) == hash(row2)) == expected

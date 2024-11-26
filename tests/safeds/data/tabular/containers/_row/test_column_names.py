@@ -1,5 +1,5 @@
 import pytest
-from safeds.data.tabular.containers import Row, Table
+from safeds.data.tabular.containers import Table
 from safeds.data.tabular.containers._lazy_vectorized_row import _LazyVectorizedRow
 
 
@@ -20,5 +20,5 @@ from safeds.data.tabular.containers._lazy_vectorized_row import _LazyVectorizedR
     ],
 )
 def test_should_return_the_column_names(table: Table, expected: list[str]) -> None:
-    row: Row[any] = _LazyVectorizedRow(table=table)
+    row = _LazyVectorizedRow(table=table)
     assert row.column_names == expected
