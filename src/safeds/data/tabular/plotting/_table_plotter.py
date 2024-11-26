@@ -94,7 +94,7 @@ class TablePlotter:
                     axs.boxplot(
                         column,
                         patch_artist=True,
-                        labels=[numerical_table.column_names[i]],
+                        tick_labels=[numerical_table.column_names[i]],
                     )
                     break
 
@@ -102,14 +102,14 @@ class TablePlotter:
                     axs[i].boxplot(
                         column,
                         patch_artist=True,
-                        labels=[numerical_table.column_names[i]],
+                        tick_labels=[numerical_table.column_names[i]],
                     )
 
                 else:
                     axs[line, i % number_of_columns].boxplot(
                         column,
                         patch_artist=True,
-                        labels=[numerical_table.column_names[i]],
+                        tick_labels=[numerical_table.column_names[i]],
                     )
 
             # removes unused ax indices, so there wont be empty plots
