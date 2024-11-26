@@ -1,3 +1,20 @@
+## [0.29.0](https://github.com/Safe-DS/Library/compare/v0.28.1...v0.29.0) (2024-11-26)
+
+### Features
+
+* remove `Image.__array__` ([#964](https://github.com/Safe-DS/Library/issues/964)) ([d2f59c9](https://github.com/Safe-DS/Library/commit/d2f59c9472d3e1056cee0bf2bd1b7a30b65753fb))
+* rename `count_row_if` to `count_rows_if` ([#960](https://github.com/Safe-DS/Library/issues/960)) ([f5d6324](https://github.com/Safe-DS/Library/commit/f5d6324ce1bfd2d81cb2cfee9a6515963aa4ce41))
+* rename `epoch_size` to `epoch_count` ([#962](https://github.com/Safe-DS/Library/issues/962)) ([fa62e9b](https://github.com/Safe-DS/Library/commit/fa62e9b9d7afc637b032462efa3fb26d4bdf4835))
+* rename `flip_vertically` and `flip_horizontally` methods ([#946](https://github.com/Safe-DS/Library/issues/946)) ([a3607d7](https://github.com/Safe-DS/Library/commit/a3607d75929540f987bf27cf7d74d461b0ea837f)), closes [#945](https://github.com/Safe-DS/Library/issues/945)
+* rename `load_pretrained_model` to `from_pretrained_model` ([#957](https://github.com/Safe-DS/Library/issues/957)) ([5b32acc](https://github.com/Safe-DS/Library/commit/5b32acc3f7dd1669d1aed57d4c8004c45a58f342))
+* rename `Row.get_value` to `Row.get_cell` ([#947](https://github.com/Safe-DS/Library/issues/947)) ([e77cb6c](https://github.com/Safe-DS/Library/commit/e77cb6cf28d837b981d3c11e5f3919285da6fdf1))
+
+### Bug Fixes
+
+* avoid performance warning when accessing `column_count` ([#949](https://github.com/Safe-DS/Library/issues/949)) ([c24b6d5](https://github.com/Safe-DS/Library/commit/c24b6d5176f032957bdcd7508f18e78ae76a5584))
+* handle deprecations in third-party libraries ([#963](https://github.com/Safe-DS/Library/issues/963)) ([e10e6bb](https://github.com/Safe-DS/Library/commit/e10e6bbcd00d49daa99ff8d2df84df0b8bf42570))
+* index tensor on cpu ([#961](https://github.com/Safe-DS/Library/issues/961)) ([afafd43](https://github.com/Safe-DS/Library/commit/afafd439505f0eb939617bf640b42be222dc5950))
+
 ## [0.28.1](https://github.com/Safe-DS/Library/compare/v0.28.0...v0.28.1) (2024-09-26)
 
 ### Bug Fixes
