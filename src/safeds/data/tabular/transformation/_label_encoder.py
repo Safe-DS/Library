@@ -208,7 +208,9 @@ class LabelEncoder(InvertibleTableTransformer):
             operation="inverse-transform with a LabelEncoder",
         )
 
-        columns = [pl.col(name).replace_strict(self._inverse_mapping[name], default=None) for name in self._column_names]
+        columns = [
+            pl.col(name).replace_strict(self._inverse_mapping[name], default=None) for name in self._column_names
+        ]
 
         return Table._from_polars_lazy_frame(
             transformed_table._lazy_frame.with_columns(columns),
