@@ -41,6 +41,8 @@ updates:
       development:
         applies-to: version-updates
         dependency-type: development
+        exclude-patterns:
+          - 'mkdocs*'
         update-types:
           - patch
           - minor
