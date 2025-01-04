@@ -16,11 +16,12 @@ updates:
       prefix: 'build'
       include: scope
     groups:
-      dev-patches:
+      development:
         applies-to: version-updates
         dependency-type: development
         update-types:
           - patch
+          - minor
 
   - package-ecosystem: pip
     directory: '/'
