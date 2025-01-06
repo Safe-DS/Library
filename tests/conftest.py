@@ -1,11 +1,13 @@
+import io
 from typing import Any
 
 import matplotlib as mpl
 import pytest
+from PIL.Image import open
 from safeds.data.image.containers import Image, ImageList
 from syrupy import SnapshotAssertion
 from syrupy.extensions.single_file import SingleFileSnapshotExtension
-from syrupy.types import SerializedData
+from syrupy.types import SerializableData, SerializedData
 
 # Fix for failures when running pytest in a terminal (https://github.com/Safe-DS/Library/issues/482)
 mpl.use("agg")
@@ -29,6 +31,20 @@ class PNGImageSnapshotExtension(SingleFileSnapshotExtension):
     def serialize(self, data: Image, **_kwargs: Any) -> SerializedData:
         return data._repr_png_()
 
+    def matches(
+        self,
+        *,
+        serialized_data: SerializableData,
+        snapshot_data: SerializableData,
+    ) -> bool:
+
+        # We decode the byte arrays, since torchvision seems to use different compression methods on different operating
+        # systems, thus leading to different byte arrays for the same image.
+        actual = open(io.BytesIO(serialized_data))
+        expected = open(io.BytesIO(snapshot_data))
+
+        return actual == expected
+
 
 @pytest.fixture()
 def snapshot_png_image(snapshot: SnapshotAssertion) -> SnapshotAssertion:
@@ -40,6 +56,19 @@ class PNGImageListSnapshotExtension(SingleFileSnapshotExtension):
 
     def serialize(self, data: ImageList, **_kwargs: Any) -> SerializedData:
         return data._repr_png_()
+
+    def matches(
+        self,
+        *,
+        serialized_data: SerializableData,
+        snapshot_data: SerializableData,
+    ) -> bool:
+        # We decode the byte arrays, since torchvision seems to use different compression methods on different operating
+        # systems, thus leading to different byte arrays for the same image.
+        actual = open(io.BytesIO(serialized_data))
+        expected = open(io.BytesIO(snapshot_data))
+
+        return actual == expected
 
 
 @pytest.fixture()
