@@ -2,13 +2,14 @@ from typing import Any
 
 import polars as pl
 import pytest
+
 from safeds.data.tabular.containers import Cell
 from safeds.data.tabular.containers._lazy_cell import _LazyCell
 
 
 def test_should_be_deterministic() -> None:
     cell: Cell[Any] = _LazyCell(pl.col("a"))
-    assert hash(cell) == 977452292332124345
+    assert hash(cell) == 8162512882156938440
 
 
 @pytest.mark.parametrize(

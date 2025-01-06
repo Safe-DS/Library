@@ -124,6 +124,7 @@ class DecisionTreeClassifier(Classifier, _DecisionTreeBase):
         import matplotlib.pyplot as plt
         from sklearn.tree import plot_tree
 
+        plt.figure()
         plot_tree(self._wrapped_model)
 
         # save plot fig bytes in buffer

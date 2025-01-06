@@ -354,7 +354,7 @@ class TablePlotter:
                     ]
 
                     bars = [f"{round((bins[i] + bins[i + 1]) / 2, 2)}" for i in range(len(bins) - 1)]
-                    hist = column._series.hist(bins=bins).slice(1, length=max_bin_count).get_column("count").to_numpy()
+                    hist = column._series.hist(bins=bins).get_column("count").to_numpy()
 
                     ax.bar(bars, hist, edgecolor="black")
                     ax.set_xticks(range(len(hist)), bars, rotation=45, horizontalalignment="right")
@@ -445,7 +445,7 @@ class TablePlotter:
                 agg_list.append(pl.col(name).mean().alias(f"{name}_mean"))
                 agg_list.append(pl.count(name).alias(f"{name}_count"))
                 agg_list.append(pl.std(name, ddof=0).alias(f"{name}_std"))
-            grouped = self._table._lazy_frame.sort(x_name).group_by(x_name).agg(agg_list).collect()
+            grouped = self._table._lazy_frame.sort(x_name).group_by(x_name, maintain_order=True).agg(agg_list).collect()
 
             x = grouped.get_column(x_name)
             y_s = []
@@ -641,7 +641,7 @@ class TablePlotter:
 
             # Calculate the moving average
             mean_col = pl.col(y_name).mean().alias(y_name)
-            grouped = self._table._lazy_frame.sort(x_name).group_by(x_name).agg(mean_col).collect()
+            grouped = self._table._lazy_frame.sort(x_name).group_by(x_name, maintain_order=True).agg(mean_col).collect()
             data = grouped
             moving_average = data.select([pl.col(y_name).rolling_mean(window_size).alias("moving_average")])
             # set up the arrays for plotting
