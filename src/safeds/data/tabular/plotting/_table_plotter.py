@@ -445,7 +445,7 @@ class TablePlotter:
                 agg_list.append(pl.col(name).mean().alias(f"{name}_mean"))
                 agg_list.append(pl.count(name).alias(f"{name}_count"))
                 agg_list.append(pl.std(name, ddof=0).alias(f"{name}_std"))
-            grouped = self._table._lazy_frame.sort(x_name).group_by(x_name).agg(agg_list).collect()
+            grouped = self._table._lazy_frame.sort(x_name).group_by(x_name, maintain_order=True).agg(agg_list).collect()
 
             x = grouped.get_column(x_name)
             y_s = []
