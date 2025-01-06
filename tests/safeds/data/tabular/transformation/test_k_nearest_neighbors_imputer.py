@@ -172,8 +172,8 @@ class TestFitAndTransform:
                 ["col1"],
                 Table(
                     {
-                        "col1": [1, 2, 7 / 3, 4],  # Assuming k=1, the nearest neighbor for the missing value is 2.
-                        "col2": [1, 8 / 3, 3, 4],
+                        "col1": [1, 2, 2.5, 4],  # Assuming k=1, the nearest neighbor for the missing value is 2.
+                        "col2": [1, 2.5, 3, 4],
                     },
                 ),
             ),
