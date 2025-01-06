@@ -4,10 +4,11 @@ from typing import Any
 import matplotlib as mpl
 import pytest
 from PIL.Image import open as open_image
-from safeds.data.image.containers import Image, ImageList
 from syrupy import SnapshotAssertion
 from syrupy.extensions.single_file import SingleFileSnapshotExtension
 from syrupy.types import SerializableData, SerializedData
+
+from safeds.data.image.containers import Image, ImageList
 
 # Fix for failures when running pytest in a terminal (https://github.com/Safe-DS/Library/issues/482)
 mpl.use("agg")
@@ -20,7 +21,7 @@ class JPEGImageExtension(SingleFileSnapshotExtension):
         return data._repr_jpeg_()
 
 
-@pytest.fixture()
+@pytest.fixture
 def snapshot_jpeg_image(snapshot: SnapshotAssertion) -> SnapshotAssertion:
     return snapshot.use_extension(JPEGImageExtension)
 
@@ -46,7 +47,7 @@ class PNGImageSnapshotExtension(SingleFileSnapshotExtension):
         return actual == expected
 
 
-@pytest.fixture()
+@pytest.fixture
 def snapshot_png_image(snapshot: SnapshotAssertion) -> SnapshotAssertion:
     return snapshot.use_extension(PNGImageSnapshotExtension)
 
@@ -71,6 +72,6 @@ class PNGImageListSnapshotExtension(SingleFileSnapshotExtension):
         return actual == expected
 
 
-@pytest.fixture()
+@pytest.fixture
 def snapshot_png_image_list(snapshot: SnapshotAssertion) -> SnapshotAssertion:
     return snapshot.use_extension(PNGImageListSnapshotExtension)
