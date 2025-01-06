@@ -6,7 +6,7 @@ from safeds.data.tabular.containers._lazy_temporal_cell import _LazyTemporalCell
 
 def test_should_be_deterministic() -> None:
     cell = _LazyTemporalCell(pl.col("a"))
-    assert hash(cell) == 977452292332124345
+    assert hash(cell) == 8162512882156938440
 
 
 @pytest.mark.parametrize(
