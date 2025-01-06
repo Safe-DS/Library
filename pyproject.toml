@@ -21,8 +21,8 @@ pillow = ">=9.5,<12.0"
 polars = {extras = ["numpy", "pyarrow"], version = "^1.7.1"}
 scikit-learn = "^1.2.0"
 statsmodels = "^0.14.1"
-torch = "^2.4.1"
-torchvision = "^0.19.1"
+torch = "^2.5.1"
+torchvision = "^0.20.1"
 transformers = "^4.40.2"
 xxhash = "^3.4.1"
 
@@ -33,14 +33,14 @@ syrupy = "^4.6.0"
 torch = [
     # Install the CUDA version on Windows. Projects that depend on us always get their dependencies from PyPI, so
     # there's no point moving this to the main dependencies section.
-    { version = "^2.4.1", markers="sys_platform == 'win32'", source = "torch_cuda" },
-    { version = "^2.4.1", markers="sys_platform != 'win32'", source = "pypi" },
+    { version = "^2.5.1", markers="sys_platform == 'win32'", source = "torch_cuda" },
+    { version = "^2.5.1", markers="sys_platform != 'win32'", source = "pypi" },
 ]
 torchvision = [
     # Install the CUDA version on Windows. Projects that depend on us always get their dependencies from PyPI, so
     # there's no point moving this to the main dependencies section.
-    { version = "^0.19.1", markers="sys_platform == 'win32'", source = "torch_cuda" },
-    { version = "^0.19.1", markers="sys_platform != 'win32'", source = "pypi" },
+    { version = "^0.20.1", markers="sys_platform == 'win32'", source = "torch_cuda" },
+    { version = "^0.20.1", markers="sys_platform != 'win32'", source = "pypi" },
 ]
 
 [tool.poetry.group.docs.dependencies]
