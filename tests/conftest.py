@@ -3,7 +3,7 @@ from typing import Any
 
 import matplotlib as mpl
 import pytest
-from PIL.Image import open
+from PIL.Image import open as open_image
 from safeds.data.image.containers import Image, ImageList
 from syrupy import SnapshotAssertion
 from syrupy.extensions.single_file import SingleFileSnapshotExtension
@@ -40,8 +40,8 @@ class PNGImageSnapshotExtension(SingleFileSnapshotExtension):
 
         # We decode the byte arrays, since torchvision seems to use different compression methods on different operating
         # systems, thus leading to different byte arrays for the same image.
-        actual = open(io.BytesIO(serialized_data))
-        expected = open(io.BytesIO(snapshot_data))
+        actual = open_image(io.BytesIO(serialized_data))
+        expected = open_image(io.BytesIO(snapshot_data))
 
         return actual == expected
 
@@ -65,8 +65,8 @@ class PNGImageListSnapshotExtension(SingleFileSnapshotExtension):
     ) -> bool:
         # We decode the byte arrays, since torchvision seems to use different compression methods on different operating
         # systems, thus leading to different byte arrays for the same image.
-        actual = open(io.BytesIO(serialized_data))
-        expected = open(io.BytesIO(snapshot_data))
+        actual = open_image(io.BytesIO(serialized_data))
+        expected = open_image(io.BytesIO(snapshot_data))
 
         return actual == expected
 
