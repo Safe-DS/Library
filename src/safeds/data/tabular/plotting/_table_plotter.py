@@ -641,7 +641,7 @@ class TablePlotter:
 
             # Calculate the moving average
             mean_col = pl.col(y_name).mean().alias(y_name)
-            grouped = self._table._lazy_frame.sort(x_name).group_by(x_name).agg(mean_col).collect()
+            grouped = self._table._lazy_frame.sort(x_name).group_by(x_name, maintain_order=True).agg(mean_col).collect()
             data = grouped
             moving_average = data.select([pl.col(y_name).rolling_mean(window_size).alias("moving_average")])
             # set up the arrays for plotting
