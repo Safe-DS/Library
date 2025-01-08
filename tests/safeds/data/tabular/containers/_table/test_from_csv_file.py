@@ -10,39 +10,31 @@ from tests.helpers import resolve_resource_path
 @pytest.mark.parametrize(
     ("path", "expected"),
     [
-        ("table.csv", Table({"A": ["❔"], "B": [2]})),
-        (Path("table.csv"), Table({"A": ["❔"], "B": [2]})),
-        ("emptytable.csv", Table({})),
+        ("csv/empty.csv", Table({})),
+        ("csv/non-empty.csv", Table({"A": [1], "B": [2]})),
+        ("csv/special-character.csv", Table({"A": ["❔"], "B": [2]})),
     ],
-    ids=["by String", "by path", "empty"],
+    ids=["empty", "non-empty", "special character"],
 )
-def test_should_create_table_from_csv_file(path: str | Path, expected: Table) -> None:
-    table = Table.from_csv_file(resolve_resource_path(path))
-    assert table.schema == expected.schema
-    assert table == expected
+class TestShouldCreateTableFromCsvFile:
+    def test_path_as_string(self, path: str, expected: Table) -> None:
+        path_as_string = resolve_resource_path(path)
+        table = Table.from_csv_file(path_as_string)
+        assert table.schema == expected.schema
+        assert table == expected
+
+    def test_path_as_path_object(self, path: str, expected: Table) -> None:
+        path_as_path_object = Path(resolve_resource_path(path))
+        table = Table.from_csv_file(path_as_path_object)
+        assert table.schema == expected.schema
+        assert table == expected
 
 
-@pytest.mark.parametrize(
-    "path",
-    [
-        "test_table_from_csv_file_invalid.csv",
-        Path("test_table_from_csv_file_invalid.csv"),
-    ],
-    ids=["by String", "by path"],
-)
-def test_should_raise_error_if_file_not_found(path: str | Path) -> None:
+def test_should_raise_error_if_file_not_found() -> None:
     with pytest.raises(FileNotFoundError):
-        Table.from_csv_file(resolve_resource_path(path))
+        Table.from_csv_file(resolve_resource_path("not-found.csv"))
 
 
-@pytest.mark.parametrize(
-    "path",
-    [
-        "invalid_file_extension.file_extension",
-        Path("invalid_file_extension.file_extension"),
-    ],
-    ids=["by String", "by path"],
-)
-def test_should_raise_error_if_wrong_file_extension(path: str | Path) -> None:
+def test_should_raise_error_if_wrong_file_extension() -> None:
     with pytest.raises(FileExtensionError):
-        Table.from_csv_file(resolve_resource_path(path))
+        Table.from_csv_file(resolve_resource_path("invalid-extension.txt"))

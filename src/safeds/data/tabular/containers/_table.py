@@ -162,10 +162,10 @@ class Table:
 
         Raises
         ------
+        FileExtensionError
+            If the path has an extension that is not ".csv".
         FileNotFoundError
             If no file exists at the given path.
-        ValueError
-            If the path has an extension that is not ".csv".
 
         Examples
         --------

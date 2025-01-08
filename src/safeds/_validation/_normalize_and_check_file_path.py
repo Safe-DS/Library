@@ -20,9 +20,9 @@ def _normalize_and_check_file_path(
     path:
         Path to check and normalize.
     canonical_file_extension:
-        If the path has no extension, this extension will be added. Should include the leading dot.
+        If the path has no extension, this extension will be added. It should include the leading dot.
     valid_file_extensions:
-        If the path has an extension, it must be in this set. Should include the leading dots.
+        If the path has an extension, it must be in this set. It should include the leading dots.
     check_if_file_exists:
         Whether to also check if the path points to an existing file.
 
