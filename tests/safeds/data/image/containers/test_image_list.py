@@ -746,7 +746,7 @@ class TestToJpegFiles:
 
         with tempfile.TemporaryDirectory() as tmp_parent_dir:
             tmp_files = [
-                tempfile.NamedTemporaryFile(suffix=".jpg", prefix=str(i), dir=tmp_parent_dir)
+                tempfile.NamedTemporaryFile(suffix=".jpg", prefix=str(i), dir=tmp_parent_dir)  # noqa: SIM115
                 for i in range(len(image_list))
             ]
             for tmp_file in tmp_files:
@@ -837,7 +837,7 @@ class TestToPngFiles:
 
         with tempfile.TemporaryDirectory() as tmp_parent_dir:
             tmp_files = [
-                tempfile.NamedTemporaryFile(suffix=".png", prefix=str(i), dir=tmp_parent_dir)
+                tempfile.NamedTemporaryFile(suffix=".png", prefix=str(i), dir=tmp_parent_dir)  # noqa: SIM115
                 for i in range(len(image_list))
             ]
             for tmp_file in tmp_files:
