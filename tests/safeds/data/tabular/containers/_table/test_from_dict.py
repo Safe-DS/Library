@@ -32,6 +32,6 @@ def test_should_create_table_from_dict(data: dict[str, list[Any]], expected: Tab
     assert Table.from_dict(data) == expected
 
 
-def test_should_raise_error_if_column_lengths_mismatch() -> None:
+def test_should_raise_error_if_row_counts_differ() -> None:
     with pytest.raises(RowCountMismatchError):
         Table.from_dict({"a": [1, 2], "b": [3]})

@@ -265,9 +265,9 @@ class Table:
 
         try:
             return Table._from_polars_data_frame(pl.read_json(path))
-        except (pl.exceptions.PanicException, pl.exceptions.ComputeError):
+        except (pl.exceptions.ComputeError, pl.exceptions.PanicException):
             # Can happen if the JSON file is empty (https://github.com/pola-rs/polars/issues/10234)
-            return Table({})
+            return Table({})  # pragma: no cover
 
     @staticmethod
     def from_parquet_file(path: str | Path) -> Table:
@@ -447,7 +447,7 @@ class Table:
 
     def add_columns(
         self,
-        columns: Column | list[Column],
+        columns: Column | list[Column] | Table,
     ) -> Table:
         """
         Return a new table with additional columns.
@@ -469,10 +469,10 @@ class Table:
 
         Raises
         ------
-        ValueError
-            If a column name already exists.
-        ValueError
-            If the columns have incompatible lengths.
+        DuplicateColumnError
+            If a column name exists already. This can also happen if the new columns have duplicate names.
+        RowCountMismatchError
+            If the columns have different row counts.
 
         Examples
         --------
@@ -490,7 +490,10 @@ class Table:
         |   3 |   6 |
         +-----+-----+
         """
-        from polars.exceptions import DuplicateError
+        from polars.exceptions import DuplicateError, ShapeError
+
+        if isinstance(columns, Table):
+            return self.add_table_as_columns(columns)
 
         if isinstance(columns, Column):
             columns = [columns]
@@ -504,10 +507,10 @@ class Table:
             )
         # polars already validates this, so we don't do it upfront (performance)
         except DuplicateError:
-            _check_columns_dont_exist(
-                self,
-                [column.name for column in columns],
-            )  # TODO: must also ensure that the new columns have unique names (add test)
+            _check_columns_dont_exist(self, [column.name for column in columns])
+            return Table({})  # pragma: no cover
+        except ShapeError:
+            _check_row_counts_are_equal([self, *columns])
             return Table({})  # pragma: no cover
 
     def add_computed_column(
@@ -535,7 +538,7 @@ class Table:
         Raises
         ------
         ValueError
-            If the column name already exists.
+            If the column name exists already.
 
         Examples
         --------
@@ -1094,8 +1097,6 @@ class Table:
         else:
             return None
 
-    # TODO: Rethink group_rows/group_rows_by_column. They should not return a dict.
-
     def remove_duplicate_rows(self) -> Table:
         """
         Return a new table without duplicate rows.
@@ -1127,7 +1128,7 @@ class Table:
 
     def remove_rows(
         self,
-        query: Callable[[Row], Cell[bool]],
+        predicate: Callable[[Row], Cell[bool]],
     ) -> Table:
         """
         Return a new table without rows that satisfy a condition.
@@ -1136,7 +1137,7 @@ class Table:
 
         Parameters
         ----------
-        query:
+        predicate:
             The function that determines which rows to remove.
 
         Returns
@@ -1158,7 +1159,7 @@ class Table:
         |   3 |   6 |
         +-----+-----+
         """
-        mask = query(_LazyVectorizedRow(self))
+        mask = predicate(_LazyVectorizedRow(self))
 
         return Table._from_polars_lazy_frame(
             self._lazy_frame.filter(~mask._polars_expression),
@@ -1167,7 +1168,7 @@ class Table:
     def remove_rows_by_column(
         self,
         name: str,
-        query: Callable[[Cell], Cell[bool]],
+        predicate: Callable[[Cell], Cell[bool]],
     ) -> Table:
         """
         Return a new table without rows that satisfy a condition on a specific column.
@@ -1178,7 +1179,7 @@ class Table:
         ----------
         name:
             The name of the column.
-        query:
+        predicate:
             The function that determines which rows to remove.
 
         Returns
@@ -1209,7 +1210,7 @@ class Table:
 
         import polars as pl
 
-        mask = query(_LazyCell(pl.col(name)))
+        mask = predicate(_LazyCell(pl.col(name)))
 
         return Table._from_polars_lazy_frame(
             self._lazy_frame.filter(~mask._polars_expression),
@@ -1633,11 +1634,19 @@ class Table:
         |   3 |   6 |
         +-----+-----+
         """
-        # TODO: raises?
+        from polars.exceptions import DuplicateError, ShapeError
 
-        return Table._from_polars_data_frame(
-            self._data_frame.hstack(other._data_frame),
-        )
+        try:
+            return Table._from_polars_data_frame(
+                self._data_frame.hstack(other._data_frame),
+            )
+        # polars already validates this, so we don't do it upfront (performance)
+        except DuplicateError:
+            _check_columns_dont_exist(self, other.column_names)
+            return Table({})  # pragma: no cover
+        except ShapeError:
+            _check_row_counts_are_equal([self, other])
+            return Table({})  # pragma: no cover
 
     def add_table_as_rows(self, other: Table) -> Table:
         """
