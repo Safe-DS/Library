@@ -2,6 +2,7 @@ import sys
 
 import pytest
 import torch
+
 from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 from safeds.data.image.typing import ImageSize
@@ -51,7 +52,7 @@ class TestDataConversionImage:
             output_conversion_image_to_image = InputConversionImageToImage(ImageSize(1, 1, 1))
             output_conversion_image_to_table = InputConversionImageToTable(ImageSize(1, 1, 1))
             output_conversion_image_to_column = InputConversionImageToColumn(ImageSize(1, 1, 1))
-            other = Table()
+            other = Table({})
             assert output_conversion_image_to_image.__eq__(other) is NotImplemented
             assert output_conversion_image_to_image.__eq__(output_conversion_image_to_table) is NotImplemented
             assert output_conversion_image_to_image.__eq__(output_conversion_image_to_column) is NotImplemented

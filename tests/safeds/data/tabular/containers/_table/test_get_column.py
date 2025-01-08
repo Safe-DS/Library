@@ -1,4 +1,5 @@
 import pytest
+
 from safeds.data.tabular.containers import Column, Table
 from safeds.exceptions import ColumnNotFoundError
 
@@ -18,7 +19,7 @@ def test_should_get_column(table1: Table, expected: Column) -> None:
     "table",
     [
         (Table({"col1": ["col1_1"], "col2": ["col2_1"]})),
-        (Table()),
+        (Table({})),
     ],
     ids=["no col3", "empty"],
 )

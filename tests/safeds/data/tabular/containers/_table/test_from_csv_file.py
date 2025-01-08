@@ -1,9 +1,9 @@
 from pathlib import Path
 
 import pytest
+
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import FileExtensionError
-
 from tests.helpers import resolve_resource_path
 
 
@@ -12,7 +12,7 @@ from tests.helpers import resolve_resource_path
     [
         ("table.csv", Table({"A": ["❔"], "B": [2]})),
         (Path("table.csv"), Table({"A": ["❔"], "B": [2]})),
-        ("emptytable.csv", Table()),
+        ("emptytable.csv", Table({})),
     ],
     ids=["by String", "by path", "empty"],
 )

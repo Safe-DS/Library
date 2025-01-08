@@ -7,7 +7,7 @@ from safeds.data.tabular.containers._lazy_vectorized_row import _LazyVectorizedR
 @pytest.mark.parametrize(
     ("table", "expected"),
     [
-        (Table(), []),
+        (Table({}), []),
         (Table({"A": ["a", "aa", "aaa"]}), ["A"]),
         (Table({"A": ["a", "aa", "aaa"], "B": ["b", "bb", "bbb"], "C": ["c", "cc", "ccc"]}), ["A", "B", "C"]),
     ],

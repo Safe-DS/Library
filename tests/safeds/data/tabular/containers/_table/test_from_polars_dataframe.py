@@ -27,7 +27,7 @@
 #             Schema({"col1": String(), "col2": String()}),
 #             Table({"col1": [0, 1.1], "col2": ["a", "b"]}),
 #         ),
-#         (pd.DataFrame(), Schema({}), Schema({}), Table()),
+#         (pd.DataFrame(), Schema({}), Schema({}), Table({})),
 #     ],
 #     ids=["one row, one column", "one row, two columns", "two rows, one column", "two rows, two columns", "empty"],
 # )

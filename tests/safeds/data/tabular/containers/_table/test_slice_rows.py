@@ -1,4 +1,5 @@
 import pytest
+
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import OutOfBoundsError
 
@@ -7,10 +8,10 @@ from safeds.exceptions import OutOfBoundsError
     ("table", "start", "length", "expected"),
     [
         (
-            Table(),
+            Table({}),
             0,
             None,
-            Table(),
+            Table({}),
         ),
         (
             Table({"col1": []}),
@@ -78,6 +79,6 @@ def test_should_slice_rows(table: Table, start: int, length: int | None, expecte
 
 
 def test_should_raise_for_negative_length() -> None:
-    table: Table = Table()
+    table: Table = Table({})
     with pytest.raises(OutOfBoundsError):
         table.slice_rows(0, -1)

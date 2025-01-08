@@ -1,11 +1,12 @@
 import pytest
+
 from safeds.data.tabular.containers import Column
 
 
 @pytest.mark.parametrize(
     ("column", "expected"),
     [
-        (Column("a"), 1581717131331298536),
+        (Column("a", []), 1581717131331298536),
         (Column("a", [1, 2, 3]), 239695622656180157),
     ],
     ids=[
@@ -20,9 +21,9 @@ def test_should_be_deterministic(column: Column, expected: int) -> None:
 @pytest.mark.parametrize(
     ("column1", "column2", "expected"),
     [
-        (Column("a"), Column("a"), True),
+        (Column("a", []), Column("a", []), True),
         (Column("a", [1, 2, 3]), Column("a", [1, 2, 3]), True),
-        (Column("a"), Column("b"), False),
+        (Column("a", []), Column("b", []), False),
         (Column("a", [1, 2, 3]), Column("a", [1, 2]), False),
         (Column("a", [1, 2, 3]), Column("a", ["1", "2", "3"]), False),
         # We don't use the column values in the hash calculation

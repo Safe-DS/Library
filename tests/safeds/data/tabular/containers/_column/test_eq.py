@@ -1,15 +1,16 @@
 from typing import Any
 
 import pytest
+
 from safeds.data.tabular.containers import Column, Table
 
 
 @pytest.mark.parametrize(
     ("column1", "column2", "expected"),
     [
-        (Column("a"), Column("a"), True),
+        (Column("a", []), Column("a", []), True),
         (Column("a", [1, 2, 3]), Column("a", [1, 2, 3]), True),
-        (Column("a"), Column("b"), False),
+        (Column("a", []), Column("b", []), False),
         (Column("a", [1, 2, 3]), Column("a", [1, 2, 4]), False),
         (Column("a", [1, 2, 3]), Column("a", ["1", "2", "3"]), False),
     ],
@@ -28,7 +29,7 @@ def test_should_return_whether_two_columns_are_equal(column1: Column, column2: C
 @pytest.mark.parametrize(
     "column",
     [
-        Column("a"),
+        Column("a", []),
         Column("a", [1, 2, 3]),
     ],
     ids=[
@@ -43,8 +44,8 @@ def test_should_return_true_if_objects_are_identical(column: Column) -> None:
 @pytest.mark.parametrize(
     ("column", "other"),
     [
-        (Column("a"), None),
-        (Column("a", [1, 2, 3]), Table()),
+        (Column("a", []), None),
+        (Column("a", [1, 2, 3]), Table({})),
     ],
     ids=[
         "Column vs. None",

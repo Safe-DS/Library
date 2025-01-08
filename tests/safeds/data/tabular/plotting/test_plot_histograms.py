@@ -1,6 +1,7 @@
 import pytest
-from safeds.data.tabular.containers import Table
 from syrupy import SnapshotAssertion
+
+from safeds.data.tabular.containers import Table
 
 
 @pytest.mark.parametrize(
@@ -73,7 +74,7 @@ def test_should_match_snapshot(table: Table, snapshot_png_image: SnapshotAsserti
 
 def test_should_fail_on_empty_table() -> None:
     with pytest.raises(ZeroDivisionError):
-        Table().plot.histograms()
+        Table({}).plot.histograms()
 
 
 @pytest.mark.parametrize(

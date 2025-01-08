@@ -1,4 +1,5 @@
 import pytest
+
 from safeds.data.labeled.containers import TimeSeriesDataset
 from safeds.data.tabular.containers import Table
 
@@ -17,7 +18,7 @@ from safeds.data.tabular.containers import Table
                 target_name="T",
                 window_size=1,
             ),
-            Table(),
+            Table({}),
         ),
         (
             TimeSeriesDataset(

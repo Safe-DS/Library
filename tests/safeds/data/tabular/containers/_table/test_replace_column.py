@@ -1,4 +1,5 @@
 import pytest
+
 from safeds.data.tabular.containers import Column, Table
 from safeds.exceptions import (
     ColumnNotFoundError,
@@ -116,4 +117,4 @@ def test_should_raise_error(
 
 def test_should_fail_on_empty_table() -> None:
     with pytest.raises(ColumnNotFoundError):
-        Table().replace_column("col", [Column("a", [1, 2])])
+        Table({}).replace_column("col", [Column("a", [1, 2])])

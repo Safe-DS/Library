@@ -1,7 +1,8 @@
 import pytest
+from syrupy import SnapshotAssertion
+
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import ColumnNotFoundError, ColumnTypeError
-from syrupy import SnapshotAssertion
 
 
 @pytest.mark.parametrize(
@@ -86,7 +87,7 @@ def test_should_match_snapshot_dark(
         (Table({"A": [1, 2, 3], "B": [2, 4, 7]}), "C", "A"),
         (Table({"A": [1, 2, 3], "B": [2, 4, 7]}), "B", "C"),
         (Table({"A": [1, 2, 3], "B": [2, 4, 7]}), "C", "D"),
-        (Table(), "C", "D"),
+        (Table({}), "C", "D"),
     ],
     ids=["First argument doesn't exist", "Second argument doesn't exist", "Both arguments do not exist", "empty"],
 )

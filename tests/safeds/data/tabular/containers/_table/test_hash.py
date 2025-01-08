@@ -1,11 +1,12 @@
 import pytest
+
 from safeds.data.tabular.containers import Table
 
 
 @pytest.mark.parametrize(
     ("table1", "table2"),
     [
-        (Table(), Table()),
+        (Table({}), Table({})),
         (Table({"a": [], "b": []}), Table({"a": [], "b": []})),
         (Table({"col1": [1]}), Table({"col1": [1]})),
         (Table({"col1": [1, 2, 3]}), Table({"col1": [1, 1, 3]})),

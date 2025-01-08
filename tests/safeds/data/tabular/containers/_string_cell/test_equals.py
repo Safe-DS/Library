@@ -2,6 +2,7 @@ from typing import Any
 
 import polars as pl
 import pytest
+
 from safeds.data.tabular.containers import StringCell, Table
 from safeds.data.tabular.containers._lazy_string_cell import _LazyStringCell
 
@@ -30,7 +31,7 @@ def test_should_return_true_if_objects_are_identical() -> None:
     ("cell", "other"),
     [
         (_LazyStringCell(pl.col("a")), None),
-        (_LazyStringCell(pl.col("a")), Table()),
+        (_LazyStringCell(pl.col("a")), Table({})),
     ],
     ids=[
         "Cell vs. None",

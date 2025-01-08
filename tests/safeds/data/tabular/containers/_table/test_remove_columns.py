@@ -1,4 +1,5 @@
 import pytest
+
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import ColumnNotFoundError
 
@@ -8,19 +9,19 @@ from safeds.exceptions import ColumnNotFoundError
     ("table", "expected", "columns", "ignore_unknown_names"),
     [
         (Table({"col1": [1, 2, 1], "col2": ["a", "b", "c"]}), Table({"col1": [1, 2, 1]}), ["col2"], True),
-        (Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), Table(), ["col1", "col2"], True),
+        (Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), Table({}), ["col1", "col2"], True),
         (Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), [], True),
-        (Table(), Table(), [], True),
-        (Table(), Table(), ["col1"], True),
+        (Table({}), Table({}), [], True),
+        (Table({}), Table({}), ["col1"], True),
         (Table({"col1": [1, 2, 1], "col2": ["a", "b", "c"]}), Table({"col1": [1, 2, 1]}), ["col2"], False),
-        (Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), Table(), ["col1", "col2"], False),
+        (Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), Table({}), ["col1", "col2"], False),
         (
             Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
             Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
             [],
             False,
         ),
-        (Table(), Table(), [], False),
+        (Table({}), Table({}), [], False),
     ],
     ids=[
         "one column, ignore unknown names",
@@ -50,8 +51,8 @@ def test_should_remove_table_columns_no_exception(
 @pytest.mark.parametrize(
     ("table", "columns", "ignore_unknown_names"),
     [
-        (Table(), ["col1"], False),
-        (Table(), ["col12"], False),
+        (Table({}), ["col1"], False),
+        (Table({}), ["col12"], False),
     ],
     ids=[
         "missing columns",

@@ -1,8 +1,8 @@
 import pytest
-from safeds.data.tabular.containers import Table
-from safeds.exceptions import ColumnNotFoundError, ColumnTypeError, OutOfBoundsError
 from syrupy import SnapshotAssertion
 
+from safeds.data.tabular.containers import Table
+from safeds.exceptions import ColumnNotFoundError, ColumnTypeError, OutOfBoundsError
 from tests.helpers import os_mac, skip_if_os
 
 
@@ -51,7 +51,7 @@ def test_should_match_snapshot(
         (Table({"A": [1, 2, 3], "B": [2, 4, 7]}), "C", "A"),
         (Table({"A": [1, 2, 3], "B": [2, 4, 7]}), "B", "C"),
         (Table({"A": [1, 2, 3], "B": [2, 4, 7]}), "C", "D"),
-        (Table(), "C", "D"),
+        (Table({}), "C", "D"),
     ],
     ids=[
         "First argument doesn't exist",

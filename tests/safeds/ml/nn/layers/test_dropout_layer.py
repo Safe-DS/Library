@@ -1,11 +1,12 @@
 import sys
 
 import pytest
+from torch import nn
+
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import OutOfBoundsError
 from safeds.ml.nn.layers import DropoutLayer
 from safeds.ml.nn.typing import ConstantImageSize
-from torch import nn
 
 
 class TestProbability:
@@ -49,7 +50,7 @@ class TestEq:
         assert DropoutLayer(0.5) == DropoutLayer(0.5)
 
     def test_should_be_not_implemented(self) -> None:
-        assert DropoutLayer(0.5).__eq__(Table()) is NotImplemented
+        assert DropoutLayer(0.5).__eq__(Table({})) is NotImplemented
 
 
 class TestHash:

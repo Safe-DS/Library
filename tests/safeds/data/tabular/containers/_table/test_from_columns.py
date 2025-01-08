@@ -1,4 +1,5 @@
 import pytest
+
 from safeds.data.tabular.containers import Column, Table
 from safeds.exceptions import ColumnLengthMismatchError, DuplicateColumnError
 
@@ -6,7 +7,7 @@ from safeds.exceptions import ColumnLengthMismatchError, DuplicateColumnError
 @pytest.mark.parametrize(
     ("columns", "expected"),
     [
-        ([], Table()),
+        ([], Table({})),
         (
             [
                 Column("A", [1, 2]),

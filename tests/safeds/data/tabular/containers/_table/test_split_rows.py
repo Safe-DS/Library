@@ -1,4 +1,5 @@
 import pytest
+
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import OutOfBoundsError
 
@@ -53,6 +54,6 @@ def test_should_raise_if_value_not_in_range(percentage_in_first: float) -> None:
 
 
 def test_should_split_empty_table() -> None:
-    t1, t2 = Table().split_rows(0.4)
+    t1, t2 = Table({}).split_rows(0.4)
     assert t1.row_count == 0
     assert t2.row_count == 0

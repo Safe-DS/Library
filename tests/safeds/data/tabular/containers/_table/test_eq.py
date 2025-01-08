@@ -1,13 +1,14 @@
 from typing import Any
 
 import pytest
+
 from safeds.data.tabular.containers import Column, Table
 
 
 @pytest.mark.parametrize(
     ("table1", "table2", "expected"),
     [
-        (Table(), Table(), True),
+        (Table({}), Table({}), True),
         (Table({"a": [], "b": []}), Table({"a": [], "b": []}), True),
         (Table({"col1": [1]}), Table({"col1": [1]}), True),
         (Table({"col1": [1]}), Table({"col2": [1]}), False),
@@ -29,7 +30,7 @@ def test_should_return_whether_two_tables_are_equal(table1: Table, table2: Table
 
 @pytest.mark.parametrize(
     "table",
-    [Table(), Table({"col1": [1]})],
+    [Table({}), Table({"col1": [1]})],
     ids=[
         "empty",
         "non-empty",
@@ -43,7 +44,7 @@ def test_should_return_true_if_objects_are_identical(table: Table) -> None:
     ("table", "other"),
     [
         (Table({"col1": [1]}), None),
-        (Table({"col1": [1]}), Column("a")),
+        (Table({"col1": [1]}), Column("a", [])),
     ],
     ids=[
         "Table vs. None",

@@ -1,7 +1,8 @@
 import pytest
+from syrupy import SnapshotAssertion
+
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import NonNumericColumnError
-from syrupy import SnapshotAssertion
 
 
 @pytest.mark.parametrize(
@@ -32,7 +33,7 @@ def test_should_raise_if_column_contains_non_numerical_values() -> None:
 
 def test_should_fail_on_empty_table() -> None:
     with pytest.raises(NonNumericColumnError):
-        Table().plot.box_plots()
+        Table({}).plot.box_plots()
 
 
 @pytest.mark.parametrize(

@@ -1,4 +1,5 @@
 import pytest
+
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import ColumnNotFoundError
 
@@ -30,7 +31,7 @@ def test_should_transform_column(table: Table, table_transformed: Table) -> None
                 "C": ["a", "b", "c"],
             },
         ),
-        Table(),
+        Table({}),
     ],
     ids=["column not found", "empty"],
 )

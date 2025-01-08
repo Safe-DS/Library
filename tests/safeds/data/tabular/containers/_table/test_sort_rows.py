@@ -1,6 +1,7 @@
 from collections.abc import Callable
 
 import pytest
+
 from safeds.data.tabular.containers import Cell, Row, Table
 
 
@@ -8,9 +9,9 @@ from safeds.data.tabular.containers import Cell, Row, Table
     ("table", "key_selector", "expected"),
     [
         (
-            Table(),
+            Table({}),
             lambda row: row["col1"],
-            Table(),
+            Table({}),
         ),
         (
             Table({"col1": [3, 2, 1]}),
@@ -33,9 +34,9 @@ def test_should_return_sorted_table(
     ("table", "key_selector", "expected"),
     [
         (
-            Table(),
+            Table({}),
             lambda row: row["col1"],
-            Table(),
+            Table({}),
         ),
         (
             Table({"col1": [3, 2, 1]}),

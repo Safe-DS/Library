@@ -307,7 +307,7 @@ class TestEQ:
     def test_should_be_not_implemented(self, resource_path: str, device: Device) -> None:
         configure_test_with_device(device)
         image = Image.from_file(resolve_resource_path(resource_path))
-        other = Table()
+        other = Table({})
         assert (image.__eq__(other)) is NotImplemented
 
 

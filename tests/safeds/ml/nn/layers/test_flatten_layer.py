@@ -1,11 +1,12 @@
 import sys
 
 import pytest
+from torch import nn
+
 from safeds.data.image.typing import ImageSize
 from safeds.data.tabular.containers import Table
 from safeds.ml.nn.layers import FlattenLayer
 from safeds.ml.nn.typing import VariableImageSize
-from torch import nn
 
 
 class TestFlattenLayer:
@@ -42,7 +43,7 @@ class TestFlattenLayer:
             assert FlattenLayer() == FlattenLayer()
 
         def test_should_be_not_implemented(self) -> None:
-            assert FlattenLayer().__eq__(Table()) is NotImplemented
+            assert FlattenLayer().__eq__(Table({})) is NotImplemented
 
     class TestHash:
         def test_hash_should_be_equal(self) -> None:

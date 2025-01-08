@@ -1,4 +1,5 @@
 import pytest
+
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import ColumnLengthMismatchError
 
@@ -6,7 +7,7 @@ from safeds.exceptions import ColumnLengthMismatchError
 # @pytest.mark.parametrize(
 #     ("table", "expected"),
 #     [
-#         (Table(), Schema({})),
+#         (Table({}), Schema({})),
 #         (Table({}), Schema({})),
 #         (Table({"col1": [0]}), Schema({"col1": Integer()})),
 #     ],

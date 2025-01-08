@@ -1,8 +1,8 @@
 import pytest
-from safeds.data.tabular.containers import Table
-from safeds.exceptions import ColumnNotFoundError
 from syrupy import SnapshotAssertion
 
+from safeds.data.tabular.containers import Table
+from safeds.exceptions import ColumnNotFoundError
 from tests.helpers import os_mac, skip_if_os
 
 
@@ -47,7 +47,7 @@ def test_should_not_match_snapshot_without_confidence(snapshot_png_image: Snapsh
     [
         (Table({"A": [1, 2, 3], "B": [2, 4, 7]}), "C", "A"),
         (Table({"A": [1, 2, 3], "B": [2, 4, 7]}), "A", "C"),
-        (Table(), "x", "y"),
+        (Table({}), "x", "y"),
     ],
     ids=["x column", "y column", "empty"],
 )
