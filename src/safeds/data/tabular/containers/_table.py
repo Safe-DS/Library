@@ -356,7 +356,7 @@ class Table:
                 self.__data_frame_cache = self._lazy_frame.collect()
             except (pl.NoDataError, pl.PolarsPanicError):
                 # Can happen for some operations on empty tables (e.g. https://github.com/pola-rs/polars/issues/16202)
-                return pl.DataFrame()
+                self.__data_frame_cache = pl.DataFrame()
 
         return self.__data_frame_cache
 
@@ -364,6 +364,8 @@ class Table:
     def column_names(self) -> list[str]:
         """
         The names of the columns in the table.
+
+        **Note:** This operation must compute the schema of the table, which can be expensive.
 
         Examples
         --------
@@ -378,6 +380,8 @@ class Table:
     def column_count(self) -> int:
         """
         The number of columns in the table.
+
+        **Note:** This operation must compute the schema of the table, which can be expensive.
 
         Examples
         --------
