@@ -1618,6 +1618,13 @@ class Table:
         new_table:
             The table with the columns added.
 
+        Raises
+        ------
+        DuplicateColumnError
+            If a column name exists already.
+        RowCountMismatchError
+            If the tables have different row counts.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
