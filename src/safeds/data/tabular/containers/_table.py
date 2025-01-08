@@ -1030,7 +1030,7 @@ class Table:
     @overload
     def count_rows_if(
         self,
-        predicate: Callable[[Row], Cell[bool | None]],
+        predicate: Callable[[Row], Cell[bool]],
         *,
         ignore_unknown: Literal[True] = ...,
     ) -> int: ...
@@ -1038,14 +1038,14 @@ class Table:
     @overload
     def count_rows_if(
         self,
-        predicate: Callable[[Row], Cell[bool | None]],
+        predicate: Callable[[Row], Cell[bool]],
         *,
         ignore_unknown: bool,
     ) -> int | None: ...
 
     def count_rows_if(
         self,
-        predicate: Callable[[Row], Cell[bool | None]],
+        predicate: Callable[[Row], Cell[bool]],
         *,
         ignore_unknown: bool = True,
     ) -> int | None:
@@ -1079,12 +1079,12 @@ class Table:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
-        >>> table = Table({"col1": [1, 2, 3], "col2": [1, 3, 3]})
-        >>> table.count_rows_if(lambda row: row["col1"] == row["col2"])
-        2
+        >>> table = Table({"col1": [1, 2, 3], "col2": [1, 3, None]})
+        >>> table.count_rows_if(lambda row: row["col1"] < row["col2"])
+        1
 
-        >>> table.count_rows_if(lambda row: row["col1"] > row["col2"])
-        0
+        >>> table.count_rows_if(lambda row: row["col1"] < row["col2"], ignore_unknown=False)
+        None
         """
         expression = predicate(_LazyVectorizedRow(self))._polars_expression
         series = self._lazy_frame.select(expression.alias("count")).collect().get_column("count")

@@ -218,7 +218,7 @@ class Column(Sequence[T_co]):
 
         return series.unique(maintain_order=True).to_list()
 
-    def get_value(self, index: int) -> T_co:
+    def get_value(self, index: int) -> T_co | None:
         """
         Return the column value at specified index. Equivalent to the `[]` operator (indexed access).
 
@@ -262,7 +262,7 @@ class Column(Sequence[T_co]):
     @overload
     def all(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool]],
         *,
         ignore_unknown: Literal[True] = ...,
     ) -> bool: ...
@@ -270,14 +270,14 @@ class Column(Sequence[T_co]):
     @overload
     def all(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool]],
         *,
         ignore_unknown: bool,
     ) -> bool | None: ...
 
     def all(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool]],
         *,
         ignore_unknown: bool = True,
     ) -> bool | None:
@@ -337,7 +337,7 @@ class Column(Sequence[T_co]):
     @overload
     def any(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool]],
         *,
         ignore_unknown: Literal[True] = ...,
     ) -> bool: ...
@@ -345,14 +345,14 @@ class Column(Sequence[T_co]):
     @overload
     def any(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool]],
         *,
         ignore_unknown: bool,
     ) -> bool | None: ...
 
     def any(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool]],
         *,
         ignore_unknown: bool = True,
     ) -> bool | None:
@@ -412,7 +412,7 @@ class Column(Sequence[T_co]):
     @overload
     def count_if(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool]],
         *,
         ignore_unknown: Literal[True] = ...,
     ) -> int: ...
@@ -420,14 +420,14 @@ class Column(Sequence[T_co]):
     @overload
     def count_if(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool]],
         *,
         ignore_unknown: bool,
     ) -> int | None: ...
 
     def count_if(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool]],
         *,
         ignore_unknown: bool = True,
     ) -> int | None:
@@ -482,7 +482,7 @@ class Column(Sequence[T_co]):
     @overload
     def none(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool]],
         *,
         ignore_unknown: Literal[True] = ...,
     ) -> bool: ...
@@ -490,14 +490,14 @@ class Column(Sequence[T_co]):
     @overload
     def none(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool]],
         *,
         ignore_unknown: bool,
     ) -> bool | None: ...
 
     def none(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool]],
         *,
         ignore_unknown: bool = True,
     ) -> bool | None:
