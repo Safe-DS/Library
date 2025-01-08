@@ -1,6 +1,7 @@
 from typing import Any
 
 import pytest
+
 from safeds.data.tabular.containers import Column, Table
 
 

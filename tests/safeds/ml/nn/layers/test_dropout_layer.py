@@ -1,11 +1,12 @@
 import sys
 
 import pytest
+from torch import nn
+
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import OutOfBoundsError
 from safeds.ml.nn.layers import DropoutLayer
 from safeds.ml.nn.typing import ConstantImageSize
-from torch import nn
 
 
 class TestProbability:

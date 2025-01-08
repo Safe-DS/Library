@@ -2,6 +2,7 @@ from typing import Any
 
 import polars as pl
 import pytest
+
 from safeds.data.tabular.containers import StringCell, Table
 from safeds.data.tabular.containers._lazy_string_cell import _LazyStringCell
 

@@ -2,6 +2,7 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 import pytest
+
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import FileExtensionError
 

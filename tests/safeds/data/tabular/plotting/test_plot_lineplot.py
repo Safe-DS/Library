@@ -1,8 +1,8 @@
 import pytest
-from safeds.data.tabular.containers import Table
-from safeds.exceptions import ColumnNotFoundError
 from syrupy import SnapshotAssertion
 
+from safeds.data.tabular.containers import Table
+from safeds.exceptions import ColumnNotFoundError
 from tests.helpers import os_mac, skip_if_os
 
 

@@ -1,4 +1,5 @@
 import pytest
+
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.exceptions import ColumnNotFoundError, TransformerNotFittedError
