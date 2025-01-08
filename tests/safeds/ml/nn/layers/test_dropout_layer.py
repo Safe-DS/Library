@@ -49,7 +49,7 @@ class TestEq:
         assert DropoutLayer(0.5) == DropoutLayer(0.5)
 
     def test_should_be_not_implemented(self) -> None:
-        assert DropoutLayer(0.5).__eq__(Table()) is NotImplemented
+        assert DropoutLayer(0.5).__eq__(Table({})) is NotImplemented
 
 
 class TestHash:

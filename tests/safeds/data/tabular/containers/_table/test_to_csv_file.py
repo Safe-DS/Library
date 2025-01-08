@@ -12,7 +12,7 @@ from tests.helpers import resolve_resource_path
     "table",
     [
         (Table({"col1": ["col1_1"], "col2": ["col2_1"]})),
-        (Table()),
+        (Table({})),
     ],
     ids=["by String", "empty"],
 )
@@ -35,7 +35,7 @@ def test_should_create_csv_file_from_table_by_str(table: Table) -> None:
     "table",
     [
         (Table({"col1": ["col1_1"], "col2": ["col2_1"]})),
-        (Table()),
+        (Table({})),
     ],
     ids=["by String", "empty"],
 )

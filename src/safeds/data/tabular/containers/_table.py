@@ -243,7 +243,7 @@ class Table:
             return Table._from_polars_data_frame(pl.read_json(path))
         except (pl.exceptions.PanicException, pl.exceptions.ComputeError):
             # Can happen if the JSON file is empty (https://github.com/pola-rs/polars/issues/10234)
-            return Table()
+            return Table({})
 
     @staticmethod
     def from_parquet_file(path: str | Path) -> Table:
@@ -304,11 +304,8 @@ class Table:
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, data: Mapping[str, Sequence[Any]] | None = None) -> None:
+    def __init__(self, data: Mapping[str, Sequence[Any]]) -> None:
         import polars as pl
-
-        if data is None:
-            data = {}
 
         # Validation
         expected_length: int | None = None
@@ -487,7 +484,7 @@ class Table:
         except DuplicateError:
             # polars already validates this, so we don't need to do it again upfront (performance)
             _check_columns_dont_exist(self, [column.name for column in columns])
-            return Table()  # pragma: no cover
+            return Table({})  # pragma: no cover
 
     def add_computed_column(
         self,
@@ -1837,7 +1834,7 @@ class Table:
         +----------------------+---------+
         """
         if self.column_count == 0:
-            return Table()
+            return Table({})
 
         head = self.get_column(self.column_names[0]).summarize_statistics()
         tail = [self.get_column(name).summarize_statistics().get_column(name)._series for name in self.column_names[1:]]

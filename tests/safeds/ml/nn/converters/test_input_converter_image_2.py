@@ -51,7 +51,7 @@ class TestDataConversionImage:
             output_conversion_image_to_image = InputConversionImageToImage(ImageSize(1, 1, 1))
             output_conversion_image_to_table = InputConversionImageToTable(ImageSize(1, 1, 1))
             output_conversion_image_to_column = InputConversionImageToColumn(ImageSize(1, 1, 1))
-            other = Table()
+            other = Table({})
             assert output_conversion_image_to_image.__eq__(other) is NotImplemented
             assert output_conversion_image_to_image.__eq__(output_conversion_image_to_table) is NotImplemented
             assert output_conversion_image_to_image.__eq__(output_conversion_image_to_column) is NotImplemented

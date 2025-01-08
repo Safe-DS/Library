@@ -55,7 +55,7 @@ class TestEq:
         [
             (
                 InputConversionTimeSeries(),
-                Table(),
+                Table({}),
             ),
         ],
     )

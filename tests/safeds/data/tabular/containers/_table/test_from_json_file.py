@@ -12,7 +12,7 @@ from tests.helpers import resolve_resource_path
     [
         ("table.json", Table({"A": ["❔"], "B": [2]})),
         (Path("table.json"), Table({"A": ["❔"], "B": [2]})),
-        (Path("emptytable.json"), Table()),
+        (Path("emptytable.json"), Table({})),
     ],
     ids=["by string", "by path", "empty"],
 )

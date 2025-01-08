@@ -44,7 +44,7 @@ def test_should_return_true_if_objects_are_identical(column: Column) -> None:
     ("column", "other"),
     [
         (Column("a"), None),
-        (Column("a", [1, 2, 3]), Table()),
+        (Column("a", [1, 2, 3]), Table({})),
     ],
     ids=[
         "Column vs. None",

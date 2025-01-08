@@ -48,8 +48,8 @@ from safeds.data.tabular.containers import Table
             ),
         ),
         (
-            Table(),
-            Table(),
+            Table({}),
+            Table({}),
         ),
         (
             Table({"col": [], "gg": []}),

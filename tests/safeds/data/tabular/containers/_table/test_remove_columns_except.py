@@ -9,7 +9,7 @@ from safeds.exceptions import ColumnNotFoundError
         (
             Table({"A": [1], "B": [2]}),
             [],
-            Table(),
+            Table({}),
         ),
         (
             Table({"A": [1], "B": [2]}),
@@ -33,9 +33,9 @@ from safeds.exceptions import ColumnNotFoundError
             Table({"C": [3], "A": [1]}),
         ),
         (
-            Table(),
+            Table({}),
             [],
-            Table(),
+            Table({}),
         ),
     ],
     ids=["No Column Name", "First Column", "Second Column", "All columns", "Last and first columns", "empty"],
@@ -48,7 +48,7 @@ def test_should_remove_all_except_listed_columns(table: Table, column_names: lis
         assert expected.row_count == 0
 
 
-@pytest.mark.parametrize("table", [Table({"A": [1], "B": [2]}), Table()], ids=["table", "empty"])
+@pytest.mark.parametrize("table", [Table({"A": [1], "B": [2]}), Table({})], ids=["table", "empty"])
 def test_should_raise_error_if_column_name_unknown(table: Table) -> None:
     with pytest.raises(ColumnNotFoundError):
         table.remove_columns_except(["C"])

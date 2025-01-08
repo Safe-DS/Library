@@ -107,7 +107,7 @@ class TestEq:
 
     def test_should_be_not_implemented(self) -> None:
         input_conversion_image = InputConversionImageToImage(ImageSize(1, 2, 3))
-        other = Table()
+        other = Table({})
         assert input_conversion_image.__eq__(other) is NotImplemented
 
 

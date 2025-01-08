@@ -66,7 +66,7 @@ def test_should_return_whether_two_tabular_datasets_are_equal(
     ("table", "other"),
     [
         (TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b"), None),
-        (TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b"), Table()),
+        (TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b"), Table({})),
     ],
     ids=[
         "TabularDataset vs. None",

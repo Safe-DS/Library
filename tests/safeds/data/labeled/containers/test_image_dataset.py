@@ -43,11 +43,11 @@ class TestImageDatasetInit:
         [
             (
                 _MultiSizeImageList(),
-                Table(),
+                Table({}),
                 ValueError,
                 r"The given input ImageList contains images of different sizes.",
             ),
-            (_EmptyImageList(), Table(), ValueError, r"The given input ImageList contains no images."),
+            (_EmptyImageList(), Table({}), ValueError, r"The given input ImageList contains no images."),
             (
                 ImageList.from_files(resolve_resource_path([plane_png_path, plane_png_path])),
                 ImageList.from_files(resolve_resource_path([plane_png_path, white_square_png_path])),
@@ -62,7 +62,7 @@ class TestImageDatasetInit:
             ),
             (
                 ImageList.from_files(resolve_resource_path(plane_png_path)),
-                Table(),
+                Table({}),
                 OutputLengthMismatchError,
                 r"The length of the output container differs",
             ),
@@ -210,7 +210,7 @@ class TestEq:
     def test_should_be_not_implemented(self, device: Device) -> None:
         configure_test_with_device(device)
         image_dataset = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("images", [1]))
-        other = Table()
+        other = Table({})
         assert image_dataset.__eq__(other) is NotImplemented
 
 
@@ -510,7 +510,7 @@ class TestTableAsTensor:
 
     def test_eq_should_be_not_implemented(self, device: Device) -> None:
         configure_test_with_device(device)
-        assert _TableAsTensor(Table()).__eq__(Table()) is NotImplemented
+        assert _TableAsTensor(Table({})).__eq__(Table({})) is NotImplemented
 
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
@@ -554,7 +554,7 @@ class TestColumnAsTensor:
 
     def test_eq_should_be_not_implemented(self, device: Device) -> None:
         configure_test_with_device(device)
-        assert _ColumnAsTensor(Column("column", [1])).__eq__(Table()) is NotImplemented
+        assert _ColumnAsTensor(Column("column", [1])).__eq__(Table({})) is NotImplemented
 
     def test_should_not_warn(self, device: Device) -> None:
         configure_test_with_device(device)

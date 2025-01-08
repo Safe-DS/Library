@@ -16,7 +16,7 @@ from safeds.data.tabular.containers import Table
                 },
                 target_name="T",
             ),
-            Table(),
+            Table({}),
         ),
         (
             TabularDataset(

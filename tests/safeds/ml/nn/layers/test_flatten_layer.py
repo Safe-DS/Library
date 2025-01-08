@@ -42,7 +42,7 @@ class TestFlattenLayer:
             assert FlattenLayer() == FlattenLayer()
 
         def test_should_be_not_implemented(self) -> None:
-            assert FlattenLayer().__eq__(Table()) is NotImplemented
+            assert FlattenLayer().__eq__(Table({})) is NotImplemented
 
     class TestHash:
         def test_hash_should_be_equal(self) -> None:

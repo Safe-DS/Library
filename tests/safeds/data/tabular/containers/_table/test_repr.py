@@ -27,7 +27,7 @@ from safeds.data.tabular.containers import Table
             "+------+------+",
         ),
         (
-            Table(),
+            Table({}),
             "++\n++\n++",
         ),
         (

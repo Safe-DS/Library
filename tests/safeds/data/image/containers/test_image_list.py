@@ -121,7 +121,7 @@ class TestAllImageCombinations:
         assert image_list != image_list_unequal_1
         assert image_list != image_list_unequal_2
         assert image_list != image_list_unequal_3
-        assert image_list.__eq__(Table()) is NotImplemented
+        assert image_list.__eq__(Table({})) is NotImplemented
 
         # Test hash
         assert hash(image_list) == hash(image_list_clone)
@@ -1540,7 +1540,7 @@ class TestEmptyImageList:
     def test_eq(self, device: Device) -> None:
         configure_test_with_device(device)
         assert _EmptyImageList() == _EmptyImageList()
-        assert _EmptyImageList().__eq__(Table()) is NotImplemented
+        assert _EmptyImageList().__eq__(Table({})) is NotImplemented
 
     def test_hash(self, device: Device) -> None:
         configure_test_with_device(device)

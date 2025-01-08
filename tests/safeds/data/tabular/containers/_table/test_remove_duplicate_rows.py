@@ -14,7 +14,7 @@ from safeds.data.tabular.containers import Table
             ),
             Table({"A": [1, 4], "B": [2, 5]}),
         ),
-        (Table(), Table()),
+        (Table({}), Table({})),
         (Table({"col1": []}), Table({"col1": []})),
     ],
     ids=["duplicate rows", "empty", "no rows"],

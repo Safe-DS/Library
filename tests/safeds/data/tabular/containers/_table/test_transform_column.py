@@ -30,7 +30,7 @@ def test_should_transform_column(table: Table, table_transformed: Table) -> None
                 "C": ["a", "b", "c"],
             },
         ),
-        Table(),
+        Table({}),
     ],
     ids=["column not found", "empty"],
 )

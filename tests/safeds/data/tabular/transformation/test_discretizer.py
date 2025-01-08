@@ -42,7 +42,7 @@ class TestFit:
                 ColumnNotFoundError,
                 None,
             ),
-            (Table(), ["col2"], ValueError, "The Discretizer cannot be fitted because the table contains 0 rows"),
+            (Table({}), ["col2"], ValueError, "The Discretizer cannot be fitted because the table contains 0 rows"),
             (
                 Table(
                     {
@@ -105,7 +105,7 @@ class TestTransform:
                 ColumnNotFoundError,
                 None,
             ),
-            (Table(), ["col1", "col3"], ValueError, "The table cannot be transformed because it contains 0 rows"),
+            (Table({}), ["col1", "col3"], ValueError, "The table cannot be transformed because it contains 0 rows"),
             (
                 Table(
                     {

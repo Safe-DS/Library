@@ -7,7 +7,7 @@ from safeds.data.tabular.containers import Table
     [
         (Table({"col1": [1], "col2": [1]}), ["col1", "col2"]),
         (Table({"col": [], "gg": []}), ["col", "gg"]),
-        (Table(), []),
+        (Table({}), []),
     ],
     ids=["Integer", "rowless", "empty"],
 )

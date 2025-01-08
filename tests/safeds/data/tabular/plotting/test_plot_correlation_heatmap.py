@@ -21,7 +21,7 @@ def test_should_match_snapshot(table: Table, snapshot_png_image: SnapshotAsserti
 #         UserWarning,
 #         match=r"An empty table has been used. A correlation heatmap on an empty table will show nothing.",
 #     ):
-#         Table().plot.correlation_heatmap()
+#         Table({}).plot.correlation_heatmap()
 
 
 @pytest.mark.parametrize(

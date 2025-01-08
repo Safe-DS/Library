@@ -10,7 +10,7 @@ from safeds.exceptions import ColumnLengthMismatchError
     [
         (
             {},
-            Table(),
+            Table({}),
         ),
         (
             {

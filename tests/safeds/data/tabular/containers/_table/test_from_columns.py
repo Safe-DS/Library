@@ -6,7 +6,7 @@ from safeds.exceptions import ColumnLengthMismatchError, DuplicateColumnError
 @pytest.mark.parametrize(
     ("columns", "expected"),
     [
-        ([], Table()),
+        ([], Table({})),
         (
             [
                 Column("A", [1, 2]),

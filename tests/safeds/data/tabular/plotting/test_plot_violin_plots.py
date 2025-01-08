@@ -46,4 +46,4 @@ def test_should_raise_if_column_contains_non_numerical_values() -> None:
 
 def test_should_fail_on_empty_table() -> None:
     with pytest.raises(NonNumericColumnError):
-        Table().plot.violin_plots()
+        Table({}).plot.violin_plots()

@@ -30,7 +30,7 @@ def test_should_get_correct_item(table_data: dict, column_name: str, target: int
 @pytest.mark.parametrize(
     ("table", "column_name"),
     [
-        (Table(), "A"),
+        (Table({}), "A"),
         (Table({"A": ["a", "aa", "aaa"]}), "B"),
         (Table({"A": ["b", "aa", "aaa"], "C": ["b", "aa", "aaa"]}), "B"),
     ],

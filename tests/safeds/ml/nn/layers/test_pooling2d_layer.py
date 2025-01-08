@@ -105,7 +105,7 @@ class TestPooling2DLayer:
         def test_should_be_not_implemented(self) -> None:
             max_pooling_2d_layer = MaxPooling2DLayer(1)
             avg_pooling_2d_layer = AveragePooling2DLayer(1)
-            other = Table()
+            other = Table({})
             assert max_pooling_2d_layer.__eq__(other) is NotImplemented
             assert max_pooling_2d_layer.__eq__(avg_pooling_2d_layer) is NotImplemented
             assert avg_pooling_2d_layer.__eq__(other) is NotImplemented

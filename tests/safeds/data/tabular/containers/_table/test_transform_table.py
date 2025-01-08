@@ -91,7 +91,7 @@ def test_should_return_transformed_table(
                 "col1": ["a", "b", "c"],
             },
         ),
-        Table(),
+        Table({}),
     ],
     ids=["non-empty table", "empty table"],
 )

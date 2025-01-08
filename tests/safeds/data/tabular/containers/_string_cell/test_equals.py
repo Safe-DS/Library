@@ -30,7 +30,7 @@ def test_should_return_true_if_objects_are_identical() -> None:
     ("cell", "other"),
     [
         (_LazyStringCell(pl.col("a")), None),
-        (_LazyStringCell(pl.col("a")), Table()),
+        (_LazyStringCell(pl.col("a")), Table({})),
     ],
     ids=[
         "Cell vs. None",

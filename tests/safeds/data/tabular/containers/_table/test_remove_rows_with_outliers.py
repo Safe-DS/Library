@@ -248,7 +248,7 @@ from safeds.data.tabular.containers import Table
                 },
             ),
         ),
-        (Table(), Table()),
+        (Table({}), Table({})),
     ],
     ids=[
         "no outliers",
