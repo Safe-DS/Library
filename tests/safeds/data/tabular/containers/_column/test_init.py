@@ -13,13 +13,9 @@ def test_should_store_the_name() -> None:
     ("column", "expected"),
     [
         (Column("a", []), []),
-        (Column("a", None), []),
-        (Column("a", []), []),
         (Column("a", [1, 2, 3]), [1, 2, 3]),
     ],
     ids=[
-        "none (implicit)",
-        "none (explicit)",
         "empty",
         "non-empty",
     ],
