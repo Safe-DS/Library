@@ -240,10 +240,10 @@ class Table:
 
         Raises
         ------
+        FileExtensionError
+            If the path has an extension that is not ".json".
         FileNotFoundError
             If no file exists at the given path.
-        ValueError
-            If the path has an extension that is not ".json".
 
         Examples
         --------
@@ -286,10 +286,10 @@ class Table:
 
         Raises
         ------
+        FileExtensionError
+            If the path has an extension that is not ".parquet".
         FileNotFoundError
             If no file exists at the given path.
-        ValueError
-            If the path has an extension that is not ".parquet".
 
         Examples
         --------
