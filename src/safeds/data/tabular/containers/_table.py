@@ -18,7 +18,6 @@ from safeds.data.tabular.plotting import TablePlotter
 from safeds.data.tabular.typing._polars_schema import _PolarsSchema
 from safeds.exceptions import (
     DuplicateColumnError,
-    RowCountMismatchError,
 )
 
 from ._column import Column
@@ -333,14 +332,7 @@ class Table:
         import polars as pl
 
         # Validation
-        expected_length: int | None = None
-        for column_values in data.values():
-            if expected_length is None:
-                expected_length = len(column_values)
-            elif len(column_values) != expected_length:
-                raise RowCountMismatchError(
-                    "\n".join(f"{column_name}: {len(column_values)}" for column_name, column_values in data.items()),
-                )
+        _check_row_counts_are_equal(data)
 
         # Implementation
         self._lazy_frame: pl.LazyFrame = pl.LazyFrame(data, strict=False)
