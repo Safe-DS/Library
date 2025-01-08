@@ -68,11 +68,8 @@ class Column(Sequence[T_co]):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, name: str, data: Sequence[T_co] | None = None) -> None:
+    def __init__(self, name: str, data: Sequence[T_co]) -> None:
         import polars as pl
-
-        if data is None:
-            data = []
 
         self._series: pl.Series = pl.Series(name, data, strict=False)
 
