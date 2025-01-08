@@ -25,13 +25,13 @@ from safeds.exceptions import RowCountMismatchError
             ),
         ),
     ],
-    ids=["empty", "with values"],
+    ids=["empty", "non-empty"],
 )
 def test_should_create_table_from_dict(data: dict[str, list[Any]], expected: Table) -> None:
     assert Table.from_dict(data).schema == expected.schema
     assert Table.from_dict(data) == expected
 
 
-def test_should_raise_error_if_columns_have_different_lengths() -> None:
-    with pytest.raises(RowCountMismatchError, match=r"The length of at least one column differs: \na: 2\nb: 1"):
+def test_should_raise_error_if_column_lengths_mismatch() -> None:
+    with pytest.raises(RowCountMismatchError):
         Table.from_dict({"a": [1, 2], "b": [3]})

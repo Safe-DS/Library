@@ -203,7 +203,7 @@ class Table:
 
         Raises
         ------
-        ValueError
+        RowCountMismatchError
             If columns have different lengths.
 
         Examples
