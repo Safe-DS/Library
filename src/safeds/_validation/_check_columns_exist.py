@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 def _check_columns_exist(table_or_schema: Table | Schema, requested_names: str | list[str]) -> None:
     """
-    Check if the specified column names exist in the table or schema and raise an error if they do not.
+    Check whether the specified column names exist, and raise an error if they do not.
 
     Parameters
     ----------

@@ -1,7 +1,6 @@
 import sys
 
 import polars as pl
-
 from safeds.data.tabular.containers._lazy_vectorized_row import _LazyVectorizedRow
 
 

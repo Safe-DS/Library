@@ -1,7 +1,6 @@
 import pytest
-from syrupy import SnapshotAssertion
-
 from safeds.data.tabular.containers import Table
+from syrupy import SnapshotAssertion
 
 
 @pytest.mark.parametrize(

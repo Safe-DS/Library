@@ -5,8 +5,6 @@ from typing import TYPE_CHECKING
 from safeds.exceptions import DuplicateColumnError
 
 if TYPE_CHECKING:
-    from collections.abc import Container
-
     from safeds.data.tabular.containers import Table
     from safeds.data.tabular.typing import Schema
 
@@ -18,7 +16,7 @@ def _check_columns_dont_exist(
     old_name: str | None = None,
 ) -> None:
     """
-    Check if the specified column names don't exist in the table or schema yet and raise an error if they do.
+    Check whether the specified new column names do not exist yet and are unique, and raise an error if they do.
 
     Parameters
     ----------
@@ -41,13 +39,17 @@ def _check_columns_dont_exist(
     if isinstance(new_names, str):
         new_names = [new_names]
 
-    if len(new_names) > 1:
-        # Create a set for faster containment checks
-        known_names: Container = set(table_or_schema.column_names)
-    else:
-        known_names = table_or_schema.column_names
+    # Compute the duplicate names
+    known_names = set(table_or_schema.column_names) - {old_name}
+    duplicate_names = []
 
-    duplicate_names = [name for name in new_names if name != old_name and name in known_names]
+    for name in new_names:
+        if name in known_names:
+            duplicate_names.append(name)
+        else:
+            known_names.add(name)
+
+    # Raise an error if duplicate names exist
     if duplicate_names:
         message = _build_error_message(duplicate_names)
         raise DuplicateColumnError(message)

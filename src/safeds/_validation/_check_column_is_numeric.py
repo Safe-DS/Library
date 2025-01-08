@@ -17,7 +17,7 @@ def _check_column_is_numeric(
     operation: str = "do a numeric operation",
 ) -> None:
     """
-    Check if the column is numeric and raise an error if it is not.
+    Check whether the column is numeric, and raise an error if it is not.
 
     Parameters
     ----------

@@ -1,12 +1,12 @@
 import sys
 
 import pytest
-
 from safeds.data.image.containers import ImageList
 from safeds.data.image.typing import ImageSize
 from safeds.data.labeled.containers import ImageDataset
 from safeds.data.tabular.containers import Column, Table
 from safeds.ml.nn.converters import InputConversionImageToImage
+
 from tests.helpers import images_all, resolve_resource_path
 
 _test_image_list = ImageList.from_files(resolve_resource_path(images_all())).resize(10, 10)

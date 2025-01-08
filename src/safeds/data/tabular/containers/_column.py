@@ -4,13 +4,13 @@ from collections.abc import Callable, Iterator, Sequence
 from typing import TYPE_CHECKING, Any, Literal, TypeVar, overload
 
 from safeds._utils import _structural_hash
-from safeds._validation._check_columns_are_numeric import _check_column_is_numeric
+from safeds._validation import _check_column_is_numeric
 from safeds.data.tabular.plotting import ColumnPlotter
 from safeds.data.tabular.typing._polars_data_type import _PolarsDataType
 from safeds.exceptions import (
-    ColumnLengthMismatchError,
     IndexOutOfBoundsError,
     MissingValuesColumnError,
+    RowCountMismatchError,
 )
 
 from ._lazy_cell import _LazyCell
@@ -763,7 +763,7 @@ class Column(Sequence[T_co]):
         _check_column_is_numeric(other, operation="calculate the correlation")
 
         if self.row_count != other.row_count:
-            raise ColumnLengthMismatchError("")  # TODO: Add column names to error message
+            raise RowCountMismatchError("")  # TODO: Add column names to error message
         if self.missing_value_count() > 0 or other.missing_value_count() > 0:
             raise MissingValuesColumnError("")  # TODO: Add column names to error message
 

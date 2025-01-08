@@ -13,7 +13,7 @@ def _normalize_and_check_file_path(
     check_if_file_exists: bool = False,
 ) -> Path:
     """
-    Check if the provided path is a valid file path and normalize it.
+    Check whether the provided path is a valid file path and normalize it.
 
     Parameters
     ----------
@@ -33,7 +33,7 @@ def _normalize_and_check_file_path(
 
     Raises
     ------
-    ValueError
+    FileExtensionError
         If the path has an extension that is not in the `valid_file_extensions` list.
     FileNotFoundError
         If `check_if_file_exists` is True and the file does not exist.

@@ -6,13 +6,19 @@ from safeds._config import _get_device, _init_default_device
 from safeds._config._polars import _get_polars_config
 from safeds._utils import _structural_hash
 from safeds._utils._random import _get_random_seed
-from safeds._validation import _check_bounds, _check_columns_exist, _ClosedBound, _normalize_and_check_file_path
-from safeds._validation._check_columns_dont_exist import _check_columns_dont_exist
+from safeds._validation import (
+    _check_bounds,
+    _check_columns_dont_exist,
+    _check_columns_exist,
+    _check_row_counts_are_equal,
+    _ClosedBound,
+    _normalize_and_check_file_path,
+)
 from safeds.data.tabular.plotting import TablePlotter
 from safeds.data.tabular.typing._polars_schema import _PolarsSchema
 from safeds.exceptions import (
-    ColumnLengthMismatchError,
     DuplicateColumnError,
+    RowCountMismatchError,
 )
 
 from ._column import Column
@@ -66,7 +72,16 @@ class Table:
     Examples
     --------
     >>> from safeds.data.tabular.containers import Table
-    >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
+    >>> Table({"a": [1, 2, 3], "b": [4, 5, 6]})
+    +-----+-----+
+    |   a |   b |
+    | --- | --- |
+    | i64 | i64 |
+    +===========+
+    |   1 |   4 |
+    |   2 |   5 |
+    |   3 |   6 |
+    +-----+-----+
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -76,7 +91,7 @@ class Table:
     @staticmethod
     def from_columns(columns: Column | list[Column]) -> Table:
         """
-        Create a table from a list of columns.
+        Create a table from columns.
 
         Parameters
         ----------
@@ -87,6 +102,13 @@ class Table:
         -------
         table:
             The created table.
+
+        Raises
+        ------
+        ColumnLengthMismatchError
+            If some columns have different lengths.
+        DuplicateColumnError
+            If multiple columns have the same name.
 
         Examples
         --------
@@ -114,10 +136,13 @@ class Table:
             return Table._from_polars_lazy_frame(
                 pl.LazyFrame([column._series for column in columns]),
             )
+        # polars already validates this, so we don't do it upfront (performance)
         except DuplicateError:
-            raise DuplicateColumnError("") from None  # TODO: message
+            _check_columns_dont_exist(Table({}), [column.name for column in columns])
+            return Table({})  # pragma: no cover
         except ShapeError:
-            raise ColumnLengthMismatchError("") from None  # TODO: message
+            _check_row_counts_are_equal(columns)
+            return Table({})  # pragma: no cover
 
     @staticmethod
     def from_csv_file(path: str | Path, *, separator: str = ",") -> Table:
@@ -313,7 +338,7 @@ class Table:
             if expected_length is None:
                 expected_length = len(column_values)
             elif len(column_values) != expected_length:
-                raise ColumnLengthMismatchError(
+                raise RowCountMismatchError(
                     "\n".join(f"{column_name}: {len(column_values)}" for column_name, column_values in data.items()),
                 )
 
@@ -354,7 +379,7 @@ class Table:
         if self.__data_frame_cache is None:
             try:
                 self.__data_frame_cache = self._lazy_frame.collect()
-            except (pl.NoDataError, pl.PolarsPanicError):
+            except (pl.NoDataError, pl.PolarsPanicError):  # pragma: no cover
                 # Can happen for some operations on empty tables (e.g. https://github.com/pola-rs/polars/issues/16202)
                 self.__data_frame_cache = pl.DataFrame()
 
@@ -420,7 +445,7 @@ class Table:
 
         try:
             return _PolarsSchema(self._lazy_frame.collect_schema())
-        except (pl.exceptions.NoDataError, pl.exceptions.PanicException):
+        except (pl.exceptions.NoDataError, pl.exceptions.PanicException):  # pragma: no cover
             # Can happen for some operations on empty tables (e.g. https://github.com/pola-rs/polars/issues/16202)
             return _PolarsSchema(pl.Schema({}))
 
@@ -485,9 +510,12 @@ class Table:
             return Table._from_polars_data_frame(
                 self._data_frame.hstack([column._series for column in columns]),
             )
+        # polars already validates this, so we don't do it upfront (performance)
         except DuplicateError:
-            # polars already validates this, so we don't need to do it again upfront (performance)
-            _check_columns_dont_exist(self, [column.name for column in columns])
+            _check_columns_dont_exist(
+                self,
+                [column.name for column in columns],
+            )  # TODO: must also ensure that the new columns have unique names (add test)
             return Table({})  # pragma: no cover
 
     def add_computed_column(

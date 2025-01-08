@@ -1,7 +1,6 @@
 import sys
 
 import pytest
-
 from safeds.data.tabular.containers import Table
 from safeds.ml.nn import (
     NeuralNetworkRegressor,

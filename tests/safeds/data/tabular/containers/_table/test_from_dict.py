@@ -1,9 +1,8 @@
 from typing import Any
 
 import pytest
-
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import ColumnLengthMismatchError
+from safeds.exceptions import RowCountMismatchError
 
 
 @pytest.mark.parametrize(
@@ -34,5 +33,5 @@ def test_should_create_table_from_dict(data: dict[str, list[Any]], expected: Tab
 
 
 def test_should_raise_error_if_columns_have_different_lengths() -> None:
-    with pytest.raises(ColumnLengthMismatchError, match=r"The length of at least one column differs: \na: 2\nb: 1"):
+    with pytest.raises(RowCountMismatchError, match=r"The length of at least one column differs: \na: 2\nb: 1"):
         Table.from_dict({"a": [1, 2], "b": [3]})

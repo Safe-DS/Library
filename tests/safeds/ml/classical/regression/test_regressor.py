@@ -7,7 +7,6 @@ import pytest
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Column, Table
 from safeds.exceptions import (
-    ColumnLengthMismatchError,
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
     FittingWithChoiceError,
@@ -16,6 +15,7 @@ from safeds.exceptions import (
     ModelNotFittedError,
     NonNumericColumnError,
     PlainTableError,
+    RowCountMismatchError,
 )
 from safeds.ml.classical.regression import (
     AdaBoostRegressor,
@@ -110,7 +110,6 @@ def valid_data() -> TabularDataset:
 
 @pytest.mark.parametrize("regressor_with_choice", regressors_with_choices(), ids=lambda x: x.__class__.__name__)
 class TestChoiceRegressors:
-
     def test_workflow_with_choice_parameter(self, regressor_with_choice: Regressor, valid_data: TabularDataset) -> None:
         model = regressor_with_choice.fit_by_exhaustive_search(valid_data, RegressorMetric.MEAN_SQUARED_ERROR)
         assert isinstance(model, type(regressor_with_choice))
@@ -528,7 +527,7 @@ class TestCheckMetricsPreconditions:
         [
             (["A", "B"], [1, 2], TypeError),
             ([1, 2], ["A", "B"], TypeError),
-            ([1, 2, 3], [1, 2], ColumnLengthMismatchError),
+            ([1, 2, 3], [1, 2], RowCountMismatchError),
         ],
     )
     def test_should_raise_if_validation_fails(

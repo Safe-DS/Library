@@ -11,7 +11,7 @@ def _check_bounds(
     upper_bound: _Bound | None = None,
 ) -> None:
     """
-    Check that a value is within the expected range and raise an error if it is not.
+    Check whether a value is within the expected range and raise an error if it is not.
 
     Parameters
     ----------

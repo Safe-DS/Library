@@ -2,7 +2,6 @@ from typing import Any
 
 import polars as pl
 import pytest
-
 from safeds.data.tabular.containers import Table, TemporalCell
 from safeds.data.tabular.containers._lazy_temporal_cell import _LazyTemporalCell
 

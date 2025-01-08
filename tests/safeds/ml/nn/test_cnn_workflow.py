@@ -3,8 +3,6 @@ from typing import TYPE_CHECKING
 
 import pytest
 import torch
-from torch.types import Device
-
 from safeds._config import _get_device
 from safeds.data.image.containers import ImageList
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
@@ -29,6 +27,8 @@ from safeds.ml.nn.layers import (
     MaxPooling2DLayer,
 )
 from safeds.ml.nn.typing import VariableImageSize
+from torch.types import Device
+
 from tests.helpers import configure_test_with_device, device_cpu, device_cuda, images_all, resolve_resource_path
 
 if TYPE_CHECKING:

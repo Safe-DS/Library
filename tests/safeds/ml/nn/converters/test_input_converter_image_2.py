@@ -2,7 +2,6 @@ import sys
 
 import pytest
 import torch
-
 from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 from safeds.data.image.typing import ImageSize

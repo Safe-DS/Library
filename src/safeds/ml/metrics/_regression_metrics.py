@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 from safeds.data.labeled.containers import TabularDataset, TimeSeriesDataset
 from safeds.data.tabular.containers import Column, Table
-from safeds.exceptions import ColumnLengthMismatchError
+from safeds.exceptions import RowCountMismatchError
 
 
 class RegressionMetrics(ABC):
@@ -334,4 +334,4 @@ def _check_equal_length(column1: Column, column2: Column) -> None:
         If the columns have different lengths.
     """
     if column1.row_count != column2.row_count:
-        ColumnLengthMismatchError("")  # TODO: pass list of columns to exception, let it handle the formatting
+        RowCountMismatchError("")  # TODO: pass list of columns to exception, let it handle the formatting

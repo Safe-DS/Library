@@ -1,7 +1,6 @@
 from typing import Any
 
 import pytest
-
 from safeds.data.labeled.containers import TimeSeriesDataset
 from safeds.data.tabular.containers import Table
 

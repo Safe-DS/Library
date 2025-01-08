@@ -1,7 +1,6 @@
 from statistics import stdev
 
 import pytest
-
 from safeds.data.tabular.containers import Table
 
 

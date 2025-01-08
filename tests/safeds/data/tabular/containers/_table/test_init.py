@@ -1,7 +1,6 @@
 import pytest
-
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import ColumnLengthMismatchError
+from safeds.exceptions import RowCountMismatchError
 
 # TODO
 # @pytest.mark.parametrize(
@@ -22,5 +21,5 @@ from safeds.exceptions import ColumnLengthMismatchError
 
 
 def test_should_raise_error_if_columns_have_different_lengths() -> None:
-    with pytest.raises(ColumnLengthMismatchError, match=r"The length of at least one column differs: \na: 2\nb: 1"):
+    with pytest.raises(RowCountMismatchError, match=r"The length of at least one column differs: \na: 2\nb: 1"):
         Table({"a": [1, 2], "b": [3]})

@@ -5,9 +5,6 @@ from typing import TypeVar
 
 import pytest
 import torch
-from torch import Tensor
-from torch.types import Device
-
 from safeds._config import _get_device
 from safeds.data.image.containers import ImageList
 from safeds.data.image.containers._empty_image_list import _EmptyImageList
@@ -23,6 +20,9 @@ from safeds.exceptions import (
     OutputLengthMismatchError,
     TransformerNotFittedError,
 )
+from torch import Tensor
+from torch.types import Device
+
 from tests.helpers import (
     configure_test_with_device,
     get_devices,

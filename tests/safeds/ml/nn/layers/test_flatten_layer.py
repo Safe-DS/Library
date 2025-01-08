@@ -1,12 +1,11 @@
 import sys
 
 import pytest
-from torch import nn
-
 from safeds.data.image.typing import ImageSize
 from safeds.data.tabular.containers import Table
 from safeds.ml.nn.layers import FlattenLayer
 from safeds.ml.nn.typing import VariableImageSize
+from torch import nn
 
 
 class TestFlattenLayer:

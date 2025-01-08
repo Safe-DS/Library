@@ -2,12 +2,11 @@ import sys
 from typing import Literal
 
 import pytest
-from torch import nn
-
 from safeds.data.image.typing import ImageSize
 from safeds.data.tabular.containers import Table
 from safeds.ml.nn.layers import AveragePooling2DLayer, MaxPooling2DLayer
 from safeds.ml.nn.layers._pooling2d_layer import _Pooling2DLayer
+from torch import nn
 
 
 class TestPooling2DLayer:

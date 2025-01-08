@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Literal
 
 from safeds._utils import _figure_to_image
-from safeds._validation._check_columns_are_numeric import _check_column_is_numeric
+from safeds._validation import _check_column_is_numeric
 
 if TYPE_CHECKING:
     from safeds.data.image.containers import Image
