@@ -1,54 +1,70 @@
+from collections.abc import Callable
+
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import ColumnNotFoundError
 
 
 @pytest.mark.parametrize(
-    ("table", "column_names", "expected"),
+    ("table_factory", "names", "expected"),
     [
         (
-            Table({"A": [1], "B": [2]}),
+            lambda: Table({}),
             [],
             Table({}),
         ),
         (
-            Table({"A": [1], "B": [2]}),
-            ["A"],
-            Table({"A": [1]}),
+            lambda: Table({"col1": [], "col2": []}),
+            [],
+            Table({}),
         ),
         (
-            Table({"A": [1], "B": [2]}),
-            ["B"],
-            Table({"B": [2]}),
+            lambda: Table({"col1": [], "col2": []}),
+            ["col2"],
+            Table({"col2": []}),
         ),
         (
-            Table({"A": [1], "B": [2]}),
-            ["A", "B"],
-            Table({"A": [1], "B": [2]}),
+            lambda: Table({"col1": [], "col2": []}),
+            ["col1", "col2"],
+            Table({"col1": [], "col2": []}),
         ),
         # Related to https://github.com/Safe-DS/Library/issues/115
         (
-            Table({"A": [1], "B": [2], "C": [3]}),
+            lambda: Table({"A": [1], "B": [2], "C": [3]}),
             ["C", "A"],
             Table({"C": [3], "A": [1]}),
         ),
-        (
-            Table({}),
-            [],
-            Table({}),
-        ),
     ],
-    ids=["No Column Name", "First Column", "Second Column", "All columns", "Last and first columns", "empty"],
+    ids=[
+        "empty table, empty list",
+        "non-empty table, empty list",
+        "non-empty table, single column",
+        "non-empty table, multiple columns",
+        "swapped order",
+    ],
 )
-def test_should_remove_all_except_listed_columns(table: Table, column_names: list[str], expected: Table) -> None:
-    transformed_table = table.remove_columns_except(column_names)
-    assert transformed_table.schema == expected.schema
-    assert transformed_table == expected
-    if len(column_names) == 0:
-        assert expected.row_count == 0
+class TestHappyPath:
+    def test_should_remove_columns(
+        self,
+        table_factory: Callable[[], Table],
+        names: str | list[str],
+        expected: Table,
+    ) -> None:
+        actual = table_factory().remove_columns_except(names)
+        assert actual.schema == expected.schema
+        assert actual == expected
+
+    def test_should_not_mutate_receiver(
+        self,
+        table_factory: Callable[[], Table],
+        names: str | list[str],
+        expected: Table,  # noqa: ARG002
+    ) -> None:
+        original = table_factory()
+        original.remove_columns_except(names)
+        assert original == table_factory()
 
 
-@pytest.mark.parametrize("table", [Table({"A": [1], "B": [2]}), Table({})], ids=["table", "empty"])
-def test_should_raise_error_if_column_name_unknown(table: Table) -> None:
+def test_should_raise_for_unknown_columns() -> None:
     with pytest.raises(ColumnNotFoundError):
-        table.remove_columns_except(["C"])
+        Table({}).remove_columns_except(["col1"])

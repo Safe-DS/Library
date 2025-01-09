@@ -667,9 +667,7 @@ class Table:
         """
         Return a new table without the specified columns.
 
-        **Notes:**
-
-        - The original table is not modified.
+        **Note:** The original table is not modified.
 
         Parameters
         ----------
@@ -732,6 +730,8 @@ class Table:
     ) -> Table:
         """
         Return a new table with only the specified columns.
+
+        **Note:** The original table is not modified.
 
         Parameters
         ----------
