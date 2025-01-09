@@ -912,6 +912,10 @@ class Table:
         ------
         ColumnNotFoundError
             If no column with the old name exists.
+        DuplicateColumnError
+            If a column name exists already. This can also happen if the new columns have duplicate names.
+        LengthMismatchError
+            If the columns have different row counts.
 
         Examples
         --------
@@ -959,6 +963,7 @@ class Table:
 
         _check_columns_exist(self, old_name)
         _check_columns_dont_exist(self, [column.name for column in new_columns], old_name=old_name)
+        _check_row_counts_are_equal([self, *new_columns])
 
         if len(new_columns) == 0:
             return self.remove_columns(old_name, ignore_unknown_names=True)

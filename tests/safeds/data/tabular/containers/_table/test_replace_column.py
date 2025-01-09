@@ -1,119 +1,154 @@
+from collections.abc import Callable
+
 import pytest
 from safeds.data.tabular.containers import Column, Table
 from safeds.exceptions import (
     ColumnNotFoundError,
     DuplicateColumnError,
+    LengthMismatchError,
 )
 
 
 @pytest.mark.parametrize(
-    ("table", "column_name", "columns", "expected"),
+    ("table_factory", "old_name", "new_columns", "expected"),
     [
         (
-            Table(
-                {
-                    "A": [1, 2, 3],
-                    "B": [4, 5, 6],
-                    "C": ["a", "b", "c"],
-                },
-            ),
-            "B",
-            [Column("B", ["d", "e", "f"]), Column("D", [3, 4, 5])],
-            Table(
-                {
-                    "A": [1, 2, 3],
-                    "B": ["d", "e", "f"],
-                    "D": [3, 4, 5],
-                    "C": ["a", "b", "c"],
-                },
-            ),
+            lambda: Table({"before": [], "col1": [], "after": []}),
+            "col1",
+            Column("col2", []),
+            Table({"before": [], "col2": [], "after": []}),
         ),
         (
-            Table(
-                {
-                    "A": [1, 2, 3],
-                    "B": [4, 5, 6],
-                    "C": ["a", "b", "c"],
-                },
-            ),
-            "C",
-            [Column("D", ["d", "e", "f"])],
-            Table(
-                {
-                    "A": [1, 2, 3],
-                    "B": [4, 5, 6],
-                    "D": ["d", "e", "f"],
-                },
-            ),
-        ),
-        (
-            Table(
-                {
-                    "A": [1, 2, 3],
-                    "B": [4, 5, 6],
-                    "C": ["a", "b", "c"],
-                },
-            ),
-            "C",
+            lambda: Table({"before": [], "col1": [], "after": []}),
+            "col1",
             [],
-            Table(
-                {
-                    "A": [1, 2, 3],
-                    "B": [4, 5, 6],
-                },
-            ),
+            Table({"before": [], "after": []}),
         ),
-    ],
-    ids=["multiple Columns", "one Column", "empty"],
-)
-def test_should_replace_column(table: Table, column_name: str, columns: list[Column], expected: Table) -> None:
-    result = table.replace_column(column_name, columns)
-    assert result.schema == expected.schema
-    assert result == expected
-
-
-@pytest.mark.parametrize(
-    ("old_column_name", "column", "error", "error_message"),
-    [
-        ("D", [Column("C", ["d", "e", "f"])], ColumnNotFoundError, None),
         (
-            "C",
-            [Column("B", ["d", "e", "f"]), Column("D", [3, 2, 1])],
-            DuplicateColumnError,
-            None,
+            lambda: Table({"before": [], "col1": [], "after": []}),
+            "col1",
+            [Column("col3", []), Column("col4", [])],
+            Table({"before": [], "col3": [], "col4": [], "after": []}),
         ),
-        # TODO
-        # (
-        #     "C",
-        #     [Column("D", [7, 8]), Column("E", ["c", "b"])],
-        #     ColumnSizeError,
-        #     r"Expected a column of size 3 but got column of size 2.",
-        # ),
+        (
+            lambda: Table({"before": [], "col1": [], "after": []}),
+            "col1",
+            Table({"col3": [], "col4": []}),
+            Table({"before": [], "col3": [], "col4": [], "after": []}),
+        ),
+        (
+            lambda: Table({"col1": []}),
+            "col1",
+            Column("col1", []),
+            Table({"col1": []}),
+        ),
     ],
     ids=[
-        "ColumnNotFoundError",
-        "DuplicateColumnError",
-        # "ColumnSizeError",
+        "single new column",
+        "empty list of new columns",
+        "non-empty list of new columns",
+        "new table",
+        "reusing the old name",
     ],
 )
-def test_should_raise_error(
-    old_column_name: str,
-    column: list[Column],
-    error: type[Exception],
-    error_message: str | None,
-) -> None:
-    input_table: Table = Table(
-        {
-            "A": [1, 2, 3],
-            "B": [4, 5, 6],
-            "C": ["a", "b", "c"],
-        },
-    )
+class TestHappyPath:
+    def test_should_replace_column(
+        self,
+        table_factory: Callable[[], Table],
+        old_name: str,
+        new_columns: list[Column],
+        expected: Table,
+    ) -> None:
+        actual = table_factory().replace_column(old_name, new_columns)
+        assert actual.schema == expected.schema
+        assert actual == expected
 
-    with pytest.raises(error, match=error_message):
-        input_table.replace_column(old_column_name, column)
+    def test_should_not_mutate_receiver(
+        self,
+        table_factory: Callable[[], Table],
+        old_name: str,
+        new_columns: list[Column],
+        expected: Table,  # noqa: ARG002
+    ) -> None:
+        original = table_factory()
+        original.replace_column(old_name, new_columns)
+        assert original == table_factory()
 
 
-def test_should_fail_on_empty_table() -> None:
+def test_should_raise_if_old_name_is_unknown() -> None:
     with pytest.raises(ColumnNotFoundError):
-        Table({}).replace_column("col", [Column("a", [1, 2])])
+        Table({}).replace_column("col1", [Column("a", [1, 2])])
+
+
+@pytest.mark.parametrize(
+    ("table", "old_name", "new_columns"),
+    [
+        (
+            Table({"col1": [], "col2": []}),
+            "col1",
+            Column("col2", []),
+        ),
+        (
+            Table({"col1": [], "col2": []}),
+            "col1",
+            [Column("col2", [])],
+        ),
+        (
+            Table({"col1": [], "col2": []}),
+            "col1",
+            Table({"col2": []}),
+        ),
+        (
+            Table({"col1": []}),
+            "col1",
+            [Column("col2", []), Column("col2", [])],
+        ),
+    ],
+    ids=[
+        "single new column",
+        "list of new columns",
+        "new table",
+        "duplicate new names",
+    ],
+)
+def test_should_raise_if_new_column_exists_already(
+    table: Table,
+    old_name: str,
+    new_columns: Column | list[Column],
+) -> None:
+    with pytest.raises(DuplicateColumnError):
+        table.replace_column(old_name, new_columns)
+
+
+@pytest.mark.parametrize(
+    ("table", "old_name", "new_columns"),
+    [
+        (
+            Table({"col1": []}),
+            "col1",
+            Column("col2", [1]),
+        ),
+        (
+            Table({"col1": []}),
+            "col1",
+            [Column("col2", [1])],
+        ),
+        (
+            Table({"col1": []}),
+            "col1",
+            Table({"col2": [1]}),
+        ),
+    ],
+    ids=[
+        "single new column",
+        "list of new columns",
+        "new table",
+    ],
+)
+def test_should_raise_if_row_counts_differ(
+    table: Table,
+    old_name: str,
+    new_columns: Column | list[Column] | Table,
+) -> None:
+    with pytest.raises(LengthMismatchError):
+        table.replace_column(old_name, new_columns)
