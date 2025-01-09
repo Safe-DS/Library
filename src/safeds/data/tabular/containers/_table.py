@@ -1913,7 +1913,7 @@ class Table:
         Returns
         -------
         columns:
-            List of columns.
+            The columns of the table.
 
         Examples
         --------
