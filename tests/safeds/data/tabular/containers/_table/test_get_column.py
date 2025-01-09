@@ -4,24 +4,20 @@ from safeds.exceptions import ColumnNotFoundError
 
 
 @pytest.mark.parametrize(
-    ("table1", "expected"),
+    ("table", "name", "expected"),
     [
-        (Table({"col1": ["col1_1"], "col2": ["col2_1"]}), Column("col1", ["col1_1"])),
+        (Table({"col1": [1]}), "col1", Column("col1", [1])),
+        (Table({"col1": [1], "col2": [2]}), "col2", Column("col2", [2])),
     ],
-    ids=["First column"],
+    ids=[
+        "one column",
+        "multiple columns",
+    ],
 )
-def test_should_get_column(table1: Table, expected: Column) -> None:
-    assert table1.get_column("col1") == expected
+def test_should_get_column(table: Table, name: str, expected: Column) -> None:
+    assert table.get_column(name) == expected
 
 
-@pytest.mark.parametrize(
-    "table",
-    [
-        (Table({"col1": ["col1_1"], "col2": ["col2_1"]})),
-        (Table({})),
-    ],
-    ids=["no col3", "empty"],
-)
-def test_should_raise_error_if_column_name_unknown(table: Table) -> None:
+def test_should_raise_if_column_name_is_unknown() -> None:
     with pytest.raises(ColumnNotFoundError):
-        table.get_column("col3")
+        Table({}).get_column("col1")
