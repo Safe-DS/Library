@@ -218,7 +218,7 @@ class LabelEncoder(InvertibleTableTransformer):
 
 
 def _warn_if_columns_are_numeric(table: Table, column_names: list[str]) -> None:
-    numeric_columns = table.remove_columns_except(column_names).remove_non_numeric_columns().column_names
+    numeric_columns = table.select_columns(column_names).remove_non_numeric_columns().column_names
     if numeric_columns:
         warnings.warn(
             f"The columns {numeric_columns} contain numerical data. "

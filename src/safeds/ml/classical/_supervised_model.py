@@ -394,7 +394,7 @@ def _predict_with_sklearn_model(
     if dataset.row_count == 0:
         raise DatasetMissesDataError
 
-    features = dataset.remove_columns_except(feature_names)
+    features = dataset.select_columns(feature_names)
 
     non_numerical_column_names = set(features.column_names) - set(
         features.remove_non_numeric_columns().column_names,

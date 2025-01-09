@@ -115,7 +115,7 @@ class Discretizer(TableTransformer):
         wrapped_transformer = sk_KBinsDiscretizer(n_bins=self._bin_count, encode="ordinal")
         wrapped_transformer.set_output(transform="polars")
         wrapped_transformer.fit(
-            table.remove_columns_except(column_names)._data_frame,
+            table.select_columns(column_names)._data_frame,
         )
 
         result = Discretizer(self._bin_count, column_names=column_names)
@@ -165,7 +165,7 @@ class Discretizer(TableTransformer):
                 raise NonNumericColumnError(f"{column} is of type {table.get_column(column).type}.")
 
         new_data = self._wrapped_transformer.transform(
-            table.remove_columns_except(self._column_names)._data_frame,
+            table.select_columns(self._column_names)._data_frame,
         )
         return Table._from_polars_lazy_frame(
             table._lazy_frame.update(new_data.lazy()),

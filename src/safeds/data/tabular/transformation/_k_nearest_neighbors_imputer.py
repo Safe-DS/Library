@@ -122,7 +122,7 @@ class KNearestNeighborsImputer(TableTransformer):
         wrapped_transformer = sk_KNNImputer(n_neighbors=self._neighbor_count, missing_values=value_to_replace)
         wrapped_transformer.set_output(transform="polars")
         wrapped_transformer.fit(
-            table.remove_columns_except(column_names)._data_frame,
+            table.select_columns(column_names)._data_frame,
         )
 
         result = KNearestNeighborsImputer(self._neighbor_count, column_names=column_names)
@@ -159,7 +159,7 @@ class KNearestNeighborsImputer(TableTransformer):
         _check_columns_exist(table, self._column_names)
 
         new_data = self._wrapped_transformer.transform(
-            table.remove_columns_except(self._column_names)._data_frame,
+            table.select_columns(self._column_names)._data_frame,
         )
 
         return Table._from_polars_lazy_frame(

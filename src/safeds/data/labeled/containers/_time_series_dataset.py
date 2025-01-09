@@ -94,11 +94,11 @@ class TimeSeriesDataset(Dataset[Table, Column]):
 
         # Set attributes
         self._table: Table = data
-        self._features: Table = data.remove_columns_except(feature_names)
+        self._features: Table = data.select_columns(feature_names)
         self._target: Column = data.get_column(target_name)
         self._window_size: int = window_size
         self._forecast_horizon: int = forecast_horizon
-        self._extras: Table = data.remove_columns_except(extra_names)
+        self._extras: Table = data.select_columns(extra_names)
         self._continuous: bool = continuous
 
     def __eq__(self, other: object) -> bool:

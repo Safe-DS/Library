@@ -719,55 +719,6 @@ class Table:
             self._lazy_frame.drop(names, strict=not ignore_unknown_names),
         )
 
-    def remove_columns_except(
-        self,
-        names: str | list[str],
-        /,
-    ) -> Table:
-        """
-        Return a new table with only the specified columns.
-
-        **Note:** The original table is not modified.
-
-        Parameters
-        ----------
-        names:
-            The names of the columns to keep.
-
-        Returns
-        -------
-        new_table:
-            The table with only the specified columns.
-
-        Raises
-        ------
-        ColumnNotFoundError
-            If a column does not exist.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
-        >>> table.remove_columns_except("a")
-        +-----+
-        |   a |
-        | --- |
-        | i64 |
-        +=====+
-        |   1 |
-        |   2 |
-        |   3 |
-        +-----+
-        """
-        if isinstance(names, str):
-            names = [names]
-
-        _check_columns_exist(self, names)
-
-        return Table._from_polars_lazy_frame(
-            self._lazy_frame.select(names),
-        )
-
     def remove_columns_with_missing_values(
         self,
         *,
@@ -1000,6 +951,54 @@ class Table:
                 *[column._series for column in new_columns],
                 *[pl.col(name) for name in self.column_names[index + 1 :]],
             ),
+        )
+
+    def select_columns(
+        self,
+        names: str | list[str],
+    ) -> Table:
+        """
+        Return a new table with only the specified columns.
+
+        **Note:** The original table is not modified.
+
+        Parameters
+        ----------
+        names:
+            The names of the columns to keep.
+
+        Returns
+        -------
+        new_table:
+            The table with only the specified columns.
+
+        Raises
+        ------
+        ColumnNotFoundError
+            If a column does not exist.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.select_columns("a")
+        +-----+
+        |   a |
+        | --- |
+        | i64 |
+        +=====+
+        |   1 |
+        |   2 |
+        |   3 |
+        +-----+
+        """
+        if isinstance(names, str):
+            names = [names]
+
+        _check_columns_exist(self, names)
+
+        return Table._from_polars_lazy_frame(
+            self._lazy_frame.select(names),
         )
 
     def transform_column(

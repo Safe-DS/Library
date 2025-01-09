@@ -94,9 +94,9 @@ class TabularDataset(Dataset[Table, Column]):
 
         # Set attributes
         self._table: Table = data
-        self._features: Table = data.remove_columns_except(feature_names)
+        self._features: Table = data.select_columns(feature_names)
         self._target: Column = data.get_column(target_name)
-        self._extras: Table = data.remove_columns_except(extra_names)
+        self._extras: Table = data.select_columns(extra_names)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, TabularDataset):

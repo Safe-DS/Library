@@ -44,13 +44,13 @@ from safeds.exceptions import ColumnNotFoundError
     ],
 )
 class TestHappyPath:
-    def test_should_remove_columns(
+    def test_should_select_columns(
         self,
         table_factory: Callable[[], Table],
         names: str | list[str],
         expected: Table,
     ) -> None:
-        actual = table_factory().remove_columns_except(names)
+        actual = table_factory().select_columns(names)
         assert actual == expected
 
     def test_should_not_mutate_receiver(
@@ -60,10 +60,10 @@ class TestHappyPath:
         expected: Table,  # noqa: ARG002
     ) -> None:
         original = table_factory()
-        original.remove_columns_except(names)
+        original.select_columns(names)
         assert original == table_factory()
 
 
 def test_should_raise_for_unknown_columns() -> None:
     with pytest.raises(ColumnNotFoundError):
-        Table({}).remove_columns_except(["col1"])
+        Table({}).select_columns(["col1"])
