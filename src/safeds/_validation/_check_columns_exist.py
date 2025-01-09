@@ -58,11 +58,12 @@ def _build_error_message(schema: Schema, unknown_names: list[str]) -> str:
     return message
 
 
-def _get_similar_column_names(schema: Schema, unknown_name: str) -> list[str]:
+def _get_similar_column_names(schema: Schema, name: str) -> list[str]:
     from difflib import get_close_matches
 
-    return get_close_matches(
-        unknown_name,
-        schema.column_names,
-        n=3,
-    )
+    close_matches = get_close_matches(name, schema.column_names, n=3)
+
+    if close_matches and close_matches[0] == name:
+        return close_matches[0:1]
+    else:
+        return close_matches
