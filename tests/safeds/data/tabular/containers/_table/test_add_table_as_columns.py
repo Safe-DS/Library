@@ -35,9 +35,9 @@ from safeds.exceptions import DuplicateColumnError, RowCountMismatchError
     ],
 )
 def test_should_add_columns(table: Table, other: Table, expected: Table) -> None:
-    table = table.add_table_as_columns(other)
-    assert table.schema == expected.schema
-    assert table == expected
+    actual = table.add_table_as_columns(other)
+    assert actual.schema == expected.schema
+    assert actual == expected
 
 
 def test_should_raise_error_if_row_counts_differ() -> None:

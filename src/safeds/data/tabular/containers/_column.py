@@ -28,6 +28,9 @@ T_co = TypeVar("T_co", covariant=True)
 R_co = TypeVar("R_co", covariant=True)
 
 
+# TODO: Rethink whether T_co should include None, also affects Cell operations ('<' return Cell[bool | None] etc.)
+
+
 class Column(Sequence[T_co]):
     """
     A named, one-dimensional collection of homogeneous values.
@@ -218,7 +221,7 @@ class Column(Sequence[T_co]):
 
         return series.unique(maintain_order=True).to_list()
 
-    def get_value(self, index: int) -> T_co | None:
+    def get_value(self, index: int) -> T_co:
         """
         Return the column value at specified index. Equivalent to the `[]` operator (indexed access).
 

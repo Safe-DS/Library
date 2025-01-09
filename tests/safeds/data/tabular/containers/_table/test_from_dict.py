@@ -28,8 +28,9 @@ from safeds.exceptions import RowCountMismatchError
     ids=["empty", "non-empty"],
 )
 def test_should_create_table_from_dict(data: dict[str, list[Any]], expected: Table) -> None:
-    assert Table.from_dict(data).schema == expected.schema
-    assert Table.from_dict(data) == expected
+    actual = Table.from_dict(data)
+    assert actual.schema == expected.schema
+    assert actual == expected
 
 
 def test_should_raise_error_if_row_counts_differ() -> None:

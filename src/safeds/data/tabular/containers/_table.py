@@ -16,9 +16,6 @@ from safeds._validation import (
 )
 from safeds.data.tabular.plotting import TablePlotter
 from safeds.data.tabular.typing._polars_schema import _PolarsSchema
-from safeds.exceptions import (
-    DuplicateColumnError,
-)
 
 from ._column import Column
 from ._lazy_cell import _LazyCell
@@ -497,7 +494,6 @@ class Table:
 
         if isinstance(columns, Column):
             columns = [columns]
-
         if len(columns) == 0:
             return self
 
@@ -537,7 +533,7 @@ class Table:
 
         Raises
         ------
-        ValueError
+        DuplicateColumnError
             If the column name exists already.
 
         Examples
@@ -555,8 +551,11 @@ class Table:
         |   3 |   6 |   9 |
         +-----+-----+-----+
         """
-        if self.has_column(name):
-            raise DuplicateColumnError(name)
+        _check_columns_dont_exist(self, name)
+
+        # When called on a frame without columns, a pl.lit expression adds a single column with a single row
+        if self.column_count == 0:
+            return self.add_columns(Column(name, []))
 
         computed_column = computer(_LazyVectorizedRow(self))
 

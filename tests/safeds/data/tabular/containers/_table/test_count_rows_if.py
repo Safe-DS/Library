@@ -30,7 +30,8 @@ def test_should_handle_boolean_logic(
     expected: int,
 ) -> None:
     table = Table({"a": values})
-    assert table.count_rows_if(lambda row: row["a"] < 2) == expected
+    actual = table.count_rows_if(lambda row: row["a"] < 2)
+    assert actual == expected
 
 
 @pytest.mark.parametrize(
@@ -61,4 +62,5 @@ def test_should_handle_kleene_logic(
     expected: int | None,
 ) -> None:
     table = Table({"a": values})
-    assert table.count_rows_if(lambda row: row["a"] < 2, ignore_unknown=False) == expected
+    actual = table.count_rows_if(lambda row: row["a"] < 2, ignore_unknown=False)
+    assert actual == expected

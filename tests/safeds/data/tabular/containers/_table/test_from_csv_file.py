@@ -19,15 +19,15 @@ from tests.helpers import resolve_resource_path
 class TestShouldCreateTableFromCsvFile:
     def test_path_as_string(self, path: str, expected: Table) -> None:
         path_as_string = resolve_resource_path(path)
-        table = Table.from_csv_file(path_as_string)
-        assert table.schema == expected.schema
-        assert table == expected
+        actual = Table.from_csv_file(path_as_string)
+        assert actual.schema == expected.schema
+        assert actual == expected
 
     def test_path_as_path_object(self, path: str, expected: Table) -> None:
         path_as_path_object = Path(resolve_resource_path(path))
-        table = Table.from_csv_file(path_as_path_object)
-        assert table.schema == expected.schema
-        assert table == expected
+        actual = Table.from_csv_file(path_as_path_object)
+        assert actual.schema == expected.schema
+        assert actual == expected
 
 
 def test_should_raise_error_if_file_not_found() -> None:
