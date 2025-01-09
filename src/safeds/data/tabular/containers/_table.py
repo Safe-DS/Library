@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, Any, Literal, overload
 from safeds._config import _get_device, _init_default_device
 from safeds._config._polars import _get_polars_config
 from safeds._utils import _structural_hash
-from safeds._utils._random import _get_random_seed
 from safeds._validation import (
     _check_bounds,
     _check_columns_dont_exist,
@@ -1338,11 +1337,16 @@ class Table:
             self._lazy_frame.filter(non_outlier_mask),
         )
 
-    def shuffle_rows(self) -> Table:
+    def shuffle_rows(self, *, seed: int = 0) -> Table:
         """
         Return a new table with the rows shuffled.
 
         **Note:** The original table is not modified.
+
+        Parameters
+        ----------
+        seed:
+            The seed for the random number generator.
 
         Returns
         -------
@@ -1368,7 +1372,7 @@ class Table:
             self._data_frame.sample(
                 fraction=1,
                 shuffle=True,
-                seed=_get_random_seed(),
+                seed=seed,
             ),
         )
 
