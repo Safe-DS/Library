@@ -6,58 +6,58 @@ from safeds.exceptions import OutOfBoundsError
 
 
 @pytest.mark.parametrize(
-    ("table", "start", "length", "expected"),
+    ("table_factory", "start", "length", "expected"),
     [
         (
-            Table({}),
+            lambda: Table({}),
             0,
             None,
             Table({}),
         ),
         (
-            Table({"col1": []}),
+            lambda: Table({"col1": []}),
             0,
             None,
             Table({"col1": []}),
         ),
         (
-            Table({"col1": [1, 2, 3]}),
+            lambda: Table({"col1": [1, 2, 3]}),
             0,
             None,
             Table({"col1": [1, 2, 3]}),
         ),
         (
-            Table({"col1": [1, 2, 3]}),
+            lambda: Table({"col1": [1, 2, 3]}),
             1,
             None,
             Table({"col1": [2, 3]}),
         ),
         (
-            Table({"col1": [1, 2, 3]}),
+            lambda: Table({"col1": [1, 2, 3]}),
             10,
             None,
             Table({"col1": []}),
         ),
         (
-            Table({"col1": [1, 2, 3]}),
+            lambda: Table({"col1": [1, 2, 3]}),
             -1,
             None,
             Table({"col1": [3]}),
         ),
         (
-            Table({"col1": [1, 2, 3]}),
+            lambda: Table({"col1": [1, 2, 3]}),
             -10,
             None,
             Table({"col1": [1, 2, 3]}),
         ),
         (
-            Table({"col1": [1, 2, 3]}),
+            lambda: Table({"col1": [1, 2, 3]}),
             0,
             1,
             Table({"col1": [1]}),
         ),
         (
-            Table({"col1": [1, 2, 3]}),
+            lambda: Table({"col1": [1, 2, 3]}),
             0,
             10,
             Table({"col1": [1, 2, 3]}),
@@ -85,6 +85,17 @@ class TestHappyPath:
     ) -> None:
         actual = table_factory().slice_rows(start, length)
         assert actual == expected
+
+    def test_should_not_mutate_receiver(
+        self,
+        table_factory: Callable[[], Table],
+        start: int,
+        length: int | None,
+        expected: Table,  # noqa: ARG002
+    ) -> None:
+        original = table_factory()
+        original.slice_rows(start, length)
+        assert original == table_factory()
 
 
 def test_should_raise_for_negative_length() -> None:

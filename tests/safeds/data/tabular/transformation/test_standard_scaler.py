@@ -3,7 +3,7 @@ from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import StandardScaler
 from safeds.exceptions import ColumnNotFoundError, ColumnTypeError, TransformerNotFittedError
 
-from tests.helpers import assert_tables_equal
+from tests.helpers import assert_tables_are_equal
 
 
 class TestFit:
@@ -128,7 +128,7 @@ class TestFitAndTransform:
     ) -> None:
         fitted_transformer, transformed_table = StandardScaler(column_names=column_names).fit_and_transform(table)
         assert fitted_transformer.is_fitted
-        assert_tables_equal(transformed_table, expected)
+        assert_tables_are_equal(transformed_table, expected)
 
     def test_should_not_change_original_table(self) -> None:
         table = Table(
@@ -182,7 +182,7 @@ class TestInverseTransform:
             },
         )
 
-        assert_tables_equal(transformed_table, expected)
+        assert_tables_are_equal(transformed_table, expected)
 
     def test_should_raise_if_not_fitted(self) -> None:
         table = Table(

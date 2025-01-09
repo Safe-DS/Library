@@ -364,14 +364,8 @@ class Table:
 
     @property
     def _data_frame(self) -> pl.DataFrame:
-        import polars as pl
-
         if self.__data_frame_cache is None:
-            try:
-                self.__data_frame_cache = self._lazy_frame.collect()
-            except (pl.NoDataError, pl.PolarsPanicError):  # pragma: no cover
-                # Can happen for some operations on empty tables (e.g. https://github.com/pola-rs/polars/issues/16202)
-                self.__data_frame_cache = pl.DataFrame()
+            self.__data_frame_cache = self._lazy_frame.collect()
 
         return self.__data_frame_cache
 
@@ -431,13 +425,16 @@ class Table:
     @property
     def schema(self) -> Schema:
         """The schema of the table."""
-        import polars as pl
+        return _PolarsSchema(self._lazy_frame.collect_schema())
 
-        try:
-            return _PolarsSchema(self._lazy_frame.collect_schema())
-        except (pl.exceptions.NoDataError, pl.exceptions.PanicException):  # pragma: no cover
-            # Can happen for some operations on empty tables (e.g. https://github.com/pola-rs/polars/issues/16202)
-            return _PolarsSchema(pl.Schema({}))
+    @property
+    def _has_no_rows(self) -> bool:
+        """
+        Whether the table has no rows.
+
+        This is faster than checking if the row count is zero, as only a single row is materialized.
+        """
+        return self._lazy_frame.head(1).collect().is_empty()
 
     # ------------------------------------------------------------------------------------------------------------------
     # Column operations
@@ -1323,7 +1320,7 @@ class Table:
         | null |   8 |
         +------+-----+
         """
-        if self.row_count == 0:
+        if self._has_no_rows:
             return self  # polars raises a ComputeError for tables without rows
         if column_names is None:
             column_names = self.column_names
@@ -1467,9 +1464,6 @@ class Table:
         |   3 |   2 |
         +-----+-----+
         """
-        if self.row_count == 0:
-            return self
-
         key = key_selector(_LazyVectorizedRow(self))
 
         return Table._from_polars_lazy_frame(
@@ -1548,6 +1542,7 @@ class Table:
         **Notes:**
 
         - The original table is not modified.
+        - This operation must fully load the data into memory, which can be expensive.
         - By default, the rows are shuffled before splitting. You can disable this by setting `shuffle` to False.
 
         Parameters

@@ -23,14 +23,21 @@ from safeds.exceptions import DuplicateColumnError
         (
             lambda: Table({"col1": [1, 2, 3]}),
             "col2",
+            lambda _: Cell.from_literal(None),
+            Table({"col1": [1, 2, 3], "col2": [None, None, None]}),
+        ),
+        (
+            lambda: Table({"col1": [1, 2, 3]}),
+            "col2",
             lambda row: 2 * row["col1"],
             Table({"col1": [1, 2, 3], "col2": [2, 4, 6]}),
         ),
     ],
     ids=[
         "empty",
-        "empty column",
-        "non-empty",
+        "no rows",
+        "non-empty, constant value",
+        "non-empty, computed value",
     ],
 )
 class TestHappyPath:
