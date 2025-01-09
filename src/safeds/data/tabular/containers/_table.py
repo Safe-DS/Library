@@ -768,7 +768,11 @@ class Table:
             self._lazy_frame.select(names),
         )
 
-    def remove_columns_with_missing_values(self) -> Table:
+    def remove_columns_with_missing_values(
+        self,
+        *,
+        max_missing_value_ratio: float = 0,
+    ) -> Table:
         """
         Return a new table without columns that contain missing values.
 
@@ -777,10 +781,15 @@ class Table:
         - The original table is not modified.
         - This operation must fully load the data into memory, which can be expensive.
 
+        Parameters
+        ----------
+        max_missing_value_ratio:
+            The maximum missing value ratio a column can have to be kept (inclusive). Must be between 0 and 1.
+
         Returns
         -------
         new_table:
-            The table without columns containing missing values.
+            The table without columns that contain missing values.
 
         Examples
         --------
@@ -799,9 +808,20 @@ class Table:
         """
         import polars as pl
 
+        _check_bounds(
+            "max_missing_value_ratio",
+            max_missing_value_ratio,
+            lower_bound=_ClosedBound(0),
+            upper_bound=_ClosedBound(1),
+        )
+
         return Table._from_polars_lazy_frame(
             pl.LazyFrame(
-                [series for series in self._data_frame.get_columns() if series.null_count() == 0],
+                [
+                    column._series
+                    for column in self.to_columns()
+                    if column.missing_value_ratio() <= max_missing_value_ratio
+                ],
             ),
         )
 
