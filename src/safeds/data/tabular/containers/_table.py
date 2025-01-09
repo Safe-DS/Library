@@ -1958,7 +1958,7 @@ class Table:
         Returns
         -------
         dict_:
-            Dictionary representation of the table.
+            The dictionary representation of the table.
 
         Examples
         --------

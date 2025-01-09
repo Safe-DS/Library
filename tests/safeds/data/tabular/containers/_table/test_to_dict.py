@@ -14,17 +14,33 @@ from safeds.data.tabular.containers import Table
         (
             Table(
                 {
-                    "a": [1],
-                    "b": [2],
+                    "col1": [],
+                    "col2": [],
                 },
             ),
             {
-                "a": [1],
-                "b": [2],
+                "col1": [],
+                "col2": [],
+            },
+        ),
+        (
+            Table(
+                {
+                    "col1": [1, 2],
+                    "col2": [3, 4],
+                },
+            ),
+            {
+                "col1": [1, 2],
+                "col2": [3, 4],
             },
         ),
     ],
-    ids=["Empty table", "Table with one row"],
+    ids=[
+        "empty",
+        "no rows",
+        "with data",
+    ],
 )
-def test_should_return_dict_for_table(table: Table, expected: dict[str, list[Any]]) -> None:
+def test_should_return_dictionary(table: Table, expected: dict[str, list[Any]]) -> None:
     assert table.to_dict() == expected
