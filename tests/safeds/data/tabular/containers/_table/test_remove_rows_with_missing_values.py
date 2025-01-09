@@ -24,7 +24,5 @@ from safeds.data.tabular.containers import Table
     ids=["some missing values", "empty"],
 )
 def test_should_remove_rows_with_missing_values(table: Table, expected: Table) -> None:
-    updated_table = table.remove_rows_with_missing_values()
-    assert updated_table.schema == expected.schema
-    assert updated_table.column_count == expected.column_count
-    assert updated_table == expected
+    actual = table.remove_rows_with_missing_values()
+    assert actual == expected

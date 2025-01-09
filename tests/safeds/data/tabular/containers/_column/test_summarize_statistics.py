@@ -132,5 +132,4 @@ from safeds.data.tabular.containers import Column, Table
     ],
 )
 def test_should_summarize_statistics(column: Column, expected: Table) -> None:
-    assert column.summarize_statistics().schema == expected.schema
     assert column.summarize_statistics() == expected

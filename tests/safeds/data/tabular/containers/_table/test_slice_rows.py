@@ -1,3 +1,5 @@
+from collections.abc import Callable
+
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import OutOfBoundsError
@@ -73,8 +75,16 @@ from safeds.exceptions import OutOfBoundsError
         "positive length out of bounds",
     ],
 )
-def test_should_slice_rows(table: Table, start: int, length: int | None, expected: Table) -> None:
-    assert table.slice_rows(start, length) == expected
+class TestHappyPath:
+    def test_should_slice_rows(
+        self,
+        table_factory: Callable[[], Table],
+        start: int,
+        length: int | None,
+        expected: Table,
+    ) -> None:
+        actual = table_factory().slice_rows(start, length)
+        assert actual == expected
 
 
 def test_should_raise_for_negative_length() -> None:

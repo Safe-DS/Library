@@ -25,7 +25,6 @@ def test_should_return_sorted_table(
     key_selector: Callable[[Row], Cell],
     expected: Table,
 ) -> None:
-    assert table.sort_rows(key_selector).schema == expected.schema
     assert table.sort_rows(key_selector) == expected
 
 
@@ -51,5 +50,4 @@ def test_should_not_modify_original_table(
     expected: Table,
 ) -> None:
     table.sort_rows(key_selector)
-    assert table.schema == expected.schema
     assert table == expected

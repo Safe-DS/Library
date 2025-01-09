@@ -29,7 +29,6 @@ from safeds.exceptions import LengthMismatchError
 )
 def test_should_create_table_from_dict(data: dict[str, list[Any]], expected: Table) -> None:
     actual = Table.from_dict(data)
-    assert actual.schema == expected.schema
     assert actual == expected
 
 

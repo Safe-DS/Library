@@ -21,5 +21,4 @@ from safeds.data.tabular.containers import Table
 )
 def test_should_remove_duplicate_rows(table: Table, expected: Table) -> None:
     actual = table.remove_duplicate_rows()
-    assert actual.schema == expected.schema
     assert actual == expected

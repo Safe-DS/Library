@@ -49,6 +49,5 @@ from safeds.data.tabular.containers import Table
     ids=["normal", "table_with_extra_column"],
 )
 def test_should_return_table(tabular_dataset: TimeSeriesDataset, expected: Table) -> None:
-    table = tabular_dataset.to_table()
-    assert table.schema == expected.schema
-    assert table == expected
+    actual = tabular_dataset.to_table()
+    assert actual == expected

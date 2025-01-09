@@ -20,13 +20,11 @@ class TestShouldCreateTableFromCsvFile:
     def test_path_as_string(self, path: str, expected: Table) -> None:
         path_as_string = resolve_resource_path(path)
         actual = Table.from_csv_file(path_as_string)
-        assert actual.schema == expected.schema
         assert actual == expected
 
     def test_path_as_path_object(self, path: str, expected: Table) -> None:
         path_as_path_object = Path(resolve_resource_path(path))
         actual = Table.from_csv_file(path_as_path_object)
-        assert actual.schema == expected.schema
         assert actual == expected
 
 

@@ -30,7 +30,6 @@ class TestHappyPath:
         expected: Table,
     ) -> None:
         actual = table_factory().rename_column(old_name, new_name)
-        assert actual.schema == expected.schema
         assert actual == expected
 
     def test_should_not_mutate_receiver(

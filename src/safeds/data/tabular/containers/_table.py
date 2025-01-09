@@ -1377,14 +1377,15 @@ class Table:
 
     def slice_rows(self, start: int = 0, length: int | None = None) -> Table:
         """
-        Return a new table with a slice of rows.
+        Return a new table with a slice of the rows.
 
         **Note:** The original table is not modified.
 
         Parameters
         ----------
         start:
-            The start index of the slice.
+            The start index of the slice. Non-negative indices count forward from the first row (index 0). Negative
+            indices count backward from the last row (index -1).
         length:
             The length of the slice. If None, the slice contains all rows starting from `start`. Must greater than or
             equal to 0.
