@@ -651,6 +651,9 @@ class Table:
         >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> table.has_column("a")
         True
+
+        >>> table.has_column("c")
+        False
         """
         return self.schema.has_column(name)
 
