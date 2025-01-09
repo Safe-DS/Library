@@ -5,27 +5,23 @@ from safeds.data.tabular.containers import Table
 
 
 @pytest.mark.parametrize(
-    ("table_factory", "seed", "expected"),
+    ("table_factory", "expected"),
     [
         (
             lambda: Table({}),
-            42,
             Table({}),
         ),
         (
             lambda: Table({"col1": []}),
-            42,
             Table({"col1": []}),
         ),
         (
             lambda: Table({"col1": [1, 2, 3]}),
-            42,
-            Table({"col1": [3, 2, 1]}),
+            Table({"col1": [1, 3, 2]}),
         ),
         (
             lambda: Table({"col1": [1, 2, 3], "col2": [4, 5, 6]}),
-            42,
-            Table({"col1": [3, 2, 1], "col2": [6, 5, 4]}),
+            Table({"col1": [1, 3, 2], "col2": [4, 6, 5]}),
         ),
     ],
     ids=[
@@ -39,18 +35,16 @@ class TestHappyPath:
     def test_should_shuffle_rows(
         self,
         table_factory: Callable[[], Table],
-        seed: int,
         expected: Table,
     ) -> None:
-        actual = table_factory().shuffle_rows(seed=seed)
+        actual = table_factory().shuffle_rows()
         assert actual == expected
 
     def test_should_not_mutate_receiver(
         self,
         table_factory: Callable[[], Table],
-        seed: int,
         expected: Table,  # noqa: ARG002
     ) -> None:
         original = table_factory()
-        original.shuffle_rows(seed=seed)
+        original.shuffle_rows()
         assert original == table_factory()

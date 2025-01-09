@@ -1341,7 +1341,10 @@ class Table:
         """
         Return a new table with the rows shuffled.
 
-        **Note:** The original table is not modified.
+        **Notes:**
+
+        - The original table is not modified.
+        - This operation must fully load the data into memory, which can be expensive.
 
         Parameters
         ----------
@@ -1536,6 +1539,7 @@ class Table:
         percentage_in_first: float,
         *,
         shuffle: bool = True,
+        seed: int = 0,
     ) -> tuple[Table, Table]:
         """
         Create two tables by splitting the rows of the current table.
@@ -1555,6 +1559,8 @@ class Table:
             The percentage of rows to include in the first table. Must be between 0 and 1.
         shuffle:
             Whether to shuffle the rows before splitting.
+        seed:
+            The seed for the random number generator used for shuffling.
 
         Returns
         -------
@@ -1600,7 +1606,7 @@ class Table:
             upper_bound=_ClosedBound(1),
         )
 
-        input_table = self.shuffle_rows() if shuffle else self
+        input_table = self.shuffle_rows(seed=seed) if shuffle else self
         row_count_in_first = round(percentage_in_first * input_table.row_count)
 
         return (
