@@ -9,8 +9,8 @@ from safeds.data.tabular.plotting import ColumnPlotter
 from safeds.data.tabular.typing._polars_data_type import _PolarsDataType
 from safeds.exceptions import (
     IndexOutOfBoundsError,
-    MissingValuesColumnError,
     LengthMismatchError,
+    MissingValuesColumnError,
 )
 
 from ._lazy_cell import _LazyCell

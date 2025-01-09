@@ -3,7 +3,7 @@ import multiprocessing as mp
 from concurrent.futures import ALL_COMPLETED, wait
 from typing import Self
 
-from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
+from safeds._validation import _check_columns_are_numeric
 from safeds.data.labeled.containers import TabularDataset
 from safeds.exceptions import (
     DatasetMissesDataError,

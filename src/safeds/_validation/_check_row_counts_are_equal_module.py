@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+
+"""The module name must differ from the function name, so it can be re-exported properly with apipkg."""
 from typing import TYPE_CHECKING, Any
 
 from safeds.exceptions import LengthMismatchError

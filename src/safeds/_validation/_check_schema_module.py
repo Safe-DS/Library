@@ -1,3 +1,5 @@
+"""The module name must differ from the function name, so it can be re-exported properly with apipkg."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Literal, TypeAlias

@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from safeds._validation import _check_columns_exist
-from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
+from safeds._validation import _check_columns_are_numeric, _check_columns_exist
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import TransformerNotFittedError
 

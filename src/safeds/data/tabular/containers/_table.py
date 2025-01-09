@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, Literal, overload
 
 from safeds._config import _get_device, _init_default_device
@@ -22,7 +23,7 @@ from ._lazy_cell import _LazyCell
 from ._lazy_vectorized_row import _LazyVectorizedRow
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Mapping, Sequence
+    from collections.abc import Mapping, Sequence
     from pathlib import Path
 
     import polars as pl
@@ -656,7 +657,6 @@ class Table:
     def remove_columns(
         self,
         names: str | list[str],
-        /,
         *,
         ignore_unknown_names: bool = False,
     ) -> Table:
@@ -682,6 +682,11 @@ class Table:
         ------
         ColumnNotFoundError
             If a column does not exist and unknown names are not ignored.
+
+        See Also
+        --------
+        select_columns:
+            Keep only a subset of the columns. This method accepts either column names, or a predicate.
 
         Examples
         --------
@@ -955,17 +960,20 @@ class Table:
 
     def select_columns(
         self,
-        names: str | list[str],
+        selector: str | list[str] | Callable[[Column], bool],
     ) -> Table:
         """
         Return a new table with only the specified columns.
 
-        **Note:** The original table is not modified.
+        **Note:**
+
+        - The original table is not modified.
+        - This operation may need to fully load the data into memory, which can be expensive.
 
         Parameters
         ----------
-        names:
-            The names of the columns to keep.
+        selector:
+            The names of the columns to keep, or a predicate that decides whether to keep a column.
 
         Returns
         -------
@@ -976,6 +984,11 @@ class Table:
         ------
         ColumnNotFoundError
             If a column does not exist.
+
+        See Also
+        --------
+        remove_columns:
+            Remove columns from the table by name.
 
         Examples
         --------
@@ -992,14 +1005,23 @@ class Table:
         |   3 |
         +-----+
         """
-        if isinstance(names, str):
-            names = [names]
+        import polars as pl
 
-        _check_columns_exist(self, names)
+        # Select by predicate
+        if isinstance(selector, Callable):
+            return Table._from_polars_lazy_frame(
+                pl.LazyFrame(
+                    [column._series for column in self.to_columns() if selector(column)],
+                ),
+            )
 
-        return Table._from_polars_lazy_frame(
-            self._lazy_frame.select(names),
-        )
+        # Select by column names
+        else:
+            _check_columns_exist(self, selector)
+
+            return Table._from_polars_lazy_frame(
+                self._lazy_frame.select(selector),
+            )
 
     def transform_column(
         self,
