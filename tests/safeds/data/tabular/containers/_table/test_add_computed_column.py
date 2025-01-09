@@ -52,9 +52,9 @@ class TestHappyPath:
         computer: Callable[[Row], Cell],
         expected: Table,  # noqa: ARG002
     ) -> None:
-        table = table_factory()
-        table.add_computed_column(name, computer)
-        assert table == table_factory()
+        original = table_factory()
+        original.add_computed_column(name, computer)
+        assert original == table_factory()
 
 
 def test_should_raise_error_if_duplicate_column_name() -> None:

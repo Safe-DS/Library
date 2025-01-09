@@ -49,12 +49,16 @@ class FileExtensionError(SafeDsError, ValueError):
     """Exception raised when a path has the wrong file extension."""
 
 
+class LengthMismatchError(SafeDsError, ValueError):
+    """Exception raised when objects have different lengths."""
+
+
 class OutOfBoundsError(SafeDsError, ValueError):
     """Exception raised when a value is outside its expected range."""
 
 
-class RowCountMismatchError(SafeDsError, ValueError):
-    """Exception raised when columns or tables have different row counts."""
+class SchemaError(SafeDsError, TypeError):
+    """Exception raised when tables have incompatible schemas."""
 
 
 __all__ = [
@@ -63,8 +67,9 @@ __all__ = [
     "ColumnTypeError",
     "DuplicateColumnError",
     "FileExtensionError",
+    "LengthMismatchError",
     "OutOfBoundsError",
-    "RowCountMismatchError",
+    "SchemaError",
     # TODO
     # Data exceptions
     "DuplicateIndexError",

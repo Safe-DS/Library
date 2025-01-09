@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any
 
-from safeds.exceptions import RowCountMismatchError
+from safeds.exceptions import LengthMismatchError
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -22,7 +22,7 @@ def _check_row_counts_are_equal(data: Sequence[Column | Table] | Mapping[str, Se
 
     Raises
     ------
-    RowCountMismatchError
+    LengthMismatchError
         If some columns or tables have different row counts.
     """
     if len(data) < 2:
@@ -40,7 +40,7 @@ def _check_row_counts_are_equal(data: Sequence[Column | Table] | Mapping[str, Se
     # Raise an error if there are mismatched columns
     if mismatched_columns:
         message = _build_error_message(names_and_row_counts[0], mismatched_columns)
-        raise RowCountMismatchError(message)
+        raise LengthMismatchError(message)
 
 
 def _get_names_and_row_counts(data: Sequence[Column | Table] | Mapping[str, Sequence[Any]]) -> list[tuple[str, int]]:

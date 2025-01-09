@@ -3,7 +3,7 @@ from safeds.data.tabular.containers import Column
 from safeds.exceptions import (
     ColumnTypeError,
     MissingValuesColumnError,
-    RowCountMismatchError,
+    LengthMismatchError,
 )
 
 
@@ -49,7 +49,7 @@ def test_should_raise_if_columns_are_not_numeric(values1: list, values2: list) -
 def test_should_raise_if_column_lengths_differ() -> None:
     column1 = Column("A", [1, 2, 3, 4])
     column2 = Column("B", [2])
-    with pytest.raises(RowCountMismatchError):
+    with pytest.raises(LengthMismatchError):
         column1.correlation_with(column2)
 
 

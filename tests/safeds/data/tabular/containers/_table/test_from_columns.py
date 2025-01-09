@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Column, Table
-from safeds.exceptions import DuplicateColumnError, RowCountMismatchError
+from safeds.exceptions import DuplicateColumnError, LengthMismatchError
 
 
 @pytest.mark.parametrize(
@@ -32,7 +32,7 @@ def test_should_create_table_from_columns(columns: Column | list[Column], expect
 
 
 def test_should_raise_error_if_row_counts_differ() -> None:
-    with pytest.raises(RowCountMismatchError):
+    with pytest.raises(LengthMismatchError):
         Table.from_columns([Column("col1", []), Column("col2", [1])])
 
 

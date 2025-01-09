@@ -2,7 +2,7 @@ from typing import Any
 
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import RowCountMismatchError
+from safeds.exceptions import LengthMismatchError
 
 
 @pytest.mark.parametrize(
@@ -34,5 +34,5 @@ def test_should_create_table_from_dict(data: dict[str, list[Any]], expected: Tab
 
 
 def test_should_raise_error_if_row_counts_differ() -> None:
-    with pytest.raises(RowCountMismatchError):
+    with pytest.raises(LengthMismatchError):
         Table.from_dict({"a": [1, 2], "b": [3]})

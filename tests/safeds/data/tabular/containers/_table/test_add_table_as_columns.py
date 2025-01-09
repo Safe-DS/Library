@@ -1,28 +1,30 @@
+from collections.abc import Callable
+
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import DuplicateColumnError, RowCountMismatchError
+from safeds.exceptions import DuplicateColumnError, LengthMismatchError
 
 
 @pytest.mark.parametrize(
-    ("table", "other", "expected"),
+    ("table_factory", "other", "expected"),
     [
         (
-            Table({}),
+            lambda: Table({}),
             Table({}),
             Table({}),
         ),
         (
-            Table({}),
+            lambda: Table({}),
             Table({"col1": [1]}),
             Table({"col1": [1]}),
         ),
         (
-            Table({"col1": [1]}),
+            lambda: Table({"col1": [1]}),
             Table({}),
             Table({"col1": [1]}),
         ),
         (
-            Table({"col1": [1]}),
+            lambda: Table({"col1": [1]}),
             Table({"col2": [2]}),
             Table({"col1": [1], "col2": [2]}),
         ),
@@ -34,14 +36,30 @@ from safeds.exceptions import DuplicateColumnError, RowCountMismatchError
         "non-empty table, non-empty table",
     ],
 )
-def test_should_add_columns(table: Table, other: Table, expected: Table) -> None:
-    actual = table.add_table_as_columns(other)
-    assert actual.schema == expected.schema
-    assert actual == expected
+class TestHappyPath:
+    def test_should_add_columns(
+        self,
+        table_factory: Callable[[], Table],
+        other: Table,
+        expected: Table,
+    ) -> None:
+        actual = table_factory().add_table_as_columns(other)
+        assert actual.schema == expected.schema
+        assert actual == expected
+
+    def test_should_not_mutate_receiver(
+        self,
+        table_factory: Callable[[], Table],
+        other: Table,
+        expected: Table,  # noqa: ARG002
+    ) -> None:
+        original = table_factory()
+        original.add_table_as_columns(other)
+        assert original == table_factory()
 
 
 def test_should_raise_error_if_row_counts_differ() -> None:
-    with pytest.raises(RowCountMismatchError):
+    with pytest.raises(LengthMismatchError):
         Table({"col1": [1]}).add_table_as_columns(Table({"col2": [1, 2]}))
 
 

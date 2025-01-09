@@ -10,7 +10,7 @@ from safeds.data.labeled.containers import TabularDataset
 from safeds.exceptions import (
     DatasetMissesDataError,
     ModelNotFittedError,
-    RowCountMismatchError,
+    LengthMismatchError,
 )
 from safeds.ml.classical import SupervisedModel
 from safeds.ml.metrics import RegressionMetrics, RegressorMetric
@@ -354,7 +354,7 @@ def _check_metrics_preconditions(actual: Column, expected: Column) -> None:  # p
         raise TypeError(f"Column 'expected' is not numerical but {expected.type}.")
 
     if actual.row_count != expected.row_count:
-        raise RowCountMismatchError(
+        raise LengthMismatchError(
             "\n".join(
                 [
                     f"{actual.name}: {actual.row_count}",

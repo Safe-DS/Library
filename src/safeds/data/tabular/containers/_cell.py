@@ -16,9 +16,9 @@ P_contra = TypeVar("P_contra", contravariant=True)
 R_co = TypeVar("R_co", covariant=True)
 
 
-NumericLiteral: TypeAlias = int | float | Decimal
-TemporalLiteral: TypeAlias = datetime.date | datetime.time | datetime.datetime | datetime.timedelta
-PythonLiteral: TypeAlias = NumericLiteral | bool | str | bytes | TemporalLiteral | None
+_NumericLiteral: TypeAlias = int | float | Decimal
+_TemporalLiteral: TypeAlias = datetime.date | datetime.time | datetime.datetime | datetime.timedelta
+_PythonLiteral: TypeAlias = _NumericLiteral | bool | str | bytes | _TemporalLiteral | None
 
 
 class Cell(ABC, Generic[T_co]):
@@ -33,7 +33,7 @@ class Cell(ABC, Generic[T_co]):
     # ------------------------------------------------------------------------------------------------------------------
 
     @staticmethod
-    def from_literal(value: PythonLiteral) -> Cell:
+    def from_literal(value: _PythonLiteral) -> Cell:
         """
         Create a new cell from a literal value.
 

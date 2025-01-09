@@ -15,7 +15,7 @@ from safeds.exceptions import (
     ModelNotFittedError,
     NonNumericColumnError,
     PlainTableError,
-    RowCountMismatchError,
+    LengthMismatchError,
 )
 from safeds.ml.classical.regression import (
     AdaBoostRegressor,
@@ -527,7 +527,7 @@ class TestCheckMetricsPreconditions:
         [
             (["A", "B"], [1, 2], TypeError),
             ([1, 2], ["A", "B"], TypeError),
-            ([1, 2, 3], [1, 2], RowCountMismatchError),
+            ([1, 2, 3], [1, 2], LengthMismatchError),
         ],
     )
     def test_should_raise_if_validation_fails(

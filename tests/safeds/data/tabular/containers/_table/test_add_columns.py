@@ -2,7 +2,7 @@ from collections.abc import Callable
 
 import pytest
 from safeds.data.tabular.containers import Column, Table
-from safeds.exceptions import DuplicateColumnError, RowCountMismatchError
+from safeds.exceptions import DuplicateColumnError, LengthMismatchError
 
 
 @pytest.mark.parametrize(
@@ -77,9 +77,9 @@ class TestHappyPath:
         columns: Column | list[Column] | Table,
         expected: Table,  # noqa: ARG002
     ) -> None:
-        table = table_factory()
-        table.add_columns(columns)
-        assert table == table_factory()
+        original = table_factory()
+        original.add_columns(columns)
+        assert original == table_factory()
 
 
 @pytest.mark.parametrize(
@@ -105,7 +105,7 @@ class TestHappyPath:
     ],
 )
 def test_should_raise_error_if_row_counts_differ(table: Table, columns: Column | list[Column] | Table) -> None:
-    with pytest.raises(RowCountMismatchError):
+    with pytest.raises(LengthMismatchError):
         table.add_columns(columns)
 
 

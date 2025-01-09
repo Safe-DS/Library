@@ -11,6 +11,7 @@ from safeds._validation import (
     _check_columns_dont_exist,
     _check_columns_exist,
     _check_row_counts_are_equal,
+    _check_schema,
     _ClosedBound,
     _normalize_and_check_file_path,
 )
@@ -200,8 +201,8 @@ class Table:
 
         Raises
         ------
-        RowCountMismatchError
-            If columns have different lengths.
+        LengthMismatchError
+            If columns have different row counts.
 
         Examples
         --------
@@ -468,7 +469,7 @@ class Table:
         ------
         DuplicateColumnError
             If a column name exists already. This can also happen if the new columns have duplicate names.
-        RowCountMismatchError
+        LengthMismatchError
             If the columns have different row counts.
 
         Examples
@@ -1621,7 +1622,7 @@ class Table:
         ------
         DuplicateColumnError
             If a column name exists already.
-        RowCountMismatchError
+        LengthMismatchError
             If the tables have different row counts.
 
         Examples
@@ -1692,7 +1693,7 @@ class Table:
         |   6 |
         +-----+
         """
-        # TODO: raises?
+        _check_schema(self, other)
 
         return Table._from_polars_data_frame(
             self._data_frame.vstack(other._data_frame),

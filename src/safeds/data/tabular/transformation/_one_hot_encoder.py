@@ -210,6 +210,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         if self._column_names is None or self._mapping is None:
             raise TransformerNotFittedError
 
+        # TODO: raise schema error instead
         _check_columns_exist(table, self._column_names)
 
         expressions = [

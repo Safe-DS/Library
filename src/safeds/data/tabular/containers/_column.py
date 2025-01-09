@@ -10,7 +10,7 @@ from safeds.data.tabular.typing._polars_data_type import _PolarsDataType
 from safeds.exceptions import (
     IndexOutOfBoundsError,
     MissingValuesColumnError,
-    RowCountMismatchError,
+    LengthMismatchError,
 )
 
 from ._lazy_cell import _LazyCell
@@ -766,7 +766,7 @@ class Column(Sequence[T_co]):
         _check_column_is_numeric(other, operation="calculate the correlation")
 
         if self.row_count != other.row_count:
-            raise RowCountMismatchError("")  # TODO: Add column names to error message
+            raise LengthMismatchError("")  # TODO: Add column names to error message
         if self.missing_value_count() > 0 or other.missing_value_count() > 0:
             raise MissingValuesColumnError("")  # TODO: Add column names to error message
 
