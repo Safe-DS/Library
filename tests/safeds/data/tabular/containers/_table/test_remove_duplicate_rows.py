@@ -5,21 +5,21 @@ from safeds.data.tabular.containers import Table
 @pytest.mark.parametrize(
     ("table", "expected"),
     [
+        (Table({}), Table({})),
+        (Table({"col1": []}), Table({"col1": []})),
         (
             Table(
                 {
-                    "A": [1, 1, 1, 4],
-                    "B": [2, 2, 2, 5],
+                    "col1": [0, 1, 2, 1, 3],
+                    "col2": [0, -1, -2, -1, -3],
                 },
             ),
-            Table({"A": [1, 4], "B": [2, 5]}),
+            Table({"col1": [0, 1, 2, 3], "col2": [0, -1, -2, -3]}),
         ),
-        (Table({}), Table({})),
-        (Table({"col1": []}), Table({"col1": []})),
     ],
-    ids=["duplicate rows", "empty", "no rows"],
+    ids=["empty", "no rows", "duplicate rows"],
 )
 def test_should_remove_duplicate_rows(table: Table, expected: Table) -> None:
-    result_table = table.remove_duplicate_rows()
-    assert result_table.schema == expected.schema
-    assert result_table == expected
+    actual = table.remove_duplicate_rows()
+    assert actual.schema == expected.schema
+    assert actual == expected
