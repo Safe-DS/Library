@@ -684,6 +684,11 @@ class Table:
         new_table:
             The table with the columns removed.
 
+        Raises
+        ------
+        ColumnNotFoundError
+            If a column does not exist and unknown names are not ignored.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
