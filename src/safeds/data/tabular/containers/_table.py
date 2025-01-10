@@ -1490,12 +1490,14 @@ class Table:
         """
         Return a new table without rows that contain missing values in the specified columns.
 
+        The resulting table no longer has missing values in the specified columns.
+
         **Note:** The original table is not modified.
 
         Parameters
         ----------
         column_names:
-            The names of the columns to consider. If None, all columns are considered.
+            The names of the columns to check. If None, all columns are checked.
 
         Returns
         -------
@@ -1515,6 +1517,16 @@ class Table:
         |   1 |   4 |
         +-----+-----+
 
+        >>> table.remove_rows_with_missing_values(column_names=["b"])
+        +------+-----+
+        |    a |   b |
+        |  --- | --- |
+        |  i64 | i64 |
+        +============+
+        |    1 |   4 |
+        | null |   5 |
+        +------+-----+
+
         Related
         -------
         - [remove_columns_with_missing_values][safeds.data.tabular.containers._table.Table.remove_columns_with_missing_values]
@@ -1529,6 +1541,10 @@ class Table:
         - [remove_duplicate_rows][safeds.data.tabular.containers._table.Table.remove_duplicate_rows]
         - [remove_rows_with_outliers][safeds.data.tabular.containers._table.Table.remove_rows_with_outliers]
         """
+        if isinstance(column_names, list) and not column_names:
+            # polars panics in this case
+            return self
+
         return Table._from_polars_lazy_frame(
             self._lazy_frame.drop_nulls(subset=column_names),
         )
