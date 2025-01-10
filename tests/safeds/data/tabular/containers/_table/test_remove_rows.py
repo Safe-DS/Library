@@ -1,8 +1,7 @@
 from collections.abc import Callable
-from typing import Any
 
 import pytest
-from safeds.data.tabular.containers import Cell, Table
+from safeds.data.tabular.containers import Cell, Row, Table
 
 
 @pytest.mark.parametrize(
@@ -46,7 +45,7 @@ class TestHappyPath:
     def test_should_remove_rows(
         self,
         table_factory: Callable[[], Table],
-        predicate: Any,
+        predicate: Callable[[Row], Cell[bool]],
         expected: Table,
     ) -> None:
         actual = table_factory().remove_rows(predicate)
@@ -55,7 +54,7 @@ class TestHappyPath:
     def test_should_not_mutate_receiver(
         self,
         table_factory: Callable[[], Table],
-        predicate: Any,
+        predicate: Callable[[Row], Cell[bool]],
         expected: Table,  # noqa: ARG002
     ) -> None:
         original = table_factory()

@@ -1313,7 +1313,8 @@ class Table:
         - filter_rows:
             _Keep_ only rows that satisfy a condition.
         - filter_rows_by_column:
-            _Keep_ only rows that satisfy a condition on a specific column.
+            _Keep_ only rows that satisfy a condition on a specific column. You can negate your predicate to achieve the
+            same effect.
         """
         _check_columns_exist(self, name)
 
