@@ -520,6 +520,15 @@ class Table:
         |   2 |   5 |
         |   3 |   6 |
         +-----+-----+
+
+        Related
+        -------
+        - [add_computed_column][safeds.data.tabular.containers._table.Table.add_computed_column]:
+            Add a column with values computed from other columns.
+        - [remove_columns][safeds.data.tabular.containers._table.Table.remove_columns]:
+            Remove columns from the table by name.
+        - [select_columns][safeds.data.tabular.containers._table.Table.select_columns]:
+            Keep only a subset of the columns. This method accepts either column names, or a predicate.
         """
         from polars.exceptions import DuplicateError, ShapeError
 
@@ -584,6 +593,13 @@ class Table:
         |   2 |   5 |   7 |
         |   3 |   6 |   9 |
         +-----+-----+-----+
+
+        Related
+        -------
+        - [add_columns][safeds.data.tabular.containers._table.Table.add_columns]:
+            Add column objects to the table.
+        - [transform_column][safeds.data.tabular.containers._table.Table.transform_column]:
+            Transform an existing column with a custom function.
         """
         _check_columns_dont_exist(self, name)
 
@@ -1108,9 +1124,8 @@ class Table:
         ----------
         name:
             The name of the column to transform.
-
         transformer:
-            The function that transforms the column.
+            The function that computes the new values of the column.
 
         Returns
         -------
@@ -1136,6 +1151,13 @@ class Table:
         |   3 |   5 |
         |   4 |   6 |
         +-----+-----+
+
+        Related
+        -------
+        - [add_computed_column][safeds.data.tabular.containers._table.Table.add_computed_column]:
+            Add a new column that is computed from other columns.
+        - [transform_table][safeds.data.tabular.containers._table.Table.transform_table]:
+            Transform the entire table with a fitted transformer.
         """
         _check_columns_exist(self, name)
 
@@ -1144,7 +1166,7 @@ class Table:
         expression = transformer(_LazyCell(pl.col(name)))
 
         return Table._from_polars_lazy_frame(
-            self._lazy_frame.with_columns(expression._polars_expression),
+            self._lazy_frame.with_columns(expression._polars_expression.alias(name)),
         )
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -1859,13 +1881,13 @@ class Table:
         Create two tables by splitting the rows of the current table.
 
         The first table contains a percentage of the rows specified by `percentage_in_first`, and the second table
-        contains the remaining rows.
+        contains the remaining rows. By default, the rows are shuffled before splitting. You can disable this by setting
+        `shuffle` to False.
 
         **Notes:**
 
         - The original table is not modified.
         - This operation must fully load the data into memory, which can be expensive.
-        - By default, the rows are shuffled before splitting. You can disable this by setting `shuffle` to False.
 
         Parameters
         ----------
@@ -2075,6 +2097,11 @@ class Table:
         | 2.00000 |
         | 3.00000 |
         +---------+
+
+        Related
+        -------
+        - [transform_table][safeds.data.tabular.containers._table.Table.transform_table]:
+            Transform the table with a fitted transformer.
         """
         return fitted_transformer.inverse_transform(self)
 
@@ -2177,6 +2204,13 @@ class Table:
         | 0.50000 |
         | 1.00000 |
         +---------+
+
+        Related
+        -------
+        - [inverse_transform_table][safeds.data.tabular.containers._table.Table.inverse_transform_table]:
+            Inverse-transform the table with a fitted, invertible transformer.
+        - [transform_column][safeds.data.tabular.containers._table.Table.transform_column]:
+            Transform a single column with a custom function.
         """
         return fitted_transformer.transform(self)
 

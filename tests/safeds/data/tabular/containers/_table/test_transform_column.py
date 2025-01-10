@@ -1,39 +1,68 @@
+from collections.abc import Callable
+
 import pytest
-from safeds.data.tabular.containers import Table
+from safeds.data.tabular.containers import Cell, Table
 from safeds.exceptions import ColumnNotFoundError
 
 
 @pytest.mark.parametrize(
-    ("table", "table_transformed"),
+    ("table_factory", "name", "transformer", "expected"),
     [
         (
-            Table({"A": [1, 2, 3], "B": [4, 5, 6], "C": ["a", "b", "c"]}),
-            Table({"A": [2, 4, 6], "B": [4, 5, 6], "C": ["a", "b", "c"]}),
+            lambda: Table({"col1": []}),
+            "col1",
+            lambda _: Cell.from_literal(None),
+            Table({"col1": []}),
+        ),
+        (
+            lambda: Table({"col1": []}),
+            "col1",
+            lambda cell: 2 * cell,
+            Table({"col1": []}),
+        ),
+        (
+            lambda: Table({"col1": [1, 2, 3]}),
+            "col1",
+            lambda _: Cell.from_literal(None),
+            Table({"col1": [None, None, None]}),
+        ),
+        (
+            lambda: Table({"col1": [1, 2, 3]}),
+            "col1",
+            lambda cell: 2 * cell,
+            Table({"col1": [2, 4, 6]}),
         ),
     ],
-    ids=["multiply by 2"],
-)
-def test_should_transform_column(table: Table, table_transformed: Table) -> None:
-    result = table.transform_column("A", lambda cell: cell * 2)
-
-    assert result.schema == table_transformed.schema
-    assert result == table_transformed
-
-
-@pytest.mark.parametrize(
-    "table",
-    [
-        Table(
-            {
-                "A": [1, 2, 3],
-                "B": [4, 5, 6],
-                "C": ["a", "b", "c"],
-            },
-        ),
-        Table({}),
+    ids=[
+        "no rows (constant value)",
+        "no rows (computed value)",
+        "non-empty (constant value)",
+        "non-empty (computed value)",
     ],
-    ids=["column not found", "empty"],
 )
-def test_should_raise_if_column_not_found(table: Table) -> None:
+class TestHappyPath:
+    def test_should_transform_column(
+        self,
+        table_factory: Callable[[], Table],
+        name: str,
+        transformer: Callable[[Cell], Cell],
+        expected: Table,
+    ) -> None:
+        actual = table_factory().transform_column(name, transformer)
+        assert actual == expected
+
+    def test_should_not_mutate_receiver(
+        self,
+        table_factory: Callable[[], Table],
+        name: str,
+        transformer: Callable[[Cell], Cell],
+        expected: Table,  # noqa: ARG002
+    ) -> None:
+        original = table_factory()
+        original.transform_column(name, transformer)
+        assert original == table_factory()
+
+
+def test_should_raise_if_column_not_found() -> None:
     with pytest.raises(ColumnNotFoundError):
-        table.transform_column("D", lambda cell: cell * 2)
+        Table({}).transform_column("col1", lambda cell: cell * 2)

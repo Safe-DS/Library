@@ -109,8 +109,8 @@ class TestHappyPath:
         2.0,
     ],
     ids=[
-        "less than 0",
-        "greater than 1",
+        "too low",
+        "too high",
     ],
 )
 def test_should_raise_if_percentage_in_first_is_out_of_bounds(percentage_in_first: float) -> None:
