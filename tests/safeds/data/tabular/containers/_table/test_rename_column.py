@@ -1,3 +1,5 @@
+from collections.abc import Callable
+
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import ColumnNotFoundError, DuplicateColumnError
@@ -24,7 +26,7 @@ from safeds.exceptions import ColumnNotFoundError, DuplicateColumnError
 class TestHappyPath:
     def test_should_rename_column(
         self,
-        table_factory: callable,
+        table_factory: Callable[[], Table],
         old_name: str,
         new_name: str,
         expected: Table,
@@ -34,7 +36,7 @@ class TestHappyPath:
 
     def test_should_not_mutate_receiver(
         self,
-        table_factory: callable,
+        table_factory: Callable[[], Table],
         old_name: str,
         new_name: str,
         expected: Table,  # noqa: ARG002

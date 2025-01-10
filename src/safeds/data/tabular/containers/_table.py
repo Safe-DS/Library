@@ -28,6 +28,7 @@ if TYPE_CHECKING:
 
     import polars as pl
     import torch
+    from polars.interchange.protocol import DataFrame
     from torch import Tensor
     from torch.utils.data import DataLoader, Dataset
 
@@ -1087,7 +1088,7 @@ class Table:
         import polars as pl
 
         # Select by predicate
-        if isinstance(selector, Callable):
+        if callable(selector):
             return Table._from_polars_lazy_frame(
                 pl.LazyFrame(
                     [column._series for column in self.to_columns() if selector(column)],
@@ -2467,7 +2468,7 @@ class Table:
     # Dataframe interchange protocol
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __dataframe__(self, nan_as_null: bool = False, allow_copy: bool = True):  # type: ignore[no-untyped-def]
+    def __dataframe__(self, allow_copy: bool = True) -> DataFrame:
         """
         Return a dataframe object that conforms to the dataframe interchange protocol.
 
@@ -2483,9 +2484,6 @@ class Table:
 
         Parameters
         ----------
-        nan_as_null:
-            This parameter is deprecated and will be removed in a later revision of the dataframe interchange protocol.
-            Setting it has no effect.
         allow_copy:
             Whether memory may be copied to create the dataframe object.
 
@@ -2517,7 +2515,7 @@ class Table:
     # Internal
     # ------------------------------------------------------------------------------------------------------------------
 
-    # TODO
+    # TODO: check and potentially rework this
     def _into_dataloader(self, batch_size: int) -> DataLoader:
         """
         Return a Dataloader for the data stored in this table, used for predicting with neural networks.
@@ -2548,7 +2546,7 @@ class Table:
         )
 
 
-# TODO
+# TODO: check and potentially rework this
 def _create_dataset(features: Tensor) -> Dataset:
     from torch.utils.data import Dataset
 
