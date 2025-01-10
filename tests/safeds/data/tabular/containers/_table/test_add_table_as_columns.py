@@ -30,10 +30,10 @@ from safeds.exceptions import DuplicateColumnError, LengthMismatchError
         ),
     ],
     ids=[
-        "empty table, empty table",
-        "empty table, non-empty table",
-        "non-empty table, empty table",
-        "non-empty table, non-empty table",
+        "empty, empty",
+        "empty, non-empty",
+        "non-empty, empty",
+        "non-empty, non-empty",
     ],
 )
 class TestHappyPath:

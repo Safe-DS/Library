@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, Literal, overload
 
 from safeds._config import _get_device, _init_default_device
@@ -23,7 +22,7 @@ from ._lazy_cell import _LazyCell
 from ._lazy_vectorized_row import _LazyVectorizedRow
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping, Sequence
+    from collections.abc import Callable, Mapping, Sequence
     from pathlib import Path
 
     import polars as pl

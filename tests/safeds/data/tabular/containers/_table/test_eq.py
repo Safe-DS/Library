@@ -98,7 +98,7 @@ from safeds.data.tabular.containers import Column, Table
         "not equal (different values)",
     ],
 )
-def test_should_return_whether_two_tables_are_equal(table1: Table, table2: Table, expected: bool) -> None:
+def test_should_return_whether_tables_are_equal(table1: Table, table2: Table, expected: bool) -> None:
     assert (table1.__eq__(table2)) == expected
 
 
@@ -115,7 +115,7 @@ def test_should_return_whether_two_tables_are_equal(table1: Table, table2: Table
         "non-empty",
     ],
 )
-def test_should_return_true_if_objects_are_identical(table: Table) -> None:
+def test_should_return_true_if_tables_are_identical(table: Table) -> None:
     assert (table.__eq__(table)) is True
 
 

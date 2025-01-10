@@ -25,9 +25,9 @@ from safeds.exceptions import SchemaError
         ),
     ],
     ids=[
-        "empty table, empty table",
-        "empty column, empty column",
-        "non-empty table, non-empty table",
+        "empty, empty",
+        "no rows, no rows",
+        "with data, with data",
     ],
 )
 class TestHappyPath:
