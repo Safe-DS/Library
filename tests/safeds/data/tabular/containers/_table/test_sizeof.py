@@ -8,13 +8,13 @@ from safeds.data.tabular.containers import Table
     "table",
     [
         Table({}),
-        Table({"col1": [0]}),
+        Table({"col1": []}),
         Table({"col1": [0, 1], "col2": ["a", "b"]}),
     ],
     ids=[
-        "empty table",
-        "table with one row",
-        "table with multiple rows",
+        "empty",
+        "no rows",
+        "with data",
     ],
 )
 def test_should_size_be_greater_than_normal_object(table: Table) -> None:
