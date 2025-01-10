@@ -472,15 +472,6 @@ class Table:
         """
         return _PolarsSchema(self._lazy_frame.collect_schema())
 
-    @property
-    def _has_no_rows(self) -> bool:
-        """
-        Whether the table has no rows.
-
-        This is faster than checking if the row count is zero, as only a single row is materialized.
-        """
-        return self._lazy_frame.head(1).collect().is_empty()
-
     # ------------------------------------------------------------------------------------------------------------------
     # Column operations
     # ------------------------------------------------------------------------------------------------------------------
@@ -1045,7 +1036,8 @@ class Table:
         **Notes:**
 
         - The original table is not modified.
-        - This operation may need to fully load the data into memory, which can be expensive.
+        - If the `selector` is a custom function, this operation must fully load the data into memory, which can be
+          expensive.
 
         Parameters
         ----------
@@ -1556,12 +1548,12 @@ class Table:
         z_score_threshold: float = 3,
     ) -> Table:
         """
-        Return a new table without rows containing outliers in the specified columns.
+        Return a new table without rows that contain outliers in the specified columns.
 
-        Whether a data point is an outlier in a column is determined by its z-score. The z-score the distance of the
-        data point from the mean of the column divided by the standard deviation of the column. If the z-score is
-        greater than the given threshold, the data point is considered an outlier. Missing values are ignored during the
-        calculation of the z-score.
+        Whether a value is an outlier in a column is determined by its z-score. The z-score the distance of the value
+        from the mean of the column divided by the standard deviation of the column. If the z-score is greater than the
+        given threshold, the value is considered an outlier. Missing values are ignored during the calculation of the
+        z-score.
 
         The z-score is only defined for numeric columns. Non-numeric columns are ignored, even if they are specified in
         `column_names`.
@@ -1581,7 +1573,7 @@ class Table:
         Returns
         -------
         new_table:
-            The table without rows containing outliers in the specified columns.
+            The table without rows that contain outliers in the specified columns.
 
         Raises
         ------
@@ -1627,18 +1619,22 @@ class Table:
             lower_bound=_ClosedBound(0),
         )
 
-        if self._has_no_rows:
-            return self  # polars raises a ComputeError for tables without rows
         if column_names is None:
             column_names = self.column_names
 
         import polars as pl
         import polars.selectors as cs
 
+        # polar's `all_horizontal` raises a `ComputeError` if there are no columns
+        selected = self._lazy_frame.select(cs.numeric() & cs.by_name(column_names))
+        if not selected.collect_schema().names():
+            return self
+
+        # Multiply z-score by standard deviation instead of dividing the distance by it, to avoid division by zero
         non_outlier_mask = pl.all_horizontal(
-            self._data_frame.select(cs.numeric() & cs.by_name(column_names)).select(
-                pl.all().is_null() | (((pl.all() - pl.all().mean()) / pl.all().std()).abs() <= z_score_threshold),
-            ),
+            selected.select(
+                pl.all().is_null() | ((pl.all() - pl.all().mean()).abs() <= (z_score_threshold * pl.all().std())),
+            ).collect(),
         )
 
         return Table._from_polars_lazy_frame(

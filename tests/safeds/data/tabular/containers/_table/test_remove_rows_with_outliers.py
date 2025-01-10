@@ -1,266 +1,118 @@
+from collections.abc import Callable
+
 import pytest
 from safeds.data.tabular.containers import Table
+from safeds.exceptions import OutOfBoundsError
 
 
 @pytest.mark.parametrize(
-    ("table", "expected"),
+    ("table_factory", "column_names", "z_score_threshold", "expected"),
     [
+        # empty
         (
-            Table(
-                {
-                    "col1": ["A", "B", "C"],
-                    "col2": [1.0, 2.0, 3.0],
-                    "col3": [2, 3, 1],
-                },
-            ),
-            Table(
-                {
-                    "col1": ["A", "B", "C"],
-                    "col2": [1.0, 2.0, 3.0],
-                    "col3": [2, 3, 1],
-                },
-            ),
+            lambda: Table({}),
+            None,
+            1,
+            Table({}),
         ),
+        # no rows
         (
-            Table(
-                {
-                    "col1": [
-                        "A",
-                        "B",
-                        "A",
-                        "outlier",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                    ],
-                    "col2": [1.0, 2.0, 3.0, 4.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, None],
-                    "col3": [2, 3, 1, 1_000_000_000, 1, 1, 1, 1, 1, 1, 1, 1],
-                },
-            ),
-            Table(
-                {
-                    "col1": [
-                        "A",
-                        "B",
-                        "A",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                    ],
-                    "col2": [1.0, 2.0, 3.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, None],
-                    "col3": [2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                },
-            ),
+            lambda: Table({"col1": []}),
+            None,
+            1,
+            Table({"col1": []}),
         ),
+        # only missing values
         (
-            Table(
-                {
-                    "col1": [
-                        "A",
-                        "B",
-                        "A",
-                        "outlier_col3",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "outlier_col2",
-                        "a",
-                    ],
-                    "col2": [1.0, 2.0, 3.0, 4.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1000.0, None],
-                    "col3": [2, 3, 1, 1_000_000_000, 1, 1, 1, 1, 1, 1, 1, 1],
-                },
-            ),
-            Table(
-                {
-                    "col1": [
-                        "A",
-                        "B",
-                        "A",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                    ],
-                    "col2": [1.0, 2.0, 3.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, None],
-                    "col3": [2, 3, 1, 1, 1, 1, 1, 1, 1, 1],
-                },
-            ),
+            lambda: Table({"col1": [None, None]}),
+            None,
+            1,
+            Table({"col1": [None, None]}),
         ),
+        # no outliers (low threshold)
         (
-            Table(
-                {
-                    "col1": [
-                        "A",
-                        "B",
-                        "A",
-                        "positive_outlier",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "negative_outlier",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                    ],
-                    "col2": [
-                        1.0,
-                        2.0,
-                        3.0,
-                        4.0,
-                        1.0,
-                        1.0,
-                        1.0,
-                        1.0,
-                        1.0,
-                        1.0,
-                        1.0,
-                        None,
-                        1.0,
-                        2.0,
-                        1.0,
-                        4.0,
-                        1.0,
-                        3.0,
-                        1.0,
-                        2.0,
-                        1.0,
-                        4.0,
-                        1.0,
-                    ],
-                    "col3": [
-                        2,
-                        3,
-                        1,
-                        1_000_000_000_000,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        -1_000_000_000_000,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                    ],
-                },
-            ),
-            Table(
-                {
-                    "col1": [
-                        "A",
-                        "B",
-                        "A",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                        "a",
-                    ],
-                    "col2": [
-                        1.0,
-                        2.0,
-                        3.0,
-                        1.0,
-                        1.0,
-                        1.0,
-                        1.0,
-                        1.0,
-                        1.0,
-                        1.0,
-                        None,
-                        2.0,
-                        1.0,
-                        4.0,
-                        1.0,
-                        3.0,
-                        1.0,
-                        2.0,
-                        1.0,
-                        4.0,
-                        1.0,
-                    ],
-                    "col3": [2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                },
-            ),
+            lambda: Table({"col1": [1, 1, 1]}),
+            None,
+            1,
+            Table({"col1": [1, 1, 1]}),
         ),
+        # no outliers (high threshold)
         (
-            Table(
-                {
-                    "col1": [],
-                    "col2": [],
-                },
-            ),
-            Table(
-                {
-                    "col1": [],
-                    "col2": [],
-                },
-            ),
+            lambda: Table({"col1": [1, 1000]}),
+            None,
+            3,
+            Table({"col1": [1, 1000]}),
         ),
-        (Table({}), Table({})),
+        # outliers (all columns selected)
+        (
+            lambda: Table({"col1": [1, 1, 1000], "col2": [1, 1000, 1], "col3": [1000, 1, 1]}),
+            None,
+            1,
+            Table({"col1": [], "col2": [], "col3": []}),
+        ),
+        # outliers (several columns selected)
+        (
+            lambda: Table({"col1": [1, 1, 1000], "col2": [1, 1000, 1], "col3": [1000, 1, 1]}),
+            ["col1", "col2"],
+            1,
+            Table({"col1": [1], "col2": [1], "col3": [1000]}),
+        ),
+        # outliers (one column selected)
+        (
+            lambda: Table({"col1": [1, 1, 1000], "col2": [1, 1000, 1], "col3": [1000, 1, 1]}),
+            "col1",
+            1,
+            Table({"col1": [1, 1], "col2": [1, 1000], "col3": [1000, 1]}),
+        ),
+        # outliers (no columns selected)
+        (
+            lambda: Table({"col1": [1, 1, 1000], "col2": [1, 1000, 1], "col3": [1000, 1, 1]}),
+            [],
+            1,
+            Table({"col1": [1, 1, 1000], "col2": [1, 1000, 1], "col3": [1000, 1, 1]}),
+        ),
     ],
     ids=[
-        "no outliers",
-        "one outlier",
-        "outliers in two different columns",
-        "multiple outliers in one column",
-        "no rows",
         "empty",
+        "no rows",
+        "only missing values",
+        "no outliers (low threshold)",
+        "no outliers (high threshold)",
+        "outliers (all columns selected)",
+        "outliers (several columns selected)",
+        "outliers (one column selected)",
+        "outliers (no columns selected)",
     ],
 )
-def test_should_remove_rows_with_outliers(table: Table, expected: Table) -> None:
-    updated_table = table.remove_rows_with_outliers()
-    assert updated_table == expected
+class TestHappyPath:
+    def test_should_remove_rows_with_outliers(
+        self,
+        table_factory: Callable[[], Table],
+        column_names: str | list[str] | None,
+        z_score_threshold: float,
+        expected: Table,
+    ) -> None:
+        actual = table_factory().remove_rows_with_outliers(
+            column_names=column_names,
+            z_score_threshold=z_score_threshold,
+        )
+        assert actual == expected
 
-# TODO: test: threshold non-negative
+    def test_should_not_mutate_receiver(
+        self,
+        table_factory: Callable[[], Table],
+        column_names: str | list[str] | None,
+        z_score_threshold: float,
+        expected: Table,  # noqa: ARG002
+    ) -> None:
+        original = table_factory()
+        original.remove_rows_with_outliers(
+            column_names=column_names,
+            z_score_threshold=z_score_threshold,
+        )
+        assert original == table_factory()
+
+
+def test_should_raise_if_z_score_threshold_is_negative() -> None:
+    with pytest.raises(OutOfBoundsError):
+        Table({}).remove_rows_with_outliers(z_score_threshold=-1.0)
