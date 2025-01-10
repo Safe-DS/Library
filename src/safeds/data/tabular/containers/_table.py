@@ -1488,19 +1488,19 @@ class Table:
         column_names: str | list[str] | None = None,
     ) -> Table:
         """
-        Return a new table without rows containing missing values in the specified columns.
+        Return a new table without rows that contain missing values in the specified columns.
 
         **Note:** The original table is not modified.
 
         Parameters
         ----------
         column_names:
-            Names of the columns to consider. If None, all columns are considered.
+            The names of the columns to consider. If None, all columns are considered.
 
         Returns
         -------
         new_table:
-            The table without rows containing missing values in the specified columns.
+            The table without rows that contain missing values in the specified columns.
 
         Examples
         --------

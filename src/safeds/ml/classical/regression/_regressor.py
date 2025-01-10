@@ -9,8 +9,8 @@ from joblib._multiprocessing_helpers import mp
 from safeds.data.labeled.containers import TabularDataset
 from safeds.exceptions import (
     DatasetMissesDataError,
-    ModelNotFittedError,
     LengthMismatchError,
+    ModelNotFittedError,
 )
 from safeds.ml.classical import SupervisedModel
 from safeds.ml.metrics import RegressionMetrics, RegressorMetric
