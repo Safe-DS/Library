@@ -22,6 +22,7 @@ class MissingValuesColumnError(Exception):
             f" \n{column_info}{line_break + help_msg if help_msg is not None else ''}",
         )
 
+
 class IndexOutOfBoundsError(IndexError):
     """
     Exception raised for trying to access an element by an index that does not exist in the underlying data.
@@ -64,13 +65,6 @@ class OutputLengthMismatchError(Exception):
 
     def __init__(self, output_info: str):
         super().__init__(f"The length of the output container differs: \n{output_info}")
-
-
-class TransformerNotFittedError(Exception):
-    """Raised when a transformer is used before fitting it."""
-
-    def __init__(self) -> None:
-        super().__init__("The transformer has not been fitted yet.")
 
 
 class TransformerNotInvertibleError(Exception):

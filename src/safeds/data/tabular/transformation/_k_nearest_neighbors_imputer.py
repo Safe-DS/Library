@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _check_columns_exist, _ClosedBound
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import TransformerNotFittedError
+from safeds.exceptions import NotFittedError
 
 from ._table_transformer import TableTransformer
 
@@ -148,13 +148,13 @@ class KNearestNeighborsImputer(TableTransformer):
 
         Raises
         ------
-        TransformerNotFittedError
+        NotFittedError
             If the transformer is not fitted.
         ColumnNotFoundError
             If one of the columns, that should be transformed is not in the table.
         """
         if self._column_names is None or self._wrapped_transformer is None:
-            raise TransformerNotFittedError
+            raise NotFittedError(kind="transformer")
 
         _check_columns_exist(table, self._column_names)
 

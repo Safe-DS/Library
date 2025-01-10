@@ -7,7 +7,6 @@ from ._data import (
     MissingValuesColumnError,
     NonNumericColumnError,
     OutputLengthMismatchError,
-    TransformerNotFittedError,
     TransformerNotInvertibleError,
     ValueNotPresentWhenFittedError,
 )
@@ -22,7 +21,6 @@ from ._ml import (
     InvalidFitDataError,
     InvalidModelStructureError,
     LearningError,
-    ModelNotFittedError,
     PlainTableError,
     PredictionError,
     TargetDataMismatchError,
@@ -53,12 +51,33 @@ class LengthMismatchError(SafeDsError, ValueError):
     """Exception raised when objects have different lengths."""
 
 
+class NotFittedError(SafeDsError, ValueError):
+    """Exception raised when an object (e.g. a transformer or model) is not fitted."""
+
+    def __init__(self, *, kind: str = "object") -> None:
+        super().__init__(f"This {kind} has not been fitted yet.")
+
+
 class OutOfBoundsError(SafeDsError, ValueError):
     """Exception raised when a value is outside its expected range."""
 
 
 class SchemaError(SafeDsError, TypeError):
     """Exception raised when tables have incompatible schemas."""
+
+
+# class NotFittedError(Exception):
+#     """Raised when a transformer is used before fitting it."""
+#
+#     def __init__(self) -> None:
+#         super().__init__("The transformer has not been fitted yet.")
+
+
+class ModelNotFittedError(RuntimeError):
+    """Raised when a model is used before fitting it."""
+
+    def __init__(self) -> None:
+        super().__init__("The model has not been fitted yet.")
 
 
 __all__ = [
@@ -68,6 +87,7 @@ __all__ = [
     "DuplicateColumnError",
     "FileExtensionError",
     "LengthMismatchError",
+    "NotFittedError",
     "OutOfBoundsError",
     "SchemaError",
     # TODO
@@ -78,7 +98,7 @@ __all__ = [
     "MissingValuesColumnError",
     "NonNumericColumnError",
     "OutputLengthMismatchError",
-    "TransformerNotFittedError",
+    "NotFittedError",
     "TransformerNotInvertibleError",
     "ValueNotPresentWhenFittedError",
     # ML exceptions

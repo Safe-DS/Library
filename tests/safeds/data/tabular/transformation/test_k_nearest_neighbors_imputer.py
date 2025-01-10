@@ -4,7 +4,7 @@ from safeds.data.tabular.transformation import KNearestNeighborsImputer
 from safeds.exceptions import (
     ColumnNotFoundError,
     OutOfBoundsError,
-    TransformerNotFittedError,
+    NotFittedError,
 )
 
 
@@ -87,7 +87,7 @@ class TestTransform:
 
         transformer = KNearestNeighborsImputer(neighbor_count=5)
 
-        with pytest.raises(TransformerNotFittedError):
+        with pytest.raises(NotFittedError):
             transformer.transform(table)
 
 

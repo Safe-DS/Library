@@ -1,7 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import LabelEncoder
-from safeds.exceptions import ColumnNotFoundError, ColumnTypeError, TransformerNotFittedError
+from safeds.exceptions import ColumnNotFoundError, ColumnTypeError, NotFittedError
 
 
 class TestFit:
@@ -73,7 +73,7 @@ class TestTransform:
 
         transformer = LabelEncoder()
 
-        with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
+        with pytest.raises(NotFittedError, match=r"The transformer has not been fitted yet."):
             transformer.transform(table)
 
 
@@ -202,7 +202,7 @@ class TestInverseTransform:
 
         transformer = LabelEncoder()
 
-        with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
+        with pytest.raises(NotFittedError, match=r"The transformer has not been fitted yet."):
             transformer.inverse_transform(table)
 
     def test_should_raise_if_column_not_found(self) -> None:

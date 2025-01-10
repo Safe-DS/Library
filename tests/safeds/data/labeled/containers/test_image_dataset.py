@@ -18,7 +18,7 @@ from safeds.exceptions import (
     NonNumericColumnError,
     OutOfBoundsError,
     OutputLengthMismatchError,
-    TransformerNotFittedError,
+    NotFittedError,
 )
 from torch import Tensor
 from torch.types import Device
@@ -530,7 +530,7 @@ class TestColumnAsTensor:
                 ValueError,
                 r"Tensor has an invalid amount of dimensions. Needed 2 dimensions but got 3.",
             ),
-            (torch.randn(10, 10), OneHotEncoder(), TransformerNotFittedError, r""),
+            (torch.randn(10, 10), OneHotEncoder(), NotFittedError, r""),
             (
                 torch.randn(10, 10),
                 OneHotEncoder().fit(Table({"b": ["a", "b", "c"]})),

@@ -7,7 +7,7 @@ from safeds._utils import _structural_hash
 from safeds._validation import _check_columns_are_numeric, _check_columns_exist
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
-    TransformerNotFittedError,
+    NotFittedError,
 )
 
 from ._invertible_table_transformer import InvertibleTableTransformer
@@ -199,7 +199,7 @@ class OneHotEncoder(InvertibleTableTransformer):
 
         Raises
         ------
-        TransformerNotFittedError
+        NotFittedError
             If the transformer has not been fitted yet.
         ColumnNotFoundError
             If the input table does not contain all columns used to fit the transformer.
@@ -208,7 +208,7 @@ class OneHotEncoder(InvertibleTableTransformer):
 
         # Used in favor of is_fitted, so the type checker is happy
         if self._column_names is None or self._mapping is None:
-            raise TransformerNotFittedError
+            raise NotFittedError(kind="transformer")
 
         # TODO: raise schema error instead
         _check_columns_exist(table, self._column_names)
@@ -242,7 +242,7 @@ class OneHotEncoder(InvertibleTableTransformer):
 
         Raises
         ------
-        TransformerNotFittedError
+        NotFittedError
             If the transformer has not been fitted yet.
         ColumnNotFoundError
             If the input table does not contain all columns used to fit the transformer.
@@ -253,7 +253,7 @@ class OneHotEncoder(InvertibleTableTransformer):
 
         # Used in favor of is_fitted, so the type checker is happy
         if self._column_names is None or self._new_column_names is None or self._mapping is None:
-            raise TransformerNotFittedError
+            raise NotFittedError(kind="transformer")
 
         _check_columns_exist(transformed_table, self._new_column_names)
         _check_columns_are_numeric(
@@ -280,7 +280,7 @@ class OneHotEncoder(InvertibleTableTransformer):
     # TODO: remove / replace with consistent introspection methods across all transformers
     def _get_names_of_added_columns(self) -> list[str]:
         if self._new_column_names is None:
-            raise TransformerNotFittedError
+            raise NotFittedError(kind="transformer")
         return list(self._new_column_names)  # defensive copy
 
 

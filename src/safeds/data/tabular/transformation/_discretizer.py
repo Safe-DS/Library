@@ -7,7 +7,7 @@ from safeds._validation import _check_bounds, _check_columns_are_numeric, _check
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
     NonNumericColumnError,
-    TransformerNotFittedError,
+    NotFittedError,
 )
 
 from ._table_transformer import TableTransformer
@@ -140,7 +140,7 @@ class Discretizer(TableTransformer):
 
         Raises
         ------
-        TransformerNotFittedError
+        NotFittedError
             If the transformer has not been fitted yet.
         ValueError
             If the table is empty.
@@ -151,7 +151,7 @@ class Discretizer(TableTransformer):
         """
         # Transformer has not been fitted yet
         if self._wrapped_transformer is None or self._column_names is None:
-            raise TransformerNotFittedError
+            raise NotFittedError(kind="transformer")
 
         if table.row_count == 0:
             raise ValueError("The table cannot be transformed because it contains 0 rows")

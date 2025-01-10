@@ -1,7 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import RobustScaler
-from safeds.exceptions import ColumnNotFoundError, ColumnTypeError, TransformerNotFittedError
+from safeds.exceptions import ColumnNotFoundError, ColumnTypeError, NotFittedError
 
 from tests.helpers import assert_tables_are_equal
 
@@ -94,7 +94,7 @@ class TestTransform:
 
         transformer = RobustScaler()
 
-        with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
+        with pytest.raises(NotFittedError, match=r"The transformer has not been fitted yet."):
             transformer.transform(table)
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
@@ -216,7 +216,7 @@ class TestInverseTransform:
 
         transformer = RobustScaler()
 
-        with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
+        with pytest.raises(NotFittedError, match=r"The transformer has not been fitted yet."):
             transformer.inverse_transform(table)
 
     def test_should_raise_if_column_not_found(self) -> None:

@@ -1,7 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import OneHotEncoder
-from safeds.exceptions import ColumnNotFoundError, TransformerNotFittedError
+from safeds.exceptions import ColumnNotFoundError, NotFittedError
 
 
 @pytest.mark.parametrize(
@@ -123,5 +123,5 @@ def test_should_raise_if_not_fitted() -> None:
 
     transformer = OneHotEncoder()
 
-    with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
+    with pytest.raises(NotFittedError, match=r"The transformer has not been fitted yet."):
         table.transform_table(transformer)

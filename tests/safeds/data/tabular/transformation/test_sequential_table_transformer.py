@@ -9,7 +9,7 @@ from safeds.data.tabular.transformation import (
     StandardScaler,
     TableTransformer,
 )
-from safeds.exceptions import TransformerNotFittedError, TransformerNotInvertibleError
+from safeds.exceptions import NotFittedError, TransformerNotInvertibleError
 
 from tests.helpers import assert_tables_are_equal
 
@@ -63,7 +63,7 @@ class TestTransform:
             },
         )
         sequential_table_transformer = SequentialTableTransformer(transformers)
-        with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
+        with pytest.raises(NotFittedError, match=r"The transformer has not been fitted yet."):
             sequential_table_transformer.transform(test_table)
 
     @pytest.mark.parametrize(
@@ -206,5 +206,5 @@ class TestInverseTransform:
                 "col2": ["a", "b", "a"],
             },
         )
-        with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
+        with pytest.raises(NotFittedError, match=r"The transformer has not been fitted yet."):
             sequential_table_transformer.inverse_transform(test_table)

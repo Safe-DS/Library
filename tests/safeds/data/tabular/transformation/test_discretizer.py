@@ -6,7 +6,7 @@ from safeds.exceptions import (
     ColumnTypeError,
     NonNumericColumnError,
     OutOfBoundsError,
-    TransformerNotFittedError,
+    NotFittedError,
 )
 
 
@@ -147,7 +147,7 @@ class TestTransform:
 
         transformer = Discretizer()
 
-        with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
+        with pytest.raises(NotFittedError, match=r"The transformer has not been fitted yet."):
             transformer.transform(table)
 
 
