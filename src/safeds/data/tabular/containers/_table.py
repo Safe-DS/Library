@@ -43,6 +43,8 @@ if TYPE_CHECKING:
         DuplicateColumnError,
         FileExtensionError,
         LengthMismatchError,
+        NotFittedError,
+        NotInvertibleError,
         OutOfBoundsError,
     )
 
@@ -2081,12 +2083,17 @@ class Table:
         new_table:
             The inverse-transformed table.
 
+        Raises
+        ------
+        NotFittedError
+            If the transformer has not been fitted yet.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> from safeds.data.tabular.transformation import RangeScaler
         >>> table = Table({"a": [1, 2, 3]})
-        >>> transformer, transformed_table = RangeScaler(min_=0, max_=1, column_names="a").fit_and_transform(table)
+        >>> transformer, transformed_table = RangeScaler(min_=0, max_=1).fit_and_transform(table)
         >>> transformed_table.inverse_transform_table(transformer)
         +---------+
         |       a |
@@ -2188,12 +2195,17 @@ class Table:
         new_table:
             The transformed table.
 
+        Raises
+        ------
+        NotFittedError
+            If the transformer has not been fitted yet.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> from safeds.data.tabular.transformation import RangeScaler
         >>> table = Table({"a": [1, 2, 3]})
-        >>> transformer = RangeScaler(min_=0, max_=1, column_names="a").fit(table)
+        >>> transformer = RangeScaler(min_=0, max_=1).fit(table)
         >>> table.transform_table(transformer)
         +---------+
         |       a |

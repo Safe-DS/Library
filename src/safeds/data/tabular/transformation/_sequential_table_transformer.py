@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from warnings import warn
 
 from safeds._utils import _structural_hash
-from safeds.exceptions import NotFittedError, TransformerNotInvertibleError
+from safeds.exceptions import NotFittedError, NotInvertibleError
 
 from ._invertible_table_transformer import InvertibleTableTransformer
 
@@ -72,7 +72,7 @@ class SequentialTableTransformer(InvertibleTableTransformer):
 
         Raises
         ------
-        ValueError:
+        ValueError
             Raises a ValueError if the table has no rows.
         """
         if table.row_count == 0:
@@ -97,7 +97,7 @@ class SequentialTableTransformer(InvertibleTableTransformer):
         """
         Transform the table using all the transformers sequentially.
 
-        Might change the order and type of columns base on the transformers used.
+        Might change the order and type of columns based on the transformers used.
 
         Parameters
         ----------
@@ -111,8 +111,8 @@ class SequentialTableTransformer(InvertibleTableTransformer):
 
         Raises
         ------
-        NotFittedError:
-            Raises a NotFittedError if the transformer isn't fitted.
+        NotFittedError
+            If the transformer has not been fitted yet.
         """
         if not self._is_fitted:
             raise NotFittedError(kind="transformer")
@@ -141,20 +141,20 @@ class SequentialTableTransformer(InvertibleTableTransformer):
 
         Raises
         ------
-        NotFittedError:
-            Raises a NotFittedError if the transformer isn't fitted.
-        TransformerNotInvertibleError:
-            Raises a TransformerNotInvertibleError if one of the transformers isn't invertible.
+        NotFittedError
+            If the transformer has not been fitted yet.
+        NotInvertibleError
+            If the transformer is not invertible.
         """
         if not self._is_fitted:
             raise NotFittedError(kind="transformer")
 
-        # sequentially inverse transform the table with all transformers, working from the back of the list forwards.
+        # sequentially inverse-transform the table with all transformers, working from the back of the list forwards.
         current_table: Table = transformed_table
         for transformer in reversed(self._transformers):
             # check if transformer is invertible
             if not (isinstance(transformer, InvertibleTableTransformer)):
-                raise TransformerNotInvertibleError(str(type(transformer)))
+                raise NotInvertibleError(transformer)
             current_table = transformer.inverse_transform(current_table)
 
         return current_table

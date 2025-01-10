@@ -1,5 +1,9 @@
 """Custom exceptions that can be raised by Safe-DS."""
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from ._data import (
     DuplicateIndexError,
     IllegalFormatError,
@@ -7,7 +11,6 @@ from ._data import (
     MissingValuesColumnError,
     NonNumericColumnError,
     OutputLengthMismatchError,
-    TransformerNotInvertibleError,
     ValueNotPresentWhenFittedError,
 )
 from ._ml import (
@@ -26,44 +29,54 @@ from ._ml import (
     TargetDataMismatchError,
 )
 
+if TYPE_CHECKING:
+    from safeds.data.tabular.transformation import TableTransformer
+
 
 class SafeDsError(Exception):
     """Base class for all exceptions defined by Safe-DS."""
 
 
 class ColumnNotFoundError(SafeDsError, IndexError):
-    """Exception raised when trying to access an invalid column name."""
+    """Raised when trying to access an invalid column name."""
 
 
 class ColumnTypeError(SafeDsError, TypeError):
-    """Exception raised when a column has the wrong type."""
+    """Raised when a column has the wrong type."""
 
 
 class DuplicateColumnError(SafeDsError, ValueError):
-    """Exception raised when a table has duplicate column names."""
+    """Raised when a table has duplicate column names."""
 
 
 class FileExtensionError(SafeDsError, ValueError):
-    """Exception raised when a path has the wrong file extension."""
+    """Raised when a path has the wrong file extension."""
 
 
 class LengthMismatchError(SafeDsError, ValueError):
-    """Exception raised when objects have different lengths."""
+    """Raised when objects have different lengths."""
 
 
-class NotFittedError(SafeDsError, ValueError):
-    """Exception raised when an object (e.g. a transformer or model) is not fitted."""
+class NotFittedError(SafeDsError, RuntimeError):
+    """Raised when an object (e.g. a transformer or model) is not fitted."""
 
     def __init__(self, *, kind: str = "object") -> None:
         super().__init__(f"This {kind} has not been fitted yet.")
 
 
+class NotInvertibleError(SafeDsError, TypeError):
+    """Raised when inverting a non-invertible transformation."""
+
+    def __init__(self, transformer: TableTransformer) -> None:
+        super().__init__(f"A {transformer.__class__.__name__} is not invertible.")
+
+
 class OutOfBoundsError(SafeDsError, ValueError):
-    """Exception raised when a value is outside its expected range."""
+    """Raised when a value is outside its expected range."""
 
 
 class SchemaError(SafeDsError, TypeError):
-    """Exception raised when tables have incompatible schemas."""
+    """Raised when tables have incompatible schemas."""
 
 
 __all__ = [
@@ -74,6 +87,7 @@ __all__ = [
     "FileExtensionError",
     "LengthMismatchError",
     "NotFittedError",
+    "NotInvertibleError",
     "OutOfBoundsError",
     "SchemaError",
     # TODO
@@ -84,7 +98,6 @@ __all__ = [
     "MissingValuesColumnError",
     "NonNumericColumnError",
     "OutputLengthMismatchError",
-    "TransformerNotInvertibleError",
     "ValueNotPresentWhenFittedError",
     # ML exceptions
     "DatasetMissesDataError",

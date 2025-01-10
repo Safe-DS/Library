@@ -16,7 +16,8 @@ class RobustScaler(InvertibleTableTransformer):
     """
     The RobustScaler transforms column values to a range by removing the median and scaling to the interquartile range.
 
-    Currently, for columns with high stability (IQR == 0), it will only substract the median and not scale to avoid dividing by zero.
+    Currently, for columns with high stability (IQR == 0), it will only subtract the median and not scale to avoid
+    dividing by zero.
 
     Parameters
     ----------

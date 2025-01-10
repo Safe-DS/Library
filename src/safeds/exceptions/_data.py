@@ -67,13 +67,6 @@ class OutputLengthMismatchError(Exception):
         super().__init__(f"The length of the output container differs: \n{output_info}")
 
 
-class TransformerNotInvertibleError(Exception):
-    """Raised when a function tries to invert a non-invertible transformer."""
-
-    def __init__(self, transformer_type: str) -> None:
-        super().__init__(f"{transformer_type} is not invertible.")
-
-
 class ValueNotPresentWhenFittedError(Exception):
     """Exception raised when attempting to one-hot-encode a table containing values not present in the fitting phase."""
 

@@ -9,7 +9,7 @@ from safeds.data.tabular.transformation import (
     StandardScaler,
     TableTransformer,
 )
-from safeds.exceptions import NotFittedError, TransformerNotInvertibleError
+from safeds.exceptions import NotFittedError, NotInvertibleError
 
 from tests.helpers import assert_tables_are_equal
 
@@ -163,7 +163,7 @@ class TestInverseTransform:
         sequential_table_transformer = SequentialTableTransformer(transformers)
         sequential_table_transformer = sequential_table_transformer.fit(test_table)
         transformed_table = sequential_table_transformer.transform(test_table)
-        with pytest.raises(TransformerNotInvertibleError, match=r".*is not invertible."):
+        with pytest.raises(NotInvertibleError, match=r".*is not invertible."):
             sequential_table_transformer.inverse_transform(transformed_table)
 
     @pytest.mark.parametrize(
