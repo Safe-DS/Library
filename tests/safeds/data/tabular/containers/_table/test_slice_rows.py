@@ -83,7 +83,7 @@ class TestHappyPath:
         length: int | None,
         expected: Table,
     ) -> None:
-        actual = table_factory().slice_rows(start, length)
+        actual = table_factory().slice_rows(start=start, length=length)
         assert actual == expected
 
     def test_should_not_mutate_receiver(
@@ -94,11 +94,11 @@ class TestHappyPath:
         expected: Table,  # noqa: ARG002
     ) -> None:
         original = table_factory()
-        original.slice_rows(start, length)
+        original.slice_rows(start=start, length=length)
         assert original == table_factory()
 
 
 def test_should_raise_for_negative_length() -> None:
     table: Table = Table({})
     with pytest.raises(OutOfBoundsError):
-        table.slice_rows(0, -1)
+        table.slice_rows(length=-1)

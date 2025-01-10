@@ -1484,7 +1484,8 @@ class Table:
 
     def remove_rows_with_missing_values(
         self,
-        column_names: list[str] | None = None,
+        *,
+        column_names: str | list[str] | None = None,
     ) -> Table:
         """
         Return a new table without rows containing missing values in the specified columns.
@@ -1534,8 +1535,8 @@ class Table:
 
     def remove_rows_with_outliers(
         self,
-        column_names: list[str] | None = None,
         *,
+        column_names: str | list[str] | None = None,
         z_score_threshold: float = 3,
     ) -> Table:
         """
@@ -1670,7 +1671,7 @@ class Table:
             ),
         )
 
-    def slice_rows(self, start: int = 0, length: int | None = None) -> Table:
+    def slice_rows(self, *, start: int = 0, length: int | None = None) -> Table:
         """
         Return a new table with a slice of the rows.
 
