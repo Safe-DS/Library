@@ -63,6 +63,6 @@ class TestHappyPath:
         assert original == table_factory()
 
 
-def test_should_raise_error_if_duplicate_column_name() -> None:
+def test_should_raise_if_duplicate_column_name() -> None:
     with pytest.raises(DuplicateColumnError):
         Table({"col1": [1]}).add_computed_column("col1", lambda row: row["col1"])

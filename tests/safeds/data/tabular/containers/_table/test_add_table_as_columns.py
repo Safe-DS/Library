@@ -57,11 +57,11 @@ class TestHappyPath:
         assert original == table_factory()
 
 
-def test_should_raise_error_if_row_counts_differ() -> None:
+def test_should_raise_if_row_counts_differ() -> None:
     with pytest.raises(LengthMismatchError):
         Table({"col1": [1]}).add_table_as_columns(Table({"col2": [1, 2]}))
 
 
-def test_should_raise_error_if_duplicate_column_name() -> None:
+def test_should_raise_if_duplicate_column_name() -> None:
     with pytest.raises(DuplicateColumnError):
         Table({"col1": [1]}).add_table_as_columns(Table({"col1": [1]}))

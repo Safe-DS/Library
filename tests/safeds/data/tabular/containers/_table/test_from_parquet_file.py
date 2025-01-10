@@ -13,8 +13,14 @@ from tests.helpers import resolve_resource_path
         ("parquet/empty.parquet", Table({})),
         ("parquet/non-empty.parquet", Table({"A": [1], "B": [2]})),
         ("parquet/special-character.parquet", Table({"A": ["❔"], "B": [2]})),
+        ("parquet/empty", Table({})),
     ],
-    ids=["empty", "non-empty", "special character"],
+    ids=[
+        "empty",
+        "non-empty",
+        "special character",
+        "missing extension",
+    ],
 )
 class TestShouldCreateTableFromParquetFile:
     def test_path_as_string(self, path: str, expected: Table) -> None:
@@ -29,11 +35,11 @@ class TestShouldCreateTableFromParquetFile:
         assert actual == expected
 
 
-def test_should_raise_error_if_file_not_found() -> None:
+def test_should_raise_if_file_not_found() -> None:
     with pytest.raises(FileNotFoundError):
         Table.from_parquet_file(resolve_resource_path("not-found.parquet"))
 
 
-def test_should_raise_error_if_wrong_file_extension() -> None:
+def test_should_raise_if_wrong_file_extension() -> None:
     with pytest.raises(FileExtensionError):
         Table.from_parquet_file(resolve_resource_path("invalid-extension.txt"))

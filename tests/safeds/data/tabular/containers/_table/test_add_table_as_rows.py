@@ -88,6 +88,6 @@ class TestHappyPath:
         "different column types",
     ],
 )
-def test_should_raise_error_if_schemas_differ(table: Table, other: Table) -> None:
+def test_should_raise_if_schemas_differ(table: Table, other: Table) -> None:
     with pytest.raises(SchemaError):
         table.add_table_as_rows(other)

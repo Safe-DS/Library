@@ -2293,7 +2293,7 @@ class Table:
 
         Raises
         ------
-        ValueError
+        FileExtensionError
             If the path has an extension that is not ".csv".
 
         Examples
@@ -2349,7 +2349,7 @@ class Table:
 
         Raises
         ------
-        ValueError
+        FileExtensionError
             If the path has an extension that is not ".json".
 
         Examples
@@ -2383,7 +2383,7 @@ class Table:
 
         Raises
         ------
-        ValueError
+        FileExtensionError
             If the path has an extension that is not ".parquet".
 
         Examples

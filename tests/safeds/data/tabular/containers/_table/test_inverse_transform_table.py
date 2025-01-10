@@ -106,7 +106,7 @@ def test_should_not_change_transformed_table() -> None:
     assert transformed_table == expected
 
 
-def test_should_raise_error_if_not_fitted() -> None:
+def test_should_raise_if_not_fitted() -> None:
     table = Table(
         {
             "a": [1.0, 0.0, 0.0, 0.0],

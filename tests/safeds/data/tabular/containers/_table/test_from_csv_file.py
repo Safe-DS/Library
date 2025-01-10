@@ -13,8 +13,14 @@ from tests.helpers import resolve_resource_path
         ("csv/empty.csv", Table({})),
         ("csv/non-empty.csv", Table({"A": [1], "B": [2]})),
         ("csv/special-character.csv", Table({"A": ["❔"], "B": [2]})),
+        ("csv/empty", Table({})),
     ],
-    ids=["empty", "non-empty", "special character"],
+    ids=[
+        "empty",
+        "non-empty",
+        "special character",
+        "missing extension",
+    ],
 )
 class TestShouldCreateTableFromCsvFile:
     def test_path_as_string(self, path: str, expected: Table) -> None:
@@ -28,11 +34,11 @@ class TestShouldCreateTableFromCsvFile:
         assert actual == expected
 
 
-def test_should_raise_error_if_file_not_found() -> None:
+def test_should_raise_if_file_not_found() -> None:
     with pytest.raises(FileNotFoundError):
         Table.from_csv_file(resolve_resource_path("not-found.csv"))
 
 
-def test_should_raise_error_if_wrong_file_extension() -> None:
+def test_should_raise_if_wrong_file_extension() -> None:
     with pytest.raises(FileExtensionError):
         Table.from_csv_file(resolve_resource_path("invalid-extension.txt"))

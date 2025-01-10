@@ -103,7 +103,7 @@ class TestHappyPath:
         "table of new columns",
     ],
 )
-def test_should_raise_error_if_row_counts_differ(table: Table, columns: Column | list[Column] | Table) -> None:
+def test_should_raise_if_row_counts_differ(table: Table, columns: Column | list[Column] | Table) -> None:
     with pytest.raises(LengthMismatchError):
         table.add_columns(columns)
 
@@ -135,6 +135,6 @@ def test_should_raise_error_if_row_counts_differ(table: Table, columns: Column |
         "new columns clash with each",
     ],
 )
-def test_should_raise_error_if_duplicate_column_name(table: Table, columns: Column | list[Column] | Table) -> None:
+def test_should_raise_if_duplicate_column_name(table: Table, columns: Column | list[Column] | Table) -> None:
     with pytest.raises(DuplicateColumnError):
         table.add_columns(columns)
