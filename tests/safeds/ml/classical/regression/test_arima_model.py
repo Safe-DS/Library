@@ -6,8 +6,8 @@ from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
     DatasetMissesDataError,
     MissingValuesColumnError,
-    ModelNotFittedError,
     NonNumericColumnError,
+    NotFittedError,
 )
 from safeds.ml.classical.regression import AdaBoostRegressor, ArimaModelRegressor
 
@@ -148,7 +148,7 @@ def test_correct_structure_of_time_series() -> None:
 
 def test_should_raise_if_not_fitted() -> None:
     model = ArimaModelRegressor()
-    with pytest.raises(ModelNotFittedError):
+    with pytest.raises(NotFittedError):
         model.predict(create_test_data())
 
 
@@ -165,7 +165,7 @@ def test_if_fitted_fitted() -> None:
 
 def test_should_raise_if_horizon_too_small_plot() -> None:
     model = ArimaModelRegressor()
-    with pytest.raises(ModelNotFittedError):
+    with pytest.raises(NotFittedError):
         model.plot_predictions(create_test_data())
 
 

@@ -10,7 +10,7 @@ from safeds.exceptions import (
     FittingWithChoiceError,
     InvalidFitDataError,
     InvalidModelStructureError,
-    ModelNotFittedError,
+    NotFittedError,
     OutOfBoundsError,
 )
 from safeds.ml.hyperparameters import Choice
@@ -623,7 +623,7 @@ class TestClassificationModel:
 
         def test_should_raise_if_model_has_not_been_fitted(self, device: Device) -> None:
             configure_test_with_device(device)
-            with pytest.raises(ModelNotFittedError, match="The model has not been fitted yet."):
+            with pytest.raises(NotFittedError, match="The model has not been fitted yet."):
                 NeuralNetworkClassifier(
                     InputConversionTable(),
                     [ForwardLayer(neuron_count=1)],
@@ -1235,7 +1235,7 @@ class TestRegressionModel:
 
         def test_should_raise_if_model_has_not_been_fitted(self, device: Device) -> None:
             configure_test_with_device(device)
-            with pytest.raises(ModelNotFittedError, match="The model has not been fitted yet."):
+            with pytest.raises(NotFittedError, match="The model has not been fitted yet."):
                 NeuralNetworkRegressor(
                     InputConversionTable(),
                     [ForwardLayer(neuron_count=1)],

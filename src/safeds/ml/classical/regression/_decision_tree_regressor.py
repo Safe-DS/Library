@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds.data.image.containers import Image
-from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError, ModelNotFittedError
+from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError, NotFittedError
 from safeds.ml.classical._bases import _DecisionTreeBase
 from safeds.ml.hyperparameters import Choice
 
@@ -112,11 +112,11 @@ class DecisionTreeRegressor(Regressor, _DecisionTreeBase):
 
         Raises
         ------
-        ModelNotFittedError:
+        NotFittedError:
             If model is not fitted.
         """
         if not self.is_fitted:
-            raise ModelNotFittedError
+            raise NotFittedError(kind="model")
 
         from io import BytesIO
 

@@ -5,8 +5,8 @@ from safeds.exceptions import (
     ColumnNotFoundError,
     ColumnTypeError,
     NonNumericColumnError,
-    OutOfBoundsError,
     NotFittedError,
+    OutOfBoundsError,
 )
 
 

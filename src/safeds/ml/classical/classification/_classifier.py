@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Self
 from joblib._multiprocessing_helpers import mp
 
 from safeds.data.labeled.containers import TabularDataset
-from safeds.exceptions import DatasetMissesDataError, LearningError, ModelNotFittedError
+from safeds.exceptions import DatasetMissesDataError, LearningError, NotFittedError
 from safeds.ml.classical import SupervisedModel
 from safeds.ml.metrics import ClassificationMetrics, ClassifierMetric
 
@@ -48,11 +48,11 @@ class Classifier(SupervisedModel, ABC):
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the classifier has not been fitted yet.
         """
         if not self.is_fitted:
-            raise ModelNotFittedError
+            raise NotFittedError(kind="model")
 
         validation_or_test_set = _extract_table(validation_or_test_set)
 
@@ -83,11 +83,11 @@ class Classifier(SupervisedModel, ABC):
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the classifier has not been fitted yet.
         """
         if not self.is_fitted:
-            raise ModelNotFittedError
+            raise NotFittedError(kind="model")
 
         validation_or_test_set = _extract_table(validation_or_test_set)
 
@@ -123,11 +123,11 @@ class Classifier(SupervisedModel, ABC):
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the classifier has not been fitted yet.
         """
         if not self.is_fitted:
-            raise ModelNotFittedError
+            raise NotFittedError(kind="model")
 
         validation_or_test_set = _extract_table(validation_or_test_set)
 
@@ -164,11 +164,11 @@ class Classifier(SupervisedModel, ABC):
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the classifier has not been fitted yet.
         """
         if not self.is_fitted:
-            raise ModelNotFittedError
+            raise NotFittedError(kind="model")
 
         validation_or_test_set = _extract_table(validation_or_test_set)
 
@@ -201,11 +201,11 @@ class Classifier(SupervisedModel, ABC):
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the classifier has not been fitted yet.
         """
         if not self.is_fitted:
-            raise ModelNotFittedError
+            raise NotFittedError(kind="model")
 
         validation_or_test_set = _extract_table(validation_or_test_set)
 

@@ -66,20 +66,6 @@ class SchemaError(SafeDsError, TypeError):
     """Exception raised when tables have incompatible schemas."""
 
 
-# class NotFittedError(Exception):
-#     """Raised when a transformer is used before fitting it."""
-#
-#     def __init__(self) -> None:
-#         super().__init__("The transformer has not been fitted yet.")
-
-
-class ModelNotFittedError(RuntimeError):
-    """Raised when a model is used before fitting it."""
-
-    def __init__(self) -> None:
-        super().__init__("The model has not been fitted yet.")
-
-
 __all__ = [
     "SafeDsError",
     "ColumnNotFoundError",
@@ -98,7 +84,6 @@ __all__ = [
     "MissingValuesColumnError",
     "NonNumericColumnError",
     "OutputLengthMismatchError",
-    "NotFittedError",
     "TransformerNotInvertibleError",
     "ValueNotPresentWhenFittedError",
     # ML exceptions
@@ -112,7 +97,6 @@ __all__ = [
     "InputSizeError",
     "InvalidModelStructureError",
     "LearningError",
-    "ModelNotFittedError",
     "PlainTableError",
     "PredictionError",
     "TargetDataMismatchError",

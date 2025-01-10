@@ -14,7 +14,7 @@ from safeds.exceptions import (
     FeatureDataMismatchError,
     FittingWithChoiceError,
     InvalidModelStructureError,
-    ModelNotFittedError,
+    NotFittedError,
 )
 from safeds.ml.metrics import ClassificationMetrics, RegressionMetrics
 from safeds.ml.nn.converters import (
@@ -587,7 +587,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the model has not been fitted yet
         """
         import torch
@@ -595,7 +595,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         _init_default_device()
 
         if not self._is_fitted or self._model is None:
-            raise ModelNotFittedError
+            raise NotFittedError(kind="model")
         if not self._input_conversion._is_predict_data_valid(test_data):
             raise FeatureDataMismatchError
         dataloader = self._input_conversion._data_conversion_predict(test_data, self._batch_size)
@@ -1402,7 +1402,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the Model has not been fitted yet
         """
         import torch
@@ -1410,7 +1410,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         _init_default_device()
 
         if not self._is_fitted or self._model is None:
-            raise ModelNotFittedError
+            raise NotFittedError(kind="model")
         if not self._input_conversion._is_predict_data_valid(test_data):
             raise FeatureDataMismatchError
         dataloader = self._input_conversion._data_conversion_predict(test_data, self._batch_size)

@@ -3,8 +3,8 @@ from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import KNearestNeighborsImputer
 from safeds.exceptions import (
     ColumnNotFoundError,
-    OutOfBoundsError,
     NotFittedError,
+    OutOfBoundsError,
 )
 
 

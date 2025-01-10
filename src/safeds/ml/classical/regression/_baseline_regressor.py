@@ -8,7 +8,7 @@ from safeds.data.labeled.containers import TabularDataset
 from safeds.exceptions import (
     DatasetMissesDataError,
     FeatureDataMismatchError,
-    ModelNotFittedError,
+    NotFittedError,
     TargetDataMismatchError,
 )
 from safeds.ml.classical.regression import (
@@ -135,7 +135,7 @@ class BaselineRegressor:
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the model has not been fitted yet
         FeatureDataMismatchError
             If the features of the test data do not match with the features of the trained Regressor.
@@ -151,7 +151,7 @@ class BaselineRegressor:
         from safeds.ml.metrics import RegressionMetrics
 
         if not self._is_fitted:
-            raise ModelNotFittedError
+            raise NotFittedError(kind="model")
 
         # Validate data
         if not self._feature_names == test_data.features.column_names:

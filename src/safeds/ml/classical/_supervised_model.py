@@ -12,8 +12,8 @@ from safeds.exceptions import (
     DatasetMissesFeaturesError,
     LearningError,
     MissingValuesColumnError,
-    ModelNotFittedError,
     NonNumericColumnError,
+    NotFittedError,
     PlainTableError,
     PredictionError,
 )
@@ -129,7 +129,7 @@ class SupervisedModel(ABC):
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the model has not been fitted yet.
         DatasetMissesFeaturesError
             If the dataset misses feature columns.
@@ -162,12 +162,12 @@ class SupervisedModel(ABC):
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the model has not been fitted yet.
         """
         # Used in favor of is_fitted, so the type checker is happy
         if self._feature_schema is None:
-            raise ModelNotFittedError
+            raise NotFittedError(kind="model")
 
         return self._feature_schema.column_names
 
@@ -184,12 +184,12 @@ class SupervisedModel(ABC):
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the model has not been fitted yet.
         """
         # Used in favor of is_fitted, so the type checker is happy
         if self._feature_schema is None:
-            raise ModelNotFittedError
+            raise NotFittedError(kind="model")
 
         return self._feature_schema
 
@@ -206,12 +206,12 @@ class SupervisedModel(ABC):
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the model has not been fitted yet.
         """
         # Used in favor of is_fitted, so the type checker is happy
         if self._target_name is None:
-            raise ModelNotFittedError
+            raise NotFittedError(kind="model")
 
         return self._target_name
 
@@ -228,12 +228,12 @@ class SupervisedModel(ABC):
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the model has not been fitted yet.
         """
         # Used in favor of is_fitted, so the type checker is happy
         if self._target_type is None:
-            raise ModelNotFittedError
+            raise NotFittedError(kind="model")
 
         return self._target_type
 
@@ -368,7 +368,7 @@ def _predict_with_sklearn_model(
 
     Raises
     ------
-    ModelNotFittedError
+    NotFittedError
         If the model has not been fitted yet.
     DatasetMissesFeaturesError
         If the dataset misses feature columns.
@@ -383,7 +383,7 @@ def _predict_with_sklearn_model(
     """
     # Validation
     if model is None or target_name is None or feature_names is None:
-        raise ModelNotFittedError
+        raise NotFittedError(kind="model")
     if isinstance(dataset, TabularDataset):  # pragma: no cover
         dataset = dataset.features
 

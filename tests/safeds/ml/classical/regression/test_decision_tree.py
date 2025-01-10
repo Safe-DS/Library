@@ -1,7 +1,7 @@
 import pytest
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import ModelNotFittedError, OutOfBoundsError
+from safeds.exceptions import NotFittedError, OutOfBoundsError
 from safeds.ml.classical.regression import DecisionTreeRegressor
 from safeds.ml.hyperparameters import Choice
 from syrupy import SnapshotAssertion
@@ -52,7 +52,7 @@ class TestMinSampleCountInLeaves:
 class TestPlot:
     def test_should_raise_if_model_is_not_fitted(self) -> None:
         model = DecisionTreeRegressor()
-        with pytest.raises(ModelNotFittedError):
+        with pytest.raises(NotFittedError):
             model.plot()
 
     def test_should_check_that_plot_image_is_same_as_snapshot(

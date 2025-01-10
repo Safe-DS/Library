@@ -16,9 +16,9 @@ from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.exceptions import (
     IndexOutOfBoundsError,
     NonNumericColumnError,
+    NotFittedError,
     OutOfBoundsError,
     OutputLengthMismatchError,
-    NotFittedError,
 )
 from torch import Tensor
 from torch.types import Device

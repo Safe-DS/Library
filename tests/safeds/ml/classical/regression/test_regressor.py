@@ -13,8 +13,8 @@ from safeds.exceptions import (
     FittingWithoutChoiceError,
     LengthMismatchError,
     MissingValuesColumnError,
-    ModelNotFittedError,
     NonNumericColumnError,
+    NotFittedError,
     PlainTableError,
 )
 from safeds.ml.classical.regression import (
@@ -275,7 +275,7 @@ class TestPredict:
         assert valid_data == valid_data_copy
 
     def test_should_raise_if_not_fitted(self, regressor: Regressor, valid_data: TabularDataset) -> None:
-        with pytest.raises(ModelNotFittedError):
+        with pytest.raises(NotFittedError):
             regressor.predict(valid_data.features)
 
     def test_should_raise_if_dataset_misses_features(self, regressor: Regressor, valid_data: TabularDataset) -> None:
