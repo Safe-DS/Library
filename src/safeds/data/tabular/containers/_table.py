@@ -771,8 +771,9 @@ class Table:
         """
         Return a new table without columns that contain too many missing values.
 
-        How many missing values are allowed is determined by the `missing_value_ratio_threshold` parameter. If its
-        missing value ratio is greater than the threshold, the column is removed.
+        How many missing values are allowed is determined by the `missing_value_ratio_threshold` parameter. A column is
+        removed if its missing value ratio is greater than the threshold. By default, a column is removed if it contains
+        any missing values.
 
         **Notes:**
 
@@ -788,6 +789,11 @@ class Table:
         -------
         new_table:
             The table without columns that contain too many missing values.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If the `missing_value_ratio_threshold` is not between 0 and 1.
 
         Examples
         --------
@@ -1551,6 +1557,11 @@ class Table:
         -------
         new_table:
             The table without rows containing outliers in the specified columns.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If the `z_score_threshold` is less than 0.
 
         Examples
         --------
