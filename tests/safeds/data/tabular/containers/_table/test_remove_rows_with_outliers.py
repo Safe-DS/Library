@@ -262,3 +262,5 @@ from safeds.data.tabular.containers import Table
 def test_should_remove_rows_with_outliers(table: Table, expected: Table) -> None:
     updated_table = table.remove_rows_with_outliers()
     assert updated_table == expected
+
+# TODO: test: threshold non-negative

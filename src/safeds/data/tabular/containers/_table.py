@@ -434,12 +434,34 @@ class Table:
 
     @property
     def plot(self) -> TablePlotter:
-        """The plotter for the table."""
+        """
+        The plotter for the table.
+
+        Call methods of the plotter to create various plots for the table.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> plot = table.plot.box_plots()
+        """
         return TablePlotter(self)
 
     @property
     def schema(self) -> Schema:
-        """The schema of the table."""
+        """
+        The schema of the table.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.schema
+        Schema({
+            'a': Int64,
+            'b': Int64
+        })
+        """
         return _PolarsSchema(self._lazy_frame.collect_schema())
 
     @property
@@ -727,7 +749,7 @@ class Table:
         Related
         -------
         - [select_columns][safeds.data.tabular.containers._table.Table.select_columns]:
-            _Keep only_ a subset of the columns. This method accepts either column names, or a predicate.
+            Keep only a subset of the columns. This method accepts either column names, or a predicate.
         - [remove_columns_with_missing_values][safeds.data.tabular.containers._table.Table.remove_columns_with_missing_values]
         - [remove_non_numeric_columns][safeds.data.tabular.containers._table.Table.remove_non_numeric_columns]
         """
@@ -744,10 +766,13 @@ class Table:
     def remove_columns_with_missing_values(
         self,
         *,
-        max_missing_value_ratio: float = 0,
+        missing_value_ratio_threshold: float = 0,
     ) -> Table:
         """
-        Return a new table without columns that contain missing values.
+        Return a new table without columns that contain too many missing values.
+
+        How many missing values are allowed is determined by the `missing_value_ratio_threshold` parameter. If its
+        missing value ratio is greater than the threshold, the column is removed.
 
         **Notes:**
 
@@ -756,13 +781,13 @@ class Table:
 
         Parameters
         ----------
-        max_missing_value_ratio:
+        missing_value_ratio_threshold:
             The maximum missing value ratio a column can have to be kept (inclusive). Must be between 0 and 1.
 
         Returns
         -------
         new_table:
-            The table without columns that contain missing values.
+            The table without columns that contain too many missing values.
 
         Examples
         --------
@@ -781,6 +806,11 @@ class Table:
 
         Related
         -------
+        - [remove_rows_with_missing_values][safeds.data.tabular.containers._table.Table.remove_rows_with_missing_values]
+        - [SimpleImputer][safeds.data.tabular.transformation._simple_imputer.SimpleImputer]:
+            Replace missing values with a constant value or a statistic of the column.
+        - [KNearestNeighborsImputer][safeds.data.tabular.transformation._k_nearest_neighbors_imputer.KNearestNeighborsImputer]:
+            Replace missing values with a value computed from the nearest neighbors.
         - [select_columns][safeds.data.tabular.containers._table.Table.select_columns]:
             Keep only a subset of the columns. This method accepts either column names, or a predicate.
         - [remove_columns][safeds.data.tabular.containers._table.Table.remove_columns]:
@@ -791,7 +821,7 @@ class Table:
 
         _check_bounds(
             "max_missing_value_ratio",
-            max_missing_value_ratio,
+            missing_value_ratio_threshold,
             lower_bound=_ClosedBound(0),
             upper_bound=_ClosedBound(1),
         )
@@ -801,7 +831,7 @@ class Table:
                 [
                     column._series
                     for column in self.to_columns()
-                    if column.missing_value_ratio() <= max_missing_value_ratio
+                    if column.missing_value_ratio() <= missing_value_ratio_threshold
                 ],
             ),
         )
@@ -1182,6 +1212,110 @@ class Table:
         else:
             return None
 
+    def filter_rows(
+        self,
+        predicate: Callable[[Row], Cell[bool]],
+    ) -> Table:
+        """
+        Return a new table that contains only the rows that satisfy a condition.
+
+        **Note:** The original table is not modified.
+
+        Parameters
+        ----------
+        predicate:
+            The function that determines which rows to keep.
+
+        Returns
+        -------
+        new_table:
+            The table containing only the specified rows.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.filter_rows(lambda row: row["a"] == 2)
+        +-----+-----+
+        |   a |   b |
+        | --- | --- |
+        | i64 | i64 |
+        +===========+
+        |   2 |   5 |
+        +-----+-----+
+
+        Related
+        -------
+        - [filter_rows_by_column][safeds.data.tabular.containers._table.Table.filter_rows_by_column]:
+            Keep only rows that satisfy a condition on a specific column.
+        - [remove_duplicate_rows][safeds.data.tabular.containers._table.Table.remove_duplicate_rows]
+        - [remove_rows_with_missing_values][safeds.data.tabular.containers._table.Table.remove_rows_with_missing_values]
+        - [remove_rows_with_outliers][safeds.data.tabular.containers._table.Table.remove_rows_with_outliers]
+        """
+        mask = predicate(_LazyVectorizedRow(self))
+
+        return Table._from_polars_lazy_frame(
+            self._lazy_frame.filter(mask._polars_expression),
+        )
+
+    def filter_rows_by_column(
+        self,
+        name: str,
+        predicate: Callable[[Cell], Cell[bool]],
+    ) -> Table:
+        """
+        Return a new table that contains only rows that satisfy a condition on a specific column.
+
+        **Note:** The original table is not modified.
+
+        Parameters
+        ----------
+        name:
+            The name of the column.
+        predicate:
+            The function that determines which rows to keep.
+
+        Returns
+        -------
+        new_table:
+            The table containing only the specified rows.
+
+        Raises
+        ------
+        ColumnNotFoundError
+            If the column does not exist.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.filter_rows_by_column("a", lambda cell: cell == 2)
+        +-----+-----+
+        |   a |   b |
+        | --- | --- |
+        | i64 | i64 |
+        +===========+
+        |   2 |   5 |
+        +-----+-----+
+
+        Related
+        -------
+        - [filter_rows][safeds.data.tabular.containers._table.Table.filter_rows]:
+            Keep only rows that satisfy a condition.
+        - [remove_duplicate_rows][safeds.data.tabular.containers._table.Table.remove_duplicate_rows]
+        - [remove_rows_with_missing_values][safeds.data.tabular.containers._table.Table.remove_rows_with_missing_values]
+        - [remove_rows_with_outliers][safeds.data.tabular.containers._table.Table.remove_rows_with_outliers]
+        """
+        _check_columns_exist(self, name)
+
+        import polars as pl
+
+        mask = predicate(_LazyCell(pl.col(name)))
+
+        return Table._from_polars_lazy_frame(
+            self._lazy_frame.filter(mask._polars_expression),
+        )
+
     def remove_duplicate_rows(self) -> Table:
         """
         Return a new table without duplicate rows.
@@ -1206,6 +1340,15 @@ class Table:
         |   1 |   4 |
         |   2 |   5 |
         +-----+-----+
+
+        Related
+        -------
+        - [filter_rows][safeds.data.tabular.containers._table.Table.filter_rows]:
+            Keep only rows that satisfy a condition.
+        - [filter_rows_by_column][safeds.data.tabular.containers._table.Table.filter_rows_by_column]:
+            Keep only rows that satisfy a condition on a specific column.
+        - [remove_rows_with_missing_values][safeds.data.tabular.containers._table.Table.remove_rows_with_missing_values]
+        - [remove_rows_with_outliers][safeds.data.tabular.containers._table.Table.remove_rows_with_outliers]
         """
         return Table._from_polars_lazy_frame(
             self._lazy_frame.unique(maintain_order=True),
@@ -1246,15 +1389,15 @@ class Table:
 
         Related
         -------
+        - [filter_rows][safeds.data.tabular.containers._table.Table.filter_rows]:
+            Keep only rows that satisfy a condition.
+        - [filter_rows_by_column][safeds.data.tabular.containers._table.Table.filter_rows_by_column]:
+            Keep only rows that satisfy a condition on a specific column.
+        - [remove_rows_by_column][safeds.data.tabular.containers._table.Table.filter_rows_by_column]:
+            Remove rows that satisfy a condition on a specific column.
         - [remove_duplicate_rows][safeds.data.tabular.containers._table.Table.remove_duplicate_rows]
         - [remove_rows_with_missing_values][safeds.data.tabular.containers._table.Table.remove_rows_with_missing_values]
         - [remove_rows_with_outliers][safeds.data.tabular.containers._table.Table.remove_rows_with_outliers]
-        - [remove_rows_by_column][safeds.data.tabular.containers._table.Table.remove_rows_by_column]:
-            Remove rows that satisfy a condition on a specific column.
-        - filter_rows:
-            _Keep only_ rows that satisfy a condition. You can negate your predicate to achieve the same effect.
-        - filter_rows_by_column:
-            _Keep only_ rows that satisfy a condition on a specific column.
         """
         mask = predicate(_LazyVectorizedRow(self))
 
@@ -1305,16 +1448,15 @@ class Table:
 
         Related
         -------
+        - [filter_rows][safeds.data.tabular.containers._table.Table.filter_rows]:
+            Keep only rows that satisfy a condition.
+        - [filter_rows_by_column][safeds.data.tabular.containers._table.Table.filter_rows_by_column]:
+            Keep only rows that satisfy a condition on a specific column.
         - [remove_rows][safeds.data.tabular.containers._table.Table.remove_rows]:
             Remove rows that satisfy a condition.
         - [remove_duplicate_rows][safeds.data.tabular.containers._table.Table.remove_duplicate_rows]
         - [remove_rows_with_missing_values][safeds.data.tabular.containers._table.Table.remove_rows_with_missing_values]
         - [remove_rows_with_outliers][safeds.data.tabular.containers._table.Table.remove_rows_with_outliers]
-        - filter_rows:
-            _Keep_ only rows that satisfy a condition.
-        - filter_rows_by_column:
-            _Keep_ only rows that satisfy a condition on a specific column. You can negate your predicate to achieve the
-            same effect.
         """
         _check_columns_exist(self, name)
 
@@ -1357,6 +1499,20 @@ class Table:
         +===========+
         |   1 |   4 |
         +-----+-----+
+
+        Related
+        -------
+        - [remove_columns_with_missing_values][safeds.data.tabular.containers._table.Table.remove_columns_with_missing_values]
+        - [SimpleImputer][safeds.data.tabular.transformation._simple_imputer.SimpleImputer]:
+            Replace missing values with a constant value or a statistic of the column.
+        - [KNearestNeighborsImputer][safeds.data.tabular.transformation._k_nearest_neighbors_imputer.KNearestNeighborsImputer]:
+            Replace missing values with a value computed from the nearest neighbors.
+        - [filter_rows][safeds.data.tabular.containers._table.Table.filter_rows]:
+            Keep only rows that satisfy a condition.
+        - [filter_rows_by_column][safeds.data.tabular.containers._table.Table.filter_rows_by_column]:
+            Keep only rows that satisfy a condition on a specific column.
+        - [remove_duplicate_rows][safeds.data.tabular.containers._table.Table.remove_duplicate_rows]
+        - [remove_rows_with_outliers][safeds.data.tabular.containers._table.Table.remove_rows_with_outliers]
         """
         return Table._from_polars_lazy_frame(
             self._lazy_frame.drop_nulls(subset=column_names),
@@ -1389,7 +1545,7 @@ class Table:
         column_names:
             Names of the columns to consider. If None, all numeric columns are considered.
         z_score_threshold:
-            The z-score threshold for detecting outliers.
+            The z-score threshold for detecting outliers. Must be greater than or equal to 0.
 
         Returns
         -------
@@ -1419,7 +1575,22 @@ class Table:
         |    6 |   6 |
         | null |   8 |
         +------+-----+
+
+        Related
+        -------
+        - [filter_rows][safeds.data.tabular.containers._table.Table.filter_rows]:
+            Keep only rows that satisfy a condition.
+        - [filter_rows_by_column][safeds.data.tabular.containers._table.Table.filter_rows_by_column]:
+            Keep only rows that satisfy a condition on a specific column.
+        - [remove_duplicate_rows][safeds.data.tabular.containers._table.Table.remove_duplicate_rows]
+        - [remove_rows_with_missing_values][safeds.data.tabular.containers._table.Table.remove_rows_with_missing_values]
         """
+        _check_bounds(
+            "z_score_threshold",
+            z_score_threshold,
+            lower_bound=_ClosedBound(0),
+        )
+
         if self._has_no_rows:
             return self  # polars raises a ComputeError for tables without rows
         if column_names is None:

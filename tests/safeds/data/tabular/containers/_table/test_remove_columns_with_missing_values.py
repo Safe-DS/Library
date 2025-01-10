@@ -1,9 +1,10 @@
 import pytest
 from safeds.data.tabular.containers import Table
+from safeds.exceptions import OutOfBoundsError
 
 
 @pytest.mark.parametrize(
-    ("table", "max_missing_value_ratio", "expected"),
+    ("table", "missing_value_ratio_threshold", "expected"),
     [
         (
             Table({}),
@@ -40,11 +41,33 @@ from safeds.data.tabular.containers import Table
         "empty",
         "no rows",
         "no missing values",
-        "some missing values (max_missing_value_ratio=0)",
-        "some missing values (max_missing_value_ratio=0.5)",
-        "some missing values (max_missing_value_ratio=1)",
+        "some missing values (missing_value_ratio_threshold=0)",
+        "some missing values (missing_value_ratio_threshold=0.5)",
+        "some missing values (missing_value_ratio_threshold=1)",
     ],
 )
-def test_should_remove_columns_with_missing_values(table: Table, max_missing_value_ratio: int, expected: Table) -> None:
-    updated_table = table.remove_columns_with_missing_values(max_missing_value_ratio=max_missing_value_ratio)
+def test_should_remove_columns_with_missing_values(
+    table: Table,
+    missing_value_ratio_threshold: int,
+    expected: Table,
+) -> None:
+    updated_table = table.remove_columns_with_missing_values(
+        missing_value_ratio_threshold=missing_value_ratio_threshold,
+    )
     assert updated_table == expected
+
+
+@pytest.mark.parametrize(
+    "missing_value_ratio_threshold",
+    [
+        -1,
+        2,
+    ],
+    ids=[
+        "too low",
+        "too high",
+    ],
+)
+def test_should_raise_if_missing_value_ratio_threshold_out_of_bounds(missing_value_ratio_threshold: float) -> None:
+    with pytest.raises(OutOfBoundsError):
+        Table({}).remove_columns_with_missing_values(missing_value_ratio_threshold=missing_value_ratio_threshold)
