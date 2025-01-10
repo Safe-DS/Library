@@ -37,6 +37,14 @@ if TYPE_CHECKING:
         TableTransformer,
     )
     from safeds.data.tabular.typing import DataType, Schema
+    from safeds.exceptions import (  # noqa: F401
+        ColumnNotFoundError,
+        ColumnTypeError,
+        DuplicateColumnError,
+        FileExtensionError,
+        LengthMismatchError,
+        OutOfBoundsError,
+    )
 
     from ._cell import Cell
     from ._row import Row
@@ -102,7 +110,7 @@ class Table:
 
         Raises
         ------
-        ColumnLengthMismatchError
+        LengthMismatchError
             If some columns have different lengths.
         DuplicateColumnError
             If multiple columns have the same name.
