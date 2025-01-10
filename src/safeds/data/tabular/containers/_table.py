@@ -177,6 +177,11 @@ class Table:
         |   1 |   2 |   1 |
         |   0 |   0 |   7 |
         +-----+-----+-----+
+
+        Related
+        -------
+        - [from_json_file][safeds.data.tabular.containers._table.Table.from_json_file]
+        - [from_parquet_file][safeds.data.tabular.containers._table.Table.from_parquet_file]
         """
         import polars as pl
 
@@ -256,6 +261,11 @@ class Table:
         |   2 |   5 |
         |   3 |   6 |
         +-----+-----+
+
+        Related
+        -------
+        - [from_csv_file][safeds.data.tabular.containers._table.Table.from_csv_file]
+        - [from_parquet_file][safeds.data.tabular.containers._table.Table.from_parquet_file]
         """
         import polars as pl
 
@@ -302,6 +312,11 @@ class Table:
         |   2 |   5 |
         |   3 |   6 |
         +-----+-----+
+
+        Related
+        -------
+        - [from_csv_file][safeds.data.tabular.containers._table.Table.from_csv_file]
+        - [from_json_file][safeds.data.tabular.containers._table.Table.from_json_file]
         """
         import polars as pl
 
@@ -683,11 +698,6 @@ class Table:
         ColumnNotFoundError
             If a column does not exist and unknown names are not ignored.
 
-        See Also
-        --------
-        select_columns:
-            Keep only a subset of the columns. This method accepts either column names, or a predicate.
-
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
@@ -713,6 +723,13 @@ class Table:
         |   2 |   5 |
         |   3 |   6 |
         +-----+-----+
+
+        Related
+        -------
+        - [select_columns][safeds.data.tabular.containers._table.Table.select_columns]:
+            _Keep only_ a subset of the columns. This method accepts either column names, or a predicate.
+        - [remove_columns_with_missing_values][safeds.data.tabular.containers._table.Table.remove_columns_with_missing_values]
+        - [remove_non_numeric_columns][safeds.data.tabular.containers._table.Table.remove_non_numeric_columns]
         """
         if isinstance(names, str):
             names = [names]
@@ -761,6 +778,14 @@ class Table:
         |   2 |
         |   3 |
         +-----+
+
+        Related
+        -------
+        - [select_columns][safeds.data.tabular.containers._table.Table.select_columns]:
+            Keep only a subset of the columns. This method accepts either column names, or a predicate.
+        - [remove_columns][safeds.data.tabular.containers._table.Table.remove_columns]:
+            Remove columns from the table by name.
+        - [remove_non_numeric_columns][safeds.data.tabular.containers._table.Table.remove_non_numeric_columns]
         """
         import polars as pl
 
@@ -806,6 +831,14 @@ class Table:
         |   2 |
         |   3 |
         +-----+
+
+        Related
+        -------
+        - [select_columns][safeds.data.tabular.containers._table.Table.select_columns]:
+            Keep only a subset of the columns. This method accepts either column names, or a predicate.
+        - [remove_columns][safeds.data.tabular.containers._table.Table.remove_columns]:
+            Remove columns from the table by name.
+        - [remove_columns_with_missing_values][safeds.data.tabular.containers._table.Table.remove_columns_with_missing_values]
         """
         import polars.selectors as cs
 
@@ -963,9 +996,9 @@ class Table:
         selector: str | list[str] | Callable[[Column], bool],
     ) -> Table:
         """
-        Return a new table with only the specified columns.
+        Return a new table with only a subset of the columns.
 
-        **Note:**
+        **Notes:**
 
         - The original table is not modified.
         - This operation may need to fully load the data into memory, which can be expensive.
@@ -978,17 +1011,12 @@ class Table:
         Returns
         -------
         new_table:
-            The table with only the specified columns.
+            The table with only a subset of the columns.
 
         Raises
         ------
         ColumnNotFoundError
             If a column does not exist.
-
-        See Also
-        --------
-        remove_columns:
-            Remove columns from the table by name.
 
         Examples
         --------
@@ -1004,6 +1032,13 @@ class Table:
         |   2 |
         |   3 |
         +-----+
+
+        Related
+        -------
+        - [remove_columns][safeds.data.tabular.containers._table.Table.remove_columns]:
+            Remove columns from the table by name.
+        - [remove_columns_with_missing_values][safeds.data.tabular.containers._table.Table.remove_columns_with_missing_values]
+        - [remove_non_numeric_columns][safeds.data.tabular.containers._table.Table.remove_non_numeric_columns]
         """
         import polars as pl
 
@@ -1208,6 +1243,18 @@ class Table:
         |   1 |   4 |
         |   3 |   6 |
         +-----+-----+
+
+        Related
+        -------
+        - [remove_duplicate_rows][safeds.data.tabular.containers._table.Table.remove_duplicate_rows]
+        - [remove_rows_with_missing_values][safeds.data.tabular.containers._table.Table.remove_rows_with_missing_values]
+        - [remove_rows_with_outliers][safeds.data.tabular.containers._table.Table.remove_rows_with_outliers]
+        - [remove_rows_by_column][safeds.data.tabular.containers._table.Table.remove_rows_by_column]:
+            Remove rows that satisfy a condition on a specific column.
+        - filter_rows:
+            _Keep only_ rows that satisfy a condition. You can negate your predicate to achieve the same effect.
+        - filter_rows_by_column:
+            _Keep only_ rows that satisfy a condition on a specific column.
         """
         mask = predicate(_LazyVectorizedRow(self))
 
@@ -1255,6 +1302,18 @@ class Table:
         |   1 |   4 |
         |   3 |   6 |
         +-----+-----+
+
+        Related
+        -------
+        - [remove_rows][safeds.data.tabular.containers._table.Table.remove_rows]:
+            Remove rows that satisfy a condition.
+        - [remove_duplicate_rows][safeds.data.tabular.containers._table.Table.remove_duplicate_rows]
+        - [remove_rows_with_missing_values][safeds.data.tabular.containers._table.Table.remove_rows_with_missing_values]
+        - [remove_rows_with_outliers][safeds.data.tabular.containers._table.Table.remove_rows_with_outliers]
+        - filter_rows:
+            _Keep_ only rows that satisfy a condition.
+        - filter_rows_by_column:
+            _Keep_ only rows that satisfy a condition on a specific column.
         """
         _check_columns_exist(self, name)
 
@@ -1511,6 +1570,11 @@ class Table:
         |   2 |   1 |
         |   3 |   2 |
         +-----+-----+
+
+        Related
+        -------
+        - [sort_rows_by_column][safeds.data.tabular.containers._table.Table.sort_rows_by_column]:
+            Sort the rows by a specific column.
         """
         key = key_selector(_LazyVectorizedRow(self))
 
@@ -1564,6 +1628,11 @@ class Table:
         |   2 |   1 |
         |   3 |   2 |
         +-----+-----+
+
+        Related
+        -------
+        - [sort_rows][safeds.data.tabular.containers._table.Table.sort_rows]:
+            Sort the rows by a value computed from an entire row.
         """
         _check_columns_exist(self, name)
 
@@ -1700,6 +1769,10 @@ class Table:
         |   2 |   5 |
         |   3 |   6 |
         +-----+-----+
+
+        Related
+        -------
+        - [add_table_as_rows][safeds.data.tabular.containers._table.Table.add_table_as_rows]
         """
         from polars.exceptions import DuplicateError, ShapeError
 
@@ -1752,6 +1825,10 @@ class Table:
         |   5 |
         |   6 |
         +-----+
+
+        Related
+        -------
+        - [add_table_as_columns][safeds.data.tabular.containers._table.Table.add_table_as_columns]
         """
         _check_schema(self, other)
 
@@ -1986,6 +2063,11 @@ class Table:
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> table.to_csv_file("./src/resources/to_csv_file.csv")
+
+        Related
+        -------
+        - [to_json_file][safeds.data.tabular.containers._table.Table.to_json_file]
+        - [to_parquet_file][safeds.data.tabular.containers._table.Table.to_parquet_file]
         """
         path = _normalize_and_check_file_path(path, ".csv", [".csv"])
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -2037,6 +2119,11 @@ class Table:
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> table.to_json_file("./src/resources/to_json_file.json")
+
+        Related
+        -------
+        - [to_csv_file][safeds.data.tabular.containers._table.Table.to_csv_file]
+        - [to_parquet_file][safeds.data.tabular.containers._table.Table.to_parquet_file]
         """
         path = _normalize_and_check_file_path(path, ".json", [".json"])
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -2066,6 +2153,11 @@ class Table:
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> table.to_parquet_file("./src/resources/to_parquet_file.parquet")
+
+        Related
+        -------
+        - [to_csv_file][safeds.data.tabular.containers._table.Table.to_csv_file]
+        - [to_json_file][safeds.data.tabular.containers._table.Table.to_json_file]
         """
         path = _normalize_and_check_file_path(path, ".parquet", [".parquet"])
         path.parent.mkdir(parents=True, exist_ok=True)
