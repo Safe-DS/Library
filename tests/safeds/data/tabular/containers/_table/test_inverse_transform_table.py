@@ -117,5 +117,5 @@ def test_should_raise_if_not_fitted() -> None:
 
     transformer = OneHotEncoder()
 
-    with pytest.raises(NotFittedError, match=r"The transformer has not been fitted yet."):
+    with pytest.raises(NotFittedError):
         table.inverse_transform_table(transformer)

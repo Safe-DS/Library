@@ -1,10 +1,18 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import polars as pl
 
 
 class ColumnType(ABC):
-    """The type of a column in a table."""
+    """
+    The type of a column in a table.
+
+    Use the static factory methods to create instances of this class.
+    """
 
     # ------------------------------------------------------------------------------------------------------------------
     # Factory methods
@@ -302,3 +310,12 @@ class ColumnType(ABC):
         >>> ColumnType.int8().is_unsigned_int
         False
         """
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Internal
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @property
+    @abstractmethod
+    def _polars_data_type(self) -> pl.DataType:
+        """The Polars expression that corresponds to this cell."""

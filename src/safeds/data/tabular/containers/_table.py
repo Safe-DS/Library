@@ -15,7 +15,7 @@ from safeds._validation import (
     _normalize_and_check_file_path,
 )
 from safeds.data.tabular.plotting import TablePlotter
-from safeds.data.tabular.typing._polars_schema import _PolarsSchema
+from safeds.data.tabular.typing import Schema
 
 from ._column import Column
 from ._lazy_cell import _LazyCell
@@ -36,7 +36,7 @@ if TYPE_CHECKING:
         InvertibleTableTransformer,
         TableTransformer,
     )
-    from safeds.data.tabular.typing import ColumnType, Schema
+    from safeds.data.tabular.typing import ColumnType
     from safeds.exceptions import (  # noqa: F401
         ColumnNotFoundError,
         ColumnTypeError,
@@ -472,7 +472,7 @@ class Table:
             'b': Int64
         })
         """
-        return _PolarsSchema(self._lazy_frame.collect_schema())
+        return Schema._from_polars_schema(self._lazy_frame.collect_schema())
 
     # ------------------------------------------------------------------------------------------------------------------
     # Column operations
@@ -745,7 +745,7 @@ class Table:
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> table.get_column_type("a")
-        Int64
+        int64
         """
         return self.schema.get_column_type(name)
 

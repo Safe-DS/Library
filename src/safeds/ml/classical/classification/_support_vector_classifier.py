@@ -58,7 +58,7 @@ class SupportVectorClassifier(Classifier, _SupportVectorMachineBase):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def kernel(self) -> SupportVectorClassifier.Kernel | Choice[SupportVectorClassifier.Kernel | None]:
+    def kernel(self) -> SupportVectorClassifier.Kernel | Choice[SupportVectorClassifier.Kernel]:
         """The type of kernel used."""
         return self._kernel
 

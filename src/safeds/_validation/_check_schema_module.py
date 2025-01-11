@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Literal, TypeAlias
 
-from safeds.data.tabular.typing._polars_column_type import _PolarsColumnType
 from safeds.exceptions import SchemaError
 
 if TYPE_CHECKING:
@@ -97,11 +96,7 @@ def _check_types(expected_schema: Schema, actual_schema: Schema, *, check_types:
 
 
 def _get_polars_dtype(schema: Schema, column_name: str) -> pl.DataType | None:
-    column_type = schema.get_column_type(column_name)
-    if isinstance(column_type, _PolarsColumnType):
-        return column_type._dtype
-    else:
-        return None
+    return schema.get_column_type(column_name)._polars_data_type
 
 
 def _build_error_message_for_missing_columns(missing_column: list[str]) -> str:

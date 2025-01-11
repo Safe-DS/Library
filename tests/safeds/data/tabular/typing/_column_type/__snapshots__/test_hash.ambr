@@ -1,55 +1,55 @@
 # serializer version: 1
 # name: TestSameHash.test_should_return_same_hash_in_different_processes[binary]
-  116365826426
+  9114564521908245695
 # ---
 # name: TestSameHash.test_should_return_same_hash_in_different_processes[boolean]
-  116365826736
+  253312121440042057
 # ---
 # name: TestSameHash.test_should_return_same_hash_in_different_processes[date]
-  116365827418
+  1420129173814739165
 # ---
 # name: TestSameHash.test_should_return_same_hash_in_different_processes[datetime]
-  -2705491063703776435
+  5037917593634747378
 # ---
 # name: TestSameHash.test_should_return_same_hash_in_different_processes[duration]
-  -1616371525361785100
+  61885111053208984
 # ---
 # name: TestSameHash.test_should_return_same_hash_in_different_processes[float32]
-  116365827170
+  2208906555873308475
 # ---
 # name: TestSameHash.test_should_return_same_hash_in_different_processes[float64]
-  116365827294
+  7992127945058937926
 # ---
 # name: TestSameHash.test_should_return_same_hash_in_different_processes[int16]
-  116365826984
+  231909494783576033
 # ---
 # name: TestSameHash.test_should_return_same_hash_in_different_processes[int32]
-  116365827232
+  1374055615029084484
 # ---
 # name: TestSameHash.test_should_return_same_hash_in_different_processes[int64]
-  116365826798
+  1212246054477521308
 # ---
 # name: TestSameHash.test_should_return_same_hash_in_different_processes[int8]
-  116365826860
+  2269551742465714004
 # ---
 # name: TestSameHash.test_should_return_same_hash_in_different_processes[null]
-  116366171023
+  1357169886076964811
 # ---
 # name: TestSameHash.test_should_return_same_hash_in_different_processes[string]
-  116365827356
+  1529874693733179990
 # ---
 # name: TestSameHash.test_should_return_same_hash_in_different_processes[time]
-  116365827480
+  5418105405405492344
 # ---
 # name: TestSameHash.test_should_return_same_hash_in_different_processes[uint16]
-  116365826302
+  937488211706751048
 # ---
 # name: TestSameHash.test_should_return_same_hash_in_different_processes[uint32]
-  116365827046
+  859241000506496144
 # ---
 # name: TestSameHash.test_should_return_same_hash_in_different_processes[uint64]
-  116365827108
+  1728989395548489096
 # ---
 # name: TestSameHash.test_should_return_same_hash_in_different_processes[uint8]
-  116365826922
+  48638156943199247
 # ---

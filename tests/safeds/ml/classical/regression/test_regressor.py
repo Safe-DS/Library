@@ -92,7 +92,7 @@ def regressors_with_choices() -> list[Regressor]:
             penalty=LinearRegressor.Penalty.elastic_net(alpha=Choice(1.0, 2.0), lasso_ratio=Choice(0.1, 0.9)),
         ),
         RandomForestRegressor(tree_count=Choice(1, 2), max_depth=Choice(1, 2), min_sample_count_in_leaves=Choice(1, 2)),
-        SupportVectorRegressor(kernel=Choice(None, SupportVectorRegressor.Kernel.linear()), c=Choice(0.5, 1.0)),
+        SupportVectorRegressor(kernel=Choice(SupportVectorRegressor.Kernel.linear()), c=Choice(0.5, 1.0)),
     ]
 
 

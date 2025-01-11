@@ -58,7 +58,7 @@ class SupportVectorRegressor(Regressor, _SupportVectorMachineBase):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def kernel(self) -> SupportVectorRegressor.Kernel | Choice[SupportVectorRegressor.Kernel | None]:
+    def kernel(self) -> SupportVectorRegressor.Kernel | Choice[SupportVectorRegressor.Kernel]:
         """The type of kernel used."""
         return self._kernel
 
