@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Any, Literal, overload
 
 from safeds._config import _get_device, _init_default_device
 from safeds._config._polars import _get_polars_config
-from safeds._utils import _structural_hash
+from safeds._utils import _compute_duplicates, _structural_hash
 from safeds._validation import (
     _check_bounds,
     _check_columns_dont_exist,
@@ -16,6 +16,10 @@ from safeds._validation import (
 )
 from safeds.data.tabular.plotting import TablePlotter
 from safeds.data.tabular.typing import Schema
+from safeds.exceptions import (
+    DuplicateColumnError,
+    LengthMismatchError,
+)
 
 from ._column import Column
 from ._lazy_cell import _LazyCell
@@ -40,9 +44,7 @@ if TYPE_CHECKING:
     from safeds.exceptions import (  # noqa: F401
         ColumnNotFoundError,
         ColumnTypeError,
-        DuplicateColumnError,
         FileExtensionError,
-        LengthMismatchError,
         NotFittedError,
         NotInvertibleError,
         OutOfBoundsError,
@@ -2187,19 +2189,37 @@ class Table:
         left_names: str | list[str],
         right_names: str | list[str],
         *,
-        mode: Literal["inner", "left", "right", "outer"] = "inner",
+        mode: Literal["inner", "left", "right", "full"] = "inner",
     ) -> Table:
         """
-        Join the current table with another table and return the result as a new table.
+        Join the current table (left table) with another table (right table) and return the result as a new table.
+
+        Rows are matched if the values in the specified columns are equal. The parameter `left_names` controls which
+        columns are used for the left table, and `right_names` does the same for the right table.
+
+        There are various types of joins, specified by the `mode` parameter:
+
+        - `"inner"`:
+            Keep only rows that have matching values in both tables.
+        - `"left"`:
+            Keep all rows from the left table and the matching rows from the right table. Cells with no match are
+            marked as missing values.
+        - `"right"`:
+            Keep all rows from the right table and the matching rows from the left table. Cells with no match are
+            marked as missing values.
+        - `"full"`:
+            Keep all rows from both tables. Cells with no match are marked as missing values.
+
+        **Note:** The original tables are not modified.
 
         Parameters
         ----------
         right_table:
-            The other table which is to be joined to the current table.
+            The table to join with the left table.
         left_names:
-            Name or list of names of columns from the current table on which to join right_table.
+            Name or list of names of columns to join on in the left table.
         right_names:
-            Name or list of names of columns from right_table on which to join the current table.
+            Name or list of names of columns to join on in the right table.
         mode:
             Specify which type of join you want to use.
 
@@ -2208,41 +2228,107 @@ class Table:
         new_table:
             The table with the joined table.
 
+        Raises
+        ------
+        ColumnNotFoundError
+            If a column does not exist in one of the tables.
+        DuplicateColumnError
+            If a column is used multiple times in the join.
+        LengthMismatchError
+            If the number of columns to join on is different in the two tables.
+        ValueError
+            If `left_names` or `right_names` are an empty list.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
-        >>> table1 = Table({"a": [1, 2], "b": [3, 4]})
-        >>> table2 = Table({"d": [1, 5], "e": [5, 6]})
-        >>> table1.join(table2, "a", "d", mode="left")
-        +-----+-----+------+
-        |   a |   b |    e |
-        | --- | --- |  --- |
-        | i64 | i64 |  i64 |
+        >>> table1 = Table({"a": [1, 2], "b": [True, False]})
+        >>> table2 = Table({"c": [1, 3], "d": ["a", "b"]})
+        >>> table1.join(table2, "a", "c", mode="inner")
+        +-----+------+-----+
+        |   a | b    | d   |
+        | --- | ---  | --- |
+        | i64 | bool | str |
         +==================+
-        |   1 |   3 |    5 |
-        |   2 |   4 | null |
-        +-----+-----+------+
+        |   1 | true | a   |
+        +-----+------+-----+
+
+        >>> table1.join(table2, "a", "c", mode="left")
+        +-----+-------+------+
+        |   a | b     | d    |
+        | --- | ---   | ---  |
+        | i64 | bool  | str  |
+        +====================+
+        |   1 | true  | a    |
+        |   2 | false | null |
+        +-----+-------+------+
+
+        >>> table1.join(table2, "a", "c", mode="right")
+        +------+-----+-----+
+        | b    |   c | d   |
+        | ---  | --- | --- |
+        | bool | i64 | str |
+        +==================+
+        | true |   1 | a   |
+        | null |   3 | b   |
+        +------+-----+-----+
+
+        >>> table1.join(table2, "a", "c", mode="full")
+        +------+-------+------+------+
+        |    a | b     |    c | d    |
+        |  --- | ---   |  --- | ---  |
+        |  i64 | bool  |  i64 | str  |
+        +============================+
+        |    1 | true  |    1 | a    |
+        |    2 | false | null | null |
+        | null | null  |    3 | b    |
+        +------+-------+------+------+
         """
+        # Preprocessing
+        if isinstance(left_names, str):
+            left_names = [left_names]
+        if isinstance(right_names, str):
+            right_names = [right_names]
+
         # Validation
         _check_columns_exist(self, left_names)
         _check_columns_exist(right_table, right_names)
 
+        duplicate_left_names = _compute_duplicates(left_names)
+        if duplicate_left_names:
+            raise DuplicateColumnError(
+                f"Columns to join on must be unique, but left names {duplicate_left_names} are duplicated.",
+            )
+
+        duplicate_right_names = _compute_duplicates(right_names)
+        if duplicate_right_names:
+            raise DuplicateColumnError(
+                f"Columns to join on must be unique, but right names {duplicate_right_names} are duplicated.",
+            )
+
         if len(left_names) != len(right_names):
-            raise ValueError("The number of columns to join on must be the same in both tables.")
+            raise LengthMismatchError("The number of columns to join on must be the same in both tables.")
+        if not left_names or not right_names:
+            # Here both are empty, due to the previous check
+            raise ValueError("The columns to join on must not be empty.")
 
         # Implementation
-        if mode == "outer":
-            polars_mode = "full"
-        else:
-            polars_mode = mode
+        result = self._lazy_frame.join(
+            right_table._lazy_frame,
+            left_on=left_names,
+            right_on=right_names,
+            how=mode,
+            maintain_order="left_right",
+            coalesce=True,
+        )
+
+        # Can be removed once https://github.com/pola-rs/polars/issues/20670 is fixed
+        if mode == "right" and len(left_names) > 1:
+            # We must collect because of https://github.com/pola-rs/polars/issues/20671
+            result = result.collect().drop(left_names).lazy()
 
         return self._from_polars_lazy_frame(
-            self._lazy_frame.join(
-                right_table._lazy_frame,
-                left_on=left_names,
-                right_on=right_names,
-                how=polars_mode,
-            ),
+            result,
         )
 
     def transform_table(self, fitted_transformer: TableTransformer) -> Table:

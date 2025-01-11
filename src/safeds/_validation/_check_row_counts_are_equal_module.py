@@ -49,23 +49,23 @@ def _get_names_and_row_counts(data: Sequence[Column | Table] | Mapping[str, Sequ
     from safeds.data.tabular.containers import Column, Table  # circular import
 
     if isinstance(data, Mapping):
-        return [(name, len(column)) for name, column in data.items()]
+        return [(f"Column '{name}'", len(column)) for name, column in data.items()]
     else:
         result = []
 
         for i, entry in enumerate(data):
             if isinstance(entry, Column):
-                result.append((entry.name, entry.row_count))
+                result.append((f"Column '{entry.name}'", entry.row_count))
             elif isinstance(entry, Table):
-                result.append((f"table_{i}", entry.row_count))
+                result.append((f"Table {i}", entry.row_count))
 
         return result
 
 
 def _build_error_message(first_entry: tuple[str, int], mismatched_entries: list[tuple[str, int]]) -> str:
-    result = f"'{first_entry[0]}' has {first_entry[1]} rows, which differs from:"
+    result = f"{first_entry[0]} has {first_entry[1]} rows, which differs from:"
 
     for entry in mismatched_entries:
-        result += f"\n    - '{entry[0]}' ({entry[1]} rows)"
+        result += f"\n    - {entry[0]} ({entry[1]} rows)"
 
     return result

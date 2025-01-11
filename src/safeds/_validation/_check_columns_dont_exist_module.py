@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from safeds._utils import _compute_duplicates
 from safeds.exceptions import DuplicateColumnError
 
 if TYPE_CHECKING:
@@ -43,13 +44,7 @@ def _check_columns_dont_exist(
 
     # Compute the duplicate names
     known_names = set(table_or_schema.column_names) - {old_name}
-    duplicate_names = []
-
-    for name in new_names:
-        if name in known_names:
-            duplicate_names.append(name)
-        else:
-            known_names.add(name)
+    duplicate_names = _compute_duplicates(new_names, forbidden_values=known_names)
 
     # Raise an error if duplicate names exist
     if duplicate_names:
