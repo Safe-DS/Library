@@ -112,7 +112,7 @@ class Schema:
 
     def get_column_type(self, name: str) -> ColumnType:
         """
-        Get the data type of a column.
+        Get the type of a column.
 
         Parameters
         ----------
@@ -122,7 +122,7 @@ class Schema:
         Returns
         -------
         type:
-            The data type of the column.
+            The type of the column.
 
         Raises
         ------

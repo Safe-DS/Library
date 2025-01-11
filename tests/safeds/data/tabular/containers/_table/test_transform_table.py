@@ -1,127 +1,52 @@
+from collections.abc import Callable
+
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.transformation import OneHotEncoder
-from safeds.exceptions import ColumnNotFoundError, NotFittedError
+from safeds.data.tabular.transformation import RangeScaler, TableTransformer
+from safeds.exceptions import NotFittedError
 
 
+# We test the behavior of each transformer in their own test file.
 @pytest.mark.parametrize(
-    ("table", "column_names", "expected"),
+    ("table_factory", "transformer", "expected"),
     [
         (
-            Table(
-                {
-                    "col1": ["a", "b", "b", "c"],
-                },
-            ),
-            None,
-            Table(
-                {
-                    "col1__a": [1.0, 0.0, 0.0, 0.0],
-                    "col1__b": [0.0, 1.0, 1.0, 0.0],
-                    "col1__c": [0.0, 0.0, 0.0, 1.0],
-                },
-            ),
-        ),
-        (
-            Table(
-                {
-                    "col1": ["a", "b", "b", "c"],
-                    "col2": ["a", "b", "b", "c"],
-                },
-            ),
-            ["col1"],
-            Table(
-                {
-                    "col2": ["a", "b", "b", "c"],
-                    "col1__a": [1.0, 0.0, 0.0, 0.0],
-                    "col1__b": [0.0, 1.0, 1.0, 0.0],
-                    "col1__c": [0.0, 0.0, 0.0, 1.0],
-                },
-            ),
-        ),
-        (
-            Table(
-                {
-                    "col1": ["a", "b", "b", "c"],
-                    "col2": ["a", "b", "b", "c"],
-                },
-            ),
-            ["col1", "col2"],
-            Table(
-                {
-                    "col1__a": [1.0, 0.0, 0.0, 0.0],
-                    "col1__b": [0.0, 1.0, 1.0, 0.0],
-                    "col1__c": [0.0, 0.0, 0.0, 1.0],
-                    "col2__a": [1.0, 0.0, 0.0, 0.0],
-                    "col2__b": [0.0, 1.0, 1.0, 0.0],
-                    "col2__c": [0.0, 0.0, 0.0, 1.0],
-                },
-            ),
-        ),
-        (
-            Table(
-                {
-                    "col1": ["a", "b", "c"],
-                },
-            ),
-            [],
-            Table(
-                {
-                    "col1": ["a", "b", "c"],
-                },
-            ),
+            lambda: Table({"col1": [1, 2, 3]}),
+            RangeScaler(),
+            Table({"col1": [0.0, 0.5, 1.0]}),
         ),
     ],
-    ids=["all columns", "one column", "multiple columns", "none"],
-)
-def test_should_return_transformed_table(
-    table: Table,
-    column_names: list[str] | None,
-    expected: Table,
-) -> None:
-    transformer = OneHotEncoder(column_names=column_names).fit(table)
-    assert table.transform_table(transformer) == expected
-
-
-@pytest.mark.parametrize(
-    "table_to_fit",
-    [
-        Table(
-            {
-                "col1": ["a", "b", "c"],
-            },
-        ),
-        Table({}),
+    ids=[
+        "with data",
     ],
-    ids=["non-empty table", "empty table"],
 )
-def test_should_raise_if_column_not_found(table_to_fit: Table) -> None:
-    table_to_fit = Table(
-        {
-            "col1": ["a", "b", "c"],
-        },
-    )
+class TestHappyPath:
+    def test_should_return_transformed_table(
+        self,
+        table_factory: Callable[[], Table],
+        transformer: TableTransformer,
+        expected: Table,
+    ) -> None:
+        table = table_factory()
+        fitted_transformer = transformer.fit(table)
+        actual = table.transform_table(fitted_transformer)
+        assert actual == expected
 
-    transformer = OneHotEncoder().fit(table_to_fit)
-
-    table_to_transform = Table(
-        {
-            "col2": ["a", "b", "c"],
-        },
-    )
-
-    with pytest.raises(ColumnNotFoundError):
-        table_to_transform.transform_table(transformer)
+    def test_should_not_mutate_receiver(
+        self,
+        table_factory: Callable[[], Table],
+        transformer: TableTransformer,
+        expected: Table,  # noqa: ARG002
+    ) -> None:
+        original = table_factory()
+        fitted_transformer = transformer.fit(original)
+        original.transform_table(fitted_transformer)
+        assert original == table_factory()
 
 
 def test_should_raise_if_not_fitted() -> None:
-    table = Table(
-        {
-            "col1": ["a", "b", "c"],
-        },
-    )
-
-    transformer = OneHotEncoder()
+    table = Table({})
+    transformer = RangeScaler()
 
     with pytest.raises(NotFittedError):
         table.transform_table(transformer)

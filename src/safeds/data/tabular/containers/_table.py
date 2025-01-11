@@ -483,7 +483,7 @@ class Table:
         columns: Column | list[Column] | Table,
     ) -> Table:
         """
-        Return a new table with additional columns.
+        Add columns to the table and return the result as a new table.
 
         **Notes:**
 
@@ -557,7 +557,7 @@ class Table:
         computer: Callable[[Row], Cell],
     ) -> Table:
         """
-        Return a new table with an additional computed column.
+        Add a computed column to the table and return the result as a new table.
 
         **Note:** The original table is not modified.
 
@@ -615,7 +615,7 @@ class Table:
 
     def add_index_column(self, name: str, *, first_index: int = 0) -> Table:
         """
-        Return a new table with an additional index column.
+        Add an index column to the table and return the result as a new table.
 
         **Note:** The original table is not modified.
 
@@ -723,7 +723,7 @@ class Table:
 
     def get_column_type(self, name: str) -> ColumnType:
         """
-        Get the data type of a column.
+        Get the type of a column.
 
         Parameters
         ----------
@@ -733,7 +733,7 @@ class Table:
         Returns
         -------
         type:
-            The data type of the column.
+            The type of the column.
 
         Raises
         ------
@@ -782,7 +782,7 @@ class Table:
         ignore_unknown_names: bool = False,
     ) -> Table:
         """
-        Return a new table without the specified columns.
+        Remove the specified columns from the table and return the result as a new table.
 
         **Note:** The original table is not modified.
 
@@ -853,7 +853,7 @@ class Table:
         missing_value_ratio_threshold: float = 0,
     ) -> Table:
         """
-        Return a new table without columns that contain too many missing values.
+        Remove columns with too many missing values and return the result as a new table.
 
         How many missing values are allowed is determined by the `missing_value_ratio_threshold` parameter. A column is
         removed if its missing value ratio is greater than the threshold. By default, a column is removed if it contains
@@ -928,7 +928,7 @@ class Table:
 
     def remove_non_numeric_columns(self) -> Table:
         """
-        Return a new table without non-numeric columns.
+        Remove non-numeric columns and return the result as a new table.
 
         **Note:** The original table is not modified.
 
@@ -968,7 +968,7 @@ class Table:
 
     def rename_column(self, old_name: str, new_name: str) -> Table:
         """
-        Return a new table with a column renamed.
+        Rename a column and return the result as a new table.
 
         **Note:** The original table is not modified.
 
@@ -1017,7 +1017,7 @@ class Table:
         new_columns: Column | list[Column] | Table,
     ) -> Table:
         """
-        Return a new table with a column replaced by zero or more columns.
+        Replace a column with zero or more columns and return the result as a new table.
 
         **Note:** The original table is not modified.
 
@@ -1116,7 +1116,7 @@ class Table:
         selector: str | list[str] | Callable[[Column], bool],
     ) -> Table:
         """
-        Return a new table with only a subset of the columns.
+        Select a subset of the columns and return the result as a new table.
 
         **Notes:**
 
@@ -1185,7 +1185,7 @@ class Table:
         transformer: Callable[[Cell], Cell],
     ) -> Table:
         """
-        Return a new table with a column transformed.
+        Transform a column with a custom function and return the result as a new table.
 
         **Note:** The original table is not modified.
 
@@ -1265,7 +1265,7 @@ class Table:
         ignore_unknown: bool = True,
     ) -> int | None:
         """
-        Return how many rows in the table satisfy the predicate.
+        Count how many rows in the table satisfy the predicate.
 
         The predicate can return one of three results:
 
@@ -1314,7 +1314,7 @@ class Table:
         predicate: Callable[[Row], Cell[bool]],
     ) -> Table:
         """
-        Return a new table that contains only the rows that satisfy a condition.
+        Keep only rows that satisfy a condition and return the result as a new table.
 
         **Note:** The original table is not modified.
 
@@ -1361,7 +1361,7 @@ class Table:
         predicate: Callable[[Cell], Cell[bool]],
     ) -> Table:
         """
-        Return a new table that contains only rows that satisfy a condition on a specific column.
+        Keep only rows that satisfy a condition on a specific column and return the result as a new table.
 
         **Note:** The original table is not modified.
 
@@ -1415,7 +1415,7 @@ class Table:
 
     def remove_duplicate_rows(self) -> Table:
         """
-        Return a new table without duplicate rows.
+        Remove duplicate rows and return the result as a new table.
 
         **Note:** The original table is not modified.
 
@@ -1456,7 +1456,7 @@ class Table:
         predicate: Callable[[Row], Cell[bool]],
     ) -> Table:
         """
-        Return a new table without rows that satisfy a condition.
+        Remove rows that satisfy a condition and return the result as a new table.
 
         **Note:** The original table is not modified.
 
@@ -1508,7 +1508,7 @@ class Table:
         predicate: Callable[[Cell], Cell[bool]],
     ) -> Table:
         """
-        Return a new table without rows that satisfy a condition on a specific column.
+        Remove rows that satisfy a condition on a specific column and return the result as a new table.
 
         **Note:** The original table is not modified.
 
@@ -1571,9 +1571,11 @@ class Table:
         column_names: str | list[str] | None = None,
     ) -> Table:
         """
-        Return a new table without rows that contain missing values in the specified columns.
+        Remove rows that contain missing values in the specified columns and return the result as a new table.
 
-        The resulting table no longer has missing values in the specified columns.
+        The resulting table no longer has missing values in the specified columns. Be aware that this method can discard
+        a lot of data. Consider first removing columns with many missing values, or using one of the imputation methods
+        (see "Related" section).
 
         **Note:** The original table is not modified.
 
@@ -1639,7 +1641,7 @@ class Table:
         z_score_threshold: float = 3,
     ) -> Table:
         """
-        Return a new table without rows that contain outliers in the specified columns.
+        Remove rows that contain outliers in the specified columns and return the result as a new table.
 
         Whether a value is an outlier in a column is determined by its z-score. The z-score the distance of the value
         from the mean of the column divided by the standard deviation of the column. If the z-score is greater than the
@@ -1734,7 +1736,7 @@ class Table:
 
     def shuffle_rows(self, *, seed: int = 0) -> Table:
         """
-        Return a new table with the rows shuffled.
+        Shuffle the rows and return the result as a new table.
 
         **Notes:**
 
@@ -1776,7 +1778,7 @@ class Table:
 
     def slice_rows(self, *, start: int = 0, length: int | None = None) -> Table:
         """
-        Return a new table with a slice of the rows.
+        Slice the rows and return the result as a new table.
 
         **Note:** The original table is not modified.
 
@@ -1835,7 +1837,7 @@ class Table:
         descending: bool = False,
     ) -> Table:
         """
-        Return a new table with the rows sorted.
+        Sort the rows by a custom function and return the result as a new table.
 
         **Note:** The original table is not modified.
 
@@ -1888,7 +1890,7 @@ class Table:
         descending: bool = False,
     ) -> Table:
         """
-        Return a new table with the rows sorted by a specific column.
+        Sort the rows by a specific column and return the result as a new table.
 
         **Note:** The original table is not modified.
 
@@ -2025,7 +2027,7 @@ class Table:
 
     def add_table_as_columns(self, other: Table) -> Table:
         """
-        Return a new table with the columns of another table added.
+        Add the columns of another table and return the result as a new table.
 
         **Notes:**
 
@@ -2085,7 +2087,7 @@ class Table:
 
     def add_table_as_rows(self, other: Table) -> Table:
         """
-        Return a new table with the rows of another table added.
+        Add the rows of another table and return the result as a new table.
 
         **Notes:**
 
@@ -2133,7 +2135,7 @@ class Table:
 
     def inverse_transform_table(self, fitted_transformer: InvertibleTableTransformer) -> Table:
         """
-        Return a new table inverse-transformed by a **fitted, invertible** transformer.
+        Inverse-transform the table by a **fitted, invertible** transformer and return the result as a new table.
 
         **Notes:**
 
@@ -2188,7 +2190,7 @@ class Table:
         mode: Literal["inner", "left", "right", "outer"] = "inner",
     ) -> Table:
         """
-        Join a table with the current table and return the result.
+        Join the current table with another table and return the result as a new table.
 
         Parameters
         ----------
@@ -2245,7 +2247,7 @@ class Table:
 
     def transform_table(self, fitted_transformer: TableTransformer) -> Table:
         """
-        Return a new table transformed by a **fitted** transformer.
+        Transform the table with a **fitted** transformer and return the result as a new table.
 
         **Notes:**
 

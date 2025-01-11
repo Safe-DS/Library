@@ -285,7 +285,7 @@ class Column(Sequence[T_co]):
         ignore_unknown: bool = True,
     ) -> bool | None:
         """
-        Return whether all values in the column satisfy the predicate.
+        Check whether all values in the column satisfy the predicate.
 
         The predicate can return one of three values:
 
@@ -360,7 +360,7 @@ class Column(Sequence[T_co]):
         ignore_unknown: bool = True,
     ) -> bool | None:
         """
-        Return whether any value in the column satisfies the predicate.
+        Check whether any value in the column satisfies the predicate.
 
         The predicate can return one of three values:
 
@@ -435,7 +435,7 @@ class Column(Sequence[T_co]):
         ignore_unknown: bool = True,
     ) -> int | None:
         """
-        Return how many values in the column satisfy the predicate.
+        Count how many values in the column satisfy the predicate.
 
         The predicate can return one of three results:
 
@@ -505,7 +505,7 @@ class Column(Sequence[T_co]):
         ignore_unknown: bool = True,
     ) -> bool | None:
         """
-        Return whether no value in the column satisfies the predicate.
+        Check whether no value in the column satisfies the predicate.
 
         The predicate can return one of three values:
 
@@ -563,7 +563,7 @@ class Column(Sequence[T_co]):
 
     def rename(self, new_name: str) -> Column[T_co]:
         """
-        Return a new column with a new name.
+        Rename the column and return the result as a new column.
 
         **Note:** The original column is not modified.
 
@@ -599,7 +599,7 @@ class Column(Sequence[T_co]):
         transformer: Callable[[Cell[T_co]], Cell[R_co]],
     ) -> Column[R_co]:
         """
-        Return a new column with values transformed by the transformer.
+        Transform the valus in the column and return the result as a new column.
 
         **Note:** The original column is not modified.
 
@@ -642,7 +642,7 @@ class Column(Sequence[T_co]):
 
     def summarize_statistics(self) -> Table:
         """
-        Return a table with important statistics about the column.
+        Create a table with important statistics about the column.
 
         Returns
         -------
@@ -804,7 +804,7 @@ class Column(Sequence[T_co]):
 
     def idness(self) -> float:
         """
-        Calculate the idness of this column.
+        Return the idness of this column.
 
         We define the idness as the number of distinct values (including missing values) divided by the number of rows.
         If the column is empty, the idness is 1.0.
