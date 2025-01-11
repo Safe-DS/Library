@@ -20,9 +20,9 @@ from syrupy import SnapshotAssertion
 )
 class TestSameHash:
     def test_should_return_same_hash_for_equal_tables(self, table_factory: Callable[[], Table]) -> None:
-        table1 = table_factory()
-        table2 = table_factory()
-        assert hash(table1) == hash(table2)
+        table_1 = table_factory()
+        table_2 = table_factory()
+        assert hash(table_1) == hash(table_2)
 
     def test_should_return_same_hash_in_different_processes(
         self,
@@ -34,7 +34,7 @@ class TestSameHash:
 
 
 @pytest.mark.parametrize(
-    ("table1", "table2"),
+    ("table_1", "table_2"),
     [
         # too few columns
         (
@@ -82,5 +82,5 @@ class TestSameHash:
         "too many rows",
     ],
 )
-def test_should_return_different_hash_for_unequal_tables_if_computation_is_fast(table1: Table, table2: Table) -> None:
-    assert hash(table1) != hash(table2)
+def test_should_return_different_hash_for_unequal_tables_if_computation_is_fast(table_1: Table, table_2: Table) -> None:
+    assert hash(table_1) != hash(table_2)

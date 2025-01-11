@@ -1,8 +1,8 @@
 import polars as pl
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.typing import DataType
-from safeds.data.tabular.typing._polars_data_type import _PolarsDataType
+from safeds.data.tabular.typing import ColumnType
+from safeds.data.tabular.typing._polars_data_type import _PolarsColumnType
 from safeds.exceptions import ColumnNotFoundError
 
 
@@ -12,17 +12,17 @@ from safeds.exceptions import ColumnNotFoundError
         (
             Table({"col1": [1]}),
             "col1",
-            _PolarsDataType(pl.Int64()),
+            _PolarsColumnType(pl.Int64()),
         ),
         (
             Table({"col1": ["a"]}),
             "col1",
-            _PolarsDataType(pl.String()),
+            _PolarsColumnType(pl.String()),
         ),
     ],
     ids=["int column", "string column"],
 )
-def test_should_return_data_type_of_column(table: Table, name: str, expected: DataType) -> None:
+def test_should_return_data_type_of_column(table: Table, name: str, expected: ColumnType) -> None:
     assert table.get_column_type(name) == expected
 
 

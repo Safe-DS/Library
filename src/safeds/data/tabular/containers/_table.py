@@ -36,7 +36,7 @@ if TYPE_CHECKING:
         InvertibleTableTransformer,
         TableTransformer,
     )
-    from safeds.data.tabular.typing import DataType, Schema
+    from safeds.data.tabular.typing import ColumnType, Schema
     from safeds.exceptions import (  # noqa: F401
         ColumnNotFoundError,
         ColumnTypeError,
@@ -351,7 +351,7 @@ class Table:
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, data: Mapping[str, Sequence[Any]]) -> None:
+    def __init__(self, data: Mapping[str, Sequence[object]]) -> None:
         import polars as pl
 
         # Validation
@@ -721,7 +721,7 @@ class Table:
             self._lazy_frame.select(name).collect().get_column(name),
         )
 
-    def get_column_type(self, name: str) -> DataType:
+    def get_column_type(self, name: str) -> ColumnType:
         """
         Get the data type of a column.
 

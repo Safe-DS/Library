@@ -5,7 +5,7 @@ from safeds.data.tabular.containers import Column, Table
 
 
 @pytest.mark.parametrize(
-    ("table1", "table2", "expected"),
+    ("table_1", "table_2", "expected"),
     [
         # equal (empty)
         (
@@ -98,8 +98,8 @@ from safeds.data.tabular.containers import Column, Table
         "not equal (different values)",
     ],
 )
-def test_should_return_whether_tables_are_equal(table1: Table, table2: Table, expected: bool) -> None:
-    assert (table1.__eq__(table2)) == expected
+def test_should_return_whether_tables_are_equal(table_1: Table, table_2: Table, expected: bool) -> None:
+    assert (table_1.__eq__(table_2)) == expected
 
 
 @pytest.mark.parametrize(

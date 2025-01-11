@@ -1,0 +1,55 @@
+# serializer version: 1
+# name: TestSameHash.test_should_return_same_hash_in_different_processes[binary]
+  116365826426
+# ---
+# name: TestSameHash.test_should_return_same_hash_in_different_processes[boolean]
+  116365826736
+# ---
+# name: TestSameHash.test_should_return_same_hash_in_different_processes[date]
+  116365827418
+# ---
+# name: TestSameHash.test_should_return_same_hash_in_different_processes[datetime]
+  -2705491063703776435
+# ---
+# name: TestSameHash.test_should_return_same_hash_in_different_processes[duration]
+  -1616371525361785100
+# ---
+# name: TestSameHash.test_should_return_same_hash_in_different_processes[float32]
+  116365827170
+# ---
+# name: TestSameHash.test_should_return_same_hash_in_different_processes[float64]
+  116365827294
+# ---
+# name: TestSameHash.test_should_return_same_hash_in_different_processes[int16]
+  116365826984
+# ---
+# name: TestSameHash.test_should_return_same_hash_in_different_processes[int32]
+  116365827232
+# ---
+# name: TestSameHash.test_should_return_same_hash_in_different_processes[int64]
+  116365826798
+# ---
+# name: TestSameHash.test_should_return_same_hash_in_different_processes[int8]
+  116365826860
+# ---
+# name: TestSameHash.test_should_return_same_hash_in_different_processes[null]
+  116366171023
+# ---
+# name: TestSameHash.test_should_return_same_hash_in_different_processes[string]
+  116365827356
+# ---
+# name: TestSameHash.test_should_return_same_hash_in_different_processes[time]
+  116365827480
+# ---
+# name: TestSameHash.test_should_return_same_hash_in_different_processes[uint16]
+  116365826302
+# ---
+# name: TestSameHash.test_should_return_same_hash_in_different_processes[uint32]
+  116365827046
+# ---
+# name: TestSameHash.test_should_return_same_hash_in_different_processes[uint64]
+  116365827108
+# ---
+# name: TestSameHash.test_should_return_same_hash_in_different_processes[uint8]
+  116365826922
+# ---

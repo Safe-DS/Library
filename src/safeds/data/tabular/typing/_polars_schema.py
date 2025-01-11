@@ -6,20 +6,20 @@ from typing import TYPE_CHECKING
 from safeds._utils import _structural_hash
 from safeds._validation import _check_columns_exist
 
-from ._polars_data_type import _PolarsDataType
+from ._polars_column_type import _PolarsColumnType
 from ._schema import Schema
 
 if TYPE_CHECKING:
     import polars as pl
 
-    from safeds.data.tabular.typing import DataType
+    from safeds.data.tabular.typing import ColumnType
 
 
 class _PolarsSchema(Schema):
     """
     The schema of a row or table.
 
-    This implementation is based on Polars' data types.
+    This implementation is based on the data types of polars.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -72,10 +72,10 @@ class _PolarsSchema(Schema):
     # Getters
     # ------------------------------------------------------------------------------------------------------------------
 
-    def get_column_type(self, name: str) -> DataType:
+    def get_column_type(self, name: str) -> ColumnType:
         _check_columns_exist(self, name)
 
-        return _PolarsDataType(self._schema[name])
+        return _PolarsColumnType(self._schema[name])
 
     def has_column(self, name: str) -> bool:
         return name in self._schema
@@ -84,8 +84,8 @@ class _PolarsSchema(Schema):
     # Conversion
     # ------------------------------------------------------------------------------------------------------------------
 
-    def to_dict(self) -> dict[str, DataType]:
-        return {name: _PolarsDataType(type_) for name, type_ in self._schema.items()}
+    def to_dict(self) -> dict[str, ColumnType]:
+        return {name: _PolarsColumnType(type_) for name, type_ in self._schema.items()}
 
     # ------------------------------------------------------------------------------------------------------------------
     # IPython integration

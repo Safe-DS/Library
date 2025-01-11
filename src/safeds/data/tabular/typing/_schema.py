@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ._data_type import DataType
+    from ._data_type import ColumnType
 
 
 class Schema(ABC):
@@ -57,7 +57,7 @@ class Schema(ABC):
     # ------------------------------------------------------------------------------------------------------------------
 
     @abstractmethod
-    def get_column_type(self, name: str) -> DataType:
+    def get_column_type(self, name: str) -> ColumnType:
         """
         Return the type of the given column.
 
@@ -114,7 +114,7 @@ class Schema(ABC):
     # ------------------------------------------------------------------------------------------------------------------
 
     @abstractmethod
-    def to_dict(self) -> dict[str, DataType]:
+    def to_dict(self) -> dict[str, ColumnType]:
         """
         Return a dictionary that maps column names to column types.
 

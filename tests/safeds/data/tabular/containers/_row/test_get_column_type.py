@@ -1,7 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.containers._lazy_vectorized_row import _LazyVectorizedRow
-from safeds.data.tabular.typing import DataType
+from safeds.data.tabular.typing import ColumnType
 
 
 @pytest.mark.parametrize(
@@ -15,6 +15,6 @@ from safeds.data.tabular.typing import DataType
         "two columns",
     ],
 )
-def test_should_return_the_type_of_the_column(table: Table, column_name: str, expected: DataType) -> None:
+def test_should_return_the_type_of_the_column(table: Table, column_name: str, expected: ColumnType) -> None:
     row = _LazyVectorizedRow(table=table)
     assert str(row.get_column_type(column_name)) == expected

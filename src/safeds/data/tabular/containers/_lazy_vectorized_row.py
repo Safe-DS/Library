@@ -8,7 +8,7 @@ from ._lazy_cell import _LazyCell
 from ._row import Row
 
 if TYPE_CHECKING:
-    from safeds.data.tabular.typing import DataType, Schema
+    from safeds.data.tabular.typing import ColumnType, Schema
 
     from ._table import Table
 
@@ -71,7 +71,7 @@ class _LazyVectorizedRow(Row):
 
         return _LazyCell(pl.col(name))
 
-    def get_column_type(self, name: str) -> DataType:
+    def get_column_type(self, name: str) -> ColumnType:
         return self._table.get_column_type(name)
 
     def has_column(self, name: str) -> bool:

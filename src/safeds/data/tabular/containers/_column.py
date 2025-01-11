@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, Literal, TypeVar, overload
 from safeds._utils import _structural_hash
 from safeds._validation import _check_column_is_numeric
 from safeds.data.tabular.plotting import ColumnPlotter
-from safeds.data.tabular.typing._polars_data_type import _PolarsDataType
+from safeds.data.tabular.typing._polars_column_type import _PolarsColumnType
 from safeds.exceptions import (
     IndexOutOfBoundsError,
     LengthMismatchError,
@@ -18,7 +18,7 @@ from ._lazy_cell import _LazyCell
 if TYPE_CHECKING:
     from polars import Series
 
-    from safeds.data.tabular.typing import DataType
+    from safeds.data.tabular.typing import ColumnType
 
     from ._cell import Cell
     from ._table import Table
@@ -156,9 +156,9 @@ class Column(Sequence[T_co]):
         return ColumnPlotter(self)
 
     @property
-    def type(self) -> DataType:
+    def type(self) -> ColumnType:
         """The type of the column."""
-        return _PolarsDataType(self._series.dtype)
+        return _PolarsColumnType(self._series.dtype)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Value operations

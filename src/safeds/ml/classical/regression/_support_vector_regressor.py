@@ -37,7 +37,7 @@ class SupportVectorRegressor(Regressor, _SupportVectorMachineBase):
         self,
         *,
         c: float | Choice[float] = 1.0,
-        kernel: SupportVectorRegressor.Kernel | None | Choice[SupportVectorRegressor.Kernel | None] = None,
+        kernel: SupportVectorRegressor.Kernel | Choice[SupportVectorRegressor.Kernel] | None = None,
     ) -> None:
         # Initialize superclasses
         Regressor.__init__(self)

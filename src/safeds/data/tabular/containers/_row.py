@@ -5,7 +5,7 @@ from collections.abc import Iterator, Mapping
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from safeds.data.tabular.typing import DataType, Schema
+    from safeds.data.tabular.typing import ColumnType, Schema
 
     from ._cell import Cell
 
@@ -110,7 +110,7 @@ class Row(ABC, Mapping[str, Any]):
         """
 
     @abstractmethod
-    def get_column_type(self, name: str) -> DataType:
+    def get_column_type(self, name: str) -> ColumnType:
         """
         Get the type of the specified column.
 

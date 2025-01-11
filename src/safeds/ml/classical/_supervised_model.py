@@ -21,7 +21,7 @@ from safeds.exceptions import (
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin, RegressorMixin
 
-    from safeds.data.tabular.typing import DataType, Schema
+    from safeds.data.tabular.typing import ColumnType, Schema
 
 
 class SupervisedModel(ABC):
@@ -36,7 +36,7 @@ class SupervisedModel(ABC):
     def __init__(self) -> None:
         self._feature_schema: Schema | None = None
         self._target_name: str | None = None
-        self._target_type: DataType | None = None
+        self._target_type: ColumnType | None = None
         self._wrapped_model: ClassifierMixin | RegressorMixin | None = None
 
     # The decorator ensures that the method is overridden in all subclasses
@@ -215,7 +215,7 @@ class SupervisedModel(ABC):
 
         return self._target_name
 
-    def get_target_type(self) -> DataType:
+    def get_target_type(self) -> ColumnType:
         """
         Return the type of the target column.
 
