@@ -65,4 +65,4 @@ class TestHappyPath:
 
 def test_should_raise_if_duplicate_column_name() -> None:
     with pytest.raises(DuplicateColumnError):
-        Table({"col1": [1]}).add_computed_column("col1", lambda row: row["col1"])
+        Table({"col1": []}).add_computed_column("col1", lambda row: row["col1"])

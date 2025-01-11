@@ -527,10 +527,7 @@ class Table:
         -------
         - [add_computed_column][safeds.data.tabular.containers._table.Table.add_computed_column]:
             Add a column with values computed from other columns.
-        - [remove_columns][safeds.data.tabular.containers._table.Table.remove_columns]:
-            Remove columns from the table by name.
-        - [select_columns][safeds.data.tabular.containers._table.Table.select_columns]:
-            Keep only a subset of the columns. This method accepts either column names, or a predicate.
+        - [add_index_column][safeds.data.tabular.containers._table.Table.add_index_column]
         """
         from polars.exceptions import DuplicateError, ShapeError
 
@@ -600,6 +597,7 @@ class Table:
         -------
         - [add_columns][safeds.data.tabular.containers._table.Table.add_columns]:
             Add column objects to the table.
+        - [add_index_column][safeds.data.tabular.containers._table.Table.add_index_column]
         - [transform_column][safeds.data.tabular.containers._table.Table.transform_column]:
             Transform an existing column with a custom function.
         """
@@ -613,6 +611,75 @@ class Table:
 
         return self._from_polars_lazy_frame(
             self._lazy_frame.with_columns(computed_column._polars_expression.alias(name)),
+        )
+
+    def add_index_column(self, name: str, *, first_index: int = 0) -> Table:
+        """
+        Return a new table with an additional index column.
+
+        **Note:** The original table is not modified.
+
+        Parameters
+        ----------
+        name:
+            The name of the new column.
+        first_index:
+            The index to assign to the first row. Must be greater or equal to 0.
+
+        Returns
+        -------
+        new_table:
+            The table with the index column.
+
+        Raises
+        ------
+        DuplicateColumnError
+            If the column name exists already.
+        OutOfBoundsError
+            If `first_index` is negative.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.add_index_column("id")
+        +-----+-----+-----+
+        |  id |   a |   b |
+        | --- | --- | --- |
+        | u32 | i64 | i64 |
+        +=================+
+        |   0 |   1 |   4 |
+        |   1 |   2 |   5 |
+        |   2 |   3 |   6 |
+        +-----+-----+-----+
+
+        >>> table.add_index_column("id", first_index=10)
+        +-----+-----+-----+
+        |  id |   a |   b |
+        | --- | --- | --- |
+        | u32 | i64 | i64 |
+        +=================+
+        |  10 |   1 |   4 |
+        |  11 |   2 |   5 |
+        |  12 |   3 |   6 |
+        +-----+-----+-----+
+
+        Related
+        -------
+        - [add_columns][safeds.data.tabular.containers._table.Table.add_columns]:
+            Add column objects to the table.
+        - [add_computed_column][safeds.data.tabular.containers._table.Table.add_computed_column]:
+            Add a column with values computed from other columns.
+        """
+        _check_columns_dont_exist(self, name)
+        _check_bounds(
+            "first_index",
+            first_index,
+            lower_bound=_ClosedBound(0),
+        )
+
+        return Table._from_polars_lazy_frame(
+            self._lazy_frame.with_row_index(name, offset=first_index),
         )
 
     def get_column(self, name: str) -> Column:
