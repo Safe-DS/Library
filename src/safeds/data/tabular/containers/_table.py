@@ -534,7 +534,7 @@ class Table:
         from polars.exceptions import DuplicateError, ShapeError
 
         if isinstance(columns, Table):
-            return self.add_table_as_columns(columns)
+            return self.add_tables_as_columns(columns)
 
         if isinstance(columns, Column):
             columns = [columns]
@@ -2027,19 +2027,16 @@ class Table:
     # Table operations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def add_table_as_columns(self, other: Table) -> Table:
+    def add_tables_as_columns(self, others: Table | list[Table]) -> Table:
         """
-        Add the columns of another table and return the result as a new table.
+        Add the columns of other tables and return the result as a new table.
 
-        **Notes:**
-
-        - The original tables are not modified.
-        - This operation must fully load the data into memory, which can be expensive.
+        **Note:** The original tables are not modified.
 
         Parameters
         ----------
-        other:
-            The table to add as columns.
+        others:
+            The tables to add as columns.
 
         Returns
         -------
@@ -2058,7 +2055,7 @@ class Table:
         >>> from safeds.data.tabular.containers import Table
         >>> table1 = Table({"a": [1, 2, 3]})
         >>> table2 = Table({"b": [4, 5, 6]})
-        >>> table1.add_table_as_columns(table2)
+        >>> table1.add_tables_as_columns(table2)
         +-----+-----+
         |   a |   b |
         | --- | --- |
@@ -2071,35 +2068,36 @@ class Table:
 
         Related
         -------
-        - [add_table_as_rows][safeds.data.tabular.containers._table.Table.add_table_as_rows]
+        - [add_tables_as_rows][safeds.data.tabular.containers._table.Table.add_tables_as_rows]
         """
-        from polars.exceptions import DuplicateError, ShapeError
+        import polars as pl
 
-        try:
-            return Table._from_polars_data_frame(
-                self._data_frame.hstack(other._data_frame),
-            )
-        # polars already validates this, so we don't do it upfront (performance)
-        except DuplicateError:
-            _check_columns_dont_exist(self, other.column_names)
-            return Table({})  # pragma: no cover
-        except ShapeError:
-            _check_row_counts_are_equal([self, other])
-            return Table({})  # pragma: no cover
+        if isinstance(others, Table):
+            others = [others]
 
-    def add_table_as_rows(self, other: Table) -> Table:
+        _check_columns_dont_exist(self, [name for other in others for name in other.column_names])
+        _check_row_counts_are_equal([self, *others], ignore_entries_without_rows=True)
+
+        return Table._from_polars_lazy_frame(
+            pl.concat(
+                [
+                    self._lazy_frame,
+                    *[other._lazy_frame for other in others],
+                ],
+                how="horizontal",
+            ),
+        )
+
+    def add_tables_as_rows(self, others: Table | list[Table]) -> Table:
         """
-        Add the rows of another table and return the result as a new table.
+        Add the rows of other tables and return the result as a new table.
 
-        **Notes:**
-
-        - The original tables are not modified.
-        - This operation must fully load the data into memory, which can be expensive.
+        **Note:** The original tables are not modified.
 
         Parameters
         ----------
-        other:
-            The table to add as rows.
+        others:
+            The tables to add as rows.
 
         Returns
         -------
@@ -2111,7 +2109,7 @@ class Table:
         >>> from safeds.data.tabular.containers import Table
         >>> table1 = Table({"a": [1, 2, 3]})
         >>> table2 = Table({"a": [4, 5, 6]})
-        >>> table1.add_table_as_rows(table2)
+        >>> table1.add_tables_as_rows(table2)
         +-----+
         |   a |
         | --- |
@@ -2127,12 +2125,24 @@ class Table:
 
         Related
         -------
-        - [add_table_as_columns][safeds.data.tabular.containers._table.Table.add_table_as_columns]
+        - [add_tables_as_columns][safeds.data.tabular.containers._table.Table.add_tables_as_columns]
         """
-        _check_schema(self, other)
+        import polars as pl
 
-        return Table._from_polars_data_frame(
-            self._data_frame.vstack(other._data_frame),
+        if isinstance(others, Table):
+            others = [others]
+
+        for other in others:
+            _check_schema(self, other)
+
+        return Table._from_polars_lazy_frame(
+            pl.concat(
+                [
+                    self._lazy_frame,
+                    *[other._lazy_frame for other in others],
+                ],
+                how="vertical",
+            ),
         )
 
     def inverse_transform_table(self, fitted_transformer: InvertibleTableTransformer) -> Table:

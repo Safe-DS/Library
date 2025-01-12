@@ -13,7 +13,11 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import Column, Table
 
 
-def _check_row_counts_are_equal(data: Sequence[Column | Table] | Mapping[str, Sequence[Any]]) -> None:
+def _check_row_counts_are_equal(
+    data: Sequence[Column | Table] | Mapping[str, Sequence[Any]],
+    *,
+    ignore_entries_without_rows: bool = False,
+) -> None:
     """
     Check whether all columns or tables have the same row count, and raise an error if they do not.
 
@@ -21,6 +25,8 @@ def _check_row_counts_are_equal(data: Sequence[Column | Table] | Mapping[str, Se
     ----------
     data:
         The columns or tables to check.
+    ignore_entries_without_rows:
+        Whether to ignore columns or tables that have no rows.
 
     Raises
     ------
@@ -31,7 +37,10 @@ def _check_row_counts_are_equal(data: Sequence[Column | Table] | Mapping[str, Se
         return
 
     # Compute the mismatched columns
-    names_and_row_counts = _get_names_and_row_counts(data)
+    names_and_row_counts = _get_names_and_row_counts(data, ignore_entries_without_rows=ignore_entries_without_rows)
+    if not names_and_row_counts:
+        return
+
     first_name, first_row_count = names_and_row_counts[0]
     mismatched_columns: list[tuple[str, int]] = []
 
@@ -45,7 +54,11 @@ def _check_row_counts_are_equal(data: Sequence[Column | Table] | Mapping[str, Se
         raise LengthMismatchError(message)
 
 
-def _get_names_and_row_counts(data: Sequence[Column | Table] | Mapping[str, Sequence[Any]]) -> list[tuple[str, int]]:
+def _get_names_and_row_counts(
+    data: Sequence[Column | Table] | Mapping[str, Sequence[Any]],
+    *,
+    ignore_entries_without_rows: bool = False,
+) -> list[tuple[str, int]]:
     from safeds.data.tabular.containers import Column, Table  # circular import
 
     if isinstance(data, Mapping):
@@ -54,9 +67,9 @@ def _get_names_and_row_counts(data: Sequence[Column | Table] | Mapping[str, Sequ
         result = []
 
         for i, entry in enumerate(data):
-            if isinstance(entry, Column):
+            if isinstance(entry, Column) and (not ignore_entries_without_rows or len(entry) > 0):
                 result.append((f"Column '{entry.name}'", entry.row_count))
-            elif isinstance(entry, Table):
+            elif isinstance(entry, Table) and (not ignore_entries_without_rows or entry.row_count > 0):
                 result.append((f"Table {i}", entry.row_count))
 
         return result
