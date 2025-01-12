@@ -105,7 +105,7 @@ def valid_data() -> TabularDataset:
             "feat2": [3, 6, 9, 12],
             "target": [0, 1, 0, 1],
         },
-    ).to_tabular_dataset(target_name="target", extra_names=["id"])
+    ).to_tabular_dataset("target", extra_names=["id"])
 
 
 @pytest.mark.parametrize("regressor_with_choice", regressors_with_choices(), ids=lambda x: x.__class__.__name__)
@@ -191,7 +191,7 @@ class TestFit:
                         "feat2": [3, 6],
                         "target": [0, 1],
                     },
-                ).to_tabular_dataset(target_name="target", extra_names=["id"]),
+                ).to_tabular_dataset("target", extra_names=["id"]),
                 NonNumericColumnError,
                 r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\{'feat1'\}",
             ),
@@ -203,7 +203,7 @@ class TestFit:
                         "feat2": [3, 6],
                         "target": [0, 1],
                     },
-                ).to_tabular_dataset(target_name="target", extra_names=["id"]),
+                ).to_tabular_dataset("target", extra_names=["id"]),
                 MissingValuesColumnError,
                 r"Tried to do an operation on one or multiple columns containing missing values: \n\{'feat1'\}",
             ),
@@ -215,7 +215,7 @@ class TestFit:
                         "feat2": [],
                         "target": [],
                     },
-                ).to_tabular_dataset(target_name="target", extra_names=["id"]),
+                ).to_tabular_dataset("target", extra_names=["id"]),
                 DatasetMissesDataError,
                 r"Dataset contains no rows",
             ),
@@ -437,7 +437,7 @@ class DummyRegressor(Regressor):
         feature = predicted.rename("feature")
         dataset = Table.from_columns([feature, predicted])
 
-        return dataset.to_tabular_dataset(target_name="predicted")
+        return dataset.to_tabular_dataset("predicted")
 
     @property
     def is_fitted(self) -> bool:
@@ -477,7 +477,7 @@ class TestSummarizeMetrics:
                 "expected": expected,
             },
         ).to_tabular_dataset(
-            target_name="expected",
+            "expected",
         )
 
         assert DummyRegressor().summarize_metrics(table) == result
@@ -501,7 +501,7 @@ class TestMeanAbsoluteError:
                 "expected": expected,
             },
         ).to_tabular_dataset(
-            target_name="expected",
+            "expected",
         )
 
         assert DummyRegressor().mean_absolute_error(table) == result
@@ -515,7 +515,7 @@ class TestMeanSquaredError:
     )
     def test_valid_data(self, predicted: list[float], expected: list[float], result: float) -> None:
         table = Table({"predicted": predicted, "expected": expected}).to_tabular_dataset(
-            target_name="expected",
+            "expected",
         )
 
         assert DummyRegressor().mean_squared_error(table) == result

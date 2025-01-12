@@ -63,7 +63,7 @@ class TestTransform:
             },
         )
         sequential_table_transformer = SequentialTableTransformer(transformers)
-        with pytest.raises(NotFittedError, match=r"The transformer has not been fitted yet."):
+        with pytest.raises(NotFittedError, match=r"This transformer has not been fitted yet."):
             sequential_table_transformer.transform(test_table)
 
     @pytest.mark.parametrize(
@@ -195,7 +195,7 @@ class TestInverseTransform:
         inverse_transformed_table = sequential_table_transformer.inverse_transform(transformed_table)
         assert_tables_are_equal(test_table, inverse_transformed_table, ignore_column_order=True, ignore_types=True)
 
-    def test_should_raise_transformer_not_fitted_error_if_not_fited(self) -> None:
+    def test_should_raise_transformer_not_fitted_error_if_not_fitted(self) -> None:
         one_hot = OneHotEncoder()
         imputer = SimpleImputer(SimpleImputer.Strategy.constant(0))
         transformers = [one_hot, imputer]
@@ -206,5 +206,5 @@ class TestInverseTransform:
                 "col2": ["a", "b", "a"],
             },
         )
-        with pytest.raises(NotFittedError, match=r"The transformer has not been fitted yet."):
+        with pytest.raises(NotFittedError, match=r"This transformer has not been fitted yet."):
             sequential_table_transformer.inverse_transform(test_table)

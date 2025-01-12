@@ -1,5 +1,5 @@
 import pytest
-from safeds._validation._check_columns_exist import _get_similar_column_names
+from safeds._validation._check_columns_exist_module import _get_similar_column_names
 from safeds.data.tabular.containers import Table
 
 

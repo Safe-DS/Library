@@ -357,11 +357,11 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
     def _data_split_table(self, data: TabularDataset) -> tuple[TabularDataset, TabularDataset]:
         [train_split, test_split] = data.to_table().split_rows(0.75)
         train_data = train_split.to_tabular_dataset(
-            target_name=data.target.name,
+            data.target.name,
             extra_names=data.extras.column_names,
         )
         test_dataset = test_split.to_tabular_dataset(
-            target_name=train_data.target.name,
+            train_data.target.name,
             extra_names=train_data.extras.column_names,
         )
         return train_data, test_dataset
@@ -445,10 +445,17 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
 
     def _data_split_time_series(self, data: TimeSeriesDataset) -> tuple[TimeSeriesDataset, Table]:
         (train_split, test_split) = data.to_table().split_rows(0.75)
-        train_data = train_split.to_time_series_dataset(
-            target_name=data.target.name,
+        # train_data = train_split.to_time_series_dataset(
+        #     data.target.name,
+        #     window_size=data.window_size,
+        #     extra_names=data.extras.column_names,
+        #     continuous=data.continuous,
+        #     forecast_horizon=data.forecast_horizon,
+        # )
+        train_data = TimeSeriesDataset(
+            train_split,
+            data.target.name,
             window_size=data.window_size,
-            extra_names=data.extras.column_names,
             continuous=data.continuous,
             forecast_horizon=data.forecast_horizon,
         )
@@ -994,21 +1001,28 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
     def _data_split_table(self, data: TabularDataset) -> tuple[TabularDataset, TabularDataset]:
         [train_split, test_split] = data.to_table().split_rows(0.75)
         train_data = train_split.to_tabular_dataset(
-            target_name=data.target.name,
+            data.target.name,
             extra_names=data.extras.column_names,
         )
         test_data = test_split.to_tabular_dataset(
-            target_name=train_data.target.name,
+            train_data.target.name,
             extra_names=train_data.extras.column_names,
         )
         return (train_data, test_data)
 
     def _data_split_time_series(self, data: TimeSeriesDataset) -> tuple[TimeSeriesDataset, Table]:
         (train_split, test_split) = data.to_table().split_rows(0.75)
-        train_data = train_split.to_time_series_dataset(
-            target_name=data.target.name,
+        # train_data = train_split.to_time_series_dataset(
+        #     data.target.name,
+        #     window_size=data.window_size,
+        #     extra_names=data.extras.column_names,
+        #     continuous=data.continuous,
+        #     forecast_horizon=data.forecast_horizon,
+        # )
+        train_data = TimeSeriesDataset(
+            train_split,
+            data.target.name,
             window_size=data.window_size,
-            extra_names=data.extras.column_names,
             continuous=data.continuous,
             forecast_horizon=data.forecast_horizon,
         )

@@ -60,7 +60,7 @@ class TabularDataset(Dataset[Table, Column]):
     ...         "target": [7, 8, 9],
     ...     },
     ... )
-    >>> dataset = table.to_tabular_dataset(target_name="target", extra_names="id")
+    >>> dataset = table.to_tabular_dataset("target", extra_names="id")
     """
 
     # ------------------------------------------------------------------------------------------------------------------

@@ -13,7 +13,7 @@ from safeds.data.tabular.containers import Table
                     "feature_2": [6, 12, 9],
                     "target": [1, 3, 2],
                 },
-                target_name="target",
+                "target",
                 window_size=1,
             ),
             Table(
@@ -32,7 +32,7 @@ from safeds.data.tabular.containers import Table
                     "other": [3, 9, 12],
                     "target": [1, 3, 2],
                 },
-                target_name="target",
+                "target",
                 window_size=1,
                 extra_names=["other"],
             ),

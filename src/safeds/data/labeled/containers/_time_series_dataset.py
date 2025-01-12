@@ -55,7 +55,7 @@ class TimeSeriesDataset(Dataset[Table, Column]):
     >>> from safeds.data.labeled.containers import TabularDataset
     >>> dataset = TimeSeriesDataset(
     ...     {"id": [1, 2, 3], "feature": [4, 5, 6], "target": [1, 2, 3], "error":[0,0,1]},
-    ...     target_name="target",
+    ...     "target",
     ...     window_size=1,
     ...     extra_names=["error"],
     ... )

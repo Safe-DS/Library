@@ -91,7 +91,7 @@ class TestTransform:
 
         transformer = OneHotEncoder()
 
-        with pytest.raises(NotFittedError, match=r"The transformer has not been fitted yet."):
+        with pytest.raises(NotFittedError, match=r"This transformer has not been fitted yet."):
             transformer.transform(table)
 
 
@@ -382,7 +382,7 @@ class TestInverseTransform:
 
         transformer = OneHotEncoder()
 
-        with pytest.raises(NotFittedError, match=r"The transformer has not been fitted yet."):
+        with pytest.raises(NotFittedError, match=r"This transformer has not been fitted yet."):
             transformer.inverse_transform(table)
 
     def test_should_raise_if_column_not_found(self) -> None:

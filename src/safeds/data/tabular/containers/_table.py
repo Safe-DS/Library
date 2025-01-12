@@ -2738,13 +2738,13 @@ class Table:
     #     --------
     #     >>> from safeds.data.tabular.containers import Table
     #     >>> table = Table({"day": [0, 1, 2], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
-    #     >>> dataset = table.to_time_series_dataset(target_name="amount_bought", window_size=2)
+    #     >>> dataset = table.to_time_series_dataset("amount_bought", window_size=2)
     #     """
     #     from safeds.data.labeled.containers import TimeSeriesDataset  # circular import
     #
     #     return TimeSeriesDataset(
     #         self,
-    #         target_name=target_name,
+    #         target_name,
     #         window_size=window_size,
     #         extra_names=extra_names,
     #         forecast_horizon=forecast_horizon,

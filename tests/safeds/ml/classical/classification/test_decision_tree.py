@@ -12,7 +12,7 @@ from tests.helpers import os_mac, skip_if_os
 @pytest.fixture()
 def training_set() -> TabularDataset:
     table = Table({"col1": [1, 2, 3, 4], "col2": [1, 2, 3, 4]})
-    return table.to_tabular_dataset(target_name="col1")
+    return table.to_tabular_dataset("col1")
 
 
 class TestMaxDepth:

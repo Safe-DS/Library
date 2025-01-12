@@ -14,7 +14,7 @@ from safeds.data.tabular.containers import Column
                     "C": [3, 6],
                     "T": [0, 1],
                 },
-                target_name="T",
+                "T",
             ),
             Column("T", [0, 1]),
         ),

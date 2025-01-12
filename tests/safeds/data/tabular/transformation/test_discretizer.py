@@ -114,7 +114,7 @@ class TestTransform:
                 ),
                 ["col1"],
                 NonNumericColumnError,
-                "Tried to do a numerical operation on one or multiple non-numerical columns: \ncol1 is of type String.",
+                "Tried to do a numerical operation on one or multiple non-numerical columns: \ncol1 is of type string.",
             ),
         ],
         ids=["ColumnNotFoundError", "multiple missing columns", "ValueError", "NonNumericColumnError"],
@@ -147,7 +147,7 @@ class TestTransform:
 
         transformer = Discretizer()
 
-        with pytest.raises(NotFittedError, match=r"The transformer has not been fitted yet."):
+        with pytest.raises(NotFittedError, match=r"This transformer has not been fitted yet."):
             transformer.transform(table)
 
 

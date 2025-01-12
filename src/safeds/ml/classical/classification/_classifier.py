@@ -268,11 +268,11 @@ class Classifier(SupervisedModel, ABC):
 
         [train_split, test_split] = training_set.to_table().split_rows(0.75)
         train_data = train_split.to_tabular_dataset(
-            target_name=training_set.target.name,
+            training_set.target.name,
             extra_names=training_set.extras.column_names,
         )
         test_data = test_split.to_tabular_dataset(
-            target_name=training_set.target.name,
+            training_set.target.name,
             extra_names=training_set.extras.column_names,
         )
 

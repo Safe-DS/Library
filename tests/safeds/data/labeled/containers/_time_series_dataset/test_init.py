@@ -109,7 +109,7 @@ def test_should_raise_error(
     error_msg: str | None,
 ) -> None:
     with pytest.raises(error, match=error_msg):
-        TimeSeriesDataset(data, target_name=target_name, window_size=1, extra_names=extra_names)
+        TimeSeriesDataset(data, target_name, window_size=1, extra_names=extra_names)
 
 
 @pytest.mark.parametrize(
@@ -204,7 +204,7 @@ def test_should_create_a_tabular_dataset(
 ) -> None:
     tabular_dataset = TimeSeriesDataset(
         data,
-        target_name=target_name,
+        target_name,
         window_size=1,
         extra_names=extra_names,
     )

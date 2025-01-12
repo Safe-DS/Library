@@ -11,7 +11,7 @@
 #
 # def test_predict_should_not_warn_about_feature_names() -> None:
 #     """See https://github.com/Safe-DS/Library/issues/51."""
-#     training_set = Table({"a": [1, 2, 3], "b": [2, 4, 6]}).to_tabular_dataset(target_name="b")
+#     training_set = Table({"a": [1, 2, 3], "b": [2, 4, 6]}).to_tabular_dataset("b")
 #
 #     model = LinearRegressor()
 #     fitted_model = model.fit(training_set)

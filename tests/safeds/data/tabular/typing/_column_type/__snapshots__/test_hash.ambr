@@ -1,55 +1,55 @@
 # serializer version: 1
-# name: TestSameHash.test_should_return_same_hash_in_different_processes[binary]
+# name: TestContract.test_should_return_same_hash_in_different_processes[binary]
   9114564521908245695
 # ---
-# name: TestSameHash.test_should_return_same_hash_in_different_processes[boolean]
+# name: TestContract.test_should_return_same_hash_in_different_processes[boolean]
   253312121440042057
 # ---
-# name: TestSameHash.test_should_return_same_hash_in_different_processes[date]
+# name: TestContract.test_should_return_same_hash_in_different_processes[date]
   1420129173814739165
 # ---
-# name: TestSameHash.test_should_return_same_hash_in_different_processes[datetime]
+# name: TestContract.test_should_return_same_hash_in_different_processes[datetime]
   5037917593634747378
 # ---
-# name: TestSameHash.test_should_return_same_hash_in_different_processes[duration]
+# name: TestContract.test_should_return_same_hash_in_different_processes[duration]
   61885111053208984
 # ---
-# name: TestSameHash.test_should_return_same_hash_in_different_processes[float32]
+# name: TestContract.test_should_return_same_hash_in_different_processes[float32]
   2208906555873308475
 # ---
-# name: TestSameHash.test_should_return_same_hash_in_different_processes[float64]
+# name: TestContract.test_should_return_same_hash_in_different_processes[float64]
   7992127945058937926
 # ---
-# name: TestSameHash.test_should_return_same_hash_in_different_processes[int16]
+# name: TestContract.test_should_return_same_hash_in_different_processes[int16]
   231909494783576033
 # ---
-# name: TestSameHash.test_should_return_same_hash_in_different_processes[int32]
+# name: TestContract.test_should_return_same_hash_in_different_processes[int32]
   1374055615029084484
 # ---
-# name: TestSameHash.test_should_return_same_hash_in_different_processes[int64]
+# name: TestContract.test_should_return_same_hash_in_different_processes[int64]
   1212246054477521308
 # ---
-# name: TestSameHash.test_should_return_same_hash_in_different_processes[int8]
+# name: TestContract.test_should_return_same_hash_in_different_processes[int8]
   2269551742465714004
 # ---
-# name: TestSameHash.test_should_return_same_hash_in_different_processes[null]
+# name: TestContract.test_should_return_same_hash_in_different_processes[null]
   1357169886076964811
 # ---
-# name: TestSameHash.test_should_return_same_hash_in_different_processes[string]
+# name: TestContract.test_should_return_same_hash_in_different_processes[string]
   1529874693733179990
 # ---
-# name: TestSameHash.test_should_return_same_hash_in_different_processes[time]
+# name: TestContract.test_should_return_same_hash_in_different_processes[time]
   5418105405405492344
 # ---
-# name: TestSameHash.test_should_return_same_hash_in_different_processes[uint16]
+# name: TestContract.test_should_return_same_hash_in_different_processes[uint16]
   937488211706751048
 # ---
-# name: TestSameHash.test_should_return_same_hash_in_different_processes[uint32]
+# name: TestContract.test_should_return_same_hash_in_different_processes[uint32]
   859241000506496144
 # ---
-# name: TestSameHash.test_should_return_same_hash_in_different_processes[uint64]
+# name: TestContract.test_should_return_same_hash_in_different_processes[uint64]
   1728989395548489096
 # ---
-# name: TestSameHash.test_should_return_same_hash_in_different_processes[uint8]
+# name: TestContract.test_should_return_same_hash_in_different_processes[uint8]
   48638156943199247
 # ---

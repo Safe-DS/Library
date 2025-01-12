@@ -71,7 +71,7 @@ class TestTransform:
 
         transformer = StandardScaler()
 
-        with pytest.raises(NotFittedError, match=r"The transformer has not been fitted yet."):
+        with pytest.raises(NotFittedError, match=r"This transformer has not been fitted yet."):
             transformer.transform(table)
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
@@ -193,7 +193,7 @@ class TestInverseTransform:
 
         transformer = StandardScaler()
 
-        with pytest.raises(NotFittedError, match=r"The transformer has not been fitted yet."):
+        with pytest.raises(NotFittedError, match=r"This transformer has not been fitted yet."):
             transformer.inverse_transform(table)
 
     def test_should_raise_if_column_not_found(self) -> None:

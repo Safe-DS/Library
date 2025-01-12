@@ -433,7 +433,7 @@ def _predict_with_sklearn_model(
 
         return TabularDataset(
             output,
-            target_name=target_name,
+            target_name,
             extra_names=extra_names,
         )
     except ValueError as exception:

@@ -153,7 +153,7 @@ def test_should_raise_error(
     error_msg: str | None,
 ) -> None:
     with pytest.raises(error, match=error_msg):
-        TabularDataset(data, target_name=target_name, extra_names=extra_names)
+        TabularDataset(data, target_name, extra_names=extra_names)
 
 
 @pytest.mark.parametrize(
@@ -240,7 +240,7 @@ def test_should_create_a_tabular_dataset(
     target_name: str,
     extra_names: list[str] | None,
 ) -> None:
-    tabular_dataset = TabularDataset(data, target_name=target_name, extra_names=extra_names)
+    tabular_dataset = TabularDataset(data, target_name, extra_names=extra_names)
     if not isinstance(data, Table):
         data = Table(data)
 

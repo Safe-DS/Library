@@ -1,10 +1,10 @@
 # serializer version: 1
-# name: TestSameHash.test_should_return_same_hash_in_different_processes[empty]
+# name: TestContract.test_should_return_same_hash_in_different_processes[empty]
   2230328334128810753
 # ---
-# name: TestSameHash.test_should_return_same_hash_in_different_processes[one column]
+# name: TestContract.test_should_return_same_hash_in_different_processes[one column]
   2245614720678699598
 # ---
-# name: TestSameHash.test_should_return_same_hash_in_different_processes[two columns]
+# name: TestContract.test_should_return_same_hash_in_different_processes[two columns]
   1881809609867026590
 # ---

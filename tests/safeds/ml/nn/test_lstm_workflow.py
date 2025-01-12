@@ -1,5 +1,6 @@
 import pytest
 from safeds._config import _get_device
+from safeds.data.labeled.containers import TimeSeriesDataset
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import RangeScaler
 from safeds.ml.nn import (
@@ -38,7 +39,15 @@ def test_lstm_model(device: Device) -> None:
         [ForwardLayer(neuron_count=256), GRULayer(128), LSTMLayer(neuron_count=1)],
     )
     trained_model = model.fit(
-        train_table.to_time_series_dataset(
+        # train_table.to_time_series_dataset(
+        #     "value",
+        #     window_size=7,
+        #     forecast_horizon=12,
+        #     continuous=True,
+        #     extra_names=["date"],
+        # ),
+        TimeSeriesDataset(
+            train_table,
             "value",
             window_size=7,
             forecast_horizon=12,
@@ -50,7 +59,15 @@ def test_lstm_model(device: Device) -> None:
 
     trained_model.predict(test_table)
     trained_model_2 = model_2.fit(
-        train_table.to_time_series_dataset(
+        # train_table.to_time_series_dataset(
+        #     "value",
+        #     window_size=7,
+        #     forecast_horizon=12,
+        #     continuous=False,
+        #     extra_names=["date"],
+        # ),
+        TimeSeriesDataset(
+            train_table,
             "value",
             window_size=7,
             forecast_horizon=12,

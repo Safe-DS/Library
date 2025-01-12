@@ -253,7 +253,7 @@ class TestTransform:
 
         transformer = SimpleImputer(strategy)
 
-        with pytest.raises(NotFittedError, match=r"The transformer has not been fitted yet."):
+        with pytest.raises(NotFittedError, match=r"This transformer has not been fitted yet."):
             transformer.transform(table)
 
 
