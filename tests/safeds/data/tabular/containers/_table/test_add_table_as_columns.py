@@ -6,26 +6,26 @@ from safeds.exceptions import DuplicateColumnError, LengthMismatchError
 
 
 @pytest.mark.parametrize(
-    ("table_factory", "other", "expected"),
+    ("table_factory", "other_factory", "expected"),
     [
         (
             lambda: Table({}),
-            Table({}),
+            lambda: Table({}),
             Table({}),
         ),
         (
             lambda: Table({}),
-            Table({"col1": [1]}),
+            lambda: Table({"col1": [1]}),
             Table({"col1": [1]}),
         ),
         (
             lambda: Table({"col1": [1]}),
-            Table({}),
+            lambda: Table({}),
             Table({"col1": [1]}),
         ),
         (
             lambda: Table({"col1": [1]}),
-            Table({"col2": [2]}),
+            lambda: Table({"col2": [2]}),
             Table({"col1": [1], "col2": [2]}),
         ),
     ],
@@ -40,21 +40,31 @@ class TestHappyPath:
     def test_should_add_columns(
         self,
         table_factory: Callable[[], Table],
-        other: Table,
+        other_factory: Callable[[], Table],
         expected: Table,
     ) -> None:
-        actual = table_factory().add_table_as_columns(other)
+        actual = table_factory().add_table_as_columns(other_factory())
         assert actual == expected
 
     def test_should_not_mutate_receiver(
         self,
         table_factory: Callable[[], Table],
-        other: Table,
+        other_factory: Callable[[], Table],
         expected: Table,  # noqa: ARG002
     ) -> None:
         original = table_factory()
-        original.add_table_as_columns(other)
+        original.add_table_as_columns(other_factory())
         assert original == table_factory()
+
+    def test_should_not_mutate_other(
+        self,
+        table_factory: Callable[[], Table],
+        other_factory: Callable[[], Table],
+        expected: Table,  # noqa: ARG002
+    ) -> None:
+        original = other_factory()
+        table_factory().add_table_as_columns(original)
+        assert original == other_factory()
 
 
 def test_should_raise_if_row_counts_differ() -> None:

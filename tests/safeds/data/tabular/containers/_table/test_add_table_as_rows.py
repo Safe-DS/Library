@@ -6,21 +6,21 @@ from safeds.exceptions import SchemaError
 
 
 @pytest.mark.parametrize(
-    ("table_factory", "other", "expected"),
+    ("table_factory", "other_factory", "expected"),
     [
         (
             lambda: Table({}),
-            Table({}),
+            lambda: Table({}),
             Table({}),
         ),
         (
             lambda: Table({"col1": []}),
-            Table({"col1": []}),
+            lambda: Table({"col1": []}),
             Table({"col1": []}),
         ),
         (
             lambda: Table({"col1": [1]}),
-            Table({"col1": [2]}),
+            lambda: Table({"col1": [2]}),
             Table({"col1": [1, 2]}),
         ),
     ],
@@ -34,21 +34,31 @@ class TestHappyPath:
     def test_should_add_rows(
         self,
         table_factory: Callable[[], Table],
-        other: Table,
+        other_factory: Callable[[], Table],
         expected: Table,
     ) -> None:
-        actual = table_factory().add_table_as_rows(other)
+        actual = table_factory().add_table_as_rows(other_factory())
         assert actual == expected
 
     def test_should_not_mutate_receiver(
         self,
         table_factory: Callable[[], Table],
-        other: Table,
+        other_factory: Callable[[], Table],
         expected: Table,  # noqa: ARG002
     ) -> None:
         original = table_factory()
-        original.add_table_as_rows(other)
+        original.add_table_as_rows(other_factory())
         assert original == table_factory()
+
+    def test_should_not_mutate_other_table(
+        self,
+        table_factory: Callable[[], Table],
+        other_factory: Callable[[], Table],
+        expected: Table,  # noqa: ARG002
+    ) -> None:
+        original = other_factory()
+        table_factory().add_table_as_rows(original)
+        assert original == other_factory()
 
 
 @pytest.mark.parametrize(
