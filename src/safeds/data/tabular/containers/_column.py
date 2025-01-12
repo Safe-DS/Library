@@ -659,59 +659,14 @@ class Column(Sequence[T_co]):
         | mean                 | 2.00000 |
         | median               | 2.00000 |
         | standard deviation   | 1.41421 |
-        | distinct value count | 2.00000 |
-        | idness               | 1.00000 |
         | missing value ratio  | 0.00000 |
         | stability            | 0.50000 |
+        | idness               | 1.00000 |
         +----------------------+---------+
         """
         from ._table import Table
 
-        # TODO: turn this around (call table method, implement in table; allows parallelization)
-        if self.type.is_numeric:
-            values: list[Any] = [
-                self.min(),
-                self.max(),
-                self.mean(),
-                self.median(),
-                self.standard_deviation(),
-                self.distinct_value_count(),
-                self.idness(),
-                self.missing_value_ratio(),
-                self.stability(),
-            ]
-        else:
-            min_ = self.min()
-            max_ = self.max()
-
-            values = [
-                str("-" if min_ is None else min_),
-                str("-" if max_ is None else max_),
-                "-",
-                "-",
-                "-",
-                str(self.distinct_value_count()),
-                str(self.idness()),
-                str(self.missing_value_ratio()),
-                str(self.stability()),
-            ]
-
-        return Table(
-            {
-                "statistic": [
-                    "min",
-                    "max",
-                    "mean",
-                    "median",
-                    "standard deviation",
-                    "distinct value count",
-                    "idness",
-                    "missing value ratio",
-                    "stability",
-                ],
-                self.name: values,
-            },
-        )
+        return Table.from_columns(self).summarize_statistics()
 
     def correlation_with(self, other: Column) -> float:
         """

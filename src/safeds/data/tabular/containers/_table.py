@@ -2414,10 +2414,9 @@ class Table:
         | mean                 | 2.00000 |
         | median               | 2.00000 |
         | standard deviation   | 1.41421 |
-        | distinct value count | 2.00000 |
-        | idness               | 1.00000 |
         | missing value ratio  | 0.00000 |
         | stability            | 0.50000 |
+        | idness               | 1.00000 |
         +----------------------+---------+
         """
         import polars as pl
@@ -2447,9 +2446,6 @@ class Table:
             "standard deviation": [cs.numeric().std()],
             # NaN occurs for tables without rows
             "missing value ratio": [(cs.all().null_count() / pl.len()).fill_nan(1.0)],
-            "distinct value count": [cs.all().drop_nulls().n_unique()],
-            # NaN occurs for tables without rows
-            "idness": [(cs.all().n_unique() / pl.len()).fill_nan(1.0)],
             # null occurs for columns without non-null values
             # `unique_counts` crashes in polars for boolean columns (https://github.com/pola-rs/polars/issues/16356)
             "stability": [
@@ -2458,6 +2454,8 @@ class Table:
                     pl.when(true_count >= false_count).then(true_count).otherwise(false_count) / boolean_columns.count()
                 ).fill_null(1.0),
             ],
+            # NaN occurs for tables without rows
+            "idness": [(cs.all().n_unique() / pl.len()).fill_nan(1.0)],
         }
 
         # Compute suitable types for the output columns
