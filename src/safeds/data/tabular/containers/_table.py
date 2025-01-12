@@ -1736,7 +1736,7 @@ class Table:
             self._lazy_frame.filter(non_outlier_mask),
         )
 
-    def shuffle_rows(self, *, seed: int = 0) -> Table:
+    def shuffle_rows(self, *, random_seed: int = 0) -> Table:
         """
         Shuffle the rows and return the result as a new table.
 
@@ -1747,8 +1747,8 @@ class Table:
 
         Parameters
         ----------
-        seed:
-            The seed for the random number generator.
+        random_seed:
+            The seed for the pseudorandom number generator.
 
         Returns
         -------
@@ -1774,7 +1774,7 @@ class Table:
             self._data_frame.sample(
                 fraction=1,
                 shuffle=True,
-                seed=seed,
+                seed=random_seed,
             ),
         )
 
@@ -1948,7 +1948,7 @@ class Table:
         percentage_in_first: float,
         *,
         shuffle: bool = True,
-        seed: int = 0,
+        random_seed: int = 0,
     ) -> tuple[Table, Table]:
         """
         Create two tables by splitting the rows of the current table.
@@ -1968,8 +1968,8 @@ class Table:
             The percentage of rows to include in the first table. Must be between 0 and 1.
         shuffle:
             Whether to shuffle the rows before splitting.
-        seed:
-            The seed for the random number generator used for shuffling.
+        random_seed:
+            The seed for the pseudorandom number generator used for shuffling.
 
         Returns
         -------
@@ -2015,7 +2015,7 @@ class Table:
             upper_bound=_ClosedBound(1),
         )
 
-        input_table = self.shuffle_rows(seed=seed) if shuffle else self
+        input_table = self.shuffle_rows(random_seed=random_seed) if shuffle else self
         row_count_in_first = round(percentage_in_first * input_table.row_count)
 
         return (
