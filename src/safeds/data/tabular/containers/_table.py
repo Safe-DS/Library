@@ -2405,7 +2405,7 @@ class Table:
         >>> table = Table({"a": [1, 3]})
         >>> table.summarize_statistics()
         +----------------------+---------+
-        | metric               |       a |
+        | statistic            |       a |
         | ---                  |     --- |
         | str                  |     f64 |
         +================================+
@@ -2420,14 +2420,72 @@ class Table:
         | stability            | 0.50000 |
         +----------------------+---------+
         """
+        import polars as pl
+        import polars.selectors as cs
+
         if self.column_count == 0:
+            # polars raises an error in this case
             return Table({})
 
-        head = self.get_column(self.column_names[0]).summarize_statistics()
-        tail = [self.get_column(name).summarize_statistics().get_column(name)._series for name in self.column_names[1:]]
+        # Find suitable name for the statistic column
+        statistic_column_name = "statistic"
+        while statistic_column_name in self.column_names:
+            statistic_column_name += "_"
 
-        return Table._from_polars_data_frame(
-            head._lazy_frame.collect().hstack(tail, in_place=True),
+        # Build the expressions to compute the statistics
+        non_null_columns = cs.exclude(cs.by_dtype(pl.Null))
+        non_boolean_columns = cs.exclude(cs.by_dtype(pl.Boolean))
+        boolean_columns = cs.by_dtype(pl.Boolean)
+        true_count = boolean_columns.filter(boolean_columns == True).count()  # noqa: E712
+        false_count = boolean_columns.filter(boolean_columns == False).count()  # noqa: E712
+
+        named_statistics: dict[str, list[pl.Expr]] = {
+            "min": [non_null_columns.min()],
+            "max": [non_null_columns.max()],
+            "mean": [cs.numeric().mean()],
+            "median": [cs.numeric().median()],
+            "standard deviation": [cs.numeric().std()],
+            # NaN occurs for tables without rows
+            "missing value ratio": [(cs.all().null_count() / pl.len()).fill_nan(1.0)],
+            "distinct value count": [cs.all().drop_nulls().n_unique()],
+            # NaN occurs for tables without rows
+            "idness": [(cs.all().n_unique() / pl.len()).fill_nan(1.0)],
+            # null occurs for columns without non-null values
+            # `unique_counts` crashes in polars for boolean columns (https://github.com/pola-rs/polars/issues/16356)
+            "stability": [
+                (non_boolean_columns.drop_nulls().unique_counts().max() / non_boolean_columns.count()).fill_null(1.0),
+                (
+                    pl.when(true_count >= false_count).then(true_count).otherwise(false_count) / boolean_columns.count()
+                ).fill_null(1.0),
+            ],
+        }
+
+        # Compute suitable types for the output columns
+        frame = self._lazy_frame
+        schema = frame.collect_schema()
+        for name, type_ in schema.items():
+            # polars fails to determine supertype of temporal types and u32
+            if not type_.is_numeric() and not type_.is_(pl.Null):
+                schema[name] = pl.String
+
+        # Combine everything into a single table
+        return Table._from_polars_lazy_frame(
+            pl.concat(
+                [
+                    # Ensure the columns are in the correct order
+                    pl.LazyFrame({statistic_column_name: []}),
+                    schema.to_frame(eager=False),
+                    # Add the statistics
+                    *[
+                        frame.select(
+                            pl.lit(name).alias(statistic_column_name),
+                            *expressions,
+                        )
+                        for name, expressions in named_statistics.items()
+                    ],
+                ],
+                how="diagonal_relaxed",
+            ),
         )
 
     # ------------------------------------------------------------------------------------------------------------------

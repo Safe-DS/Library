@@ -344,7 +344,7 @@ class TablePlotter:
                 ax.set_xlabel("")
                 ax.set_ylabel("")
 
-                if column.is_numeric and len(distinct_values) > max_bin_count:
+                if column.type.is_numeric and len(distinct_values) > max_bin_count:
                     min_val = (column.min() or 0) - 1e-6  # Otherwise the minimum value is not included in the first bin
                     max_val = column.max() or 0
                     bin_count = min(max_bin_count, len(distinct_values))
@@ -655,7 +655,7 @@ class TablePlotter:
                 ylabel=y_name,
             )
             ax.legend()
-            if self._table.get_column(x_name).is_temporal and self._table.get_column(x_name).row_count < 9:
+            if self._table.get_column_type(x_name).is_temporal and self._table.get_column(x_name).row_count < 9:
                 ax.set_xticks(x_data)  # Set x-ticks to the x data points
             ax.set_xticks(ax.get_xticks())
             ax.set_xticklabels(
@@ -754,5 +754,5 @@ def _plot_validation(table: Table, x_name: str, y_names: list[str]) -> None:
     y_names.remove(x_name)
     _check_columns_are_numeric(table, y_names)
 
-    if not table.get_column(x_name).is_numeric and not table.get_column(x_name).is_temporal:
+    if not table.get_column_type(x_name).is_numeric and not table.get_column_type(x_name).is_temporal:
         raise ColumnTypeError(x_name)

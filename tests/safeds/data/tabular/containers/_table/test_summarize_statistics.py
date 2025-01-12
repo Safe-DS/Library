@@ -4,6 +4,29 @@ from statistics import stdev
 import pytest
 from safeds.data.tabular.containers import Table
 
+_HEADERS = [
+    "min",
+    "max",
+    "mean",
+    "median",
+    "standard deviation",
+    "missing value ratio",
+    "distinct value count",
+    "idness",
+    "stability",
+]
+_EMPTY_COLUMN_RESULT = [
+    None,
+    None,
+    None,
+    None,
+    None,
+    1.0,
+    0,
+    1.0,
+    1.0,
+]
+
 
 @pytest.mark.parametrize(
     ("table", "expected"),
@@ -18,39 +41,9 @@ from safeds.data.tabular.containers import Table
             Table({"col1": [], "col2": []}),
             Table(
                 {
-                    "metric": [
-                        "min",
-                        "max",
-                        "mean",
-                        "median",
-                        "standard deviation",
-                        "distinct value count",
-                        "idness",
-                        "missing value ratio",
-                        "stability",
-                    ],
-                    "col1": [
-                        "-",
-                        "-",
-                        "-",
-                        "-",
-                        "-",
-                        "0",
-                        "1.0",
-                        "1.0",
-                        "1.0",
-                    ],
-                    "col2": [
-                        "-",
-                        "-",
-                        "-",
-                        "-",
-                        "-",
-                        "0",
-                        "1.0",
-                        "1.0",
-                        "1.0",
-                    ],
+                    "statistic": _HEADERS,
+                    "col1": _EMPTY_COLUMN_RESULT,
+                    "col2": _EMPTY_COLUMN_RESULT,
                 },
             ),
         ),
@@ -59,56 +52,36 @@ from safeds.data.tabular.containers import Table
             Table({"col1": [None, None, None]}),
             Table(
                 {
-                    "metric": [
-                        "min",
-                        "max",
-                        "mean",
-                        "median",
-                        "standard deviation",
-                        "distinct value count",
-                        "idness",
-                        "missing value ratio",
-                        "stability",
-                    ],
+                    "statistic": _HEADERS,
                     "col1": [
-                        "-",
-                        "-",
-                        "-",
-                        "-",
-                        "-",
-                        "0",
-                        "0.3333333333333333",
-                        "1.0",
-                        "1.0",
+                        None,
+                        None,
+                        None,
+                        None,
+                        None,
+                        1.0,
+                        0.0,
+                        1 / 3,
+                        1.0,
                     ],
                 },
             ),
         ),
         # numeric column
         (
-            Table({"col1": [1, 2, 1]}),
+            Table({"col1": [1, 2, 1, None]}),
             Table(
                 {
-                    "metric": [
-                        "min",
-                        "max",
-                        "mean",
-                        "median",
-                        "standard deviation",
-                        "distinct value count",
-                        "idness",
-                        "missing value ratio",
-                        "stability",
-                    ],
+                    "statistic": _HEADERS,
                     "col1": [
                         1,
                         2,
                         4 / 3,
                         1,
                         stdev([1, 2, 1]),
+                        1 / 4,
                         2,
-                        2 / 3,
-                        0,
+                        3 / 4,
                         2 / 3,
                     ],
                 },
@@ -122,31 +95,22 @@ from safeds.data.tabular.containers import Table
                         datetime.time(1, 2, 3),
                         datetime.time(4, 5, 6),
                         datetime.time(7, 8, 9),
+                        None,
                     ],
                 },
             ),
             Table(
                 {
-                    "metric": [
-                        "min",
-                        "max",
-                        "mean",
-                        "median",
-                        "standard deviation",
-                        "distinct value count",
-                        "idness",
-                        "missing value ratio",
-                        "stability",
-                    ],
+                    "statistic": _HEADERS,
                     "col1": [
                         "01:02:03",
                         "07:08:09",
-                        "-",
-                        "-",
-                        "-",
+                        None,
+                        None,
+                        None,
+                        "0.25",
                         "3",
                         "1.0",
-                        "0.0",
                         "0.3333333333333333",
                     ],
                 },
@@ -154,30 +118,40 @@ from safeds.data.tabular.containers import Table
         ),
         # string column
         (
-            Table({"col1": ["a", "b", "c"]}),
+            Table({"col1": ["a", "b", "c", None]}),
             Table(
                 {
-                    "metric": [
-                        "min",
-                        "max",
-                        "mean",
-                        "median",
-                        "standard deviation",
-                        "distinct value count",
-                        "idness",
-                        "missing value ratio",
-                        "stability",
-                    ],
+                    "statistic": _HEADERS,
                     "col1": [
                         "a",
                         "c",
-                        "-",
-                        "-",
-                        "-",
+                        None,
+                        None,
+                        None,
+                        "0.25",
                         "3",
                         "1.0",
-                        "0.0",
                         "0.3333333333333333",
+                    ],
+                },
+            ),
+        ),
+        # boolean column
+        (
+            Table({"col1": [True, False, True, None]}),
+            Table(
+                {
+                    "statistic": _HEADERS,
+                    "col1": [
+                        "false",
+                        "true",
+                        None,
+                        None,
+                        None,
+                        "0.25",
+                        "2",
+                        "0.75",
+                        "0.6666666666666666",
                     ],
                 },
             ),
@@ -190,7 +164,44 @@ from safeds.data.tabular.containers import Table
         "numeric column",
         "temporal column",
         "string column",
+        "boolean column",
     ],
 )
 def test_should_summarize_statistics(table: Table, expected: Table) -> None:
-    assert table.summarize_statistics() == expected
+    actual = table.summarize_statistics()
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    ("table", "expected"),
+    [
+        # has statistic column
+        (
+            Table({"statistic": []}),
+            Table(
+                {
+                    "statistic_": _HEADERS,
+                    "statistic": _EMPTY_COLUMN_RESULT,
+                },
+            ),
+        ),
+        # has statistic_ column
+        (
+            Table({"statistic": [], "statistic_": []}),
+            Table(
+                {
+                    "statistic__": _HEADERS,
+                    "statistic": _EMPTY_COLUMN_RESULT,
+                    "statistic_": _EMPTY_COLUMN_RESULT,
+                },
+            ),
+        ),
+    ],
+    ids=[
+        "has statistic column",
+        "has statistic_ column",
+    ],
+)
+def test_should_ensure_new_column_has_unique_name(table: Table, expected: Table) -> None:
+    actual = table.summarize_statistics()
+    assert actual == expected

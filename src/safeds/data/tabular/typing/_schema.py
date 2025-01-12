@@ -76,9 +76,7 @@ class Schema:
     @property
     def column_count(self) -> int:
         """
-        The number of columns in the table.
-
-        **Note:** This operation must compute the schema of the table, which can be expensive.
+        The number of columns.
 
         Examples
         --------
@@ -92,9 +90,7 @@ class Schema:
     @property
     def column_names(self) -> list[str]:
         """
-        The names of the columns in the table.
-
-        **Note:** This operation must compute the schema of the table, which can be expensive.
+        The names of the columns.
 
         Examples
         --------
