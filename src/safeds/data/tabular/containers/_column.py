@@ -642,7 +642,12 @@ class Column(Sequence[T_co]):
 
     def summarize_statistics(self) -> Table:
         """
-        Create a table with important statistics about the column.
+        Return a table with important statistics about the column.
+
+        !!! warning "API Stability"
+
+            Do not rely on the exact output of this method. In future versions, we may change the displayed statistics
+            without prior notice.
 
         Returns
         -------

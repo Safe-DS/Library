@@ -34,6 +34,11 @@ class Classifier(SupervisedModel, ABC):
 
         **Note:** The model must be fitted.
 
+        !!! warning "API Stability"
+
+            Do not rely on the exact output of this method. In future versions, we may change the displayed metrics
+            without prior notice.
+
         Parameters
         ----------
         validation_or_test_set:

@@ -2389,6 +2389,11 @@ class Table:
         """
         Return a table with important statistics about this table.
 
+        !!! warning "API Stability"
+
+            Do not rely on the exact output of this method. In future versions, we may change the displayed statistics
+            without prior notice.
+
         Returns
         -------
         statistics:
