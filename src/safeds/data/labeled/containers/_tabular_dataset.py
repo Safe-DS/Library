@@ -25,8 +25,8 @@ class TabularDataset(Dataset[Table, Column]):
 
     - The target column is the column that a model should predict.
     - Feature columns are columns that a model should use to make predictions.
-    - Extra columns are columns that are neither feature nor target. They can be used to provide additional context,
-      like an ID column.
+    - Extra columns are columns that are neither feature nor target. They are ignored by models and can be used to
+      provide additional context. An ID or name column is a common example.
 
     Feature columns are implicitly defined as all columns except the target and extra columns. If no extra columns
     are specified, all columns except the target column are used as features.
@@ -38,17 +38,17 @@ class TabularDataset(Dataset[Table, Column]):
     target_name:
         The name of the target column.
     extra_names:
-        Names of the columns that are neither features nor target. If None, no extra columns are used, i.e. all but
-        the target column are used as features.
+        Names of the columns that are neither feature nor target. If None, no extra columns are used, i.e. all but the
+        target column are used as features.
 
     Raises
     ------
     ColumnNotFoundError
-        If a column name is not found in the data.
+        If a target or extra column does not exist.
     ValueError
         If the target column is also an extra column.
     ValueError
-        If no feature columns remains.
+        If no feature column remains.
 
     Examples
     --------
@@ -57,10 +57,10 @@ class TabularDataset(Dataset[Table, Column]):
     ...     {
     ...         "id": [1, 2, 3],
     ...         "feature": [4, 5, 6],
-    ...         "target": [1, 2, 3],
+    ...         "target": [7, 8, 9],
     ...     },
     ... )
-    >>> dataset = table.to_tabular_dataset(target_name="target", extra_names=["id"])
+    >>> dataset = table.to_tabular_dataset(target_name="target", extra_names="id")
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -71,8 +71,9 @@ class TabularDataset(Dataset[Table, Column]):
         self,
         data: Table | Mapping[str, Sequence[Any]],
         target_name: str,
+        /,  # If we allow multiple targets in the future, we would rename the parameter to `target_names`.
         *,
-        extra_names: list[str] | None = None,
+        extra_names: str | list[str] | None = None,
     ):
         from safeds.data.tabular.containers import Table
 
@@ -81,6 +82,8 @@ class TabularDataset(Dataset[Table, Column]):
             data = Table(data)
         if extra_names is None:
             extra_names = []
+        elif isinstance(extra_names, str):
+            extra_names = [extra_names]
 
         # Derive feature names (build the set once, since comprehensions evaluate their condition every iteration)
         non_feature_names = {target_name, *extra_names}
@@ -88,7 +91,7 @@ class TabularDataset(Dataset[Table, Column]):
 
         # Validate inputs
         if target_name in extra_names:
-            raise ValueError(f"Column '{target_name}' cannot be both target and extra.")
+            raise ValueError(f"Column '{target_name}' cannot be both target and extra column.")
         if len(feature_names) == 0:
             raise ValueError("At least one feature column must remain.")
 

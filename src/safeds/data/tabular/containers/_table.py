@@ -2640,14 +2640,20 @@ class Table:
 
         self._lazy_frame.sink_parquet(path)
 
-    def to_tabular_dataset(self, target_name: str, *, extra_names: list[str] | None = None) -> TabularDataset:
+    def to_tabular_dataset(
+        self,
+        target_name: str,
+        /,  # If we allow multiple targets in the future, we would rename the parameter to `target_names`.
+        *,
+        extra_names: str | list[str] | None = None,
+    ) -> TabularDataset:
         """
         Return a new `TabularDataset` with columns marked as a target, feature, or extra.
 
         - The target column is the column that a model should predict.
         - Feature columns are columns that a model should use to make predictions.
-        - Extra columns are columns that are neither feature nor target. They can be used to provide additional context,
-          like an ID column.
+        - Extra columns are columns that are neither feature nor target. They are ignored by models and can be used to
+          provide additional context. An ID or name column is a common example.
 
         Feature columns are implicitly defined as all columns except the target and extra columns. If no extra columns
         are specified, all columns except the target column are used as features.
@@ -2657,38 +2663,35 @@ class Table:
         target_name:
             The name of the target column.
         extra_names:
-            Names of the columns that are neither feature nor target. If None, no extra columns are used, i.e. all but
+            Names of the columns that are neither features nor target. If None, no extra columns are used, i.e. all but
             the target column are used as features.
-
-        Returns
-        -------
-        dataset:
-            A new tabular dataset with the given target and feature names.
 
         Raises
         ------
+        ColumnNotFoundError
+            If a target or extra column does not exist.
         ValueError
-            If the target column is also a feature column.
+            If the target column is also an extra column.
         ValueError
-            If no feature columns are specified.
+            If no feature column remains.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table(
         ...     {
-        ...         "item": ["apple", "milk", "beer"],
-        ...         "price": [1.10, 1.19, 1.79],
-        ...         "amount_bought": [74, 72, 51],
-        ...     }
+        ...         "extra": [1, 2, 3],
+        ...         "feature": [4, 5, 6],
+        ...         "target": [7, 8, 9],
+        ...     },
         ... )
-        >>> dataset = table.to_tabular_dataset(target_name="amount_bought", extra_names=["item"])
+        >>> dataset = table.to_tabular_dataset("target", extra_names="extra")
         """
         from safeds.data.labeled.containers import TabularDataset  # circular import
 
         return TabularDataset(
             self,
-            target_name=target_name,
+            target_name,
             extra_names=extra_names,
         )
 
