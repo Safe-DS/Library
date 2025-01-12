@@ -283,11 +283,7 @@ class Table:
 
         path = _normalize_and_check_file_path(path, ".json", [".json"], check_if_file_exists=True)
 
-        try:
-            return Table._from_polars_data_frame(pl.read_json(path))
-        except (pl.exceptions.ComputeError, pl.exceptions.PanicException):
-            # Can happen if the JSON file is empty (https://github.com/pola-rs/polars/issues/10234)
-            return Table({})  # pragma: no cover
+        return Table._from_polars_data_frame(pl.read_json(path))
 
     @staticmethod
     def from_parquet_file(path: str | Path) -> Table:
