@@ -80,7 +80,7 @@ class Schema:
 
         Examples
         --------
-        >>> from safeds.data.tabular.typing import Schema
+        >>> from safeds.data.tabular.typing import ColumnType, Schema
         >>> schema = Schema({"a": ColumnType.int64(), "b": ColumnType.float32()})
         >>> schema.column_count
         2
@@ -94,7 +94,7 @@ class Schema:
 
         Examples
         --------
-        >>> from safeds.data.tabular.typing import Schema
+        >>> from safeds.data.tabular.typing import ColumnType, Schema
         >>> schema = Schema({"a": ColumnType.int64(), "b": ColumnType.float32()})
         >>> schema.column_names
         ['a', 'b']
@@ -127,7 +127,7 @@ class Schema:
 
         Examples
         --------
-        >>> from safeds.data.tabular.typing import Schema
+        >>> from safeds.data.tabular.typing import ColumnType, Schema
         >>> schema = Schema({"a": ColumnType.int64(), "b": ColumnType.float32()})
         >>> schema.get_column_type("a")
         int64
@@ -152,7 +152,7 @@ class Schema:
 
         Examples
         --------
-        >>> from safeds.data.tabular.typing import Schema
+        >>> from safeds.data.tabular.typing import ColumnType, Schema
         >>> schema = Schema({"a": ColumnType.int64(), "b": ColumnType.float32()})
         >>> schema.has_column("a")
         True
@@ -180,6 +180,7 @@ class Schema:
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"A": [1, 2, 3], "B": ["a", "b", "c"]})
         >>> table.schema.to_dict()
+        {'A': int64, 'B': string}
         """
         return {name: _PolarsColumnType(type_) for name, type_ in self._schema.items()}
 

@@ -470,8 +470,8 @@ class Table:
         >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> table.schema
         Schema({
-            'a': Int64,
-            'b': Int64
+            'a': int64,
+            'b': int64
         })
         """
         return Schema._from_polars_schema(self._lazy_frame.collect_schema())
@@ -1301,7 +1301,6 @@ class Table:
         1
 
         >>> table.count_rows_if(lambda row: row["col1"] < row["col2"], ignore_unknown=False)
-        None
         """
         expression = predicate(_LazyVectorizedRow(self))._polars_expression
         series = self._lazy_frame.select(expression.alias("count")).collect().get_column("count")
@@ -1765,9 +1764,9 @@ class Table:
         | --- | --- |
         | i64 | i64 |
         +===========+
+        |   1 |   4 |
         |   3 |   6 |
         |   2 |   5 |
-        |   1 |   4 |
         +-----+-----+
         """
         return Table._from_polars_data_frame(
@@ -1994,9 +1993,9 @@ class Table:
         | --- | --- |
         | i64 | i64 |
         +===========+
-        |   1 |   6 |
         |   4 |   9 |
-        |   3 |   8 |
+        |   1 |   6 |
+        |   2 |   7 |
         +-----+-----+
         >>> second_table
         +-----+-----+
@@ -2005,7 +2004,7 @@ class Table:
         | i64 | i64 |
         +===========+
         |   5 |  10 |
-        |   2 |   7 |
+        |   3 |   8 |
         +-----+-----+
         """
         _check_bounds(
@@ -2284,15 +2283,15 @@ class Table:
         +------+-----+-----+
 
         >>> table1.join(table2, "a", "c", mode="full")
-        +------+-------+------+------+
-        |    a | b     |    c | d    |
-        |  --- | ---   |  --- | ---  |
-        |  i64 | bool  |  i64 | str  |
-        +============================+
-        |    1 | true  |    1 | a    |
-        |    2 | false | null | null |
-        | null | null  |    3 | b    |
-        +------+-------+------+------+
+        +-----+-------+------+
+        |   a | b     | d    |
+        | --- | ---   | ---  |
+        | i64 | bool  | str  |
+        +====================+
+        |   1 | true  | a    |
+        |   2 | false | null |
+        |   3 | null  | b    |
+        +-----+-------+------+
         """
         # Preprocessing
         if isinstance(left_names, str):
@@ -2414,20 +2413,20 @@ class Table:
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"a": [1, 3]})
         >>> table.summarize_statistics()
-        +----------------------+---------+
-        | statistic            |       a |
-        | ---                  |     --- |
-        | str                  |     f64 |
-        +================================+
-        | min                  | 1.00000 |
-        | max                  | 3.00000 |
-        | mean                 | 2.00000 |
-        | median               | 2.00000 |
-        | standard deviation   | 1.41421 |
-        | missing value ratio  | 0.00000 |
-        | stability            | 0.50000 |
-        | idness               | 1.00000 |
-        +----------------------+---------+
+        +---------------------+---------+
+        | statistic           |       a |
+        | ---                 |     --- |
+        | str                 |     f64 |
+        +===============================+
+        | min                 | 1.00000 |
+        | max                 | 3.00000 |
+        | mean                | 2.00000 |
+        | median              | 2.00000 |
+        | standard deviation  | 1.41421 |
+        | missing value ratio | 0.00000 |
+        | stability           | 0.50000 |
+        | idness              | 1.00000 |
+        +---------------------+---------+
         """
         import polars as pl
         import polars.selectors as cs

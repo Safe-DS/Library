@@ -649,20 +649,20 @@ class Column(Sequence[T_co]):
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("a", [1, 3])
         >>> column.summarize_statistics()
-        +----------------------+---------+
-        | statistic            |       a |
-        | ---                  |     --- |
-        | str                  |     f64 |
-        +================================+
-        | min                  | 1.00000 |
-        | max                  | 3.00000 |
-        | mean                 | 2.00000 |
-        | median               | 2.00000 |
-        | standard deviation   | 1.41421 |
-        | missing value ratio  | 0.00000 |
-        | stability            | 0.50000 |
-        | idness               | 1.00000 |
-        +----------------------+---------+
+        +---------------------+---------+
+        | statistic           |       a |
+        | ---                 |     --- |
+        | str                 |     f64 |
+        +===============================+
+        | min                 | 1.00000 |
+        | max                 | 3.00000 |
+        | mean                | 2.00000 |
+        | median              | 2.00000 |
+        | standard deviation  | 1.41421 |
+        | missing value ratio | 0.00000 |
+        | stability           | 0.50000 |
+        | idness              | 1.00000 |
+        +---------------------+---------+
         """
         from ._table import Table
 
