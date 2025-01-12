@@ -1,9 +1,10 @@
 import datetime
 
 import pytest
+from syrupy import SnapshotAssertion
+
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import ColumnNotFoundError, ColumnTypeError
-from syrupy import SnapshotAssertion
 
 
 @pytest.mark.parametrize(

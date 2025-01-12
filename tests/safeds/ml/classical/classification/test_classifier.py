@@ -4,6 +4,7 @@ import itertools
 from typing import TYPE_CHECKING, Any, Self
 
 import pytest
+
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
@@ -88,7 +89,7 @@ def classifiers_with_choices() -> list[Classifier]:
     ]
 
 
-@pytest.fixture()
+@pytest.fixture
 def valid_data() -> TabularDataset:
     return Table(
         {

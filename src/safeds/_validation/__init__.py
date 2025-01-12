@@ -30,9 +30,9 @@ apipkg.initpkg(
 )
 
 __all__ = [
-    "_check_bounds",
     "_ClosedBound",
     "_OpenBound",
+    "_check_bounds",
     "_check_column_is_numeric",
     "_check_columns_are_numeric",
     "_check_columns_dont_exist",

@@ -1,4 +1,5 @@
 import pytest
+
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.containers._lazy_vectorized_row import _LazyVectorizedRow
 from safeds.data.tabular.typing import ColumnType

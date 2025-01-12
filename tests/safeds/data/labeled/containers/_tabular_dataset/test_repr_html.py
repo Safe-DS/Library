@@ -1,6 +1,7 @@
 import re
 
 import pytest
+
 from safeds.data.labeled.containers import TabularDataset
 
 

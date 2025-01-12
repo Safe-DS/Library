@@ -6,16 +6,16 @@ from pathlib import Path
 
 import pytest
 import torch
+from syrupy import SnapshotAssertion
+from torch import Tensor
+from torch.types import Device
+
 from safeds.data.image.containers import Image, ImageList
 from safeds.data.image.containers._empty_image_list import _EmptyImageList
 from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import DuplicateIndexError, IllegalFormatError, IndexOutOfBoundsError, OutOfBoundsError
-from syrupy import SnapshotAssertion
-from torch import Tensor
-from torch.types import Device
-
 from tests.helpers import (
     configure_test_with_device,
     device_cpu,
@@ -746,7 +746,7 @@ class TestToJpegFiles:
 
         with tempfile.TemporaryDirectory() as tmp_parent_dir:
             tmp_files = [
-                tempfile.NamedTemporaryFile(suffix=".jpg", prefix=str(i), dir=tmp_parent_dir)
+                tempfile.NamedTemporaryFile(suffix=".jpg", prefix=str(i), dir=tmp_parent_dir)  # noqa: SIM115
                 for i in range(len(image_list))
             ]
             for tmp_file in tmp_files:
@@ -837,7 +837,7 @@ class TestToPngFiles:
 
         with tempfile.TemporaryDirectory() as tmp_parent_dir:
             tmp_files = [
-                tempfile.NamedTemporaryFile(suffix=".png", prefix=str(i), dir=tmp_parent_dir)
+                tempfile.NamedTemporaryFile(suffix=".png", prefix=str(i), dir=tmp_parent_dir)  # noqa: SIM115
                 for i in range(len(image_list))
             ]
             for tmp_file in tmp_files:

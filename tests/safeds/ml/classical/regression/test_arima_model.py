@@ -1,6 +1,7 @@
 from typing import Any
 
 import pytest
+
 from safeds.data.labeled.containers import TimeSeriesDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
@@ -10,7 +11,6 @@ from safeds.exceptions import (
     NotFittedError,
 )
 from safeds.ml.classical.regression import AdaBoostRegressor, ArimaModelRegressor
-
 from tests.helpers import resolve_resource_path
 
 

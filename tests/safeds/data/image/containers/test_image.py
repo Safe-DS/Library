@@ -5,14 +5,14 @@ from tempfile import NamedTemporaryFile
 
 import pytest
 import torch
+from syrupy import SnapshotAssertion
+from torch.types import Device
+
 from safeds._config import _get_device
 from safeds.data.image.containers import Image
 from safeds.data.image.typing import ImageSize
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import IllegalFormatError, OutOfBoundsError
-from syrupy import SnapshotAssertion
-from torch.types import Device
-
 from tests.helpers import (
     configure_test_with_device,
     device_cpu,

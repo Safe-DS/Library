@@ -22,7 +22,7 @@ apipkg.initpkg(
 
 __all__ = [
     "_compute_duplicates",
-    "_structural_hash",
     "_figure_to_image",
     "_get_random_seed",
+    "_structural_hash",
 ]

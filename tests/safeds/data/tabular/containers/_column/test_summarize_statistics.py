@@ -2,6 +2,7 @@ import datetime
 from statistics import stdev
 
 import pytest
+
 from safeds.data.tabular.containers import Column, Table
 
 _HEADERS = [

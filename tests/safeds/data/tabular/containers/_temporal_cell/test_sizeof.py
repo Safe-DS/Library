@@ -1,6 +1,7 @@
 import sys
 
 import polars as pl
+
 from safeds.data.tabular.containers._lazy_temporal_cell import _LazyTemporalCell
 
 

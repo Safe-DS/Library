@@ -1,6 +1,7 @@
 from typing import Any
 
 import pytest
+
 from safeds.data.tabular.containers import Column
 from safeds.data.tabular.typing import ColumnType, Schema
 

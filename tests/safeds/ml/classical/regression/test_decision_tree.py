@@ -1,13 +1,14 @@
 import pytest
+from syrupy import SnapshotAssertion
+
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import NotFittedError, OutOfBoundsError
 from safeds.ml.classical.regression import DecisionTreeRegressor
 from safeds.ml.hyperparameters import Choice
-from syrupy import SnapshotAssertion
 
 
-@pytest.fixture()
+@pytest.fixture
 def training_set() -> TabularDataset:
     table = Table({"col1": [1, 2, 3, 4], "col2": [1, 2, 3, 4]})
     return table.to_tabular_dataset("col1")

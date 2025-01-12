@@ -2,6 +2,7 @@ from collections.abc import Callable
 from typing import Any
 
 from polars.testing import assert_frame_equal
+
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Cell, Column, Table
 

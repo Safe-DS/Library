@@ -1,6 +1,7 @@
 from collections.abc import Callable
 
 import pytest
+
 from safeds.data.tabular.containers import Cell, Table
 from safeds.exceptions import ColumnNotFoundError
 

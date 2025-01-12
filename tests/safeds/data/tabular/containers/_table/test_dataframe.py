@@ -1,5 +1,6 @@
 import pytest
 from polars import from_dataframe
+
 from safeds.data.tabular.containers import Table
 
 

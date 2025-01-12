@@ -1,9 +1,9 @@
 import pytest
-from safeds._config import _get_device
-from safeds.data.tabular.containers import Table
 from torch.types import Device
 from torch.utils.data import DataLoader
 
+from safeds._config import _get_device
+from safeds.data.tabular.containers import Table
 from tests.helpers import configure_test_with_device, get_devices, get_devices_ids
 
 

@@ -2,6 +2,7 @@ from typing import Any
 
 import polars as pl
 import pytest
+
 from safeds.data.tabular.containers import Table
 
 

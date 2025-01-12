@@ -89,8 +89,6 @@ line-length = 120
 target-version = "py311"
 
 [tool.ruff.lint]
-ignore-init-module-imports = true
-
 select = [
     "F",
     "E",

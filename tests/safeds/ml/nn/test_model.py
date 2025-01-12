@@ -2,6 +2,8 @@ import pickle
 import re
 
 import pytest
+from torch.types import Device
+
 from safeds.data.image.typing import ImageSize
 from safeds.data.labeled.containers import TabularDataset, TimeSeriesDataset
 from safeds.data.tabular.containers import Table
@@ -37,8 +39,6 @@ from safeds.ml.nn.layers import (
     MaxPooling2DLayer,
 )
 from safeds.ml.nn.typing import VariableImageSize
-from torch.types import Device
-
 from tests.helpers import configure_test_with_device, get_devices, get_devices_ids
 
 

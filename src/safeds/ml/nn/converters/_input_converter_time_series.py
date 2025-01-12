@@ -163,6 +163,4 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
         for name in self._feature_names:
             if name not in input_data.column_names:
                 return False
-        if self._target_name not in input_data.column_names:
-            return False
-        return True
+        return self._target_name in input_data.column_names

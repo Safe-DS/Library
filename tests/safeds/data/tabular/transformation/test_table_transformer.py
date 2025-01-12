@@ -1,6 +1,7 @@
 import itertools
 
 import pytest
+
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import (
     Discretizer,
@@ -81,7 +82,7 @@ def transformers() -> list[TableTransformer]:
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def valid_data_numeric() -> Table:
     return Table(
         {
@@ -90,7 +91,7 @@ def valid_data_numeric() -> Table:
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def valid_data_non_numeric() -> Table:
     return Table(
         {
@@ -99,7 +100,7 @@ def valid_data_non_numeric() -> Table:
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def valid_data_imputer() -> Table:
     return Table(
         {

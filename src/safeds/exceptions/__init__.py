@@ -79,7 +79,7 @@ class SchemaError(SafeDsError, TypeError):
     """Raised when tables have incompatible schemas."""
 
 
-__all__ = [
+__all__ = [  # noqa: RUF022
     "SafeDsError",
     "ColumnNotFoundError",
     "ColumnTypeError",

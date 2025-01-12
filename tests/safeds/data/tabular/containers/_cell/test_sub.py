@@ -1,7 +1,7 @@
 import polars as pl
 import pytest
-from safeds.data.tabular.containers._lazy_cell import _LazyCell
 
+from safeds.data.tabular.containers._lazy_cell import _LazyCell
 from tests.helpers import assert_cell_operation_works
 
 

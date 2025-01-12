@@ -2,11 +2,11 @@ import sys
 from typing import Any
 
 import pytest
+from torch.types import Device
+
 from safeds.data.image.containers import Image
 from safeds.exceptions import OutOfBoundsError
 from safeds.ml.nn.typing import ConstantImageSize, ModelImageSize, VariableImageSize
-from torch.types import Device
-
 from tests.helpers import (
     configure_test_with_device,
     get_devices,

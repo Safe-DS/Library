@@ -2,6 +2,7 @@ import sys
 import warnings
 
 import pytest
+
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import SimpleImputer
 from safeds.data.tabular.transformation._simple_imputer import _Mode

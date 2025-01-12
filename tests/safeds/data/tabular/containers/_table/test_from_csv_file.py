@@ -1,9 +1,9 @@
 from pathlib import Path
 
 import pytest
+
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import FileExtensionError
-
 from tests.helpers import resolve_resource_path
 
 

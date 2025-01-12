@@ -1,4 +1,5 @@
 import pytest
+
 from safeds.exceptions import IndexOutOfBoundsError
 
 

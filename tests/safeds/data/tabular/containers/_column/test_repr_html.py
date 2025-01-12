@@ -1,5 +1,6 @@
 import pytest
 import regex as re
+
 from safeds.data.tabular.containers import Column
 
 

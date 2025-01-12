@@ -1,4 +1,5 @@
 import pytest
+
 from safeds.data.labeled.containers import TimeSeriesDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import ColumnNotFoundError

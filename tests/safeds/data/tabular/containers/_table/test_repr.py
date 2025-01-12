@@ -1,4 +1,5 @@
 import pytest
+
 from safeds.data.tabular.containers import Table
 
 
@@ -11,12 +12,7 @@ from safeds.data.tabular.containers import Table
         ),
         (
             Table({"col1": [], "col2": []}),
-            "+------+------+\n"
-            "| col1 | col2 |\n"
-            "| ---  | ---  |\n"
-            "| null | null |\n"
-            "+=============+\n"
-            "+------+------+",
+            "+------+------+\n| col1 | col2 |\n| ---  | ---  |\n| null | null |\n+=============+\n+------+------+",
         ),
         (
             Table({"col1": [1, 2], "col2": [3, 4]}),

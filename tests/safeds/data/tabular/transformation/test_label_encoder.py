@@ -1,4 +1,5 @@
 import pytest
+
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import LabelEncoder
 from safeds.exceptions import ColumnNotFoundError, ColumnTypeError, NotFittedError

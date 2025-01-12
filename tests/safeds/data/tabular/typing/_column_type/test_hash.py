@@ -1,8 +1,9 @@
 from collections.abc import Callable
 
 import pytest
-from safeds.data.tabular.typing import ColumnType
 from syrupy import SnapshotAssertion
+
+from safeds.data.tabular.typing import ColumnType
 
 
 @pytest.mark.parametrize(

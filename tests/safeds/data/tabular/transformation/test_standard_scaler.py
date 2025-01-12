@@ -1,8 +1,8 @@
 import pytest
+
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import StandardScaler
 from safeds.exceptions import ColumnNotFoundError, ColumnTypeError, NotFittedError
-
 from tests.helpers import assert_tables_are_equal
 
 

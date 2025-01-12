@@ -4,6 +4,7 @@ import itertools
 from typing import TYPE_CHECKING, Any, Self
 
 import pytest
+
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Column, Table
 from safeds.exceptions import (
@@ -96,7 +97,7 @@ def regressors_with_choices() -> list[Regressor]:
     ]
 
 
-@pytest.fixture()
+@pytest.fixture
 def valid_data() -> TabularDataset:
     return Table(
         {

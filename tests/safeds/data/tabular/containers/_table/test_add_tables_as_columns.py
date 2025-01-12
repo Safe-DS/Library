@@ -1,6 +1,7 @@
 from collections.abc import Callable
 
 import pytest
+
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import DuplicateColumnError, LengthMismatchError
 

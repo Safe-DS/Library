@@ -2,6 +2,7 @@ from collections.abc import Callable
 from typing import Literal
 
 import pytest
+
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import ColumnNotFoundError, DuplicateColumnError, LengthMismatchError
 

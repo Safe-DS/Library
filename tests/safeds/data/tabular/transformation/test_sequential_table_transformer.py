@@ -1,4 +1,5 @@
 import pytest
+
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import (
     Discretizer,
@@ -10,7 +11,6 @@ from safeds.data.tabular.transformation import (
     TableTransformer,
 )
 from safeds.exceptions import NotFittedError, NotInvertibleError
-
 from tests.helpers import assert_tables_are_equal
 
 
