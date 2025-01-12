@@ -914,14 +914,16 @@ class Table:
             upper_bound=_ClosedBound(1),
         )
 
-        return Table._from_polars_lazy_frame(
-            pl.LazyFrame(
-                [
-                    column._series
-                    for column in self.to_columns()
-                    if column.missing_value_ratio() <= missing_value_ratio_threshold
-                ],
-            ),
+        # Collect the data here, since we need it again later
+        mask = self._data_frame.select(
+            (pl.all().null_count() / pl.len() <= missing_value_ratio_threshold),
+        )
+
+        if mask.is_empty():
+            return Table({})
+
+        return Table._from_polars_data_frame(
+            self._data_frame[:, mask.row(0)],
         )
 
     def remove_non_numeric_columns(self) -> Table:
