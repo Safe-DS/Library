@@ -18,8 +18,8 @@ from syrupy import SnapshotAssertion
         "with data",
     ],
 )
-class TestSameHash:
-    def test_should_return_same_hash_for_equal_tables(self, table_factory: Callable[[], Table]) -> None:
+class TestContract:
+    def test_should_return_same_hash_for_equal_objects(self, table_factory: Callable[[], Table]) -> None:
         table_1 = table_factory()
         table_2 = table_factory()
         assert hash(table_1) == hash(table_2)
@@ -82,5 +82,5 @@ class TestSameHash:
         "too many rows",
     ],
 )
-def test_should_return_different_hash_for_unequal_tables_if_computation_is_fast(table_1: Table, table_2: Table) -> None:
+def test_should_be_good_hash(table_1: Table, table_2: Table) -> None:
     assert hash(table_1) != hash(table_2)

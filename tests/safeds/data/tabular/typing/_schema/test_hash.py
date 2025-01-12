@@ -18,8 +18,8 @@ from syrupy import SnapshotAssertion
         "two columns",
     ],
 )
-class TestSameHash:
-    def test_should_return_same_hash_for_equal_schemas(self, schema_factory: Callable[[], Schema]) -> None:
+class TestContract:
+    def test_should_return_same_hash_for_equal_objects(self, schema_factory: Callable[[], Schema]) -> None:
         schema_1 = schema_factory()
         schema_2 = schema_factory()
         assert hash(schema_1) == hash(schema_2)
@@ -70,7 +70,7 @@ class TestSameHash:
         "different types",
     ],
 )
-def test_should_return_different_hash_for_unequal_schemas(
+def test_should_be_good_hash(
     schema_1: Schema,
     schema_2: Schema,
 ) -> None:
