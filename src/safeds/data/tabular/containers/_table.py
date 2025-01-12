@@ -35,7 +35,7 @@ if TYPE_CHECKING:
     from torch import Tensor
     from torch.utils.data import DataLoader, Dataset
 
-    from safeds.data.labeled.containers import TabularDataset, TimeSeriesDataset
+    from safeds.data.labeled.containers import TabularDataset
     from safeds.data.tabular.transformation import (
         InvertibleTableTransformer,
         TableTransformer,
@@ -2695,60 +2695,61 @@ class Table:
             extra_names=extra_names,
         )
 
-    def to_time_series_dataset(
-        self,
-        target_name: str,
-        window_size: int,
-        *,
-        extra_names: list[str] | None = None,
-        forecast_horizon: int = 1,
-        continuous: bool = False,
-    ) -> TimeSeriesDataset:
-        """
-        Return a new `TimeSeriesDataset` with columns marked as a target column, time or feature columns.
-
-        The original table is not modified.
-
-        Parameters
-        ----------
-        target_name:
-            The name of the target column.
-        window_size:
-            The number of consecutive sample to use as input for prediction.
-        extra_names:
-            Names of the columns that are neither features nor target. If None, no extra columns are used, i.e. all but
-            the target column are used as features.
-        forecast_horizon:
-            The number of time steps to predict into the future.
-
-        Returns
-        -------
-        dataset:
-            A new time series dataset with the given target and feature names.
-
-        Raises
-        ------
-        ValueError
-            If the target column is also a feature column.
-        ValueError
-            If the time column is also a feature column.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> table = Table({"day": [0, 1, 2], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
-        >>> dataset = table.to_time_series_dataset(target_name="amount_bought", window_size=2)
-        """
-        from safeds.data.labeled.containers import TimeSeriesDataset  # circular import
-
-        return TimeSeriesDataset(
-            self,
-            target_name=target_name,
-            window_size=window_size,
-            extra_names=extra_names,
-            forecast_horizon=forecast_horizon,
-            continuous=continuous,
-        )
+    # TODO: check design, test, and add the method back (here we should definitely allow multiple targets)
+    # def to_time_series_dataset(
+    #     self,
+    #     target_name: str,
+    #     window_size: int,
+    #     *,
+    #     extra_names: list[str] | None = None,
+    #     forecast_horizon: int = 1,
+    #     continuous: bool = False,
+    # ) -> TimeSeriesDataset:
+    #     """
+    #     Return a new `TimeSeriesDataset` with columns marked as a target column, time or feature columns.
+    #
+    #     The original table is not modified.
+    #
+    #     Parameters
+    #     ----------
+    #     target_name:
+    #         The name of the target column.
+    #     window_size:
+    #         The number of consecutive sample to use as input for prediction.
+    #     extra_names:
+    #         Names of the columns that are neither features nor target. If None, no extra columns are used, i.e. all but
+    #         the target column are used as features.
+    #     forecast_horizon:
+    #         The number of time steps to predict into the future.
+    #
+    #     Returns
+    #     -------
+    #     dataset:
+    #         A new time series dataset with the given target and feature names.
+    #
+    #     Raises
+    #     ------
+    #     ValueError
+    #         If the target column is also a feature column.
+    #     ValueError
+    #         If the time column is also a feature column.
+    #
+    #     Examples
+    #     --------
+    #     >>> from safeds.data.tabular.containers import Table
+    #     >>> table = Table({"day": [0, 1, 2], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
+    #     >>> dataset = table.to_time_series_dataset(target_name="amount_bought", window_size=2)
+    #     """
+    #     from safeds.data.labeled.containers import TimeSeriesDataset  # circular import
+    #
+    #     return TimeSeriesDataset(
+    #         self,
+    #         target_name=target_name,
+    #         window_size=window_size,
+    #         extra_names=extra_names,
+    #         forecast_horizon=forecast_horizon,
+    #         continuous=continuous,
+    #     )
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dataframe interchange protocol
