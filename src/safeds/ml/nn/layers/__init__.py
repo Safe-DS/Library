@@ -31,14 +31,14 @@ apipkg.initpkg(
 )
 
 __all__ = [
+    "AveragePooling2DLayer",
     "Convolutional2DLayer",
     "ConvolutionalTranspose2DLayer",
+    "DropoutLayer",
     "FlattenLayer",
     "ForwardLayer",
-    "Layer",
-    "LSTMLayer",
     "GRULayer",
-    "AveragePooling2DLayer",
+    "LSTMLayer",
+    "Layer",
     "MaxPooling2DLayer",
-    "DropoutLayer",
 ]

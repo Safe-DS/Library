@@ -1,17 +1,16 @@
 """Custom exceptions that can be raised by Safe-DS."""
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from ._data import (
-    ColumnLengthMismatchError,
-    ColumnSizeError,
-    DuplicateColumnError,
     DuplicateIndexError,
     IllegalFormatError,
     IndexOutOfBoundsError,
     MissingValuesColumnError,
     NonNumericColumnError,
     OutputLengthMismatchError,
-    TransformerNotFittedError,
-    TransformerNotInvertibleError,
     ValueNotPresentWhenFittedError,
 )
 from ._ml import (
@@ -25,52 +24,80 @@ from ._ml import (
     InvalidFitDataError,
     InvalidModelStructureError,
     LearningError,
-    ModelNotFittedError,
     PlainTableError,
     PredictionError,
     TargetDataMismatchError,
 )
+
+if TYPE_CHECKING:
+    from safeds.data.tabular.transformation import TableTransformer
 
 
 class SafeDsError(Exception):
     """Base class for all exceptions defined by Safe-DS."""
 
 
-class ColumnNotFoundError(SafeDsError):
-    """Exception raised when trying to access an invalid column name."""
+class ColumnNotFoundError(SafeDsError, IndexError):
+    """Raised when trying to access an invalid column name."""
 
 
-class ColumnTypeError(SafeDsError):
-    """Exception raised when a column has the wrong type."""
+class ColumnTypeError(SafeDsError, TypeError):
+    """Raised when a column has the wrong type."""
 
 
-class FileExtensionError(SafeDsError):
-    """Exception raised when a path has the wrong file extension."""
+class DuplicateColumnError(SafeDsError, ValueError):
+    """Raised when a table has duplicate column names."""
 
 
-class OutOfBoundsError(SafeDsError):
-    """Exception raised when a value is outside its expected range."""
+class FileExtensionError(SafeDsError, ValueError):
+    """Raised when a path has the wrong file extension."""
 
 
-__all__ = [
+class LengthMismatchError(SafeDsError, ValueError):
+    """Raised when objects have different lengths."""
+
+
+class NotFittedError(SafeDsError, RuntimeError):
+    """Raised when an object (e.g. a transformer or model) is not fitted."""
+
+    def __init__(self, *, kind: str = "object") -> None:
+        super().__init__(f"This {kind} has not been fitted yet.")
+
+
+class NotInvertibleError(SafeDsError, TypeError):
+    """Raised when inverting a non-invertible transformation."""
+
+    def __init__(self, transformer: TableTransformer) -> None:
+        super().__init__(f"A {transformer.__class__.__name__} is not invertible.")
+
+
+class OutOfBoundsError(SafeDsError, ValueError):
+    """Raised when a value is outside its expected range."""
+
+
+class SchemaError(SafeDsError, TypeError):
+    """Raised when tables have incompatible schemas."""
+
+
+__all__ = [  # noqa: RUF022
     "SafeDsError",
     "ColumnNotFoundError",
     "ColumnTypeError",
+    "DuplicateColumnError",
     "FileExtensionError",
+    "LengthMismatchError",
+    "NotFittedError",
+    "NotInvertibleError",
     "OutOfBoundsError",
+    "SchemaError",
     # TODO
     # Data exceptions
-    "ColumnLengthMismatchError",
-    "ColumnSizeError",
-    "DuplicateColumnError",
     "DuplicateIndexError",
     "IllegalFormatError",
     "IndexOutOfBoundsError",
     "MissingValuesColumnError",
     "NonNumericColumnError",
     "OutputLengthMismatchError",
-    "TransformerNotFittedError",
-    "TransformerNotInvertibleError",
     "ValueNotPresentWhenFittedError",
     # ML exceptions
     "DatasetMissesDataError",
@@ -83,7 +110,6 @@ __all__ = [
     "InputSizeError",
     "InvalidModelStructureError",
     "LearningError",
-    "ModelNotFittedError",
     "PlainTableError",
     "PredictionError",
     "TargetDataMismatchError",

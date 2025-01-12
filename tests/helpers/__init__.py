@@ -1,7 +1,7 @@
 from ._assertions import (
     assert_cell_operation_works,
     assert_row_operation_works,
-    assert_tables_equal,
+    assert_tables_are_equal,
     assert_that_tabular_datasets_are_equal,
 )
 from ._devices import (
@@ -40,17 +40,17 @@ from ._resources import resolve_resource_path
 __all__ = [
     "assert_cell_operation_works",
     "assert_row_operation_works",
-    "assert_tables_equal",
+    "assert_tables_are_equal",
     "assert_that_tabular_datasets_are_equal",
     "configure_test_with_device",
     "device_cpu",
     "device_cuda",
+    "get_devices",
+    "get_devices_ids",
     "grayscale_jpg_id",
     "grayscale_jpg_path",
     "grayscale_png_id",
     "grayscale_png_path",
-    "get_devices",
-    "get_devices_ids",
     "images_all",
     "images_all_channel",
     "images_all_channel_ids",

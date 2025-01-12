@@ -3,12 +3,13 @@ import warnings
 
 import pytest
 from polars.testing import assert_frame_equal
+
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.exceptions import (
     ColumnNotFoundError,
     ColumnTypeError,
-    TransformerNotFittedError,
+    NotFittedError,
 )
 
 
@@ -91,7 +92,7 @@ class TestTransform:
 
         transformer = OneHotEncoder()
 
-        with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
+        with pytest.raises(NotFittedError, match=r"This transformer has not been fitted yet."):
             transformer.transform(table)
 
 
@@ -382,7 +383,7 @@ class TestInverseTransform:
 
         transformer = OneHotEncoder()
 
-        with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
+        with pytest.raises(NotFittedError, match=r"This transformer has not been fitted yet."):
             transformer.inverse_transform(table)
 
     def test_should_raise_if_column_not_found(self) -> None:

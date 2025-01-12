@@ -10,39 +10,35 @@ from tests.helpers import resolve_resource_path
 @pytest.mark.parametrize(
     ("path", "expected"),
     [
-        ("table.json", Table({"A": ["❔"], "B": [2]})),
-        (Path("table.json"), Table({"A": ["❔"], "B": [2]})),
-        (Path("emptytable.json"), Table({})),
+        ("json/empty.json", Table({})),
+        ("json/non-empty.json", Table({"A": [1], "B": [2]})),
+        ("json/special-character.json", Table({"A": ["❔"], "B": [2]})),
+        ("json/empty", Table({})),
     ],
-    ids=["by string", "by path", "empty"],
+    ids=[
+        "empty",
+        "non-empty",
+        "special character",
+        "missing extension",
+    ],
 )
-def test_should_create_table_from_json_file(path: str | Path, expected: Table) -> None:
-    table = Table.from_json_file(resolve_resource_path(path))
-    assert table.schema == expected.schema
-    assert table == expected
+class TestShouldCreateTableFromJsonFile:
+    def test_path_as_string(self, path: str, expected: Table) -> None:
+        path_as_string = resolve_resource_path(path)
+        actual = Table.from_json_file(path_as_string)
+        assert actual == expected
+
+    def test_path_as_path_object(self, path: str, expected: Table) -> None:
+        path_as_path_object = Path(resolve_resource_path(path))
+        actual = Table.from_json_file(path_as_path_object)
+        assert actual == expected
 
 
-@pytest.mark.parametrize(
-    "path",
-    [
-        "test_table_from_json_file_invalid.json",
-        Path("test_table_from_json_file_invalid.json"),
-    ],
-    ids=["by string", "by path"],
-)
-def test_should_raise_error_if_file_not_found(path: str | Path) -> None:
+def test_should_raise_if_file_not_found() -> None:
     with pytest.raises(FileNotFoundError):
-        Table.from_json_file(resolve_resource_path(path))
+        Table.from_json_file(resolve_resource_path("not-found.json"))
 
 
-@pytest.mark.parametrize(
-    "path",
-    [
-        "invalid_file_extension.file_extension",
-        Path("invalid_file_extension.file_extension"),
-    ],
-    ids=["by String", "by path"],
-)
-def test_should_raise_error_if_wrong_file_extension(path: str | Path) -> None:
+def test_should_raise_if_wrong_file_extension() -> None:
     with pytest.raises(FileExtensionError):
-        Table.from_json_file(resolve_resource_path(path))
+        Table.from_json_file(resolve_resource_path("invalid-extension.txt"))

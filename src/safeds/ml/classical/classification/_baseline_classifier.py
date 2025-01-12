@@ -3,12 +3,12 @@ import multiprocessing as mp
 from concurrent.futures import ALL_COMPLETED, wait
 from typing import Self
 
-from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
+from safeds._validation import _check_columns_are_numeric
 from safeds.data.labeled.containers import TabularDataset
 from safeds.exceptions import (
     DatasetMissesDataError,
     FeatureDataMismatchError,
-    ModelNotFittedError,
+    NotFittedError,
     TargetDataMismatchError,
 )
 from safeds.ml.classical.classification import (
@@ -125,7 +125,7 @@ class BaselineClassifier:
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the model has not been fitted yet
         FeatureDataMismatchError
             If the features of the test data do not match with the features of the trained Classifier.
@@ -141,7 +141,7 @@ class BaselineClassifier:
         from safeds.ml.metrics import ClassificationMetrics
 
         if not self._is_fitted:
-            raise ModelNotFittedError
+            raise NotFittedError(kind="model")
 
         # Validate data
         if not self._feature_names == test_data.features.column_names:

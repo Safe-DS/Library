@@ -3,10 +3,10 @@ from __future__ import annotations
 from timeit import timeit
 
 import polars as pl
-from safeds.data.tabular.containers import Table
-from safeds.ml.metrics import ClassificationMetrics
 
 from benchmarks.table.utils import create_synthetic_table
+from safeds.data.tabular.containers import Table
+from safeds.ml.metrics import ClassificationMetrics
 
 REPETITIONS = 10
 

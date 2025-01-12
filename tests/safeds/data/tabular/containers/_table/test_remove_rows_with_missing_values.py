@@ -1,31 +1,82 @@
+from collections.abc import Callable
+
 import pytest
 
 from safeds.data.tabular.containers import Table
 
 
 @pytest.mark.parametrize(
-    ("table", "expected"),
+    ("table_factory", "column_names", "expected"),
     [
+        # empty
         (
-            Table(
-                {
-                    "col1": [None, None, "C", "A"],
-                    "col2": [None, "2", "3", "4"],
-                },
-            ),
-            Table(
-                {
-                    "col1": ["C", "A"],
-                    "col2": ["3", "4"],
-                },
-            ),
+            lambda: Table({}),
+            None,
+            Table({}),
         ),
-        (Table({}), Table({})),
+        # no rows
+        (
+            lambda: Table({"col1": []}),
+            None,
+            Table({"col1": []}),
+        ),
+        # no missing values
+        (
+            lambda: Table({"col1": [1, 2]}),
+            None,
+            Table({"col1": [1, 2]}),
+        ),
+        # missing values (all columns selected)
+        (
+            lambda: Table({"col1": [1, 2, None], "col2": [1, None, 3], "col3": [None, 2, 3]}),
+            None,
+            Table({"col1": [], "col2": [], "col3": []}),
+        ),
+        # missing values (several columns selected)
+        (
+            lambda: Table({"col1": [1, 2, None], "col2": [1, None, 3], "col3": [None, 2, 3]}),
+            ["col1", "col2"],
+            Table({"col1": [1], "col2": [1], "col3": [None]}),
+        ),
+        # missing values (one column selected)
+        (
+            lambda: Table({"col1": [1, 2, None], "col2": [1, None, 3], "col3": [None, 2, 3]}),
+            "col1",
+            Table({"col1": [1, 2], "col2": [1, None], "col3": [None, 2]}),
+        ),
+        # missing values (no columns selected)
+        (
+            lambda: Table({"col1": [1, 2, None], "col2": [1, None, 3], "col3": [None, 2, 3]}),
+            [],
+            Table({"col1": [1, 2, None], "col2": [1, None, 3], "col3": [None, 2, 3]}),
+        ),
     ],
-    ids=["some missing values", "empty"],
+    ids=[
+        "empty",
+        "no rows",
+        "no missing values",
+        "missing values (all columns selected)",
+        "missing values (several columns selected)",
+        "missing values (one column selected)",
+        "missing values (no columns selected)",
+    ],
 )
-def test_should_remove_rows_with_missing_values(table: Table, expected: Table) -> None:
-    updated_table = table.remove_rows_with_missing_values()
-    assert updated_table.schema == expected.schema
-    assert updated_table.column_count == expected.column_count
-    assert updated_table == expected
+class TestHappyPath:
+    def test_should_remove_rows_with_missing_values(
+        self,
+        table_factory: Callable[[], Table],
+        column_names: str | list[str] | None,
+        expected: Table,
+    ) -> None:
+        actual = table_factory().remove_rows_with_missing_values(column_names=column_names)
+        assert actual == expected
+
+    def test_should_not_mutate_receiver(
+        self,
+        table_factory: Callable[[], Table],
+        column_names: str | list[str] | None,
+        expected: Table,  # noqa: ARG002
+    ) -> None:
+        original = table_factory()
+        original.remove_rows_with_missing_values(column_names=column_names)
+        assert original == table_factory()

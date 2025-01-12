@@ -55,7 +55,7 @@ class TimeSeriesDataset(Dataset[Table, Column]):
     >>> from safeds.data.labeled.containers import TabularDataset
     >>> dataset = TimeSeriesDataset(
     ...     {"id": [1, 2, 3], "feature": [4, 5, 6], "target": [1, 2, 3], "error":[0,0,1]},
-    ...     target_name="target",
+    ...     "target",
     ...     window_size=1,
     ...     extra_names=["error"],
     ... )
@@ -94,11 +94,11 @@ class TimeSeriesDataset(Dataset[Table, Column]):
 
         # Set attributes
         self._table: Table = data
-        self._features: Table = data.remove_columns_except(feature_names)
+        self._features: Table = data.select_columns(feature_names)
         self._target: Column = data.get_column(target_name)
         self._window_size: int = window_size
         self._forecast_horizon: int = forecast_horizon
-        self._extras: Table = data.remove_columns_except(extra_names)
+        self._extras: Table = data.select_columns(extra_names)
         self._continuous: bool = continuous
 
     def __eq__(self, other: object) -> bool:

@@ -1,6 +1,7 @@
 from typing import Any
 
 import pytest
+
 from safeds._utils._hashing import _structural_hash, _value_to_bytes
 from safeds.data.tabular.containers import Table
 

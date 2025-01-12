@@ -5,14 +5,14 @@ import pytest
 from torch.types import Device
 
 from safeds.data.image.typing import ImageSize
-from safeds.data.labeled.containers import TabularDataset
+from safeds.data.labeled.containers import TabularDataset, TimeSeriesDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
     FeatureDataMismatchError,
     FittingWithChoiceError,
     InvalidFitDataError,
     InvalidModelStructureError,
-    ModelNotFittedError,
+    NotFittedError,
     OutOfBoundsError,
 )
 from safeds.ml.hyperparameters import Choice
@@ -206,7 +206,13 @@ class TestClassificationModel:
 
         def test_should_raise_when_time_series_classification_with_continuous_data(self, device: Device) -> None:
             configure_test_with_device(device)
-            data = Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, 1, 0]}).to_time_series_dataset(
+            # data = Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, 1, 0]}).to_time_series_dataset(
+            #     "c",
+            #     1,
+            #     continuous=True,
+            # )
+            data = TimeSeriesDataset(
+                Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, 1, 0]}),
                 "c",
                 1,
                 continuous=True,
@@ -623,7 +629,7 @@ class TestClassificationModel:
 
         def test_should_raise_if_model_has_not_been_fitted(self, device: Device) -> None:
             configure_test_with_device(device)
-            with pytest.raises(ModelNotFittedError, match="The model has not been fitted yet."):
+            with pytest.raises(NotFittedError, match="This model has not been fitted yet."):
                 NeuralNetworkClassifier(
                     InputConversionTable(),
                     [ForwardLayer(neuron_count=1)],
@@ -1235,7 +1241,7 @@ class TestRegressionModel:
 
         def test_should_raise_if_model_has_not_been_fitted(self, device: Device) -> None:
             configure_test_with_device(device)
-            with pytest.raises(ModelNotFittedError, match="The model has not been fitted yet."):
+            with pytest.raises(NotFittedError, match="This model has not been fitted yet."):
                 NeuralNetworkRegressor(
                     InputConversionTable(),
                     [ForwardLayer(neuron_count=1)],

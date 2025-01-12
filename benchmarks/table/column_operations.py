@@ -1,8 +1,7 @@
 from timeit import timeit
 
-from safeds.data.tabular.containers import Table
-
 from benchmarks.table.utils import create_synthetic_table
+from safeds.data.tabular.containers import Table
 
 REPETITIONS = 10
 

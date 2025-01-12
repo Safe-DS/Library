@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from safeds._validation import _check_columns_exist
-from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
+from safeds._validation import _check_columns_are_numeric, _check_columns_exist
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import TransformerNotFittedError
+from safeds.exceptions import NotFittedError
 
 from ._invertible_table_transformer import InvertibleTableTransformer
 
@@ -115,7 +114,7 @@ class StandardScaler(InvertibleTableTransformer):
 
         Raises
         ------
-        TransformerNotFittedError
+        NotFittedError
             If the transformer has not been fitted yet.
         ColumnNotFoundError
             If the input table does not contain all columns used to fit the transformer.
@@ -126,7 +125,7 @@ class StandardScaler(InvertibleTableTransformer):
 
         # Used in favor of is_fitted, so the type checker is happy
         if self._column_names is None or self._data_mean is None or self._data_standard_deviation is None:
-            raise TransformerNotFittedError
+            raise NotFittedError(kind="transformer")
 
         _check_columns_exist(table, self._column_names)
         _check_columns_are_numeric(table, self._column_names, operation="transform with a StandardScaler")
@@ -158,7 +157,7 @@ class StandardScaler(InvertibleTableTransformer):
 
         Raises
         ------
-        TransformerNotFittedError
+        NotFittedError
             If the transformer has not been fitted yet.
         ColumnNotFoundError
             If the input table does not contain all columns used to fit the transformer.
@@ -169,7 +168,7 @@ class StandardScaler(InvertibleTableTransformer):
 
         # Used in favor of is_fitted, so the type checker is happy
         if self._column_names is None or self._data_mean is None or self._data_standard_deviation is None:
-            raise TransformerNotFittedError
+            raise NotFittedError(kind="transformer")
 
         _check_columns_exist(transformed_table, self._column_names)
         _check_columns_are_numeric(

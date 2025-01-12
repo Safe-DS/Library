@@ -1,9 +1,9 @@
 import pytest
+
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import StandardScaler
-from safeds.exceptions import ColumnNotFoundError, ColumnTypeError, TransformerNotFittedError
-
-from tests.helpers import assert_tables_equal
+from safeds.exceptions import ColumnNotFoundError, ColumnTypeError, NotFittedError
+from tests.helpers import assert_tables_are_equal
 
 
 class TestFit:
@@ -71,7 +71,7 @@ class TestTransform:
 
         transformer = StandardScaler()
 
-        with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
+        with pytest.raises(NotFittedError, match=r"This transformer has not been fitted yet."):
             transformer.transform(table)
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
@@ -128,7 +128,7 @@ class TestFitAndTransform:
     ) -> None:
         fitted_transformer, transformed_table = StandardScaler(column_names=column_names).fit_and_transform(table)
         assert fitted_transformer.is_fitted
-        assert_tables_equal(transformed_table, expected)
+        assert_tables_are_equal(transformed_table, expected)
 
     def test_should_not_change_original_table(self) -> None:
         table = Table(
@@ -182,7 +182,7 @@ class TestInverseTransform:
             },
         )
 
-        assert_tables_equal(transformed_table, expected)
+        assert_tables_are_equal(transformed_table, expected)
 
     def test_should_raise_if_not_fitted(self) -> None:
         table = Table(
@@ -193,7 +193,7 @@ class TestInverseTransform:
 
         transformer = StandardScaler()
 
-        with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
+        with pytest.raises(NotFittedError, match=r"This transformer has not been fitted yet."):
             transformer.inverse_transform(table)
 
     def test_should_raise_if_column_not_found(self) -> None:

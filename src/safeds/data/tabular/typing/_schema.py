@@ -1,65 +1,114 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+import sys
 from typing import TYPE_CHECKING
 
+from safeds._utils import _structural_hash
+from safeds._validation import _check_columns_exist
+
+from ._polars_column_type import _PolarsColumnType
+
 if TYPE_CHECKING:
-    from ._data_type import DataType
+    from collections.abc import Mapping
+
+    import polars as pl
+
+    from ._column_type import ColumnType
 
 
-class Schema(ABC):
+class Schema:
     """The schema of a row or table."""
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Static methods
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @staticmethod
+    def _from_polars_schema(schema: pl.Schema) -> Schema:
+        result = object.__new__(Schema)
+        result._schema = schema
+        return result
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    @abstractmethod
-    def __eq__(self, other: object) -> bool: ...
+    def __init__(self, schema: Mapping[str, ColumnType]) -> None:
+        import polars as pl
 
-    @abstractmethod
-    def __hash__(self) -> int: ...
+        self._schema: pl.Schema = pl.Schema(
+            [(name, type_._polars_data_type) for name, type_ in schema.items()],
+            check_dtypes=False,
+        )
 
-    @abstractmethod
-    def __repr__(self) -> str: ...
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Schema):
+            return NotImplemented
+        if self is other:
+            return True
+        return self._schema == other._schema
 
-    @abstractmethod
-    def __sizeof__(self) -> int: ...
+    def __hash__(self) -> int:
+        return _structural_hash(tuple(self._schema.keys()), [str(type_) for type_ in self._schema.values()])
 
-    @abstractmethod
-    def __str__(self) -> str: ...
+    def __repr__(self) -> str:
+        return f"Schema({self!s})"
+
+    def __sizeof__(self) -> int:
+        return sys.getsizeof(self._schema)
+
+    def __str__(self) -> str:
+        match self._schema.len():
+            case 0:
+                return "{}"
+            case 1:
+                name, type_ = next(iter(self._schema.items()))
+                return f"{{{name!r}: {_PolarsColumnType(type_)}}}"
+            case _:
+                lines = (f"    {name!r}: {_PolarsColumnType(type_)}" for name, type_ in self._schema.items())
+                joined = ",\n".join(lines)
+                return f"{{\n{joined}\n}}"
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    @abstractmethod
-    def column_names(self) -> list[str]:
+    def column_count(self) -> int:
         """
-        Return a list of all column names contained in this schema.
-
-        Returns
-        -------
-        column_names:
-            The column names.
+        The number of columns.
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> table = Table({"A": [1, 2, 3], "B": ["a", "b", "c"]})
-        >>> table.schema.column_names
-        ['A', 'B']
+        >>> from safeds.data.tabular.typing import ColumnType, Schema
+        >>> schema = Schema({"a": ColumnType.int64(), "b": ColumnType.float32()})
+        >>> schema.column_count
+        2
         """
+        return self._schema.len()
+
+    @property
+    def column_names(self) -> list[str]:
+        """
+        The names of the columns.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.typing import ColumnType, Schema
+        >>> schema = Schema({"a": ColumnType.int64(), "b": ColumnType.float32()})
+        >>> schema.column_names
+        ['a', 'b']
+        """
+        # polars already creates a defensive copy
+        return self._schema.names()
 
     # ------------------------------------------------------------------------------------------------------------------
     # Getters
     # ------------------------------------------------------------------------------------------------------------------
 
-    @abstractmethod
-    def get_column_type(self, name: str) -> DataType:
+    def get_column_type(self, name: str) -> ColumnType:
         """
-        Return the type of the given column.
+        Get the type of a column.
 
         Parameters
         ----------
@@ -74,19 +123,22 @@ class Schema(ABC):
         Raises
         ------
         ColumnNotFoundError
-            If the specified column name does not exist.
+            If the column does not exist.
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> table = Table({"A": [1, 2, 3], "B": ["a", "b", "c"]})
-        >>> type_ = table.schema.get_column_type("A")
+        >>> from safeds.data.tabular.typing import ColumnType, Schema
+        >>> schema = Schema({"a": ColumnType.int64(), "b": ColumnType.float32()})
+        >>> schema.get_column_type("a")
+        int64
         """
+        _check_columns_exist(self, name)
 
-    @abstractmethod
+        return _PolarsColumnType(self._schema[name])
+
     def has_column(self, name: str) -> bool:
         """
-        Return whether the schema contains a given column.
+        Check if the table has a column with a specific name.
 
         Parameters
         ----------
@@ -95,46 +147,47 @@ class Schema(ABC):
 
         Returns
         -------
-        contains:
-            True if the schema contains the column.
+        has_column:
+            Whether the table has a column with the specified name.
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> table = Table({"A": [1, 2, 3], "B": ["a", "b", "c"]})
-        >>> table.schema.has_column("A")
+        >>> from safeds.data.tabular.typing import ColumnType, Schema
+        >>> schema = Schema({"a": ColumnType.int64(), "b": ColumnType.float32()})
+        >>> schema.has_column("a")
         True
 
-        >>> table.schema.has_column("C")
+        >>> schema.has_column("c")
         False
         """
+        return name in self._schema
 
     # ------------------------------------------------------------------------------------------------------------------
     # Conversion
     # ------------------------------------------------------------------------------------------------------------------
 
-    @abstractmethod
-    def to_dict(self) -> dict[str, DataType]:
+    def to_dict(self) -> dict[str, ColumnType]:
         """
         Return a dictionary that maps column names to column types.
 
         Returns
         -------
         data:
-            Dictionary representation of the schema.
+            The dictionary representation of the schema.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"A": [1, 2, 3], "B": ["a", "b", "c"]})
-        >>> dict_ = table.schema.to_dict()
+        >>> table.schema.to_dict()
+        {'A': int64, 'B': string}
         """
+        return {name: _PolarsColumnType(type_) for name, type_ in self._schema.items()}
 
     # ------------------------------------------------------------------------------------------------------------------
     # IPython integration
     # ------------------------------------------------------------------------------------------------------------------
 
-    @abstractmethod
     def _repr_markdown_(self) -> str:
         """
         Return a Markdown representation of the schema for IPython.
@@ -144,3 +197,9 @@ class Schema(ABC):
         markdown:
             The generated Markdown.
         """
+        if self._schema.len() == 0:
+            return "Empty schema"
+
+        lines = (f"| {name} | {type_} |" for name, type_ in self._schema.items())
+        joined = "\n".join(lines)
+        return f"| Column Name | Column Type |\n| --- | --- |\n{joined}"

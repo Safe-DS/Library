@@ -14,7 +14,7 @@ from safeds.exceptions import (
     FeatureDataMismatchError,
     FittingWithChoiceError,
     InvalidModelStructureError,
-    ModelNotFittedError,
+    NotFittedError,
 )
 from safeds.ml.metrics import ClassificationMetrics, RegressionMetrics
 from safeds.ml.nn.converters import (
@@ -357,11 +357,11 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
     def _data_split_table(self, data: TabularDataset) -> tuple[TabularDataset, TabularDataset]:
         [train_split, test_split] = data.to_table().split_rows(0.75)
         train_data = train_split.to_tabular_dataset(
-            target_name=data.target.name,
+            data.target.name,
             extra_names=data.extras.column_names,
         )
         test_dataset = test_split.to_tabular_dataset(
-            target_name=train_data.target.name,
+            train_data.target.name,
             extra_names=train_data.extras.column_names,
         )
         return train_data, test_dataset
@@ -445,10 +445,17 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
 
     def _data_split_time_series(self, data: TimeSeriesDataset) -> tuple[TimeSeriesDataset, Table]:
         (train_split, test_split) = data.to_table().split_rows(0.75)
-        train_data = train_split.to_time_series_dataset(
-            target_name=data.target.name,
+        # train_data = train_split.to_time_series_dataset(
+        #     data.target.name,
+        #     window_size=data.window_size,
+        #     extra_names=data.extras.column_names,
+        #     continuous=data.continuous,
+        #     forecast_horizon=data.forecast_horizon,
+        # )
+        train_data = TimeSeriesDataset(
+            train_split,
+            data.target.name,
             window_size=data.window_size,
-            extra_names=data.extras.column_names,
             continuous=data.continuous,
             forecast_horizon=data.forecast_horizon,
         )
@@ -587,7 +594,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the model has not been fitted yet
         """
         import torch
@@ -595,7 +602,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         _init_default_device()
 
         if not self._is_fitted or self._model is None:
-            raise ModelNotFittedError
+            raise NotFittedError(kind="model")
         if not self._input_conversion._is_predict_data_valid(test_data):
             raise FeatureDataMismatchError
         dataloader = self._input_conversion._data_conversion_predict(test_data, self._batch_size)
@@ -994,21 +1001,28 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
     def _data_split_table(self, data: TabularDataset) -> tuple[TabularDataset, TabularDataset]:
         [train_split, test_split] = data.to_table().split_rows(0.75)
         train_data = train_split.to_tabular_dataset(
-            target_name=data.target.name,
+            data.target.name,
             extra_names=data.extras.column_names,
         )
         test_data = test_split.to_tabular_dataset(
-            target_name=train_data.target.name,
+            train_data.target.name,
             extra_names=train_data.extras.column_names,
         )
         return (train_data, test_data)
 
     def _data_split_time_series(self, data: TimeSeriesDataset) -> tuple[TimeSeriesDataset, Table]:
         (train_split, test_split) = data.to_table().split_rows(0.75)
-        train_data = train_split.to_time_series_dataset(
-            target_name=data.target.name,
+        # train_data = train_split.to_time_series_dataset(
+        #     data.target.name,
+        #     window_size=data.window_size,
+        #     extra_names=data.extras.column_names,
+        #     continuous=data.continuous,
+        #     forecast_horizon=data.forecast_horizon,
+        # )
+        train_data = TimeSeriesDataset(
+            train_split,
+            data.target.name,
             window_size=data.window_size,
-            extra_names=data.extras.column_names,
             continuous=data.continuous,
             forecast_horizon=data.forecast_horizon,
         )
@@ -1402,7 +1416,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the Model has not been fitted yet
         """
         import torch
@@ -1410,7 +1424,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         _init_default_device()
 
         if not self._is_fitted or self._model is None:
-            raise ModelNotFittedError
+            raise NotFittedError(kind="model")
         if not self._input_conversion._is_predict_data_valid(test_data):
             raise FeatureDataMismatchError
         dataloader = self._input_conversion._data_conversion_predict(test_data, self._batch_size)

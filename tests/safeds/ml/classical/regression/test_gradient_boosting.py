@@ -1,4 +1,5 @@
 import pytest
+
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import OutOfBoundsError
@@ -6,10 +7,10 @@ from safeds.ml.classical.regression import GradientBoostingRegressor
 from safeds.ml.hyperparameters import Choice
 
 
-@pytest.fixture()
+@pytest.fixture
 def training_set() -> TabularDataset:
     table = Table({"col1": [1, 2, 3, 4], "col2": [1, 2, 3, 4]})
-    return table.to_tabular_dataset(target_name="col1")
+    return table.to_tabular_dataset("col1")
 
 
 class TestTreeCount:

@@ -1,7 +1,8 @@
 import pytest
 import torch
-from safeds._config import _init_default_device, _set_default_device
 from torch.types import Device
+
+from safeds._config import _init_default_device, _set_default_device
 
 _init_default_device()
 

@@ -6,51 +6,51 @@ from safeds.data.tabular.containers import Cell, Row, Table
 
 
 @pytest.mark.parametrize(
-    ("table", "key_selector", "expected"),
+    ("table_factory", "key_selector", "descending", "expected"),
     [
         (
-            Table({}),
+            lambda: Table({"col1": [], "col2": []}),
             lambda row: row["col1"],
-            Table({}),
+            False,
+            Table({"col1": [], "col2": []}),
         ),
         (
-            Table({"col1": [3, 2, 1]}),
+            lambda: Table({"col1": [2, 3, 1], "col2": [5, 6, 4]}),
             lambda row: row["col1"],
-            Table({"col1": [1, 2, 3]}),
+            False,
+            Table({"col1": [1, 2, 3], "col2": [4, 5, 6]}),
+        ),
+        (
+            lambda: Table({"col1": [2, 3, 1], "col2": [5, 6, 4]}),
+            lambda row: row["col1"],
+            True,
+            Table({"col1": [3, 2, 1], "col2": [6, 5, 4]}),
         ),
     ],
-    ids=["empty", "3 rows"],
-)
-def test_should_return_sorted_table(
-    table: Table,
-    key_selector: Callable[[Row], Cell],
-    expected: Table,
-) -> None:
-    assert table.sort_rows(key_selector).schema == expected.schema
-    assert table.sort_rows(key_selector) == expected
-
-
-@pytest.mark.parametrize(
-    ("table", "key_selector", "expected"),
-    [
-        (
-            Table({}),
-            lambda row: row["col1"],
-            Table({}),
-        ),
-        (
-            Table({"col1": [3, 2, 1]}),
-            lambda row: row["col1"],
-            Table({"col1": [3, 2, 1]}),
-        ),
+    ids=[
+        "no rows",
+        "non-empty, ascending",
+        "non-empty, descending",
     ],
-    ids=["empty", "3 rows"],
 )
-def test_should_not_modify_original_table(
-    table: Table,
-    key_selector: Callable[[Row], Cell],
-    expected: Table,
-) -> None:
-    table.sort_rows(key_selector)
-    assert table.schema == expected.schema
-    assert table == expected
+class TestHappyPath:
+    def test_should_return_sorted_table(
+        self,
+        table_factory: Callable[[], Table],
+        key_selector: Callable[[Row], Cell],
+        descending: bool,
+        expected: Table,
+    ) -> None:
+        actual = table_factory().sort_rows(key_selector, descending=descending)
+        assert actual == expected
+
+    def test_should_not_mutate_receiver(
+        self,
+        table_factory: Callable[[], Table],
+        key_selector: Callable[[Row], Cell],
+        descending: bool,
+        expected: Table,  # noqa: ARG002
+    ) -> None:
+        original = table_factory()
+        original.sort_rows(key_selector, descending=descending)
+        assert original == table_factory()

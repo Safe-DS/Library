@@ -2,10 +2,11 @@ import sys
 import warnings
 
 import pytest
+
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import SimpleImputer
 from safeds.data.tabular.transformation._simple_imputer import _Mode
-from safeds.exceptions import ColumnNotFoundError, ColumnTypeError, TransformerNotFittedError
+from safeds.exceptions import ColumnNotFoundError, ColumnTypeError, NotFittedError
 
 
 def strategies() -> list[SimpleImputer.Strategy]:
@@ -253,7 +254,7 @@ class TestTransform:
 
         transformer = SimpleImputer(strategy)
 
-        with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
+        with pytest.raises(NotFittedError, match=r"This transformer has not been fitted yet."):
             transformer.transform(table)
 
 

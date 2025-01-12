@@ -1,32 +1,63 @@
-from typing import Any
+from collections.abc import Callable
 
 import pytest
 
-from safeds.data.tabular.containers import Table
+from safeds.data.tabular.containers import Cell, Row, Table
 
 
 @pytest.mark.parametrize(
-    ("table1", "filter_column", "filter_value", "table2"),
+    ("table_factory", "predicate", "expected"),
     [
         (
-            Table({"col1": [3, 2, 4], "col2": [1, 2, 4]}),
-            "col1",
-            1,
-            Table({"col1": [3, 2, 4], "col2": [1, 2, 4]}),
+            lambda: Table({}),
+            lambda _: Cell.from_literal(False),  # noqa: FBT003
+            Table({}),
         ),
         (
-            Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
-            "col1",
-            1,
-            Table({"col1": [2], "col2": [2]}),
+            lambda: Table({"col1": []}),
+            lambda _: Cell.from_literal(False),  # noqa: FBT003
+            Table({"col1": []}),
+        ),
+        (
+            lambda: Table({"col1": [1, 2]}),
+            lambda row: row["col1"] <= 0,
+            Table({"col1": [1, 2]}),
+        ),
+        (
+            lambda: Table({"col1": [1, 2]}),
+            lambda row: row["col1"] <= 1,
+            Table({"col1": [2]}),
+        ),
+        (
+            lambda: Table({"col1": [1, 2]}),
+            lambda row: row["col1"] <= 2,
+            Table({"col1": []}),
         ),
     ],
     ids=[
-        "no match",
-        "matches",
+        "empty",
+        "no rows",
+        "no matches",
+        "some matches",
+        "only matches",
     ],
 )
-def test_should_remove_rows(table1: Table, filter_column: str, filter_value: Any, table2: Table) -> None:
-    table1 = table1.remove_rows(lambda row: row[filter_column] == filter_value)
-    assert table1.schema == table2.schema
-    assert table2 == table1
+class TestHappyPath:
+    def test_should_remove_rows(
+        self,
+        table_factory: Callable[[], Table],
+        predicate: Callable[[Row], Cell[bool]],
+        expected: Table,
+    ) -> None:
+        actual = table_factory().remove_rows(predicate)
+        assert actual == expected
+
+    def test_should_not_mutate_receiver(
+        self,
+        table_factory: Callable[[], Table],
+        predicate: Callable[[Row], Cell[bool]],
+        expected: Table,  # noqa: ARG002
+    ) -> None:
+        original = table_factory()
+        original.remove_rows(predicate)
+        assert original == table_factory()

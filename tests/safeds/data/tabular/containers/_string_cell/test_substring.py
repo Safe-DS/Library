@@ -1,6 +1,6 @@
 import pytest
-from safeds.exceptions import OutOfBoundsError
 
+from safeds.exceptions import OutOfBoundsError
 from tests.helpers import assert_cell_operation_works
 
 

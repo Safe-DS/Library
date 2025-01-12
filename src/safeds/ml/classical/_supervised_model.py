@@ -12,8 +12,8 @@ from safeds.exceptions import (
     DatasetMissesFeaturesError,
     LearningError,
     MissingValuesColumnError,
-    ModelNotFittedError,
     NonNumericColumnError,
+    NotFittedError,
     PlainTableError,
     PredictionError,
 )
@@ -21,7 +21,7 @@ from safeds.exceptions import (
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin, RegressorMixin
 
-    from safeds.data.tabular.typing import DataType, Schema
+    from safeds.data.tabular.typing import ColumnType, Schema
 
 
 class SupervisedModel(ABC):
@@ -36,7 +36,7 @@ class SupervisedModel(ABC):
     def __init__(self) -> None:
         self._feature_schema: Schema | None = None
         self._target_name: str | None = None
-        self._target_type: DataType | None = None
+        self._target_type: ColumnType | None = None
         self._wrapped_model: ClassifierMixin | RegressorMixin | None = None
 
     # The decorator ensures that the method is overridden in all subclasses
@@ -129,7 +129,7 @@ class SupervisedModel(ABC):
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the model has not been fitted yet.
         DatasetMissesFeaturesError
             If the dataset misses feature columns.
@@ -162,12 +162,12 @@ class SupervisedModel(ABC):
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the model has not been fitted yet.
         """
         # Used in favor of is_fitted, so the type checker is happy
         if self._feature_schema is None:
-            raise ModelNotFittedError
+            raise NotFittedError(kind="model")
 
         return self._feature_schema.column_names
 
@@ -184,12 +184,12 @@ class SupervisedModel(ABC):
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the model has not been fitted yet.
         """
         # Used in favor of is_fitted, so the type checker is happy
         if self._feature_schema is None:
-            raise ModelNotFittedError
+            raise NotFittedError(kind="model")
 
         return self._feature_schema
 
@@ -206,16 +206,16 @@ class SupervisedModel(ABC):
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the model has not been fitted yet.
         """
         # Used in favor of is_fitted, so the type checker is happy
         if self._target_name is None:
-            raise ModelNotFittedError
+            raise NotFittedError(kind="model")
 
         return self._target_name
 
-    def get_target_type(self) -> DataType:
+    def get_target_type(self) -> ColumnType:
         """
         Return the type of the target column.
 
@@ -228,12 +228,12 @@ class SupervisedModel(ABC):
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the model has not been fitted yet.
         """
         # Used in favor of is_fitted, so the type checker is happy
         if self._target_type is None:
-            raise ModelNotFittedError
+            raise NotFittedError(kind="model")
 
         return self._target_type
 
@@ -368,7 +368,7 @@ def _predict_with_sklearn_model(
 
     Raises
     ------
-    ModelNotFittedError
+    NotFittedError
         If the model has not been fitted yet.
     DatasetMissesFeaturesError
         If the dataset misses feature columns.
@@ -383,7 +383,7 @@ def _predict_with_sklearn_model(
     """
     # Validation
     if model is None or target_name is None or feature_names is None:
-        raise ModelNotFittedError
+        raise NotFittedError(kind="model")
     if isinstance(dataset, TabularDataset):  # pragma: no cover
         dataset = dataset.features
 
@@ -394,7 +394,7 @@ def _predict_with_sklearn_model(
     if dataset.row_count == 0:
         raise DatasetMissesDataError
 
-    features = dataset.remove_columns_except(feature_names)
+    features = dataset.select_columns(feature_names)
 
     non_numerical_column_names = set(features.column_names) - set(
         features.remove_non_numeric_columns().column_names,
@@ -433,7 +433,7 @@ def _predict_with_sklearn_model(
 
         return TabularDataset(
             output,
-            target_name=target_name,
+            target_name,
             extra_names=extra_names,
         )
     except ValueError as exception:

@@ -1,0 +1,55 @@
+# serializer version: 1
+# name: TestContract.test_should_return_same_hash_in_different_processes[binary]
+  9114564521908245695
+# ---
+# name: TestContract.test_should_return_same_hash_in_different_processes[boolean]
+  253312121440042057
+# ---
+# name: TestContract.test_should_return_same_hash_in_different_processes[date]
+  1420129173814739165
+# ---
+# name: TestContract.test_should_return_same_hash_in_different_processes[datetime]
+  5037917593634747378
+# ---
+# name: TestContract.test_should_return_same_hash_in_different_processes[duration]
+  61885111053208984
+# ---
+# name: TestContract.test_should_return_same_hash_in_different_processes[float32]
+  2208906555873308475
+# ---
+# name: TestContract.test_should_return_same_hash_in_different_processes[float64]
+  7992127945058937926
+# ---
+# name: TestContract.test_should_return_same_hash_in_different_processes[int16]
+  231909494783576033
+# ---
+# name: TestContract.test_should_return_same_hash_in_different_processes[int32]
+  1374055615029084484
+# ---
+# name: TestContract.test_should_return_same_hash_in_different_processes[int64]
+  1212246054477521308
+# ---
+# name: TestContract.test_should_return_same_hash_in_different_processes[int8]
+  2269551742465714004
+# ---
+# name: TestContract.test_should_return_same_hash_in_different_processes[null]
+  1357169886076964811
+# ---
+# name: TestContract.test_should_return_same_hash_in_different_processes[string]
+  1529874693733179990
+# ---
+# name: TestContract.test_should_return_same_hash_in_different_processes[time]
+  5418105405405492344
+# ---
+# name: TestContract.test_should_return_same_hash_in_different_processes[uint16]
+  937488211706751048
+# ---
+# name: TestContract.test_should_return_same_hash_in_different_processes[uint32]
+  859241000506496144
+# ---
+# name: TestContract.test_should_return_same_hash_in_different_processes[uint64]
+  1728989395548489096
+# ---
+# name: TestContract.test_should_return_same_hash_in_different_processes[uint8]
+  48638156943199247
+# ---

@@ -2,6 +2,7 @@ import sys
 
 import pytest
 
+from safeds.data.labeled.containers import TimeSeriesDataset
 from safeds.data.tabular.containers import Table
 from safeds.ml.nn import (
     NeuralNetworkRegressor,
@@ -19,8 +20,13 @@ def test_should_raise_if_is_fitted_is_set_correctly_lstm() -> None:
         InputConversionTimeSeries(),
         [LSTMLayer(neuron_count=1)],
     )
-    ts = Table.from_dict({"target": [1, 1, 1, 1], "time": [0, 0, 0, 0], "feat": [0, 0, 0, 0]}).to_time_series_dataset(
-        target_name="target",
+    # ts = Table.from_dict({"target": [1, 1, 1, 1], "time": [0, 0, 0, 0], "feat": [0, 0, 0, 0]}).to_time_series_dataset(
+    #     "target",
+    #     window_size=1,
+    # )
+    ts = TimeSeriesDataset(
+        Table.from_dict({"target": [1, 1, 1, 1], "time": [0, 0, 0, 0], "feat": [0, 0, 0, 0]}),
+        "target",
         window_size=1,
     )
     assert not model.is_fitted

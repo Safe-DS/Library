@@ -1,95 +1,141 @@
+from collections.abc import Callable
+
 import pytest
 
 from safeds.data.tabular.containers import Column, Table
+from safeds.exceptions import DuplicateColumnError, LengthMismatchError
 
 
 @pytest.mark.parametrize(
-    ("table1", "columns", "expected"),
+    ("table_factory", "columns", "expected"),
     [
         (
-            Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
-            [Column("col3", [0, -1, -2]), Column("col4", ["a", "b", "c"])],
-            Table({"col1": [1, 2, 1], "col2": [1, 2, 4], "col3": [0, -1, -2], "col4": ["a", "b", "c"]}),
+            lambda: Table({}),
+            [],
+            Table({}),
         ),
         (
-            Table({}),
-            [Column("col3", []), Column("col4", [])],
-            Table({"col3": [], "col4": []}),
+            lambda: Table({}),
+            Column("col1", [1]),
+            Table({"col1": [1]}),
         ),
         (
-            Table({}),
-            [Column("col3", [1]), Column("col4", [2])],
-            Table({"col3": [1], "col4": [2]}),
+            lambda: Table({}),
+            Table({"col1": [1]}),
+            Table({"col1": [1]}),
+        ),
+        (
+            lambda: Table({}),
+            [Column("col1", [1]), Column("col2", [2])],
+            Table({"col1": [1], "col2": [2]}),
+        ),
+        (
+            lambda: Table({"col0": [0]}),
+            [],
+            Table({"col0": [0]}),
+        ),
+        (
+            lambda: Table({"col0": [0]}),
+            Column("col1", [1]),
+            Table({"col0": [0], "col1": [1]}),
+        ),
+        (
+            lambda: Table({"col0": [0]}),
+            Table({"col1": [1]}),
+            Table({"col0": [0], "col1": [1]}),
+        ),
+        (
+            lambda: Table({"col0": [0]}),
+            [Column("col1", [1]), Column("col2", [2])],
+            Table({"col0": [0], "col1": [1], "col2": [2]}),
         ),
     ],
-    ids=["add 2 columns", "empty with empty column", "empty with filled column"],
+    ids=[
+        "empty table, empty list",
+        "empty table, single column",
+        "empty table, single table",
+        "empty table, multiple columns",
+        "non-empty table, empty list",
+        "non-empty table, single column",
+        "empty table, single table",
+        "non-empty table, multiple columns",
+    ],
 )
-def test_should_add_columns(table1: Table, columns: list[Column], expected: Table) -> None:
-    table1 = table1.add_columns(columns)
-    # assert table1.schema == expected.schema
-    assert table1 == expected
+class TestHappyPath:
+    def test_should_add_columns(
+        self,
+        table_factory: Callable[[], Table],
+        columns: Column | list[Column] | Table,
+        expected: Table,
+    ) -> None:
+        actual = table_factory().add_columns(columns)
+        assert actual == expected
+
+    def test_should_not_mutate_receiver(
+        self,
+        table_factory: Callable[[], Table],
+        columns: Column | list[Column] | Table,
+        expected: Table,  # noqa: ARG002
+    ) -> None:
+        original = table_factory()
+        original.add_columns(columns)
+        assert original == table_factory()
 
 
 @pytest.mark.parametrize(
-    ("table1", "table2", "expected"),
+    ("table", "columns"),
     [
         (
-            Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
-            Table({"col3": [0, -1, -2], "col4": ["a", "b", "c"]}),
-            Table({"col1": [1, 2, 1], "col2": [1, 2, 4], "col3": [0, -1, -2], "col4": ["a", "b", "c"]}),
+            Table({"col1": [1]}),
+            Column("col2", [1, 2]),
         ),
-        (Table({}), Table({"col1": [1, 2], "col2": [60, 2]}), Table({"col1": [1, 2], "col2": [60, 2]})),
         (
-            Table({"col1": [1, 2], "col2": [60, 2]}),
-            Table({}),
-            Table({"col1": [1, 2], "col2": [60, 2]}),
+            Table({"col1": [1]}),
+            [Column("col2", [1, 2])],
         ),
-        (Table({"yeet": [], "col": []}), Table({"gg": []}), Table({"yeet": [], "col": [], "gg": []})),
+        (
+            Table({"col1": [1]}),
+            Table({"col2": [1, 2]}),
+        ),
     ],
-    ids=["add a table with 2 columns", "empty add filled", "filled add empty", "rowless"],
+    ids=[
+        "single new column",
+        "list of new columns",
+        "table of new columns",
+    ],
 )
-def test_should_add_columns_from_table(table1: Table, table2: Table, expected: Table) -> None:
-    table1 = table1.add_table_as_columns(table2)  # TODO: move to separate test file
-    assert table1.schema == expected.schema
-    assert table1 == expected
+def test_should_raise_if_row_counts_differ(table: Table, columns: Column | list[Column] | Table) -> None:
+    with pytest.raises(LengthMismatchError):
+        table.add_columns(columns)
 
 
-#  TODO - separate test for add_table_as_columns and a new one here
-# @pytest.mark.parametrize(
-#     ("table", "columns", "error_message_regex"),
-#     [
-#         (
-#             Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
-#             [Column("col3", ["a", "b", "c", "d"]), Column("col4", ["e", "f", "g", "h"])],
-#             r"Expected a column of size 3 but got column of size 4.",
-#         ),
-#     ],
-#     ids=["Two Columns with too many values"],
-# )
-# def test_should_raise_error_if_column_size_invalid(
-#     table: Table,
-#     columns: list[Column] | Table,
-#     error_message_regex: str,
-# ) -> None:
-#     with pytest.raises(ColumnSizeError, match=error_message_regex):
-#         table.add_columns(columns)
-
-#  TODO - separate test for add_table_as_columns and a new one here
-# @pytest.mark.parametrize(
-#     ("table", "columns", "error_message_regex"),
-#     [
-#         (
-#             Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
-#             [Column("col2", ["a", "b", "c"]), Column("col3", [2, 3, 4])],
-#             r"Column 'col2' already exists.",
-#         ),
-#     ],
-#     ids=["Column already exists"],
-# )
-# def test_should_raise_error_if_column_name_in_result_column(
-#     table: Table,
-#     columns: list[Column] | Table,
-#     error_message_regex: str,
-# ) -> None:
-#     with pytest.raises(DuplicateColumnError, match=error_message_regex):
-#         table.add_columns(columns)
+@pytest.mark.parametrize(
+    ("table", "columns"),
+    [
+        (
+            Table({"col1": [1]}),
+            Column("col1", [1]),
+        ),
+        (
+            Table({"col1": [1]}),
+            [Column("col1", [1])],
+        ),
+        (
+            Table({"col1": [1]}),
+            Table({"col1": [1]}),
+        ),
+        (
+            Table({}),
+            [Column("col1", [1]), Column("col1", [2])],
+        ),
+    ],
+    ids=[
+        "single new column clashes with existing column",
+        "list of new columns clashes with existing column",
+        "table of new columns clashes with existing column",
+        "new columns clash with each",
+    ],
+)
+def test_should_raise_if_duplicate_column_name(table: Table, columns: Column | list[Column] | Table) -> None:
+    with pytest.raises(DuplicateColumnError):
+        table.add_columns(columns)

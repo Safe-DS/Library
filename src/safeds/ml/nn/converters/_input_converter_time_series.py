@@ -89,9 +89,16 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
         )
 
     def _data_conversion_predict(self, input_data: Table, batch_size: int) -> DataLoader:
-        data: TimeSeriesDataset
-        data = input_data.to_time_series_dataset(
-            target_name=self._target_name,
+        # data = input_data.to_time_series_dataset(
+        #     self._target_name,
+        #     window_size=self._window_size,
+        #     extra_names=self._extra_names,
+        #     forecast_horizon=self._forecast_horizon,
+        #     continuous=self._continuous,
+        # )
+        data = TimeSeriesDataset(
+            input_data,
+            self._target_name,
             window_size=self._window_size,
             extra_names=self._extra_names,
             forecast_horizon=self._forecast_horizon,
@@ -114,11 +121,22 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
         table_data = input_data
         input_data_table = table_data.slice_rows(start=window_size + forecast_horizon)
 
-        return input_data_table.replace_column(
+        # return input_data_table.replace_column(
+        #     self._target_name,
+        #     [Column(self._target_name, output_data.tolist())],
+        # ).to_time_series_dataset(
+        #     self._target_name,
+        #     window_size=self._window_size,
+        #     extra_names=self._extra_names,
+        #     forecast_horizon=self._forecast_horizon,
+        #     continuous=self._continuous,
+        # )
+        return TimeSeriesDataset(
+            input_data_table.replace_column(
+                self._target_name,
+                [Column(self._target_name, output_data.tolist())],
+            ),
             self._target_name,
-            [Column(self._target_name, output_data.tolist())],
-        ).to_time_series_dataset(
-            target_name=self._target_name,
             window_size=self._window_size,
             extra_names=self._extra_names,
             forecast_horizon=self._forecast_horizon,
@@ -145,6 +163,4 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
         for name in self._feature_names:
             if name not in input_data.column_names:
                 return False
-        if self._target_name not in input_data.column_names:
-            return False
-        return True
+        return self._target_name in input_data.column_names

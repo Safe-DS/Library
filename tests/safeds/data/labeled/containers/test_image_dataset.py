@@ -19,9 +19,9 @@ from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.exceptions import (
     IndexOutOfBoundsError,
     NonNumericColumnError,
+    NotFittedError,
     OutOfBoundsError,
     OutputLengthMismatchError,
-    TransformerNotFittedError,
 )
 from tests.helpers import (
     configure_test_with_device,
@@ -384,7 +384,6 @@ class TestBatch:
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 @pytest.mark.parametrize("shuffle", [True, False])
 class TestSplit:
-
     @pytest.mark.parametrize(
         "output",
         [
@@ -530,7 +529,7 @@ class TestColumnAsTensor:
                 ValueError,
                 r"Tensor has an invalid amount of dimensions. Needed 2 dimensions but got 3.",
             ),
-            (torch.randn(10, 10), OneHotEncoder(), TransformerNotFittedError, r""),
+            (torch.randn(10, 10), OneHotEncoder(), NotFittedError, r""),
             (
                 torch.randn(10, 10),
                 OneHotEncoder().fit(Table({"b": ["a", "b", "c"]})),

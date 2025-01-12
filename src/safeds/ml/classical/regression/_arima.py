@@ -10,8 +10,8 @@ from safeds.data.tabular.containers import Column
 from safeds.exceptions import (
     DatasetMissesDataError,
     MissingValuesColumnError,
-    ModelNotFittedError,
     NonNumericColumnError,
+    NotFittedError,
 )
 
 if TYPE_CHECKING:
@@ -126,7 +126,7 @@ class ArimaModelRegressor:
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the model has not been fitted yet.
         IndexError
             If the forecast horizon is not greater than zero.
@@ -139,7 +139,7 @@ class ArimaModelRegressor:
         result_table = result_table.remove_columns([time_series.target.name], ignore_unknown_names=True)
         # Validation
         if not self.is_fitted or self._arima is None:
-            raise ModelNotFittedError
+            raise NotFittedError(kind="model")
 
         # forecast
         # couldn't invoke prediction error, will be added when found
@@ -165,7 +165,7 @@ class ArimaModelRegressor:
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the model has not been fitted yet.
         PredictionError
             If predicting with the given dataset failed.
@@ -174,7 +174,7 @@ class ArimaModelRegressor:
         import matplotlib.pyplot as plt
 
         if not self.is_fitted or self._arima is None:
-            raise ModelNotFittedError
+            raise NotFittedError(kind="model")
         test_data = test_series.target._series.to_numpy()
         n_steps = len(test_data)
         forecast_results = self._arima.forecast(steps=n_steps)

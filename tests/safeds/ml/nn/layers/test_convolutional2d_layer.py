@@ -2,9 +2,10 @@ import sys
 from typing import Literal
 
 import pytest
+from torch import nn
+
 from safeds.data.image.typing import ImageSize
 from safeds.ml.nn.layers import Convolutional2DLayer, ConvolutionalTranspose2DLayer
-from torch import nn
 
 
 class TestConvolutional2DLayer:

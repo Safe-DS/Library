@@ -1,3 +1,5 @@
+from collections.abc import Callable
+
 import pytest
 
 from safeds.data.tabular.containers import Table
@@ -5,38 +7,100 @@ from safeds.exceptions import OutOfBoundsError
 
 
 @pytest.mark.parametrize(
-    ("table", "result_train_table", "result_test_table", "percentage_in_first"),
+    ("table_factory", "percentage_in_first", "shuffle", "expected_1", "expected_2"),
     [
         (
-            Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
-            Table({"col1": [1, 2], "col2": [4, 2]}),
-            Table({"col1": [1], "col2": [1]}),
-            2 / 3,
+            lambda: Table({}),
+            0.0,
+            False,
+            Table({}),
+            Table({}),
         ),
         (
-            Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
-            Table({"col1": [], "col2": []}),
-            Table({"col1": [1, 2, 1], "col2": [4, 2, 1]}),
-            0,
+            lambda: Table({"col1": []}),
+            0.0,
+            False,
+            Table({"col1": []}),
+            Table({"col1": []}),
         ),
         (
-            Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
-            Table({"col1": [1, 2, 1], "col2": [4, 2, 1]}),
-            Table({"col1": [], "col2": []}),
-            1,
+            lambda: Table({"col1": [1, 2, 3, 4]}),
+            1.0,
+            False,
+            Table({"col1": [1, 2, 3, 4]}),
+            Table({"col1": []}),
+        ),
+        (
+            lambda: Table({"col1": [1, 2, 3, 4]}),
+            1.0,
+            True,
+            Table({"col1": [4, 1, 2, 3]}),
+            Table({"col1": []}),
+        ),
+        (
+            lambda: Table({"col1": [1, 2, 3, 4]}),
+            0.0,
+            False,
+            Table({"col1": []}),
+            Table({"col1": [1, 2, 3, 4]}),
+        ),
+        (
+            lambda: Table({"col1": [1, 2, 3, 4]}),
+            0.0,
+            True,
+            Table({"col1": []}),
+            Table({"col1": [4, 1, 2, 3]}),
+        ),
+        (
+            lambda: Table({"col1": [1, 2, 3, 4]}),
+            0.5,
+            False,
+            Table({"col1": [1, 2]}),
+            Table({"col1": [3, 4]}),
+        ),
+        (
+            lambda: Table({"col1": [1, 2, 3, 4]}),
+            0.5,
+            True,
+            Table({"col1": [4, 1]}),
+            Table({"col1": [2, 3]}),
         ),
     ],
-    ids=["2/3%", "0%", "100%"],
+    ids=[
+        "empty",
+        "no rows",
+        "all in first, no shuffle",
+        "all in first, shuffle",
+        "all in second, no shuffle",
+        "all in second, shuffle",
+        "even split, no shuffle",
+        "even split, shuffle",
+    ],
 )
-def test_should_split_table(
-    table: Table,
-    result_test_table: Table,
-    result_train_table: Table,
-    percentage_in_first: int,
-) -> None:
-    train_table, test_table = table.split_rows(percentage_in_first)
-    assert result_test_table == test_table
-    assert result_train_table == train_table
+class TestHappyPath:
+    def test_should_split_rows(
+        self,
+        table_factory: Callable[[], Table],
+        percentage_in_first: float,
+        shuffle: bool,
+        expected_1: Table,
+        expected_2: Table,
+    ) -> None:
+        actual_1, actual_2 = table_factory().split_rows(percentage_in_first, shuffle=shuffle)
+        assert actual_1 == expected_1
+        assert actual_2 == expected_2
+
+    def test_should_not_mutate_receiver(
+        self,
+        table_factory: Callable[[], Table],
+        percentage_in_first: float,
+        shuffle: bool,
+        expected_1: Table,  # noqa: ARG002
+        expected_2: Table,  # noqa: ARG002
+    ) -> None:
+        original = table_factory()
+        original.split_rows(percentage_in_first, shuffle=shuffle)
+        assert original == table_factory()
 
 
 @pytest.mark.parametrize(
@@ -45,15 +109,11 @@ def test_should_split_table(
         -1.0,
         2.0,
     ],
-    ids=["-100%", "200%"],
+    ids=[
+        "too low",
+        "too high",
+    ],
 )
-def test_should_raise_if_value_not_in_range(percentage_in_first: float) -> None:
-    table = Table({"col1": [1, 2, 1], "col2": [1, 2, 4]})
+def test_should_raise_if_percentage_in_first_is_out_of_bounds(percentage_in_first: float) -> None:
     with pytest.raises(OutOfBoundsError):
-        table.split_rows(percentage_in_first)
-
-
-def test_should_split_empty_table() -> None:
-    t1, t2 = Table({}).split_rows(0.4)
-    assert t1.row_count == 0
-    assert t2.row_count == 0
+        Table({}).split_rows(percentage_in_first)

@@ -1,4 +1,5 @@
 import pytest
+
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
 
@@ -14,7 +15,7 @@ from safeds.data.tabular.containers import Table
                     "C": [3, 6],
                     "T": [0, 1],
                 },
-                target_name="T",
+                "T",
             ),
             Table({"A": [1, 4], "B": [2, 5], "C": [3, 6]}),
         ),
@@ -26,7 +27,7 @@ from safeds.data.tabular.containers import Table
                     "C": [3, 6],
                     "T": [0, 1],
                 },
-                target_name="T",
+                "T",
                 extra_names=["B"],
             ),
             Table({"A": [1, 4], "C": [3, 6]}),

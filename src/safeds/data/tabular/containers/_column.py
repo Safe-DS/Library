@@ -4,12 +4,12 @@ from collections.abc import Callable, Iterator, Sequence
 from typing import TYPE_CHECKING, Any, Literal, TypeVar, overload
 
 from safeds._utils import _structural_hash
-from safeds._validation._check_columns_are_numeric import _check_column_is_numeric
+from safeds._validation import _check_column_is_numeric
 from safeds.data.tabular.plotting import ColumnPlotter
-from safeds.data.tabular.typing._polars_data_type import _PolarsDataType
+from safeds.data.tabular.typing._polars_column_type import _PolarsColumnType
 from safeds.exceptions import (
-    ColumnLengthMismatchError,
     IndexOutOfBoundsError,
+    LengthMismatchError,
     MissingValuesColumnError,
 )
 
@@ -18,7 +18,7 @@ from ._lazy_cell import _LazyCell
 if TYPE_CHECKING:
     from polars import Series
 
-    from safeds.data.tabular.typing import DataType
+    from safeds.data.tabular.typing import ColumnType
 
     from ._cell import Cell
     from ._table import Table
@@ -26,6 +26,9 @@ if TYPE_CHECKING:
 
 T_co = TypeVar("T_co", covariant=True)
 R_co = TypeVar("R_co", covariant=True)
+
+
+# TODO: Rethink whether T_co should include None, also affects Cell operations ('<' return Cell[bool | None] etc.)
 
 
 class Column(Sequence[T_co]):
@@ -128,16 +131,6 @@ class Column(Sequence[T_co]):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def is_numeric(self) -> bool:
-        """Whether the column is numeric."""
-        return self._series.dtype.is_numeric()
-
-    @property
-    def is_temporal(self) -> bool:
-        """Whether the column is operator."""
-        return self._series.dtype.is_temporal()
-
-    @property
     def name(self) -> str:
         """The name of the column."""
         return self._series.name
@@ -153,9 +146,9 @@ class Column(Sequence[T_co]):
         return ColumnPlotter(self)
 
     @property
-    def type(self) -> DataType:
+    def type(self) -> ColumnType:
         """The type of the column."""
-        return _PolarsDataType(self._series.dtype)
+        return _PolarsColumnType(self._series.dtype)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Value operations
@@ -262,7 +255,7 @@ class Column(Sequence[T_co]):
     @overload
     def all(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool]],
         *,
         ignore_unknown: Literal[True] = ...,
     ) -> bool: ...
@@ -270,19 +263,19 @@ class Column(Sequence[T_co]):
     @overload
     def all(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool]],
         *,
         ignore_unknown: bool,
     ) -> bool | None: ...
 
     def all(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool]],
         *,
         ignore_unknown: bool = True,
     ) -> bool | None:
         """
-        Return whether all values in the column satisfy the predicate.
+        Check whether all values in the column satisfy the predicate.
 
         The predicate can return one of three values:
 
@@ -337,7 +330,7 @@ class Column(Sequence[T_co]):
     @overload
     def any(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool]],
         *,
         ignore_unknown: Literal[True] = ...,
     ) -> bool: ...
@@ -345,19 +338,19 @@ class Column(Sequence[T_co]):
     @overload
     def any(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool]],
         *,
         ignore_unknown: bool,
     ) -> bool | None: ...
 
     def any(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool]],
         *,
         ignore_unknown: bool = True,
     ) -> bool | None:
         """
-        Return whether any value in the column satisfies the predicate.
+        Check whether any value in the column satisfies the predicate.
 
         The predicate can return one of three values:
 
@@ -412,7 +405,7 @@ class Column(Sequence[T_co]):
     @overload
     def count_if(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool]],
         *,
         ignore_unknown: Literal[True] = ...,
     ) -> int: ...
@@ -420,19 +413,19 @@ class Column(Sequence[T_co]):
     @overload
     def count_if(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool]],
         *,
         ignore_unknown: bool,
     ) -> int | None: ...
 
     def count_if(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool]],
         *,
         ignore_unknown: bool = True,
     ) -> int | None:
         """
-        Return how many values in the column satisfy the predicate.
+        Count how many values in the column satisfy the predicate.
 
         The predicate can return one of three results:
 
@@ -482,7 +475,7 @@ class Column(Sequence[T_co]):
     @overload
     def none(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool]],
         *,
         ignore_unknown: Literal[True] = ...,
     ) -> bool: ...
@@ -490,19 +483,19 @@ class Column(Sequence[T_co]):
     @overload
     def none(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool]],
         *,
         ignore_unknown: bool,
     ) -> bool | None: ...
 
     def none(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool]],
         *,
         ignore_unknown: bool = True,
     ) -> bool | None:
         """
-        Return whether no value in the column satisfies the predicate.
+        Check whether no value in the column satisfies the predicate.
 
         The predicate can return one of three values:
 
@@ -560,7 +553,7 @@ class Column(Sequence[T_co]):
 
     def rename(self, new_name: str) -> Column[T_co]:
         """
-        Return a new column with a new name.
+        Rename the column and return the result as a new column.
 
         **Note:** The original column is not modified.
 
@@ -596,7 +589,7 @@ class Column(Sequence[T_co]):
         transformer: Callable[[Cell[T_co]], Cell[R_co]],
     ) -> Column[R_co]:
         """
-        Return a new column with values transformed by the transformer.
+        Transform the valus in the column and return the result as a new column.
 
         **Note:** The original column is not modified.
 
@@ -641,6 +634,11 @@ class Column(Sequence[T_co]):
         """
         Return a table with important statistics about the column.
 
+        !!! warning "API Stability"
+
+            Do not rely on the exact output of this method. In future versions, we may change the displayed statistics
+            without prior notice.
+
         Returns
         -------
         statistics:
@@ -651,69 +649,24 @@ class Column(Sequence[T_co]):
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("a", [1, 3])
         >>> column.summarize_statistics()
-        +----------------------+---------+
-        | metric               |       a |
-        | ---                  |     --- |
-        | str                  |     f64 |
-        +================================+
-        | min                  | 1.00000 |
-        | max                  | 3.00000 |
-        | mean                 | 2.00000 |
-        | median               | 2.00000 |
-        | standard deviation   | 1.41421 |
-        | distinct value count | 2.00000 |
-        | idness               | 1.00000 |
-        | missing value ratio  | 0.00000 |
-        | stability            | 0.50000 |
-        +----------------------+---------+
+        +---------------------+---------+
+        | statistic           |       a |
+        | ---                 |     --- |
+        | str                 |     f64 |
+        +===============================+
+        | min                 | 1.00000 |
+        | max                 | 3.00000 |
+        | mean                | 2.00000 |
+        | median              | 2.00000 |
+        | standard deviation  | 1.41421 |
+        | missing value ratio | 0.00000 |
+        | stability           | 0.50000 |
+        | idness              | 1.00000 |
+        +---------------------+---------+
         """
         from ._table import Table
 
-        # TODO: turn this around (call table method, implement in table; allows parallelization)
-        if self.is_numeric:
-            values: list[Any] = [
-                self.min(),
-                self.max(),
-                self.mean(),
-                self.median(),
-                self.standard_deviation(),
-                self.distinct_value_count(),
-                self.idness(),
-                self.missing_value_ratio(),
-                self.stability(),
-            ]
-        else:
-            min_ = self.min()
-            max_ = self.max()
-
-            values = [
-                str("-" if min_ is None else min_),
-                str("-" if max_ is None else max_),
-                "-",
-                "-",
-                "-",
-                str(self.distinct_value_count()),
-                str(self.idness()),
-                str(self.missing_value_ratio()),
-                str(self.stability()),
-            ]
-
-        return Table(
-            {
-                "metric": [
-                    "min",
-                    "max",
-                    "mean",
-                    "median",
-                    "standard deviation",
-                    "distinct value count",
-                    "idness",
-                    "missing value ratio",
-                    "stability",
-                ],
-                self.name: values,
-            },
-        )
+        return Table.from_columns(self).summarize_statistics()
 
     def correlation_with(self, other: Column) -> float:
         """
@@ -763,7 +716,7 @@ class Column(Sequence[T_co]):
         _check_column_is_numeric(other, operation="calculate the correlation")
 
         if self.row_count != other.row_count:
-            raise ColumnLengthMismatchError("")  # TODO: Add column names to error message
+            raise LengthMismatchError("")  # TODO: Add column names to error message
         if self.missing_value_count() > 0 or other.missing_value_count() > 0:
             raise MissingValuesColumnError("")  # TODO: Add column names to error message
 
@@ -790,9 +743,12 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3, 2])
+        >>> column = Column("test", [1, 2, 3, 2, None])
         >>> column.distinct_value_count()
         3
+
+        >>> column.distinct_value_count(ignore_missing_values=False)
+        4
         """
         if ignore_missing_values:
             return self._series.drop_nulls().n_unique()
@@ -801,13 +757,14 @@ class Column(Sequence[T_co]):
 
     def idness(self) -> float:
         """
-        Calculate the idness of this column.
+        Return the idness of this column.
 
         We define the idness as the number of distinct values (including missing values) divided by the number of rows.
         If the column is empty, the idness is 1.0.
 
-        A high idness indicates that the column most values in the column are unique. In this case, you must be careful
-        when using the column for analysis, as a model may learn a mapping from this column to the target.
+        A high idness indicates that most values in the column are unique. In this case, you must be careful when using
+        the column for analysis, as a model may learn a mapping from this column to the target, which might not
+        generalize well.
 
         Returns
         -------
@@ -828,7 +785,7 @@ class Column(Sequence[T_co]):
         if self.row_count == 0:
             return 1.0  # All values are unique (since there are none)
 
-        return self.distinct_value_count(ignore_missing_values=False) / self.row_count
+        return self._series.n_unique() / self.row_count
 
     def max(self) -> T_co | None:
         """
@@ -904,6 +861,10 @@ class Column(Sequence[T_co]):
         >>> column = Column("test", [1, 2, 3])
         >>> column.median()
         2.0
+
+        >>> column = Column("test", [1, 2, 3, 4])
+        >>> column.median()
+        2.5
         """
         _check_column_is_numeric(self, operation="calculate the median")
 
@@ -1064,7 +1025,7 @@ class Column(Sequence[T_co]):
         if non_missing.len() == 0:
             return 1.0  # All non-null values are the same (since there is are none)
 
-        # `unique_counts` crashes in polars for boolean columns
+        # `unique_counts` crashes in polars for boolean columns (https://github.com/pola-rs/polars/issues/16356)
         mode_count = non_missing.value_counts().get_column("count").max()
 
         return mode_count / non_missing.len()
@@ -1078,8 +1039,7 @@ class Column(Sequence[T_co]):
         Returns
         -------
         standard_deviation:
-            The standard deviation of the values in the column. If no standard deviation can be calculated due to the
-            type of the column, None is returned.
+            The standard deviation of the values in the column.
 
         Raises
         ------
@@ -1111,8 +1071,7 @@ class Column(Sequence[T_co]):
         Returns
         -------
         variance:
-            The variance of the values in the column. If no variance can be calculated due to the type of the column,
-            None is returned.
+            The variance of the values in the column.
 
         Examples
         --------

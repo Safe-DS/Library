@@ -2,6 +2,7 @@ import sys
 from typing import TYPE_CHECKING, Any
 
 import polars as pl
+
 from safeds.data.tabular.containers._lazy_cell import _LazyCell
 
 if TYPE_CHECKING:

@@ -1,3 +1,5 @@
+from collections.abc import Callable
+
 import pytest
 
 from safeds.data.tabular.containers import Table
@@ -5,58 +7,58 @@ from safeds.exceptions import OutOfBoundsError
 
 
 @pytest.mark.parametrize(
-    ("table", "start", "length", "expected"),
+    ("table_factory", "start", "length", "expected"),
     [
         (
-            Table({}),
+            lambda: Table({}),
             0,
             None,
             Table({}),
         ),
         (
-            Table({"col1": []}),
+            lambda: Table({"col1": []}),
             0,
             None,
             Table({"col1": []}),
         ),
         (
-            Table({"col1": [1, 2, 3]}),
+            lambda: Table({"col1": [1, 2, 3]}),
             0,
             None,
             Table({"col1": [1, 2, 3]}),
         ),
         (
-            Table({"col1": [1, 2, 3]}),
+            lambda: Table({"col1": [1, 2, 3]}),
             1,
             None,
             Table({"col1": [2, 3]}),
         ),
         (
-            Table({"col1": [1, 2, 3]}),
+            lambda: Table({"col1": [1, 2, 3]}),
             10,
             None,
             Table({"col1": []}),
         ),
         (
-            Table({"col1": [1, 2, 3]}),
+            lambda: Table({"col1": [1, 2, 3]}),
             -1,
             None,
             Table({"col1": [3]}),
         ),
         (
-            Table({"col1": [1, 2, 3]}),
+            lambda: Table({"col1": [1, 2, 3]}),
             -10,
             None,
             Table({"col1": [1, 2, 3]}),
         ),
         (
-            Table({"col1": [1, 2, 3]}),
+            lambda: Table({"col1": [1, 2, 3]}),
             0,
             1,
             Table({"col1": [1]}),
         ),
         (
-            Table({"col1": [1, 2, 3]}),
+            lambda: Table({"col1": [1, 2, 3]}),
             0,
             10,
             Table({"col1": [1, 2, 3]}),
@@ -74,11 +76,30 @@ from safeds.exceptions import OutOfBoundsError
         "positive length out of bounds",
     ],
 )
-def test_should_slice_rows(table: Table, start: int, length: int | None, expected: Table) -> None:
-    assert table.slice_rows(start, length) == expected
+class TestHappyPath:
+    def test_should_slice_rows(
+        self,
+        table_factory: Callable[[], Table],
+        start: int,
+        length: int | None,
+        expected: Table,
+    ) -> None:
+        actual = table_factory().slice_rows(start=start, length=length)
+        assert actual == expected
+
+    def test_should_not_mutate_receiver(
+        self,
+        table_factory: Callable[[], Table],
+        start: int,
+        length: int | None,
+        expected: Table,  # noqa: ARG002
+    ) -> None:
+        original = table_factory()
+        original.slice_rows(start=start, length=length)
+        assert original == table_factory()
 
 
 def test_should_raise_for_negative_length() -> None:
     table: Table = Table({})
     with pytest.raises(OutOfBoundsError):
-        table.slice_rows(0, -1)
+        table.slice_rows(length=-1)

@@ -4,6 +4,7 @@ import itertools
 from typing import TYPE_CHECKING, Any, Self
 
 import pytest
+
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
@@ -13,8 +14,8 @@ from safeds.exceptions import (
     FittingWithoutChoiceError,
     LearningError,
     MissingValuesColumnError,
-    ModelNotFittedError,
     NonNumericColumnError,
+    NotFittedError,
     PlainTableError,
 )
 from safeds.ml.classical.classification import (
@@ -84,11 +85,11 @@ def classifiers_with_choices() -> list[Classifier]:
             max_depth=Choice(1, 2),
             min_sample_count_in_leaves=Choice(1, 2),
         ),
-        SupportVectorClassifier(kernel=Choice(None, SupportVectorClassifier.Kernel.linear()), c=Choice(0.5, 1.0)),
+        SupportVectorClassifier(kernel=Choice(SupportVectorClassifier.Kernel.linear()), c=Choice(0.5, 1.0)),
     ]
 
 
-@pytest.fixture()
+@pytest.fixture
 def valid_data() -> TabularDataset:
     return Table(
         {
@@ -97,12 +98,11 @@ def valid_data() -> TabularDataset:
             "feat2": [3, 6, 9, 12],
             "target": [0, 1, 0, 1],
         },
-    ).to_tabular_dataset(target_name="target", extra_names=["id"])
+    ).to_tabular_dataset("target", extra_names=["id"])
 
 
 @pytest.mark.parametrize("classifier_with_choice", classifiers_with_choices(), ids=lambda x: x.__class__.__name__)
 class TestChoiceClassifiers:
-
     def test_should_raise_if_model_is_fitted_with_choice(
         self,
         classifier_with_choice: Classifier,
@@ -131,7 +131,6 @@ class TestChoiceClassifiers:
 
 
 class TestFitByExhaustiveSearch:
-
     @pytest.mark.parametrize("classifier", classifiers(), ids=lambda x: x.__class__.__name__)
     def test_should_raise_if_model_is_fitted_by_exhaustive_search_without_choice(
         self,
@@ -211,7 +210,7 @@ class TestFit:
                         "feat2": [3, 6],
                         "target": [0, 1],
                     },
-                ).to_tabular_dataset(target_name="target", extra_names=["id"]),
+                ).to_tabular_dataset("target", extra_names=["id"]),
                 NonNumericColumnError,
                 (
                     r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\{'feat1'\}\nYou"
@@ -228,7 +227,7 @@ class TestFit:
                         "feat2": [3, 6],
                         "target": [0, 1],
                     },
-                ).to_tabular_dataset(target_name="target", extra_names=["id"]),
+                ).to_tabular_dataset("target", extra_names=["id"]),
                 MissingValuesColumnError,
                 (
                     r"Tried to do an operation on one or multiple columns containing missing values: \n\{'feat1'\}\nYou"
@@ -245,7 +244,7 @@ class TestFit:
                         "feat2": [],
                         "target": [],
                     },
-                ).to_tabular_dataset(target_name="target", extra_names=["id"]),
+                ).to_tabular_dataset("target", extra_names=["id"]),
                 DatasetMissesDataError,
                 r"Dataset contains no rows",
             ),
@@ -305,7 +304,7 @@ class TestPredict:
         assert valid_data == valid_data_copy
 
     def test_should_raise_if_not_fitted(self, classifier: Classifier, valid_data: TabularDataset) -> None:
-        with pytest.raises(ModelNotFittedError):
+        with pytest.raises(NotFittedError):
             classifier.predict(valid_data.features)
 
     def test_should_raise_if_dataset_misses_features(self, classifier: Classifier, valid_data: TabularDataset) -> None:
@@ -458,7 +457,7 @@ class DummyClassifier(Classifier):
         feature = predicted.rename("feature")
         dataset = Table.from_columns([feature, predicted])
 
-        return dataset.to_tabular_dataset(target_name="predicted")
+        return dataset.to_tabular_dataset("predicted")
 
     @property
     def is_fitted(self) -> bool:
@@ -491,7 +490,7 @@ class TestSummarizeMetrics:
                 "expected": expected,
             },
         ).to_tabular_dataset(
-            target_name="expected",
+            "expected",
         )
 
         assert DummyClassifier().summarize_metrics(table, 1) == result
@@ -504,7 +503,7 @@ class TestAccuracy:
                 "predicted": [1, 2, 3, 4],
                 "expected": [1, 2, 3, 3],
             },
-        ).to_tabular_dataset(target_name="expected")
+        ).to_tabular_dataset("expected")
 
         assert DummyClassifier().accuracy(table) == 0.75
 
@@ -514,7 +513,7 @@ class TestAccuracy:
                 "predicted": ["1", "2", "3", "4"],
                 "expected": [1, 2, 3, 3],
             },
-        ).to_tabular_dataset(target_name="expected")
+        ).to_tabular_dataset("expected")
 
         assert DummyClassifier().accuracy(table) == 0.0
 
@@ -557,7 +556,7 @@ class TestPrecision:
                 "predicted": predicted,
                 "expected": expected,
             },
-        ).to_tabular_dataset(target_name="expected")
+        ).to_tabular_dataset("expected")
 
         assert DummyClassifier().precision(table, 1) == result
 
@@ -600,7 +599,7 @@ class TestRecall:
                 "predicted": predicted,
                 "expected": expected,
             },
-        ).to_tabular_dataset(target_name="expected")
+        ).to_tabular_dataset("expected")
 
         assert DummyClassifier().recall(table, 1) == result
 
@@ -659,6 +658,6 @@ class TestF1Score:
                 "predicted": predicted,
                 "expected": expected,
             },
-        ).to_tabular_dataset(target_name="expected")
+        ).to_tabular_dataset("expected")
 
         assert DummyClassifier().f1_score(table, 1) == result

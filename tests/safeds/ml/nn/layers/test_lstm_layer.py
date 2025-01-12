@@ -2,11 +2,12 @@ import sys
 from typing import Any
 
 import pytest
+from torch import nn
+
 from safeds.data.image.typing import ImageSize
 from safeds.exceptions import OutOfBoundsError
 from safeds.ml.hyperparameters import Choice
 from safeds.ml.nn.layers import LSTMLayer
-from torch import nn
 
 # TODO: Should be tested on a model, not a layer, since input size gets inferred
 # @pytest.mark.parametrize(

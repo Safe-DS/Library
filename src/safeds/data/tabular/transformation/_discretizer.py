@@ -3,12 +3,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds._validation import _check_bounds, _check_columns_exist, _ClosedBound
-from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
+from safeds._validation import _check_bounds, _check_columns_are_numeric, _check_columns_exist, _ClosedBound
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
     NonNumericColumnError,
-    TransformerNotFittedError,
+    NotFittedError,
 )
 
 from ._table_transformer import TableTransformer
@@ -115,7 +114,7 @@ class Discretizer(TableTransformer):
         wrapped_transformer = sk_KBinsDiscretizer(n_bins=self._bin_count, encode="ordinal")
         wrapped_transformer.set_output(transform="polars")
         wrapped_transformer.fit(
-            table.remove_columns_except(column_names)._data_frame,
+            table.select_columns(column_names)._data_frame,
         )
 
         result = Discretizer(self._bin_count, column_names=column_names)
@@ -141,7 +140,7 @@ class Discretizer(TableTransformer):
 
         Raises
         ------
-        TransformerNotFittedError
+        NotFittedError
             If the transformer has not been fitted yet.
         ValueError
             If the table is empty.
@@ -152,7 +151,7 @@ class Discretizer(TableTransformer):
         """
         # Transformer has not been fitted yet
         if self._wrapped_transformer is None or self._column_names is None:
-            raise TransformerNotFittedError
+            raise NotFittedError(kind="transformer")
 
         if table.row_count == 0:
             raise ValueError("The table cannot be transformed because it contains 0 rows")
@@ -165,7 +164,7 @@ class Discretizer(TableTransformer):
                 raise NonNumericColumnError(f"{column} is of type {table.get_column(column).type}.")
 
         new_data = self._wrapped_transformer.transform(
-            table.remove_columns_except(self._column_names)._data_frame,
+            table.select_columns(self._column_names)._data_frame,
         )
         return Table._from_polars_lazy_frame(
             table._lazy_frame.update(new_data.lazy()),

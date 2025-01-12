@@ -1,123 +1,201 @@
+import datetime
 from statistics import stdev
 
 import pytest
 
 from safeds.data.tabular.containers import Table
 
+_HEADERS = [
+    "min",
+    "max",
+    "mean",
+    "median",
+    "standard deviation",
+    "missing value ratio",
+    "stability",
+    "idness",
+]
+_EMPTY_COLUMN_RESULT = [
+    None,
+    None,
+    None,
+    None,
+    None,
+    1.0,
+    1.0,
+    1.0,
+]
+
 
 @pytest.mark.parametrize(
     ("table", "expected"),
     [
+        # empty
         (
-            Table({"col1": [1, 2, 1], "col2": ["a", "b", "c"]}),
+            Table({}),
+            Table({}),
+        ),
+        # no rows, multiple columns
+        (
+            Table({"col1": [], "col2": []}),
             Table(
                 {
-                    "metric": [
-                        "min",
-                        "max",
-                        "mean",
-                        "median",
-                        "standard deviation",
-                        "distinct value count",
-                        "idness",
-                        "missing value ratio",
-                        "stability",
+                    "statistic": _HEADERS,
+                    "col1": _EMPTY_COLUMN_RESULT,
+                    "col2": _EMPTY_COLUMN_RESULT,
+                },
+            ),
+        ),
+        # null column
+        (
+            Table({"col1": [None, None, None]}),
+            Table(
+                {
+                    "statistic": _HEADERS,
+                    "col1": [
+                        None,
+                        None,
+                        None,
+                        None,
+                        None,
+                        1.0,
+                        1.0,
+                        1 / 3,
                     ],
+                },
+            ),
+        ),
+        # numeric column
+        (
+            Table({"col1": [1, 2, 1, None]}),
+            Table(
+                {
+                    "statistic": _HEADERS,
                     "col1": [
                         1,
                         2,
                         4 / 3,
                         1,
                         stdev([1, 2, 1]),
-                        2,
+                        1 / 4,
                         2 / 3,
-                        0,
-                        2 / 3,
+                        3 / 4,
                     ],
-                    "col2": [
+                },
+            ),
+        ),
+        # temporal column
+        (
+            Table(
+                {
+                    "col1": [
+                        datetime.time(1, 2, 3),
+                        datetime.time(4, 5, 6),
+                        datetime.time(7, 8, 9),
+                        None,
+                    ],
+                },
+            ),
+            Table(
+                {
+                    "statistic": _HEADERS,
+                    "col1": [
+                        "01:02:03",
+                        "07:08:09",
+                        None,
+                        None,
+                        None,
+                        "0.25",
+                        "0.3333333333333333",
+                        "1.0",
+                    ],
+                },
+            ),
+        ),
+        # string column
+        (
+            Table({"col1": ["a", "b", "c", None]}),
+            Table(
+                {
+                    "statistic": _HEADERS,
+                    "col1": [
                         "a",
                         "c",
-                        "-",
-                        "-",
-                        "-",
-                        "3",
-                        "1.0",
-                        "0.0",
+                        None,
+                        None,
+                        None,
+                        "0.25",
                         "0.3333333333333333",
-                    ],
-                },
-            ),
-        ),
-        (
-            Table({}),
-            Table({}),
-        ),
-        (
-            Table({"col": [], "gg": []}),
-            Table(
-                {
-                    "metric": [
-                        "min",
-                        "max",
-                        "mean",
-                        "median",
-                        "standard deviation",
-                        "distinct value count",
-                        "idness",
-                        "missing value ratio",
-                        "stability",
-                    ],
-                    "col": [
-                        "-",
-                        "-",
-                        "-",
-                        "-",
-                        "-",
-                        "0",
-                        "1.0",
-                        "1.0",
-                        "1.0",
-                    ],
-                    "gg": [
-                        "-",
-                        "-",
-                        "-",
-                        "-",
-                        "-",
-                        "0",
-                        "1.0",
-                        "1.0",
                         "1.0",
                     ],
                 },
             ),
         ),
+        # boolean column
         (
-            Table({"col": [None, None]}),
+            Table({"col1": [True, False, True, None]}),
             Table(
                 {
-                    "metric": [
-                        "min",
-                        "max",
-                        "mean",
-                        "median",
-                        "standard deviation",
-                        "distinct value count",
-                        "idness",
-                        "missing value ratio",
-                        "stability",
+                    "statistic": _HEADERS,
+                    "col1": [
+                        "false",
+                        "true",
+                        None,
+                        None,
+                        None,
+                        "0.25",
+                        "0.6666666666666666",
+                        "0.75",
                     ],
-                    "col": ["-", "-", "-", "-", "-", "0", "0.5", "1.0", "1.0"],
                 },
             ),
         ),
     ],
     ids=[
-        "Column of integers and Column of characters",
         "empty",
-        "empty with columns",
-        "Column of None",
+        "no rows, multiple columns",
+        "null column",
+        "numeric column",
+        "temporal column",
+        "string column",
+        "boolean column",
     ],
 )
 def test_should_summarize_statistics(table: Table, expected: Table) -> None:
-    assert table.summarize_statistics() == expected
+    actual = table.summarize_statistics()
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    ("table", "expected"),
+    [
+        # has statistic column
+        (
+            Table({"statistic": []}),
+            Table(
+                {
+                    "statistic_": _HEADERS,
+                    "statistic": _EMPTY_COLUMN_RESULT,
+                },
+            ),
+        ),
+        # has statistic_ column
+        (
+            Table({"statistic": [], "statistic_": []}),
+            Table(
+                {
+                    "statistic__": _HEADERS,
+                    "statistic": _EMPTY_COLUMN_RESULT,
+                    "statistic_": _EMPTY_COLUMN_RESULT,
+                },
+            ),
+        ),
+    ],
+    ids=[
+        "has statistic column",
+        "has statistic_ column",
+    ],
+)
+def test_should_ensure_new_column_has_unique_name(table: Table, expected: Table) -> None:
+    actual = table.summarize_statistics()
+    assert actual == expected

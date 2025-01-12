@@ -1,4 +1,5 @@
 import pytest
+
 from safeds.data.labeled.containers import TimeSeriesDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import ColumnNotFoundError
@@ -109,7 +110,7 @@ def test_should_raise_error(
     error_msg: str | None,
 ) -> None:
     with pytest.raises(error, match=error_msg):
-        TimeSeriesDataset(data, target_name=target_name, window_size=1, extra_names=extra_names)
+        TimeSeriesDataset(data, target_name, window_size=1, extra_names=extra_names)
 
 
 @pytest.mark.parametrize(
@@ -204,7 +205,7 @@ def test_should_create_a_tabular_dataset(
 ) -> None:
     tabular_dataset = TimeSeriesDataset(
         data,
-        target_name=target_name,
+        target_name,
         window_size=1,
         extra_names=extra_names,
     )
@@ -217,5 +218,5 @@ def test_should_create_a_tabular_dataset(
     assert isinstance(tabular_dataset, TimeSeriesDataset)
     assert tabular_dataset._extras.column_names == extra_names
     assert tabular_dataset._target.name == target_name
-    assert tabular_dataset._extras == data.remove_columns_except(extra_names)
+    assert tabular_dataset._extras == data.select_columns(extra_names)
     assert tabular_dataset._target == data.get_column(target_name)

@@ -2,11 +2,12 @@ import sys
 from typing import Any
 
 import pytest
+from torch import nn
+
 from safeds.data.image.typing import ImageSize
 from safeds.exceptions import OutOfBoundsError
 from safeds.ml.hyperparameters import Choice
 from safeds.ml.nn.layers import GRULayer
-from torch import nn
 
 
 @pytest.mark.parametrize(

@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 import apipkg
 
 if TYPE_CHECKING:
+    from ._collections import _compute_duplicates
     from ._hashing import _structural_hash
     from ._plotting import _figure_to_image
     from ._random import _get_random_seed
@@ -12,6 +13,7 @@ if TYPE_CHECKING:
 apipkg.initpkg(
     __name__,
     {
+        "_compute_duplicates": "._collections:_compute_duplicates",
         "_structural_hash": "._hashing:_structural_hash",
         "_figure_to_image": "._plotting:_figure_to_image",
         "_get_random_seed": "._random:_get_random_seed",
@@ -19,7 +21,8 @@ apipkg.initpkg(
 )
 
 __all__ = [
-    "_structural_hash",
+    "_compute_duplicates",
     "_figure_to_image",
     "_get_random_seed",
+    "_structural_hash",
 ]

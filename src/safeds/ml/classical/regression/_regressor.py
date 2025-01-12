@@ -8,9 +8,9 @@ from joblib._multiprocessing_helpers import mp
 
 from safeds.data.labeled.containers import TabularDataset
 from safeds.exceptions import (
-    ColumnLengthMismatchError,
     DatasetMissesDataError,
-    ModelNotFittedError,
+    LengthMismatchError,
+    NotFittedError,
 )
 from safeds.ml.classical import SupervisedModel
 from safeds.ml.metrics import RegressionMetrics, RegressorMetric
@@ -32,6 +32,11 @@ class Regressor(SupervisedModel, ABC):
 
         **Note:** The model must be fitted.
 
+        !!! warning "API Stability"
+
+            Do not rely on the exact output of this method. In future versions, we may change the displayed metrics
+            without prior notice.
+
         Parameters
         ----------
         validation_or_test_set:
@@ -44,11 +49,11 @@ class Regressor(SupervisedModel, ABC):
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the classifier has not been fitted yet.
         """
         if not self.is_fitted:
-            raise ModelNotFittedError
+            raise NotFittedError(kind="model")
 
         validation_or_test_set = _extract_table(validation_or_test_set)
 
@@ -91,11 +96,11 @@ class Regressor(SupervisedModel, ABC):
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the classifier has not been fitted yet.
         """
         if not self.is_fitted:
-            raise ModelNotFittedError
+            raise NotFittedError(kind="model")
 
         validation_or_test_set = _extract_table(validation_or_test_set)
 
@@ -126,11 +131,11 @@ class Regressor(SupervisedModel, ABC):
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the classifier has not been fitted yet.
         """
         if not self.is_fitted:
-            raise ModelNotFittedError
+            raise NotFittedError(kind="model")
 
         validation_or_test_set = _extract_table(validation_or_test_set)
 
@@ -165,11 +170,11 @@ class Regressor(SupervisedModel, ABC):
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the classifier has not been fitted yet.
         """
         if not self.is_fitted:
-            raise ModelNotFittedError
+            raise NotFittedError(kind="model")
 
         validation_or_test_set = _extract_table(validation_or_test_set)
 
@@ -203,11 +208,11 @@ class Regressor(SupervisedModel, ABC):
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the classifier has not been fitted yet.
         """
         if not self.is_fitted:
-            raise ModelNotFittedError
+            raise NotFittedError(kind="model")
 
         validation_or_test_set = _extract_table(validation_or_test_set)
 
@@ -238,11 +243,11 @@ class Regressor(SupervisedModel, ABC):
 
         Raises
         ------
-        ModelNotFittedError
+        NotFittedError
             If the classifier has not been fitted yet.
         """
         if not self.is_fitted:
-            raise ModelNotFittedError
+            raise NotFittedError(kind="model")
 
         validation_or_test_set = _extract_table(validation_or_test_set)
 
@@ -287,11 +292,11 @@ class Regressor(SupervisedModel, ABC):
 
         [train_split, test_split] = training_set.to_table().split_rows(0.75)
         train_data = train_split.to_tabular_dataset(
-            target_name=training_set.target.name,
+            training_set.target.name,
             extra_names=training_set.extras.column_names,
         )
         test_data = test_split.to_tabular_dataset(
-            target_name=training_set.target.name,
+            training_set.target.name,
             extra_names=training_set.extras.column_names,
         )
 
@@ -354,7 +359,7 @@ def _check_metrics_preconditions(actual: Column, expected: Column) -> None:  # p
         raise TypeError(f"Column 'expected' is not numerical but {expected.type}.")
 
     if actual.row_count != expected.row_count:
-        raise ColumnLengthMismatchError(
+        raise LengthMismatchError(
             "\n".join(
                 [
                     f"{actual.name}: {actual.row_count}",

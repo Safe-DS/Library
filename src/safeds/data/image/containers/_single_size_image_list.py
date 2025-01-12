@@ -557,7 +557,7 @@ class _SingleSizeImageList(ImageList):
         from safeds.data.image.containers._empty_image_list import _EmptyImageList
         from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
 
-        if isinstance(images, _EmptyImageList) or isinstance(images, list) and len(images) == 0:
+        if isinstance(images, _EmptyImageList) or (isinstance(images, list) and len(images) == 0):
             return self
 
         next_index = max(self._tensor_positions_to_indices) + 1
@@ -593,7 +593,7 @@ class _SingleSizeImageList(ImageList):
                     new_image_lists[self_size] = self.change_channel(max_channel)
                 else:
                     new_image_lists[self_size] = self
-            for size in images_with_sizes_with_channel:
+            for size in images_with_sizes_with_channel:  # noqa: PLC0206
                 if size == self_size:
                     new_tensor = torch.empty(
                         len(self) + images_with_sizes_count[size],

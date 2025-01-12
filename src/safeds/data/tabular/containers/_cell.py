@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import datetime
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Generic, TypeVar
+from decimal import Decimal
+from typing import TYPE_CHECKING, Any, Generic, TypeAlias, TypeVar
 
 if TYPE_CHECKING:
     import polars as pl
@@ -14,16 +16,42 @@ P_contra = TypeVar("P_contra", contravariant=True)
 R_co = TypeVar("R_co", covariant=True)
 
 
+_NumericLiteral: TypeAlias = int | float | Decimal
+_TemporalLiteral: TypeAlias = datetime.date | datetime.time | datetime.datetime | datetime.timedelta
+_PythonLiteral: TypeAlias = _NumericLiteral | bool | str | bytes | _TemporalLiteral | None
+
+
 class Cell(ABC, Generic[T_co]):
     """
     A single value in a table.
 
-    This class cannot be instantiated directly. It is only used for arguments of callbacks.
+    You only need to interact with this class in callbacks passed to higher-order functions.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
     # Static methods
     # ------------------------------------------------------------------------------------------------------------------
+
+    @staticmethod
+    def from_literal(value: _PythonLiteral) -> Cell:
+        """
+        Create a new cell from a literal value.
+
+        Parameters
+        ----------
+        value:
+            The value to create the cell from.
+
+        Returns
+        -------
+        cell:
+            The created cell.
+        """
+        import polars as pl
+
+        from ._lazy_cell import _LazyCell  # circular import
+
+        return _LazyCell(pl.lit(value))
 
     @staticmethod
     def first_not_none(cells: list[Cell]) -> Cell:
@@ -38,8 +66,8 @@ class Cell(ABC, Generic[T_co]):
         Returns
         -------
         cell:
-            Returns the contents of the first cell that is not None.
-            If all cells in the list are None or the list is empty returns None.
+            Returns the contents of the first cell that is not None. If all cells in the list are None or the list is
+            empty returns None.
         """
         import polars as pl
 

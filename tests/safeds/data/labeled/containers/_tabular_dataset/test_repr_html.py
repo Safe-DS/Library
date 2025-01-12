@@ -1,13 +1,14 @@
 import re
 
 import pytest
+
 from safeds.data.labeled.containers import TabularDataset
 
 
 @pytest.mark.parametrize(
     "tabular_dataset",
     [
-        TabularDataset({"a": [1, 2], "b": [3, 4]}, target_name="b"),
+        TabularDataset({"a": [1, 2], "b": [3, 4]}, "b"),
     ],
     ids=[
         "non-empty",
@@ -21,7 +22,7 @@ def test_should_contain_tabular_dataset_element(tabular_dataset: TabularDataset)
 @pytest.mark.parametrize(
     "tabular_dataset",
     [
-        TabularDataset({"a": [1, 2], "b": [3, 4]}, target_name="b"),
+        TabularDataset({"a": [1, 2], "b": [3, 4]}, "b"),
     ],
     ids=[
         "non-empty",
@@ -35,7 +36,7 @@ def test_should_contain_th_element_for_each_column_name(tabular_dataset: Tabular
 @pytest.mark.parametrize(
     "tabular_dataset",
     [
-        TabularDataset({"a": [1, 2], "b": [3, 4]}, target_name="b"),
+        TabularDataset({"a": [1, 2], "b": [3, 4]}, "b"),
     ],
     ids=[
         "non-empty",

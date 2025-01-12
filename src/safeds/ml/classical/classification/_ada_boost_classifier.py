@@ -23,15 +23,17 @@ class AdaBoostClassifier(Classifier, _AdaBoostBase):
         The learner from which the boosted ensemble is built.
     max_learner_count:
         The maximum number of learners at which boosting is terminated. In case of perfect fit, the learning procedure
-        is stopped early. Has to be greater than 0.
+        is stopped early. Must be greater than 0.
     learning_rate:
         Weight applied to each classifier at each boosting iteration. A higher learning rate increases the contribution
-        of each classifier. Has to be greater than 0.
+        of each classifier. Must be greater than 0.
 
     Raises
     ------
     OutOfBoundsError
-        If `max_learner_count` or `learning_rate` are less than or equal to 0.
+        If `max_learner_count` is less than or equal to 0.
+    OutOfBoundsError
+        If `learning_rate` is less than or equal to 0.
     """
 
     # ------------------------------------------------------------------------------------------------------------------

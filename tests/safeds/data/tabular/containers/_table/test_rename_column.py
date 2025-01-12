@@ -1,3 +1,5 @@
+from collections.abc import Callable
+
 import pytest
 
 from safeds.data.tabular.containers import Table
@@ -5,21 +7,49 @@ from safeds.exceptions import ColumnNotFoundError, DuplicateColumnError
 
 
 @pytest.mark.parametrize(
-    ("name_from", "name_to", "column_one", "column_two"),
-    [("A", "D", "D", "B"), ("A", "A", "A", "B")],
-    ids=["column renamed", "column not renamed"],
+    ("table_factory", "old_name", "new_name", "expected"),
+    [
+        (
+            lambda: Table({"A": [1], "B": [2]}),
+            "A",
+            "C",
+            Table({"C": [1], "B": [2]}),
+        ),
+        (
+            lambda: Table({"A": [1], "B": [2]}),
+            "A",
+            "A",
+            Table({"A": [1], "B": [2]}),
+        ),
+    ],
+    ids=["name changed", "name unchanged"],
 )
-def test_should_rename_column(name_from: str, name_to: str, column_one: str, column_two: str) -> None:
-    table: Table = Table({"A": [1], "B": [2]})
-    renamed_table = table.rename_column(name_from, name_to)
-    assert renamed_table.schema.column_names == [column_one, column_two]
-    assert renamed_table.column_names == [column_one, column_two]
+class TestHappyPath:
+    def test_should_rename_column(
+        self,
+        table_factory: Callable[[], Table],
+        old_name: str,
+        new_name: str,
+        expected: Table,
+    ) -> None:
+        actual = table_factory().rename_column(old_name, new_name)
+        assert actual == expected
+
+    def test_should_not_mutate_receiver(
+        self,
+        table_factory: Callable[[], Table],
+        old_name: str,
+        new_name: str,
+        expected: Table,  # noqa: ARG002
+    ) -> None:
+        original: Table = table_factory()
+        original.rename_column(old_name, new_name)
+        assert original == table_factory()
 
 
-@pytest.mark.parametrize("table", [Table({"A": [1], "B": [2]}), Table({})], ids=["normal", "empty"])
-def test_should_raise_if_old_column_does_not_exist(table: Table) -> None:
+def test_should_raise_if_old_column_does_not_exist() -> None:
     with pytest.raises(ColumnNotFoundError):
-        table.rename_column("C", "D")
+        Table({}).rename_column("A", "B")
 
 
 def test_should_raise_if_new_column_exists_already() -> None:

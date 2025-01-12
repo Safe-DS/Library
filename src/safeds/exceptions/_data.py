@@ -23,20 +23,6 @@ class MissingValuesColumnError(Exception):
         )
 
 
-class DuplicateColumnError(ValueError):
-    """
-    Exception raised for trying to modify a table resulting in a duplicate column name.
-
-    Parameters
-    ----------
-    column_name:
-        The name of the column that resulted in a duplicate.
-    """
-
-    def __init__(self, column_name: str):
-        super().__init__(f"Column '{column_name}' already exists.")
-
-
 class IndexOutOfBoundsError(IndexError):
     """
     Exception raised for trying to access an element by an index that does not exist in the underlying data.
@@ -74,48 +60,11 @@ class DuplicateIndexError(IndexError):
         super().__init__(f"The index '{index}' is already in use.")
 
 
-class ColumnSizeError(Exception):
-    """
-    Exception raised for trying to use a column of unsupported size.
-
-    Parameters
-    ----------
-    expected_size:
-        The expected size of the column as an expression (e.g. 2, >0, !=0).
-    actual_size:
-        The actual size of the column as an expression (e.g. 2, >0, !=0).
-    """
-
-    def __init__(self, expected_size: str, actual_size: str):
-        super().__init__(f"Expected a column of size {expected_size} but got column of size {actual_size}.")
-
-
-class ColumnLengthMismatchError(ValueError):
-    """Exception raised when the lengths of two or more columns do not match."""
-
-    def __init__(self, column_info: str):
-        super().__init__(f"The length of at least one column differs: \n{column_info}")
-
-
 class OutputLengthMismatchError(Exception):
     """Exception raised when the lengths of the input and output container does not match."""
 
     def __init__(self, output_info: str):
         super().__init__(f"The length of the output container differs: \n{output_info}")
-
-
-class TransformerNotFittedError(Exception):
-    """Raised when a transformer is used before fitting it."""
-
-    def __init__(self) -> None:
-        super().__init__("The transformer has not been fitted yet.")
-
-
-class TransformerNotInvertibleError(Exception):
-    """Raised when a function tries to invert a non-invertible transformer."""
-
-    def __init__(self, transformer_type: str) -> None:
-        super().__init__(f"{transformer_type} is not invertible.")
 
 
 class ValueNotPresentWhenFittedError(Exception):

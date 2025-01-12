@@ -1,4 +1,5 @@
 import pytest
+
 from safeds.data.labeled.containers import TimeSeriesDataset
 from safeds.data.tabular.containers import Column
 
@@ -14,7 +15,7 @@ from safeds.data.tabular.containers import Column
                     "C": [3, 6],
                     "T": [0, 1],
                 },
-                target_name="T",
+                "T",
                 window_size=1,
             ),
             Column("T", [0, 1]),

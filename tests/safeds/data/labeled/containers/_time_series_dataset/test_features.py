@@ -1,4 +1,5 @@
 import pytest
+
 from safeds.data.labeled.containers import TimeSeriesDataset
 from safeds.data.tabular.containers import Table
 
@@ -14,7 +15,7 @@ from safeds.data.tabular.containers import Table
                     "C": [3, 6],
                     "T": [0, 1],
                 },
-                target_name="T",
+                "T",
                 extra_names=["C"],
                 window_size=1,
             ),
@@ -29,7 +30,7 @@ from safeds.data.tabular.containers import Table
                     "T": [0, 1],
                     "time": [0, 0],
                 },
-                target_name="T",
+                "T",
                 window_size=1,
                 extra_names=["B"],
             ),

@@ -1,16 +1,16 @@
 from typing import Any
 
 import pytest
+
 from safeds.data.labeled.containers import TimeSeriesDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
     DatasetMissesDataError,
     MissingValuesColumnError,
-    ModelNotFittedError,
     NonNumericColumnError,
+    NotFittedError,
 )
 from safeds.ml.classical.regression import AdaBoostRegressor, ArimaModelRegressor
-
 from tests.helpers import resolve_resource_path
 
 
@@ -22,8 +22,22 @@ def test_arima_model() -> None:
     )
     train_ts, test_ts = time_series.split_rows(0.8)
     model = ArimaModelRegressor()
-    trained_model = model.fit(train_ts.to_time_series_dataset("value", window_size=1))
-    trained_model.predict(test_ts.to_time_series_dataset("value", window_size=1))
+    # trained_model = model.fit(train_ts.to_time_series_dataset("value", window_size=1))
+    # trained_model.predict(test_ts.to_time_series_dataset("value", window_size=1))
+    trained_model = model.fit(
+        TimeSeriesDataset(
+            train_ts,
+            "value",
+            window_size=1,
+        ),
+    )
+    trained_model.predict(
+        TimeSeriesDataset(
+            test_ts,
+            "value",
+            window_size=1,
+        ),
+    )
     # suggest it ran through
     assert True
 
@@ -31,7 +45,7 @@ def test_arima_model() -> None:
 def create_test_data() -> TimeSeriesDataset:
     return TimeSeriesDataset(
         {"time": [1, 2, 3, 4, 5, 6, 7, 8, 9], "value": [1, 2, 3, 4, 5, 6, 7, 8, 9]},
-        target_name="value",
+        "value",
         window_size=1,
     )
 
@@ -43,7 +57,7 @@ def create_test_data_with_feature() -> TimeSeriesDataset:
             "value": [1, 2, 3, 4, 5, 6, 7, 8, 9],
             "feature": [1, 2, 3, 4, 5, 6, 7, 8, 9],
         },
-        target_name="value",
+        "value",
         window_size=1,
     )
 
@@ -82,38 +96,74 @@ def test_should_succeed_on_valid_data_plot() -> None:
     ("invalid_data", "expected_error", "expected_error_msg"),
     [
         (
-            Table(
-                {
-                    "id": [1, 4],
-                    "feat1": [1, 5],
-                    "feat2": [3, 6],
-                    "target": ["0", 1],
-                },
-            ).to_time_series_dataset(target_name="target", window_size=1),
+            # Table(
+            #     {
+            #         "id": [1, 4],
+            #         "feat1": [1, 5],
+            #         "feat2": [3, 6],
+            #         "target": ["0", 1],
+            #     },
+            # ).to_time_series_dataset("target", window_size=1),
+            TimeSeriesDataset(
+                Table(
+                    {
+                        "id": [1, 4],
+                        "feat1": [1, 5],
+                        "feat2": [3, 6],
+                        "target": ["0", 1],
+                    },
+                ),
+                "target",
+                window_size=1,
+            ),
             NonNumericColumnError,
             r"Tried to do a numerical operation on one or multiple non-numerical columns: \ntarget",
         ),
         (
-            Table(
-                {
-                    "id": [1, 4],
-                    "feat1": [1, 5],
-                    "feat2": [3, 6],
-                    "target": [None, 1],
-                },
-            ).to_time_series_dataset(target_name="target", window_size=1),
+            # Table(
+            #     {
+            #         "id": [1, 4],
+            #         "feat1": [1, 5],
+            #         "feat2": [3, 6],
+            #         "target": [None, 1],
+            #     },
+            # ).to_time_series_dataset("target", window_size=1),
+            TimeSeriesDataset(
+                Table(
+                    {
+                        "id": [1, 4],
+                        "feat1": [1, 5],
+                        "feat2": [3, 6],
+                        "target": [None, 1],
+                    },
+                ),
+                "target",
+                window_size=1,
+            ),
             MissingValuesColumnError,
             r"Tried to do an operation on one or multiple columns containing missing values: \ntarget\nYou can use the Imputer to replace the missing values based on different strategies.\nIf you want toremove the missing values entirely you can use the method `TimeSeries.remove_rows_with_missing_values`.",
         ),
         (
-            Table(
-                {
-                    "id": [],
-                    "feat1": [],
-                    "feat2": [],
-                    "target": [],
-                },
-            ).to_time_series_dataset(target_name="target", window_size=1),
+            # Table(
+            #     {
+            #         "id": [],
+            #         "feat1": [],
+            #         "feat2": [],
+            #         "target": [],
+            #     },
+            # ).to_time_series_dataset("target", window_size=1),
+            TimeSeriesDataset(
+                Table(
+                    {
+                        "id": [],
+                        "feat1": [],
+                        "feat2": [],
+                        "target": [],
+                    },
+                ),
+                "target",
+                window_size=1,
+            ),
             DatasetMissesDataError,
             r"Dataset contains no rows",
         ),
@@ -148,7 +198,7 @@ def test_correct_structure_of_time_series() -> None:
 
 def test_should_raise_if_not_fitted() -> None:
     model = ArimaModelRegressor()
-    with pytest.raises(ModelNotFittedError):
+    with pytest.raises(NotFittedError):
         model.predict(create_test_data())
 
 
@@ -165,7 +215,7 @@ def test_if_fitted_fitted() -> None:
 
 def test_should_raise_if_horizon_too_small_plot() -> None:
     model = ArimaModelRegressor()
-    with pytest.raises(ModelNotFittedError):
+    with pytest.raises(NotFittedError):
         model.plot_predictions(create_test_data())
 
 

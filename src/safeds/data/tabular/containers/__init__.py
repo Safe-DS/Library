@@ -29,6 +29,6 @@ __all__ = [
     "Column",
     "Row",
     "StringCell",
-    "TemporalCell",
     "Table",
+    "TemporalCell",
 ]

@@ -112,7 +112,7 @@ class _MultiSizeImageList(ImageList):
                 image_index_dict[size].append(index)
                 max_channel = max(max_channel, image.size(dim=-3))
 
-        for size in image_tensor_dict:
+        for size in image_tensor_dict:  # noqa: PLC0206
             image_list._image_list_dict[size] = _SingleSizeImageList._create_image_list(
                 image_tensor_dict[size],
                 image_index_dict[size],
@@ -320,7 +320,7 @@ class _MultiSizeImageList(ImageList):
         from safeds.data.image.containers._empty_image_list import _EmptyImageList
         from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 
-        if isinstance(images, _EmptyImageList) or isinstance(images, list) and len(images) == 0:
+        if isinstance(images, _EmptyImageList) or (isinstance(images, list) and len(images) == 0):
             return self
 
         indices_for_images_with_size = {}

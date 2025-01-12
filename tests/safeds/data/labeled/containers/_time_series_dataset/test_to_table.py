@@ -1,4 +1,5 @@
 import pytest
+
 from safeds.data.labeled.containers import TimeSeriesDataset
 from safeds.data.tabular.containers import Table
 
@@ -13,7 +14,7 @@ from safeds.data.tabular.containers import Table
                     "feature_2": [6, 12, 9],
                     "target": [1, 3, 2],
                 },
-                target_name="target",
+                "target",
                 window_size=1,
             ),
             Table(
@@ -32,7 +33,7 @@ from safeds.data.tabular.containers import Table
                     "other": [3, 9, 12],
                     "target": [1, 3, 2],
                 },
-                target_name="target",
+                "target",
                 window_size=1,
                 extra_names=["other"],
             ),
@@ -49,6 +50,5 @@ from safeds.data.tabular.containers import Table
     ids=["normal", "table_with_extra_column"],
 )
 def test_should_return_table(tabular_dataset: TimeSeriesDataset, expected: Table) -> None:
-    table = tabular_dataset.to_table()
-    assert table.schema == expected.schema
-    assert table == expected
+    actual = tabular_dataset.to_table()
+    assert actual == expected

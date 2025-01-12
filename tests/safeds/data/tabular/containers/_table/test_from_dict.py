@@ -3,7 +3,7 @@ from typing import Any
 import pytest
 
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import ColumnLengthMismatchError
+from safeds.exceptions import LengthMismatchError
 
 
 @pytest.mark.parametrize(
@@ -26,13 +26,13 @@ from safeds.exceptions import ColumnLengthMismatchError
             ),
         ),
     ],
-    ids=["empty", "with values"],
+    ids=["empty", "non-empty"],
 )
 def test_should_create_table_from_dict(data: dict[str, list[Any]], expected: Table) -> None:
-    assert Table.from_dict(data).schema == expected.schema
-    assert Table.from_dict(data) == expected
+    actual = Table.from_dict(data)
+    assert actual == expected
 
 
-def test_should_raise_error_if_columns_have_different_lengths() -> None:
-    with pytest.raises(ColumnLengthMismatchError, match=r"The length of at least one column differs: \na: 2\nb: 1"):
+def test_should_raise_if_row_counts_differ() -> None:
+    with pytest.raises(LengthMismatchError):
         Table.from_dict({"a": [1, 2], "b": [3]})

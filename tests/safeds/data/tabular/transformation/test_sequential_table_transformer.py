@@ -1,4 +1,5 @@
 import pytest
+
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import (
     Discretizer,
@@ -9,13 +10,11 @@ from safeds.data.tabular.transformation import (
     StandardScaler,
     TableTransformer,
 )
-from safeds.exceptions import TransformerNotFittedError, TransformerNotInvertibleError
-
-from tests.helpers import assert_tables_equal
+from safeds.exceptions import NotFittedError, NotInvertibleError
+from tests.helpers import assert_tables_are_equal
 
 
 class TestInit:
-
     def test_should_warn_on_empty_list(self) -> None:
         with pytest.warns(UserWarning, match=("transformers should contain at least 1 transformer")):
             SequentialTableTransformer(transformers=[])  # type: ignore[attr-defined]
@@ -64,7 +63,7 @@ class TestTransform:
             },
         )
         sequential_table_transformer = SequentialTableTransformer(transformers)
-        with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
+        with pytest.raises(NotFittedError, match=r"This transformer has not been fitted yet."):
             sequential_table_transformer.transform(test_table)
 
     @pytest.mark.parametrize(
@@ -89,7 +88,7 @@ class TestTransform:
         transformer = transformer.fit(test_table)
         test_table_normal = transformer.transform(test_table)
         test_table_sequential = sequential_transformer.transform(test_table)
-        assert_tables_equal(test_table_normal, test_table_sequential)
+        assert_tables_are_equal(test_table_normal, test_table_sequential)
 
     def test_should_transform_with_multiple_transformers(self) -> None:
         one_hot = OneHotEncoder()
@@ -110,7 +109,7 @@ class TestTransform:
         imputer = imputer.fit(transformed_table_individual)
         transformed_table_individual = imputer.transform(transformed_table_individual)
 
-        assert_tables_equal(transformed_table_sequential, transformed_table_individual)
+        assert_tables_are_equal(transformed_table_sequential, transformed_table_individual)
 
 
 class TestIsFitted:
@@ -137,7 +136,6 @@ class TestIsFitted:
 
 
 class TestInverseTransform:
-
     @pytest.mark.parametrize(
         "transformers",
         [
@@ -165,7 +163,7 @@ class TestInverseTransform:
         sequential_table_transformer = SequentialTableTransformer(transformers)
         sequential_table_transformer = sequential_table_transformer.fit(test_table)
         transformed_table = sequential_table_transformer.transform(test_table)
-        with pytest.raises(TransformerNotInvertibleError, match=r".*is not invertible."):
+        with pytest.raises(NotInvertibleError, match=r".*is not invertible."):
             sequential_table_transformer.inverse_transform(transformed_table)
 
     @pytest.mark.parametrize(
@@ -195,9 +193,9 @@ class TestInverseTransform:
         sequential_table_transformer = sequential_table_transformer.fit(test_table)
         transformed_table = sequential_table_transformer.transform(test_table)
         inverse_transformed_table = sequential_table_transformer.inverse_transform(transformed_table)
-        assert_tables_equal(test_table, inverse_transformed_table, ignore_column_order=True, ignore_types=True)
+        assert_tables_are_equal(test_table, inverse_transformed_table, ignore_column_order=True, ignore_types=True)
 
-    def test_should_raise_transformer_not_fitted_error_if_not_fited(self) -> None:
+    def test_should_raise_transformer_not_fitted_error_if_not_fitted(self) -> None:
         one_hot = OneHotEncoder()
         imputer = SimpleImputer(SimpleImputer.Strategy.constant(0))
         transformers = [one_hot, imputer]
@@ -208,5 +206,5 @@ class TestInverseTransform:
                 "col2": ["a", "b", "a"],
             },
         )
-        with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
+        with pytest.raises(NotFittedError, match=r"This transformer has not been fitted yet."):
             sequential_table_transformer.inverse_transform(test_table)

@@ -1,4 +1,5 @@
 import pytest
+
 from safeds.data.labeled.containers import TimeSeriesDataset
 
 
@@ -13,7 +14,7 @@ from safeds.data.labeled.containers import TimeSeriesDataset
                     "C": [3, 6],
                     "T": [0, 1],
                 },
-                target_name="T",
+                "T",
                 window_size=1,
                 continuous=True,
             ),
@@ -27,7 +28,7 @@ from safeds.data.labeled.containers import TimeSeriesDataset
                     "C": [3, 6],
                     "T": [0, 1],
                 },
-                target_name="T",
+                "T",
                 window_size=1,
                 extra_names=["A", "C"],
                 continuous=False,

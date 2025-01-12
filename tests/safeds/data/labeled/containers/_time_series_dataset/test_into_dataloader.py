@@ -1,12 +1,12 @@
 import pytest
 import torch
+from torch.types import Device
+from torch.utils.data import DataLoader
+
 from safeds._config import _get_device
 from safeds.data.labeled.containers import TimeSeriesDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import OutOfBoundsError
-from torch.types import Device
-from torch.utils.data import DataLoader
-
 from tests.helpers import configure_test_with_device, get_devices, get_devices_ids
 
 
@@ -36,7 +36,13 @@ def test_should_create_dataloader(
     device: Device,
 ) -> None:
     configure_test_with_device(device)
-    tabular_dataset = Table.from_dict(data).to_time_series_dataset(
+    # tabular_dataset = Table.from_dict(data).to_time_series_dataset(
+    #     target_name,
+    #     window_size=1,
+    #     extra_names=extra_names,
+    # )
+    tabular_dataset = TimeSeriesDataset(
+        Table.from_dict(data),
         target_name,
         window_size=1,
         extra_names=extra_names,
@@ -74,7 +80,13 @@ def test_should_create_dataloader_predict(
     device: Device,
 ) -> None:
     configure_test_with_device(device)
-    tabular_dataset = Table.from_dict(data).to_time_series_dataset(
+    # tabular_dataset = Table.from_dict(data).to_time_series_dataset(
+    #     target_name,
+    #     window_size=1,
+    #     extra_names=extra_names,
+    # )
+    tabular_dataset = TimeSeriesDataset(
+        Table.from_dict(data),
         target_name,
         window_size=1,
         extra_names=extra_names,
@@ -89,42 +101,78 @@ def test_should_create_dataloader_predict(
     ("data", "window_size", "forecast_horizon", "error_type", "error_msg"),
     [
         (
-            Table(
-                {
-                    "A": [1, 4],
-                    "B": [2, 5],
-                    "C": [3, 6],
-                    "T": [0, 1],
-                },
-            ).to_time_series_dataset(target_name="T", window_size=1),
+            # Table(
+            #     {
+            #         "A": [1, 4],
+            #         "B": [2, 5],
+            #         "C": [3, 6],
+            #         "T": [0, 1],
+            #     },
+            # ).to_time_series_dataset("T", window_size=1),
+            TimeSeriesDataset(
+                Table(
+                    {
+                        "A": [1, 4],
+                        "B": [2, 5],
+                        "C": [3, 6],
+                        "T": [0, 1],
+                    },
+                ),
+                "T",
+                window_size=1,
+            ),
             1,
             2,
             ValueError,
             r"Can not create windows with window size less then forecast horizon \+ window_size",
         ),
         (
-            Table(
-                {
-                    "A": [1, 4],
-                    "B": [2, 5],
-                    "C": [3, 6],
-                    "T": [0, 1],
-                },
-            ).to_time_series_dataset(target_name="T", window_size=1),
+            # Table(
+            #     {
+            #         "A": [1, 4],
+            #         "B": [2, 5],
+            #         "C": [3, 6],
+            #         "T": [0, 1],
+            #     },
+            # ).to_time_series_dataset("T", window_size=1),
+            TimeSeriesDataset(
+                Table(
+                    {
+                        "A": [1, 4],
+                        "B": [2, 5],
+                        "C": [3, 6],
+                        "T": [0, 1],
+                    },
+                ),
+                "T",
+                window_size=1,
+            ),
             1,
             0,
             OutOfBoundsError,
             None,
         ),
         (
-            Table(
-                {
-                    "A": [1, 4],
-                    "B": [2, 5],
-                    "C": [3, 6],
-                    "T": [0, 1],
-                },
-            ).to_time_series_dataset(target_name="T", window_size=1),
+            # Table(
+            #     {
+            #         "A": [1, 4],
+            #         "B": [2, 5],
+            #         "C": [3, 6],
+            #         "T": [0, 1],
+            #     },
+            # ).to_time_series_dataset("T", window_size=1),
+            TimeSeriesDataset(
+                Table(
+                    {
+                        "A": [1, 4],
+                        "B": [2, 5],
+                        "C": [3, 6],
+                        "T": [0, 1],
+                    },
+                ),
+                "T",
+                window_size=1,
+            ),
             0,
             1,
             OutOfBoundsError,
@@ -155,43 +203,79 @@ def test_should_create_dataloader_invalid(
     ("data", "window_size", "forecast_horizon", "error_type", "error_msg"),
     [
         (
-            Table(
-                {
-                    "A": [1, 4],
-                    "B": [2, 5],
-                    "C": [3, 6],
-                    "T": [0, 1],
-                },
-            ).to_time_series_dataset(target_name="T", window_size=1),
+            # Table(
+            #     {
+            #         "A": [1, 4],
+            #         "B": [2, 5],
+            #         "C": [3, 6],
+            #         "T": [0, 1],
+            #     },
+            # ).to_time_series_dataset("T", window_size=1),
+            TimeSeriesDataset(
+                Table(
+                    {
+                        "A": [1, 4],
+                        "B": [2, 5],
+                        "C": [3, 6],
+                        "T": [0, 1],
+                    },
+                ),
+                "T",
+                window_size=1,
+            ),
             1,
             2,
             ValueError,
             r"Can not create windows with window size less then forecast horizon \+ window_size",
         ),
         (
-            Table(
-                {
-                    "A": [1, 4],
-                    "B": [2, 5],
-                    "C": [3, 6],
-                    "T": [0, 1],
-                },
-            ).to_time_series_dataset(target_name="T", window_size=1),
+            # Table(
+            #     {
+            #         "A": [1, 4],
+            #         "B": [2, 5],
+            #         "C": [3, 6],
+            #         "T": [0, 1],
+            #     },
+            # ).to_time_series_dataset("T", window_size=1),
+            TimeSeriesDataset(
+                Table(
+                    {
+                        "A": [1, 4],
+                        "B": [2, 5],
+                        "C": [3, 6],
+                        "T": [0, 1],
+                    },
+                ),
+                "T",
+                window_size=1,
+            ),
             1,
             0,
             OutOfBoundsError,
             None,
         ),
         (
-            Table(
-                {
-                    "A": [1, 4],
-                    "B": [2, 5],
-                    "C": [3, 6],
-                    "T": [0, 1],
-                },
-            ).to_time_series_dataset(
-                target_name="T",
+            # Table(
+            #     {
+            #         "A": [1, 4],
+            #         "B": [2, 5],
+            #         "C": [3, 6],
+            #         "T": [0, 1],
+            #     },
+            # ).to_time_series_dataset(
+            #     "T",
+            #     window_size=1,
+            # ),
+            TimeSeriesDataset(
+                Table(
+                    {
+                        "A": [1, 4],
+                        "B": [2, 5],
+                        "C": [3, 6],
+                        "T": [0, 1],
+                    },
+                ),
+                "T",
                 window_size=1,
             ),
             0,
@@ -225,9 +309,17 @@ def test_should_create_dataloader_predict_invalid(
 
 
 def test_continues_dataloader() -> None:
-    ts = Table(
-        {"a": [1, 2, 3, 4, 5, 6, 7], "b": [1, 2, 3, 4, 5, 6, 7], "c": [1, 2, 3, 4, 5, 6, 7]},
-    ).to_time_series_dataset("a", window_size=1, forecast_horizon=2)
+    # ts = Table(
+    #     {"a": [1, 2, 3, 4, 5, 6, 7], "b": [1, 2, 3, 4, 5, 6, 7], "c": [1, 2, 3, 4, 5, 6, 7]},
+    # ).to_time_series_dataset("a", window_size=1, forecast_horizon=2)
+    ts = TimeSeriesDataset(
+        Table(
+            {"a": [1, 2, 3, 4, 5, 6, 7], "b": [1, 2, 3, 4, 5, 6, 7], "c": [1, 2, 3, 4, 5, 6, 7]},
+        ),
+        "a",
+        window_size=1,
+        forecast_horizon=2,
+    )
     dl = ts._into_dataloader_with_window(1, 2, 1, continuous=True)
     dl_2 = ts._into_dataloader_with_window(1, 2, 1, continuous=False)
     assert len(dl_2.dataset.Y) == len(dl.dataset.Y)

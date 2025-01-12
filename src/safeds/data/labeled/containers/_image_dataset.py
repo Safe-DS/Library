@@ -18,8 +18,8 @@ from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.exceptions import (
     IndexOutOfBoundsError,
     NonNumericColumnError,
+    NotFittedError,
     OutputLengthMismatchError,
-    TransformerNotFittedError,
 )
 
 from ._dataset import Dataset
@@ -482,7 +482,7 @@ class _ColumnAsTensor:
         if tensor.dim() != 2:
             raise ValueError(f"Tensor has an invalid amount of dimensions. Needed 2 dimensions but got {tensor.dim()}.")
         if not one_hot_encoder.is_fitted:
-            raise TransformerNotFittedError
+            raise NotFittedError(kind="transformer")
         if tensor.size(dim=1) != len(one_hot_encoder._get_names_of_added_columns()):
             raise ValueError(
                 f"Tensor and one_hot_encoder have different amounts of classes ({tensor.size(dim=1)}!={len(one_hot_encoder._get_names_of_added_columns())}).",

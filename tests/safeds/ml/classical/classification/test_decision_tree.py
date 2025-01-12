@@ -1,18 +1,18 @@
 import pytest
-from safeds.data.labeled.containers import TabularDataset
-from safeds.data.tabular.containers import Table
-from safeds.exceptions import ModelNotFittedError, OutOfBoundsError
-from safeds.ml.classical.classification import DecisionTreeClassifier
-from safeds.ml.hyperparameters import Choice
 from syrupy import SnapshotAssertion
 
+from safeds.data.labeled.containers import TabularDataset
+from safeds.data.tabular.containers import Table
+from safeds.exceptions import NotFittedError, OutOfBoundsError
+from safeds.ml.classical.classification import DecisionTreeClassifier
+from safeds.ml.hyperparameters import Choice
 from tests.helpers import os_mac, skip_if_os
 
 
-@pytest.fixture()
+@pytest.fixture
 def training_set() -> TabularDataset:
     table = Table({"col1": [1, 2, 3, 4], "col2": [1, 2, 3, 4]})
-    return table.to_tabular_dataset(target_name="col1")
+    return table.to_tabular_dataset("col1")
 
 
 class TestMaxDepth:
@@ -54,7 +54,7 @@ class TestMinSampleCountInLeaves:
 class TestPlot:
     def test_should_raise_if_model_is_not_fitted(self) -> None:
         model = DecisionTreeClassifier()
-        with pytest.raises(ModelNotFittedError):
+        with pytest.raises(NotFittedError):
             model.plot()
 
     def test_should_check_that_plot_image_is_same_as_snapshot(

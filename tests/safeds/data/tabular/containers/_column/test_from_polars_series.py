@@ -1,5 +1,6 @@
 import polars as pl
 import pytest
+
 from safeds.data.tabular.containers import Column
 
 

@@ -21,8 +21,8 @@ apipkg.initpkg(
 )
 
 __all__ = [
-    "ClassifierMetric",
     "ClassificationMetrics",
-    "RegressorMetric",
+    "ClassifierMetric",
     "RegressionMetrics",
+    "RegressorMetric",
 ]

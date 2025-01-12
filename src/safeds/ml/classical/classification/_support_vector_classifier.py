@@ -37,7 +37,7 @@ class SupportVectorClassifier(Classifier, _SupportVectorMachineBase):
         self,
         *,
         c: float | Choice[float] = 1.0,
-        kernel: SupportVectorClassifier.Kernel | None | Choice[SupportVectorClassifier.Kernel | None] = None,
+        kernel: SupportVectorClassifier.Kernel | Choice[SupportVectorClassifier.Kernel] | None = None,
     ) -> None:
         # Initialize superclasses
         Classifier.__init__(self)
@@ -58,7 +58,7 @@ class SupportVectorClassifier(Classifier, _SupportVectorMachineBase):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def kernel(self) -> SupportVectorClassifier.Kernel | Choice[SupportVectorClassifier.Kernel | None]:
+    def kernel(self) -> SupportVectorClassifier.Kernel | Choice[SupportVectorClassifier.Kernel]:
         """The type of kernel used."""
         return self._kernel
 

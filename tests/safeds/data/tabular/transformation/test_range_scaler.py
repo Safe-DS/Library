@@ -1,7 +1,8 @@
 import pytest
+
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import RangeScaler
-from safeds.exceptions import ColumnNotFoundError, ColumnTypeError, TransformerNotFittedError
+from safeds.exceptions import ColumnNotFoundError, ColumnTypeError, NotFittedError
 
 
 class TestInit:
@@ -73,7 +74,7 @@ class TestTransform:
 
         transformer = RangeScaler()
 
-        with pytest.raises(TransformerNotFittedError):
+        with pytest.raises(NotFittedError):
             transformer.transform(table)
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
@@ -257,7 +258,7 @@ class TestInverseTransform:
 
         transformer = RangeScaler()
 
-        with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
+        with pytest.raises(NotFittedError, match=r"This transformer has not been fitted yet."):
             transformer.inverse_transform(table)
 
     def test_should_raise_if_column_not_found(self) -> None:
