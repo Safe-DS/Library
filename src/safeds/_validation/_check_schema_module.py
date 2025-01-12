@@ -84,7 +84,7 @@ def _check_types(expected_schema: Schema, actual_schema: Schema, *, check_types:
         expected_polars_dtype = _get_polars_dtype(expected_schema, column_name)
         actual_polars_dtype = _get_polars_dtype(actual_schema, column_name)
 
-        if expected_polars_dtype is None or actual_polars_dtype is None:
+        if expected_polars_dtype is None or actual_polars_dtype is None:  # pragma: no cover
             continue
 
         if check_types == "equality" and not actual_polars_dtype.is_(expected_polars_dtype):
