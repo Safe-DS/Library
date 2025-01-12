@@ -384,7 +384,6 @@ class TestBatch:
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 @pytest.mark.parametrize("shuffle", [True, False])
 class TestSplit:
-
     @pytest.mark.parametrize(
         "output",
         [

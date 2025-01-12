@@ -37,7 +37,6 @@ class PNGImageSnapshotExtension(SingleFileSnapshotExtension):
         serialized_data: SerializableData,
         snapshot_data: SerializableData,
     ) -> bool:
-
         # We decode the byte arrays, since torchvision seems to use different compression methods on different operating
         # systems, thus leading to different byte arrays for the same image.
         actual = open_image(io.BytesIO(serialized_data))
