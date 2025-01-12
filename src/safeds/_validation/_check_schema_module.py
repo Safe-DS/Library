@@ -56,19 +56,19 @@ def _check_schema(
     missing_columns = set(expected_column_names) - set(actual_column_names)
     if missing_columns:
         message = _build_error_message_for_missing_columns(sorted(missing_columns))
-        raise SchemaError(message)
+        raise SchemaError(message) from None
 
     # There must be no additional columns
     if check_names_exactly:
         additional_columns = set(actual_column_names) - set(expected_column_names)
         if additional_columns:
             message = _build_error_message_for_additional_columns(sorted(additional_columns))
-            raise SchemaError(message)
+            raise SchemaError(message) from None
 
     # All columns must have the correct order
     if check_names_exactly and expected_column_names != actual_column_names:
         message = _build_error_message_for_columns_in_wrong_order(expected_column_names, actual_column_names)
-        raise SchemaError(message)
+        raise SchemaError(message) from None
 
     # All columns must have the correct type
     _check_types(expected_schema, actual_schema, check_types=check_types)

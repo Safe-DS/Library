@@ -43,7 +43,7 @@ def _check_bounds(
 
     if not lower_bound._check_as_lower_bound(actual) or not upper_bound._check_as_upper_bound(actual):
         message = _build_error_message(name, actual, lower_bound, upper_bound)
-        raise OutOfBoundsError(message)
+        raise OutOfBoundsError(message) from None
 
 
 def _build_error_message(name: str, actual: float, lower_bound: _Bound, upper_bound: _Bound) -> str:

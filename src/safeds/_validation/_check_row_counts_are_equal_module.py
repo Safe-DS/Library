@@ -51,7 +51,7 @@ def _check_row_counts_are_equal(
     # Raise an error if there are mismatched columns
     if mismatched_columns:
         message = _build_error_message(names_and_row_counts[0], mismatched_columns)
-        raise LengthMismatchError(message)
+        raise LengthMismatchError(message) from None
 
 
 def _get_names_and_row_counts(

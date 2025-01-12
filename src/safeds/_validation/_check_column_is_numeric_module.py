@@ -35,7 +35,7 @@ def _check_column_is_numeric(
     """
     if not column.type.is_numeric:
         message = _build_error_message([column.name], operation)
-        raise ColumnTypeError(message)
+        raise ColumnTypeError(message) from None
 
 
 def _check_columns_are_numeric(
@@ -81,7 +81,7 @@ def _check_columns_are_numeric(
     ]
     if non_numeric_names:
         message = _build_error_message(non_numeric_names, operation)
-        raise ColumnTypeError(message)
+        raise ColumnTypeError(message) from None
 
 
 def _build_error_message(non_numeric_names: list[str], operation: str) -> str:

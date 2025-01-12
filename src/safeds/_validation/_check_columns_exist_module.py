@@ -45,7 +45,7 @@ def _check_columns_exist(table_or_schema: Table | Schema, requested_names: str |
     unknown_names = [name for name in requested_names if name not in known_names]
     if unknown_names:
         message = _build_error_message(table_or_schema, unknown_names)
-        raise ColumnNotFoundError(message)
+        raise ColumnNotFoundError(message) from None
 
 
 def _build_error_message(schema: Schema, unknown_names: list[str]) -> str:

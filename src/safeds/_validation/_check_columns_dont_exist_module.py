@@ -49,7 +49,7 @@ def _check_columns_dont_exist(
     # Raise an error if duplicate names exist
     if duplicate_names:
         message = _build_error_message(duplicate_names)
-        raise DuplicateColumnError(message)
+        raise DuplicateColumnError(message) from None
 
 
 def _build_error_message(duplicate_names: list[str]) -> str:
