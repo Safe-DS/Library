@@ -971,8 +971,12 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [1, None, 3])
-        >>> column.missing_value_count()
+        >>> column1 = Column("a", [1, 2, 3])
+        >>> column1.missing_value_count()
+        0
+
+        >>> column2 = Column("a", [1, None, 3])
+        >>> column2.missing_value_count()
         1
         """
         return self._series.null_count()
@@ -995,9 +999,17 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [1, None, 3, None])
-        >>> column.missing_value_ratio()
+        >>> column1 = Column("a", [1, 2, 3])
+        >>> column1.missing_value_ratio()
+        0.0
+
+        >>> column2 = Column("a", [1, None])
+        >>> column2.missing_value_ratio()
         0.5
+
+        >>> column3 = Column("a", [])
+        >>> column3.missing_value_ratio()
+        1.0
         """
         if self.row_count == 0:
             return 1.0  # All values are missing (since there are none)

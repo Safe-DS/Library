@@ -1784,8 +1784,8 @@ class Table:
         Parameters
         ----------
         start:
-            The start index of the slice. Non-negative indices count forward from the first row (index 0). Negative
-            indices count backward from the last row (index -1).
+            The start index of the slice. Nonnegative indices are counted from the beginning (starting at 0), negative
+            indices from the end (starting at -1).
         length:
             The length of the slice. If None, the slice contains all rows starting from `start`. Must greater than or
             equal to 0.
