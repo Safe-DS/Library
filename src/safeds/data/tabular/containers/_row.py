@@ -61,7 +61,7 @@ class Row(ABC, Mapping[str, Cell]):
     @property
     @abstractmethod
     def schema(self) -> Schema:
-        """The schema, which is a mapping from column names to their types."""
+        """The schema of the row, which is a mapping from column names to their types."""
 
     # ------------------------------------------------------------------------------------------------------------------
     # Column operations

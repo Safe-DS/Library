@@ -458,7 +458,7 @@ class Table:
     @property
     def schema(self) -> Schema:
         """
-        The schema, which is a mapping from column names to their types.
+        The schema of the table, which is a mapping from column names to their types.
 
         Examples
         --------

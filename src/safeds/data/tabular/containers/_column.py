@@ -143,7 +143,7 @@ class Column(Sequence[T_co]):
 
     @property
     def row_count(self) -> int:
-        """The number of rows in the column."""
+        """The number of rows."""
         return self._series.len()
 
     @property
