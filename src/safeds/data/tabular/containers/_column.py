@@ -40,7 +40,9 @@ class Column(Sequence[T_co]):
     name:
         The name of the column.
     data:
-        The data of the column. If None, an empty column is created.
+        The data of the column.
+    type_:
+        The type of the column. If `None` (default), the type is inferred from the data.
 
     Examples
     --------
@@ -83,10 +85,20 @@ class Column(Sequence[T_co]):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, name: str, data: Sequence[T_co]) -> None:
+    def __init__(
+        self,
+        name: str,
+        data: Sequence[T_co],
+        *,
+        type_: ColumnType | None = None,
+    ) -> None:
         import polars as pl
 
-        self._series: pl.Series = pl.Series(name, data, strict=False)
+        # Preprocessing
+        dtype = None if type_ is None else type_._polars_data_type
+
+        # Implementation
+        self._series: pl.Series = pl.Series(name, data, dtype=dtype, strict=False)
 
     def __contains__(self, value: object) -> bool:
         import polars as pl
