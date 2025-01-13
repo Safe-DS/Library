@@ -6,15 +6,15 @@ from safeds.data.tabular.containers import Column
 
 
 def test_should_store_the_name() -> None:
-    column: Column[Any] = Column("a", [])
-    assert column.name == "a"
+    column: Column[Any] = Column("col1", [])
+    assert column.name == "col1"
 
 
 @pytest.mark.parametrize(
     ("column", "expected"),
     [
-        (Column("a", []), []),
-        (Column("a", [1, 2, 3]), [1, 2, 3]),
+        (Column("col1", []), []),
+        (Column("col1", [1]), [1]),
     ],
     ids=[
         "empty",

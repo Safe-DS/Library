@@ -8,11 +8,11 @@ from safeds.data.tabular.typing import ColumnType
     ("column", "expected"),
     [
         (
-            Column("a", [1]),
+            Column("col1", [1]),
             ColumnType.int64(),
         ),
         (
-            Column("a", ["a"]),
+            Column("col1", ["a"]),
             ColumnType.string(),
         ),
     ],

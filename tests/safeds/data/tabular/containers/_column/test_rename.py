@@ -9,14 +9,14 @@ from safeds.data.tabular.containers import Column
     ("column_factory", "new_name", "expected"),
     [
         (
-            lambda: Column("a", []),
-            "b",
-            Column("b", []),
+            lambda: Column("col1", []),
+            "col2",
+            Column("col2", []),
         ),
         (
-            lambda: Column("a", [0]),
-            "b",
-            Column("b", [0]),
+            lambda: Column("col1", [0]),
+            "col2",
+            Column("col2", [0]),
         ),
     ],
     ids=[

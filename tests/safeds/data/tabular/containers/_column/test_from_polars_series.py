@@ -5,8 +5,8 @@ from safeds.data.tabular.containers import Column
 
 
 def test_should_store_the_name() -> None:
-    series = pl.Series("a", [])
-    assert Column._from_polars_series(series).name == "a"
+    series = pl.Series("col1", [])
+    assert Column._from_polars_series(series).name == "col1"
 
 
 @pytest.mark.parametrize(
