@@ -28,5 +28,5 @@ if TYPE_CHECKING:
     ],
 )
 def test_should_get_distinct_values(values: list[Any], ignore_missing_values: bool, expected: list[Any]) -> None:
-    column: Column = Column("", values)
+    column: Column = Column("col1", values)
     assert column.get_distinct_values(ignore_missing_values=ignore_missing_values) == expected

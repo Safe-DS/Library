@@ -4,48 +4,30 @@ from safeds.data.tabular.containers import Column
 
 
 @pytest.mark.parametrize(
-    ("values", "expected"),
+    ("values", "ignore_missing_values", "expected"),
     [
-        ([], []),
-        ([None, 2, 2, None], [2]),
-        ([None, None, None], []),
-        ([1, 2, 2], [2]),
-        (["a", "a", "b"], ["a"]),
-        ([1, 2], [1, 2]),
+        ([], True, []),
+        ([1, 2, 2], True, [2]),
+        (["a", "a", "b"], True, ["a"]),
+        ([1, 2, None], True, [1, 2]),
+        ([1, 2, None], False, [None, 1, 2]),
+        ([None, 2, None], True, [2]),
+        ([None, 2, None], False, [None]),
+        ([None, None, None], True, []),
+        ([None, None, None], False, [None]),
     ],
     ids=[
         "empty",
-        "some missing values",
-        "all missing values",
         "numeric",
         "non-numeric",
-        "multiple values with same frequency",
+        "multiple most frequent values (missing values ignored)",
+        "multiple most frequent values (missing values not ignored)",
+        "missing values are most frequent (missing values ignored)",
+        "missing values are most frequent (missing values not ignored)",
+        "only missing values (missing values ignored)",
+        "only missing values (missing values not ignored)",
     ],
 )
-def test_should_return_mode_values_ignoring_missing_values(values: list, expected: list) -> None:
-    column = Column("col", values)
-    assert column.mode() == expected
-
-
-@pytest.mark.parametrize(
-    ("values", "expected"),
-    [
-        ([], []),
-        ([None, 2, 2, None], [None, 2]),
-        ([None, None, None], [None]),
-        ([1, 2, 2], [2]),
-        (["a", "a", "b"], ["a"]),
-        ([1, 2], [1, 2]),
-    ],
-    ids=[
-        "empty",
-        "some missing values",
-        "all missing values",
-        "numeric",
-        "non-numeric",
-        "multiple values with same frequency",
-    ],
-)
-def test_should_return_mode_values_including_missing_values_if_requested(values: list, expected: list) -> None:
-    column = Column("col", values)
-    assert column.mode(ignore_missing_values=False) == expected
+def test_should_return_most_frequent_values(values: list, ignore_missing_values: bool, expected: list) -> None:
+    column = Column("col1", values)
+    assert column.mode(ignore_missing_values=ignore_missing_values) == expected
