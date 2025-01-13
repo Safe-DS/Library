@@ -26,4 +26,4 @@ from safeds.data.tabular.containers import Column
     ],
 )
 def test_should_return_a_string_representation(column: Column, expected: str) -> None:
-    assert repr(column) == expected
+    assert str(column) == expected
