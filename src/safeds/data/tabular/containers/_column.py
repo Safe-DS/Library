@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Iterator, Sequence
-from typing import TYPE_CHECKING, Any, Literal, TypeVar, overload
+from typing import TYPE_CHECKING, Literal, TypeVar, overload
 
 from safeds._utils import _structural_hash
 from safeds._validation import _check_column_is_numeric
@@ -76,8 +76,14 @@ class Column(Sequence[T_co]):
 
         self._series: pl.Series = pl.Series(name, data, strict=False)
 
-    def __contains__(self, item: Any) -> bool:
-        return self._series.__contains__(item)
+    def __contains__(self, value: object) -> bool:
+        import polars as pl
+
+        try:
+            return self._series.__contains__(value)
+        except pl.InvalidOperationError:
+            # Happens if types are incompatible
+            return False
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Column):
