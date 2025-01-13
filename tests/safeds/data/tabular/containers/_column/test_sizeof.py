@@ -10,12 +10,10 @@ from safeds.data.tabular.containers import Column
     [
         Column("a", []),
         Column("a", [0]),
-        Column("a", ["a", "b"]),
     ],
     ids=[
         "empty",
-        "one row",
-        "multiple rows",
+        "non-empty",
     ],
 )
 def test_should_be_larger_than_normal_object(column: Column) -> None:

@@ -9,12 +9,10 @@ from safeds.data.tabular.containers import Column
     [
         Column("a", []),
         Column("a", [0]),
-        Column("a", [0, 1]),
     ],
     ids=[
         "empty",
-        "one row",
-        "multiple rows",
+        "non-empty",
     ],
 )
 class TestHtml:

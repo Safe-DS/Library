@@ -1,33 +1,57 @@
-from typing import Any
+from collections.abc import Callable
 
 import pytest
 
-from safeds.data.tabular.containers import Column
+from safeds.data.tabular.containers import Cell, Column
 
 
 @pytest.mark.parametrize(
-    ("column", "expected"),
+    ("column_factory", "transformer", "expected"),
     [
-        (Column("test", []), Column("test", [])),
-        (Column("test", [1, 2]), Column("test", [2, 3])),
-        (Column("test", [-0.5, 0, 4]), Column("test", [0.5, 1, 5])),
+        (
+            lambda: Column("col1", []),
+            lambda _: Cell.from_literal(None),
+            Column("col1", []),
+        ),
+        (
+            lambda: Column("col1", []),
+            lambda cell: 2 * cell,
+            Column("col1", []),
+        ),
+        (
+            lambda: Column("col1", [1, 2, 3]),
+            lambda _: Cell.from_literal(None),
+            Column("col1", [None, None, None]),
+        ),
+        (
+            lambda: Column("col1", [1, 2, 3]),
+            lambda cell: 2 * cell,
+            Column("col1", [2, 4, 6]),
+        ),
     ],
-    ids=["empty", "integers", "floats"],
-)
-def test_should_transform_column(column: Column, expected: Column) -> None:
-    new_column: Column[Any] = column.transform(lambda it: it + 1)
-    assert new_column == expected
-
-
-@pytest.mark.parametrize(
-    ("column", "original"),
-    [
-        (Column("test", []), Column("test", [])),
-        (Column("test", [1, 2]), Column("test", [1, 2])),
-        (Column("test", [-0.5, 0, 4]), Column("test", [-0.5, 0, 4])),
+    ids=[
+        "empty (constant value)",
+        "empty (computed value)",
+        "non-empty (constant value)",
+        "non-empty (computed value)",
     ],
-    ids=["empty", "integers", "floats"],
 )
-def test_should_not_change_original_column(column: Column, original: Column) -> None:
-    column.transform(lambda it: it + 1)
-    assert column == original
+class TestHappyPath:
+    def test_should_transform_column(
+        self,
+        column_factory: Callable[[], Column],
+        transformer: Callable[[Cell], Cell],
+        expected: Column,
+    ) -> None:
+        actual = column_factory().transform(transformer)
+        assert actual == expected
+
+    def test_should_not_mutate_receiver(
+        self,
+        column_factory: Callable[[], Column],
+        transformer: Callable[[Cell], Cell],
+        expected: Column,  # noqa: ARG002
+    ) -> None:
+        original = column_factory()
+        original.transform(transformer)
+        assert original == column_factory()

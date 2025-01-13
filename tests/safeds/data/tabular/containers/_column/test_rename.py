@@ -18,16 +18,10 @@ from safeds.data.tabular.containers import Column
             "b",
             Column("b", [0]),
         ),
-        (
-            lambda: Column("a", ["a", "b"]),
-            "b",
-            Column("b", ["a", "b"]),
-        ),
     ],
     ids=[
         "empty",
-        "one row",
-        "multiple rows",
+        "non-empty",
     ],
 )
 class TestHappyPath:

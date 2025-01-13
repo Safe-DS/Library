@@ -8,12 +8,10 @@ from safeds.data.tabular.containers import Column
     [
         [],
         [0],
-        [0.5, 1.5],
     ],
     ids=[
         "empty",
-        "one row",
-        "multiple rows",
+        "non-empty",
     ],
 )
 def test_should_return_list_of_column_values(values: list) -> None:

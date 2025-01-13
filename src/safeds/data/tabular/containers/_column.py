@@ -631,8 +631,8 @@ class Column(Sequence[T_co]):
 
         Returns
         -------
-        renamed_column:
-            A new column with the new name.
+        new_column:
+            A column with the new name.
 
         Examples
         --------
@@ -656,7 +656,7 @@ class Column(Sequence[T_co]):
         transformer: Callable[[Cell[T_co]], Cell[R_co]],
     ) -> Column[R_co]:
         """
-        Transform the valus in the column and return the result as a new column.
+        Transform the values in the column and return the result as a new column.
 
         **Note:** The original column is not modified.
 
@@ -667,8 +667,8 @@ class Column(Sequence[T_co]):
 
         Returns
         -------
-        transformed_column:
-            A new column with transformed values.
+        new_column:
+            A column with the transformed values.
 
         Examples
         --------
@@ -689,7 +689,7 @@ class Column(Sequence[T_co]):
 
         # Expressions only work on data frames/lazy frames, so we wrap the polars series first
         expression = transformer(_LazyCell(pl.col(self.name)))._polars_expression
-        series = self._series.to_frame().select(expression.alias(self.name)).get_column(self.name)
+        series = self._series.to_frame().with_columns(expression.alias(self.name)).get_column(self.name)
 
         return self._from_polars_series(series)
 
