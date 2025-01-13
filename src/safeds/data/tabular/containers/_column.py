@@ -169,22 +169,52 @@ class Column(Sequence[T_co]):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("a", [1, 2, 3])
+        >>> column.name
+        'a'
         """
         return self._series.name
 
     @property
     def row_count(self) -> int:
-        """The number of rows."""
+        """
+        The number of rows.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [1, 2, 3])
+        >>> column.row_count
+        3
+        """
         return self._series.len()
 
     @property
     def plot(self) -> ColumnPlotter:
-        """The plotter for the column."""
+        """
+        The plotter for the column.
+
+        Call methods of the plotter to create various plots for the column.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [1, 2, 3])
+        >>> plot = column.plot.box_plot()
+        """
         return ColumnPlotter(self)
 
     @property
     def type(self) -> ColumnType:
-        """The type of the column."""
+        """
+        The type of the column.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [1, 2, 3])
+        >>> column.type
+        int64
+        """
         return _PolarsColumnType(self._series.dtype)
 
     # ------------------------------------------------------------------------------------------------------------------

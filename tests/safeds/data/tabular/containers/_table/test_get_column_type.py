@@ -21,7 +21,7 @@ from safeds.exceptions import ColumnNotFoundError
     ],
     ids=["int column", "string column"],
 )
-def test_should_return_data_type_of_column(table: Table, name: str, expected: ColumnType) -> None:
+def test_should_return_type_of_column(table: Table, name: str, expected: ColumnType) -> None:
     assert table.get_column_type(name) == expected
 
 

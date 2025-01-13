@@ -22,7 +22,7 @@ from safeds.exceptions import ColumnNotFoundError
     ],
     ids=["int column", "string column"],
 )
-def test_should_return_data_type_of_column(table: Table, name: str, expected: ColumnType) -> None:
+def test_should_return_type_of_column(table: Table, name: str, expected: ColumnType) -> None:
     row = _LazyVectorizedRow(table)
     assert row.get_column_type(name) == expected
 
