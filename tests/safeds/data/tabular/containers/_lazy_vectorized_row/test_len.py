@@ -8,15 +8,15 @@ from safeds.data.tabular.containers._lazy_vectorized_row import _LazyVectorizedR
     ("table", "expected"),
     [
         (Table({}), 0),
-        (Table({"A": ["a", "aa", "aaa"]}), 1),
-        (Table({"A": ["a", "aa", "aaa"], "B": ["b", "bb", "bbb"]}), 2),
+        (Table({"col1": []}), 1),
+        (Table({"col1": [1], "col2": [1]}), 2),
     ],
     ids=[
         "empty",
-        "one column",
-        "two columns",
+        "no rows",
+        "with data",
     ],
 )
-def test_should_have_same_length_as_number_of_columns(table: Table, expected: int) -> None:
-    row = _LazyVectorizedRow(table=table)
+def test_should_return_number_of_columns(table: Table, expected: int) -> None:
+    row = _LazyVectorizedRow(table)
     assert len(row) == expected

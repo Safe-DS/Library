@@ -4,7 +4,7 @@ from typing import Any
 from polars.testing import assert_frame_equal
 
 from safeds.data.labeled.containers import TabularDataset
-from safeds.data.tabular.containers import Cell, Column, Table
+from safeds.data.tabular.containers import Cell, Column, Row, Table
 
 
 def assert_tables_are_equal(
@@ -62,44 +62,71 @@ def assert_that_tabular_datasets_are_equal(table1: TabularDataset, table2: Tabul
 
 
 def assert_cell_operation_works(
-    input_value: Any,
+    value: Any,
     transformer: Callable[[Cell], Cell],
-    expected_value: Any,
+    expected: Any,
 ) -> None:
     """
     Assert that a cell operation works as expected.
 
     Parameters
     ----------
-    input_value:
+    value:
         The value in the input cell.
     transformer:
         The transformer to apply to the cells.
-    expected_value:
+    expected:
         The expected value of the transformed cell.
     """
-    column = Column("A", [input_value])
+    column = Column("A", [value])
     transformed_column = column.transform(transformer)
-    assert transformed_column == Column("A", [expected_value]), f"Expected: {expected_value}\nGot: {transformed_column}"
+    actual = transformed_column[0]
+    assert actual == expected
 
 
 def assert_row_operation_works(
-    input_value: Any,
-    transformer: Callable[[Table], Table],
-    expected_value: Any,
+    table: Table,
+    computer: Callable[[Row], Cell],
+    expected: list[Any],
 ) -> None:
     """
     Assert that a row operation works as expected.
 
     Parameters
     ----------
-    input_value:
-        The value in the input row.
-    transformer:
-        The transformer to apply to the rows.
-    expected_value:
-        The expected value of the transformed row.
+    table:
+        The input table.
+    computer:
+        The function that computes the new column.
+    expected:
+        The expected values of the computed column.
     """
-    table = Table(input_value)
-    transformed_table = transformer(table)
-    assert transformed_table == Table(expected_value), f"Expected: {expected_value}\nGot: {transformed_table}"
+    column_name = _find_free_column_name(table, "computed")
+
+    new_table = table.add_computed_column(column_name, computer)
+    actual = list(new_table.get_column(column_name))
+    assert actual == expected
+
+
+def _find_free_column_name(table: Table, prefix: str) -> str:
+    """
+    Find a free column name in the table.
+
+    Parameters
+    ----------
+    table:
+        The table to search for a free column name.
+    prefix:
+        The prefix to use for the column name.
+
+    Returns
+    -------
+    free_name:
+        A free column name.
+    """
+    column_name = prefix
+
+    while column_name in table.column_names:
+        column_name += "_"
+
+    return column_name

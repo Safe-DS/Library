@@ -393,6 +393,22 @@ class Table:
         return self.__data_frame_cache
 
     @property
+    def column_count(self) -> int:
+        """
+        The number of columns.
+
+        **Note:** This operation must compute the schema of the table, which can be expensive.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.column_count
+        2
+        """
+        return len(self.column_names)
+
+    @property
     def column_names(self) -> list[str]:
         """
         The names of the columns in the table.
@@ -409,25 +425,9 @@ class Table:
         return self.schema.column_names
 
     @property
-    def column_count(self) -> int:
-        """
-        The number of columns in the table.
-
-        **Note:** This operation must compute the schema of the table, which can be expensive.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
-        >>> table.column_count
-        2
-        """
-        return len(self.column_names)
-
-    @property
     def row_count(self) -> int:
         """
-        The number of rows in the table.
+        The number of rows.
 
         **Note:** This operation must fully load the data into memory, which can be expensive.
 
@@ -458,7 +458,7 @@ class Table:
     @property
     def schema(self) -> Schema:
         """
-        The schema of the table.
+        The schema, which is a mapping from column names to their types.
 
         Examples
         --------

@@ -23,7 +23,7 @@ from safeds.data.tabular.typing import ColumnType
         "not equal (numeric vs. non-numeric)",
     ],
 )
-def test_should_return_whether_column_types_are_equal(type_1: Table, type_2: Table, expected: bool) -> None:
+def test_should_return_whether_objects_are_equal(type_1: Table, type_2: Table, expected: bool) -> None:
     assert (type_1.__eq__(type_2)) == expected
 
 
@@ -70,7 +70,7 @@ def test_should_return_whether_column_types_are_equal(type_1: Table, type_2: Tab
         "null",
     ],
 )
-def test_should_return_true_if_column_types_are_identical(type_: ColumnType) -> None:
+def test_should_return_true_if_objects_are_identical(type_: ColumnType) -> None:
     assert (type_.__eq__(type_)) is True
 
 
@@ -85,5 +85,5 @@ def test_should_return_true_if_column_types_are_identical(type_: ColumnType) -> 
         "ColumnType vs. Column",
     ],
 )
-def test_should_return_not_implemented_if_other_is_not_column_type(type_: ColumnType, other: Any) -> None:
+def test_should_return_not_implemented_if_other_has_different_type(type_: ColumnType, other: Any) -> None:
     assert (type_.__eq__(other)) is NotImplemented

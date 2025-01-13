@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import sys
 from collections.abc import Iterator, Mapping
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds._validation import _check_columns_exist
@@ -39,8 +39,10 @@ class Schema(Mapping[str, ColumnType]):
             check_dtypes=False,
         )
 
-    def __contains__(self, name: Any) -> bool:
-        return self.has_column(name)
+    def __contains__(self, key: object, /) -> bool:
+        if not isinstance(key, str):
+            return False
+        return self.has_column(key)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Schema):
@@ -151,7 +153,7 @@ class Schema(Mapping[str, ColumnType]):
 
     def has_column(self, name: str) -> bool:
         """
-        Check if the schema has a column with a specific name.  This is equivalent to using the `in` operator.
+        Check if the schema has a column with a specific name. This is equivalent to using the `in` operator.
 
         Parameters
         ----------
