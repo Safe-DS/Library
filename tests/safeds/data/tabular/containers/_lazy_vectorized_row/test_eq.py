@@ -3,6 +3,7 @@ from typing import Any
 import pytest
 
 from safeds.data.tabular.containers import Column, Table
+from safeds.data.tabular.containers._lazy_vectorized_row import _LazyVectorizedRow
 
 
 @pytest.mark.parametrize(
@@ -100,7 +101,9 @@ from safeds.data.tabular.containers import Column, Table
     ],
 )
 def test_should_return_whether_objects_are_equal(table_1: Table, table_2: Table, expected: bool) -> None:
-    assert (table_1.__eq__(table_2)) == expected
+    row_1 = _LazyVectorizedRow(table_1)
+    row_2 = _LazyVectorizedRow(table_2)
+    assert (row_1.__eq__(row_2)) == expected
 
 
 @pytest.mark.parametrize(
@@ -117,7 +120,8 @@ def test_should_return_whether_objects_are_equal(table_1: Table, table_2: Table,
     ],
 )
 def test_should_return_true_if_objects_are_identical(table: Table) -> None:
-    assert (table.__eq__(table)) is True
+    row = _LazyVectorizedRow(table)
+    assert (row.__eq__(row)) is True
 
 
 @pytest.mark.parametrize(
@@ -127,9 +131,10 @@ def test_should_return_true_if_objects_are_identical(table: Table) -> None:
         (Table({}), Column("col1", [])),
     ],
     ids=[
-        "Table vs. None",
-        "Table vs. Column",
+        "Row vs. None",
+        "Row vs. Column",
     ],
 )
 def test_should_return_not_implemented_if_other_has_different_type(table: Table, other: Any) -> None:
-    assert (table.__eq__(other)) is NotImplemented
+    row = _LazyVectorizedRow(table)
+    assert (row.__eq__(other)) is NotImplemented

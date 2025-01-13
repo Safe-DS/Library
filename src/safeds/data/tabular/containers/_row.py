@@ -2,27 +2,29 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from collections.abc import Iterator, Mapping
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
+
+from ._cell import Cell
 
 if TYPE_CHECKING:
     from safeds.data.tabular.typing import ColumnType, Schema
 
-    from ._cell import Cell
 
-
-class Row(ABC, Mapping[str, Any]):
+class Row(ABC, Mapping[str, Cell]):
     """
     A one-dimensional collection of named, heterogeneous values.
 
-    This class cannot be instantiated directly. It is only used for arguments of callbacks.
+    You only need to interact with this class in callbacks passed to higher-order functions.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __contains__(self, name: Any) -> bool:
-        return self.has_column(name)
+    def __contains__(self, key: object, /) -> bool:
+        if not isinstance(key, str):
+            return False
+        return self.has_column(key)
 
     @abstractmethod
     def __eq__(self, other: object) -> bool: ...
@@ -33,7 +35,7 @@ class Row(ABC, Mapping[str, Any]):
     @abstractmethod
     def __hash__(self) -> int: ...
 
-    def __iter__(self) -> Iterator[Any]:
+    def __iter__(self) -> Iterator[str]:
         return iter(self.column_names)
 
     def __len__(self) -> int:
@@ -48,18 +50,18 @@ class Row(ABC, Mapping[str, Any]):
 
     @property
     @abstractmethod
-    def column_names(self) -> list[str]:
-        """The names of the columns in the row."""
+    def column_count(self) -> int:
+        """The number of columns."""
 
     @property
     @abstractmethod
-    def column_count(self) -> int:
-        """The number of columns in the row."""
+    def column_names(self) -> list[str]:
+        """The names of the columns."""
 
     @property
     @abstractmethod
     def schema(self) -> Schema:
-        """The schema of the row."""
+        """The schema, which is a mapping from column names to their types."""
 
     # ------------------------------------------------------------------------------------------------------------------
     # Column operations
@@ -98,7 +100,6 @@ class Row(ABC, Mapping[str, Any]):
         |    2 |    4 |
         +------+------+
 
-
         >>> table.remove_rows(lambda row: row["col1"] == 1)
         +------+------+
         | col1 | col2 |
@@ -112,7 +113,7 @@ class Row(ABC, Mapping[str, Any]):
     @abstractmethod
     def get_column_type(self, name: str) -> ColumnType:
         """
-        Get the type of the specified column.
+        Get the type of a column. This is equivalent to using the `[]` operator (indexed access).
 
         Parameters
         ----------
@@ -127,13 +128,13 @@ class Row(ABC, Mapping[str, Any]):
         Raises
         ------
         ColumnNotFoundError
-            If the column name does not exist.
+            If the column does not exist.
         """
 
     @abstractmethod
     def has_column(self, name: str) -> bool:
         """
-        Check if the row has a column with the specified name.
+        Check if the row has a column with a specific name. This is equivalent to using the `in` operator.
 
         Parameters
         ----------

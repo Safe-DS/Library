@@ -71,7 +71,7 @@ from safeds.data.tabular.typing import ColumnType, Schema
         "not equal (different types)",
     ],
 )
-def test_should_return_whether_schemas_are_equal(schema_1: Schema, schema_2: Schema, expected: bool) -> None:
+def test_should_return_whether_objects_are_equal(schema_1: Schema, schema_2: Schema, expected: bool) -> None:
     assert (schema_1.__eq__(schema_2)) == expected
 
 
@@ -88,7 +88,7 @@ def test_should_return_whether_schemas_are_equal(schema_1: Schema, schema_2: Sch
         "two columns",
     ],
 )
-def test_should_return_true_if_schemas_are_identical(schema: Schema) -> None:
+def test_should_return_true_if_objects_are_identical(schema: Schema) -> None:
     assert (schema.__eq__(schema)) is True
 
 
@@ -103,5 +103,5 @@ def test_should_return_true_if_schemas_are_identical(schema: Schema) -> None:
         "Schema vs. Column",
     ],
 )
-def test_should_return_not_implemented_if_other_is_not_schema(schema: Schema, other: Any) -> None:
+def test_should_return_not_implemented_if_other_has_different_type(schema: Schema, other: Any) -> None:
     assert (schema.__eq__(other)) is NotImplemented

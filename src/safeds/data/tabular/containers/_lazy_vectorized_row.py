@@ -21,7 +21,7 @@ class _LazyVectorizedRow(Row):
     up operations on the row.
 
     Moreover, accessing a column only builds an expression that will be evaluated when needed. This is useful when later
-    operations remove more rows or columns, so we don't do unnecessary work upfront.
+    operations remove rows or columns, so we don't do unnecessary work upfront.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
