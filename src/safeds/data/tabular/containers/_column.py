@@ -1160,7 +1160,7 @@ class Column(Sequence[T_co]):
         Returns
         -------
         values:
-            The values of the column in a list.
+            The values of the column.
 
         Examples
         --------

@@ -7,13 +7,15 @@ from safeds.data.tabular.containers import Column
     "values",
     [
         [],
-        [1, 2, 3],
+        [0],
+        [0.5, 1.5],
     ],
     ids=[
         "empty",
-        "non-empty",
+        "one row",
+        "multiple rows",
     ],
 )
 def test_should_return_list_of_column_values(values: list) -> None:
-    column = Column("col", values)
+    column = Column("a", values)
     assert column.to_list() == values
