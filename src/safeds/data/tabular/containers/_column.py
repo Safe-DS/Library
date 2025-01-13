@@ -19,6 +19,9 @@ if TYPE_CHECKING:
     from polars import Series
 
     from safeds.data.tabular.typing import ColumnType
+    from safeds.exceptions import (
+        ColumnTypeError,  # noqa: F401
+    )
 
     from ._cell import Cell
     from ._table import Table
@@ -756,9 +759,9 @@ class Column(Sequence[T_co]):
 
         Raises
         ------
-        TypeError
+        ColumnTypeError
             If one of the columns is not numeric.
-        ValueError
+        LengthMismatchError
             If the columns have different lengths.
         ValueError
             If one of the columns has missing values.
@@ -852,7 +855,7 @@ class Column(Sequence[T_co]):
 
         return self._series.n_unique() / self.row_count
 
-    def max(self) -> T_co | None:
+    def max(self) -> T_co:
         """
         Return the maximum value in the column.
 
@@ -889,7 +892,7 @@ class Column(Sequence[T_co]):
 
         Raises
         ------
-        TypeError
+        ColumnTypeError
             If the column is not numeric.
 
         Examples
@@ -917,7 +920,7 @@ class Column(Sequence[T_co]):
 
         Raises
         ------
-        TypeError
+        ColumnTypeError
             If the column is not numeric.
 
         Examples
@@ -935,7 +938,7 @@ class Column(Sequence[T_co]):
 
         return self._series.median()
 
-    def min(self) -> T_co | None:
+    def min(self) -> T_co:
         """
         Return the minimum value in the column.
 
