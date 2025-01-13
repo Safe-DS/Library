@@ -638,16 +638,16 @@ class Column(Sequence[T_co]):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("a", [1, 2, 3])
-        >>> column.rename("new_name")
-        +----------+
-        | new_name |
-        |      --- |
-        |      i64 |
-        +==========+
-        |        1 |
-        |        2 |
-        |        3 |
-        +----------+
+        >>> column.rename("b")
+        +-----+
+        |   b |
+        | --- |
+        | i64 |
+        +=====+
+        |   1 |
+        |   2 |
+        |   3 |
+        +-----+
         """
         return self._from_polars_series(self._series.rename(new_name))
 
