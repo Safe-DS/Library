@@ -1094,9 +1094,17 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [1, 1, 2, 3, None])
-        >>> column.stability()
+        >>> column1 = Column("a", [1, 1, 2, 3, None])
+        >>> column1.stability()
         0.5
+
+        >>> column2 = Column("a", [1, 1, 1, 1])
+        >>> column2.stability()
+        1.0
+
+        >>> column3 = Column("a", [])
+        >>> column3.stability()
+        1.0
         """
         non_missing = self._series.drop_nulls()
         if non_missing.len() == 0:
