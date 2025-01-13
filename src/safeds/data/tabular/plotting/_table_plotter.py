@@ -33,6 +33,10 @@ class TablePlotter:
     def __init__(self, table: Table):
         self._table: Table = table
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # Gridded plots for individual columns
+    # ------------------------------------------------------------------------------------------------------------------
+
     def box_plots(self, *, theme: Literal["dark", "light"] = "light") -> Image:
         """
         Create a box plot for every numerical column.
@@ -118,6 +122,95 @@ class TablePlotter:
                     fig.delaxes(axs[number_of_rows - 1, i])
 
             fig.tight_layout()
+            return _figure_to_image(fig)
+
+    def histograms(self, *, max_bin_count: int = 10, theme: Literal["dark", "light"] = "light") -> Image:
+        """
+        Plot a histogram for every column.
+
+        Parameters
+        ----------
+        max_bin_count:
+            The maximum number of bins to use in the histogram. Default is 10.
+        theme:
+            The color theme of the plot. Default is "light".
+
+        Returns
+        -------
+        plot:
+            The plot as an image.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"a": [2, 3, 5, 1], "b": [54, 74, 90, 2014]})
+        >>> image = table.plot.histograms()
+        """
+        import matplotlib.pyplot as plt
+
+        style = "dark_background" if theme == "dark" else "default"
+        with plt.style.context(style):
+            if theme == "dark":
+                plt.rcParams.update(
+                    {
+                        "text.color": "white",
+                        "axes.labelcolor": "white",
+                        "axes.edgecolor": "white",
+                        "xtick.color": "white",
+                        "ytick.color": "white",
+                    },
+                )
+            import polars as pl
+
+            n_cols = min(3, self._table.column_count)
+            n_rows = 1 + (self._table.column_count - 1) // n_cols
+
+            if n_cols == 1 and n_rows == 1:
+                fig, axs = plt.subplots(1, 1, tight_layout=True)
+                one_col = True
+            else:
+                fig, axs = plt.subplots(n_rows, n_cols, tight_layout=True, figsize=(n_cols * 3, n_rows * 3))
+                one_col = False
+
+            col_names = self._table.column_names
+            for col_name, ax in zip(col_names, axs.flatten() if not one_col else [axs], strict=False):
+                column = self._table.get_column(col_name)
+                distinct_values = column.get_distinct_values()
+
+                ax.set_title(col_name)
+                ax.set_xlabel("")
+                ax.set_ylabel("")
+
+                if column.type.is_numeric and len(distinct_values) > max_bin_count:
+                    min_val = (column.min() or 0) - 1e-6  # Otherwise the minimum value is not included in the first bin
+                    max_val = column.max() or 0
+                    bin_count = min(max_bin_count, len(distinct_values))
+                    bins = [
+                        *(pl.Series(range(bin_count + 1)) / bin_count * (max_val - min_val) + min_val),
+                    ]
+
+                    bars = [f"{round((bins[i] + bins[i + 1]) / 2, 2)}" for i in range(len(bins) - 1)]
+                    hist = column._series.hist(bins=bins).get_column("count").to_numpy()
+
+                    ax.bar(bars, hist, edgecolor="black")
+                    ax.set_xticks(range(len(hist)), bars, rotation=45, horizontalalignment="right")
+                else:
+                    value_counts = (
+                        column._series.drop_nulls().value_counts().sort(column.name).slice(0, length=max_bin_count)
+                    )
+                    distinct_values = value_counts.get_column(column.name).cast(pl.String).to_numpy()
+                    hist = value_counts.get_column("count").to_numpy()
+                    ax.bar(distinct_values, hist, edgecolor="black")
+                    ax.set_xticks(
+                        range(len(distinct_values)),
+                        distinct_values,
+                        rotation=45,
+                        horizontalalignment="right",
+                    )
+
+            for i in range(len(col_names), n_rows * n_cols):
+                fig.delaxes(axs.flatten()[i])  # Remove empty subplots
+
             return _figure_to_image(fig)
 
     def violin_plots(self, *, theme: Literal["dark", "light"] = "light") -> Image:
@@ -215,166 +308,9 @@ class TablePlotter:
             fig.tight_layout()
             return _figure_to_image(fig)
 
-    def correlation_heatmap(self, *, theme: Literal["dark", "light"] = "light") -> Image:
-        """
-        Plot a correlation heatmap for all numerical columns of this `Table`.
-
-        Parameters
-        ----------
-        theme:
-            The color theme of the plot. Default is "light".
-
-        Returns
-        -------
-        plot:
-            The plot as an image.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> table = Table({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
-        >>> image = table.plot.correlation_heatmap()
-        """
-        import matplotlib.pyplot as plt
-        import numpy as np
-
-        style = "dark_background" if theme == "dark" else "default"
-        with plt.style.context(style):
-            if theme == "dark":
-                plt.rcParams.update(
-                    {
-                        "text.color": "white",
-                        "axes.labelcolor": "white",
-                        "axes.edgecolor": "white",
-                        "xtick.color": "white",
-                        "ytick.color": "white",
-                    },
-                )
-
-            only_numerical = self._table.remove_non_numeric_columns()._data_frame.fill_null(0)
-
-            if self._table.row_count == 0:
-                warnings.warn(
-                    "An empty table has been used. A correlation heatmap on an empty table will show nothing.",
-                    stacklevel=2,
-                )
-
-            with warnings.catch_warnings():
-                warnings.filterwarnings(
-                    "ignore",
-                    message=(
-                        "Attempting to set identical low and high (xlims|ylims) makes transformation singular;"
-                        " automatically expanding."
-                    ),
-                )
-
-                fig, ax = plt.subplots()
-                heatmap = plt.imshow(
-                    only_numerical.corr().to_numpy(),
-                    vmin=-1,
-                    vmax=1,
-                    cmap="coolwarm",
-                )
-                ax.set_xticks(
-                    np.arange(len(only_numerical.columns)),
-                    rotation="vertical",
-                    labels=only_numerical.columns,
-                )
-                ax.set_yticks(np.arange(len(only_numerical.columns)), labels=only_numerical.columns)
-                fig.colorbar(heatmap)
-
-                plt.tight_layout()
-
-            return _figure_to_image(fig)
-
-    def histograms(self, *, max_bin_count: int = 10, theme: Literal["dark", "light"] = "light") -> Image:
-        """
-        Plot a histogram for every column.
-
-        Parameters
-        ----------
-        max_bin_count:
-            The maximum number of bins to use in the histogram. Default is 10.
-        theme:
-            The color theme of the plot. Default is "light".
-
-        Returns
-        -------
-        plot:
-            The plot as an image.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> table = Table({"a": [2, 3, 5, 1], "b": [54, 74, 90, 2014]})
-        >>> image = table.plot.histograms()
-        """
-        import matplotlib.pyplot as plt
-
-        style = "dark_background" if theme == "dark" else "default"
-        with plt.style.context(style):
-            if theme == "dark":
-                plt.rcParams.update(
-                    {
-                        "text.color": "white",
-                        "axes.labelcolor": "white",
-                        "axes.edgecolor": "white",
-                        "xtick.color": "white",
-                        "ytick.color": "white",
-                    },
-                )
-            import polars as pl
-
-            n_cols = min(3, self._table.column_count)
-            n_rows = 1 + (self._table.column_count - 1) // n_cols
-
-            if n_cols == 1 and n_rows == 1:
-                fig, axs = plt.subplots(1, 1, tight_layout=True)
-                one_col = True
-            else:
-                fig, axs = plt.subplots(n_rows, n_cols, tight_layout=True, figsize=(n_cols * 3, n_rows * 3))
-                one_col = False
-
-            col_names = self._table.column_names
-            for col_name, ax in zip(col_names, axs.flatten() if not one_col else [axs], strict=False):
-                column = self._table.get_column(col_name)
-                distinct_values = column.get_distinct_values()
-
-                ax.set_title(col_name)
-                ax.set_xlabel("")
-                ax.set_ylabel("")
-
-                if column.type.is_numeric and len(distinct_values) > max_bin_count:
-                    min_val = (column.min() or 0) - 1e-6  # Otherwise the minimum value is not included in the first bin
-                    max_val = column.max() or 0
-                    bin_count = min(max_bin_count, len(distinct_values))
-                    bins = [
-                        *(pl.Series(range(bin_count + 1)) / bin_count * (max_val - min_val) + min_val),
-                    ]
-
-                    bars = [f"{round((bins[i] + bins[i + 1]) / 2, 2)}" for i in range(len(bins) - 1)]
-                    hist = column._series.hist(bins=bins).get_column("count").to_numpy()
-
-                    ax.bar(bars, hist, edgecolor="black")
-                    ax.set_xticks(range(len(hist)), bars, rotation=45, horizontalalignment="right")
-                else:
-                    value_counts = (
-                        column._series.drop_nulls().value_counts().sort(column.name).slice(0, length=max_bin_count)
-                    )
-                    distinct_values = value_counts.get_column(column.name).cast(pl.String).to_numpy()
-                    hist = value_counts.get_column("count").to_numpy()
-                    ax.bar(distinct_values, hist, edgecolor="black")
-                    ax.set_xticks(
-                        range(len(distinct_values)),
-                        distinct_values,
-                        rotation=45,
-                        horizontalalignment="right",
-                    )
-
-            for i in range(len(col_names), n_rows * n_cols):
-                fig.delaxes(axs.flatten()[i])  # Remove empty subplots
-
-            return _figure_to_image(fig)
+    # ------------------------------------------------------------------------------------------------------------------
+    # Plots for two columns
+    # ------------------------------------------------------------------------------------------------------------------
 
     def line_plot(
         self,
@@ -487,16 +423,28 @@ class TablePlotter:
 
             return _figure_to_image(fig)
 
-    def scatter_plot(self, x_name: str, y_names: list[str], *, theme: Literal["dark", "light"] = "light") -> Image:
+    def histogram_2d(
+        self,
+        x_name: str,
+        y_name: str,
+        *,
+        x_max_bin_count: int = 10,
+        y_max_bin_count: int = 10,
+        theme: Literal["dark", "light"] = "light",
+    ) -> Image:
         """
-        Create a scatter plot for two columns in the table.
+        Create a 2D histogram for two columns in the table.
 
         Parameters
         ----------
         x_name:
             The name of the column to be plotted on the x-axis.
-        y_names:
-            The name(s) of the column(s) to be plotted on the y-axis.
+        y_name:
+            The name of the column to be plotted on the y-axis.
+        x_max_bin_count:
+            The maximum number of bins to use in the histogram for the x-axis. Default is 10.
+        y_max_bin_count:
+            The maximum number of bins to use in the histogram for the y-axis. Default is 10.
         theme:
             The color theme of the plot. Default is "light".
 
@@ -509,6 +457,8 @@ class TablePlotter:
         ------
         ColumnNotFoundError
             If a column does not exist.
+        OutOfBoundsError:
+            If x_max_bin_count or y_max_bin_count is less than 1.
         TypeError
             If a column is not numeric.
 
@@ -521,49 +471,34 @@ class TablePlotter:
         ...         "b": [2, 3, 4, 5, 6],
         ...     }
         ... )
-        >>> image = table.plot.scatter_plot("a", ["b"])
+        >>> image = table.plot.histogram_2d("a", "b")
         """
-        _plot_validation(self._table, x_name, y_names)
+        _check_bounds("x_max_bin_count", x_max_bin_count, lower_bound=_ClosedBound(1))
+        _check_bounds("y_max_bin_count", y_max_bin_count, lower_bound=_ClosedBound(1))
+        _plot_validation(self._table, x_name, [y_name])
 
         import matplotlib.pyplot as plt
 
-        style = "dark_background" if theme == "dark" else "default"
-        with plt.style.context(style):
-            if theme == "dark":
-                plt.rcParams.update(
-                    {
-                        "text.color": "white",
-                        "axes.labelcolor": "white",
-                        "axes.edgecolor": "white",
-                        "xtick.color": "white",
-                        "ytick.color": "white",
-                    },
-                )
+        if theme == "dark":
+            context = "dark_background"
+        else:
+            context = "default"
+
+        with plt.style.context(context):
             fig, ax = plt.subplots()
-            for y_name in y_names:
-                ax.scatter(
-                    x=self._table.get_column(x_name)._series,
-                    y=self._table.get_column(y_name)._series,
-                    s=64,  # marker size
-                    linewidth=1,
-                    edgecolor="white",
-                    label=y_name,
-                )
-            if len(y_names) > 1:
-                name = "values"
-            else:
-                name = y_names[0]
-            ax.set(
-                xlabel=x_name,
-                ylabel=name,
+
+            ax.hist2d(
+                x=self._table.get_column(x_name)._series,
+                y=self._table.get_column(y_name)._series,
+                bins=(x_max_bin_count, y_max_bin_count),
             )
-            ax.legend()
-            ax.set_xticks(ax.get_xticks())
-            ax.set_xticklabels(
-                ax.get_xticklabels(),
-                rotation=45,
-                horizontalalignment="right",
-            )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
+            ax.set_xlabel(x_name)
+            ax.set_ylabel(y_name)
+            ax.tick_params(
+                axis="x",
+                labelrotation=45,
+            )
+
             fig.tight_layout()
 
             return _figure_to_image(fig)
@@ -667,28 +602,16 @@ class TablePlotter:
 
             return _figure_to_image(fig)
 
-    def histogram_2d(
-        self,
-        x_name: str,
-        y_name: str,
-        *,
-        x_max_bin_count: int = 10,
-        y_max_bin_count: int = 10,
-        theme: Literal["dark", "light"] = "light",
-    ) -> Image:
+    def scatter_plot(self, x_name: str, y_names: list[str], *, theme: Literal["dark", "light"] = "light") -> Image:
         """
-        Create a 2D histogram for two columns in the table.
+        Create a scatter plot for two columns in the table.
 
         Parameters
         ----------
         x_name:
             The name of the column to be plotted on the x-axis.
-        y_name:
-            The name of the column to be plotted on the y-axis.
-        x_max_bin_count:
-            The maximum number of bins to use in the histogram for the x-axis. Default is 10.
-        y_max_bin_count:
-            The maximum number of bins to use in the histogram for the y-axis. Default is 10.
+        y_names:
+            The name(s) of the column(s) to be plotted on the y-axis.
         theme:
             The color theme of the plot. Default is "light".
 
@@ -701,8 +624,6 @@ class TablePlotter:
         ------
         ColumnNotFoundError
             If a column does not exist.
-        OutOfBoundsError:
-            If x_max_bin_count or y_max_bin_count is less than 1.
         TypeError
             If a column is not numeric.
 
@@ -715,35 +636,126 @@ class TablePlotter:
         ...         "b": [2, 3, 4, 5, 6],
         ...     }
         ... )
-        >>> image = table.plot.histogram_2d("a", "b")
+        >>> image = table.plot.scatter_plot("a", ["b"])
         """
-        _check_bounds("x_max_bin_count", x_max_bin_count, lower_bound=_ClosedBound(1))
-        _check_bounds("y_max_bin_count", y_max_bin_count, lower_bound=_ClosedBound(1))
-        _plot_validation(self._table, x_name, [y_name])
+        _plot_validation(self._table, x_name, y_names)
 
         import matplotlib.pyplot as plt
 
-        if theme == "dark":
-            context = "dark_background"
-        else:
-            context = "default"
-
-        with plt.style.context(context):
+        style = "dark_background" if theme == "dark" else "default"
+        with plt.style.context(style):
+            if theme == "dark":
+                plt.rcParams.update(
+                    {
+                        "text.color": "white",
+                        "axes.labelcolor": "white",
+                        "axes.edgecolor": "white",
+                        "xtick.color": "white",
+                        "ytick.color": "white",
+                    },
+                )
             fig, ax = plt.subplots()
-
-            ax.hist2d(
-                x=self._table.get_column(x_name)._series,
-                y=self._table.get_column(y_name)._series,
-                bins=(x_max_bin_count, y_max_bin_count),
+            for y_name in y_names:
+                ax.scatter(
+                    x=self._table.get_column(x_name)._series,
+                    y=self._table.get_column(y_name)._series,
+                    s=64,  # marker size
+                    linewidth=1,
+                    edgecolor="white",
+                    label=y_name,
+                )
+            if len(y_names) > 1:
+                name = "values"
+            else:
+                name = y_names[0]
+            ax.set(
+                xlabel=x_name,
+                ylabel=name,
             )
-            ax.set_xlabel(x_name)
-            ax.set_ylabel(y_name)
-            ax.tick_params(
-                axis="x",
-                labelrotation=45,
-            )
-
+            ax.legend()
+            ax.set_xticks(ax.get_xticks())
+            ax.set_xticklabels(
+                ax.get_xticklabels(),
+                rotation=45,
+                horizontalalignment="right",
+            )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
             fig.tight_layout()
+
+            return _figure_to_image(fig)
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Plots for all columns
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def correlation_heatmap(self, *, theme: Literal["dark", "light"] = "light") -> Image:
+        """
+        Plot a correlation heatmap for all numerical columns of this `Table`.
+
+        Parameters
+        ----------
+        theme:
+            The color theme of the plot. Default is "light".
+
+        Returns
+        -------
+        plot:
+            The plot as an image.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
+        >>> image = table.plot.correlation_heatmap()
+        """
+        import matplotlib.pyplot as plt
+        import numpy as np
+
+        style = "dark_background" if theme == "dark" else "default"
+        with plt.style.context(style):
+            if theme == "dark":
+                plt.rcParams.update(
+                    {
+                        "text.color": "white",
+                        "axes.labelcolor": "white",
+                        "axes.edgecolor": "white",
+                        "xtick.color": "white",
+                        "ytick.color": "white",
+                    },
+                )
+
+            only_numerical = self._table.remove_non_numeric_columns()._data_frame.fill_null(0)
+
+            if self._table.row_count == 0:
+                warnings.warn(
+                    "An empty table has been used. A correlation heatmap on an empty table will show nothing.",
+                    stacklevel=2,
+                )
+
+            with warnings.catch_warnings():
+                warnings.filterwarnings(
+                    "ignore",
+                    message=(
+                        "Attempting to set identical low and high (xlims|ylims) makes transformation singular;"
+                        " automatically expanding."
+                    ),
+                )
+
+                fig, ax = plt.subplots()
+                heatmap = plt.imshow(
+                    only_numerical.corr().to_numpy(),
+                    vmin=-1,
+                    vmax=1,
+                    cmap="coolwarm",
+                )
+                ax.set_xticks(
+                    np.arange(len(only_numerical.columns)),
+                    rotation="vertical",
+                    labels=only_numerical.columns,
+                )
+                ax.set_yticks(np.arange(len(only_numerical.columns)), labels=only_numerical.columns)
+                fig.colorbar(heatmap)
+
+                plt.tight_layout()
 
             return _figure_to_image(fig)
 

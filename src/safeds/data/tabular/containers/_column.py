@@ -664,9 +664,7 @@ class Column(Sequence[T_co]):
         | idness              | 1.00000 |
         +---------------------+---------+
         """
-        from ._table import Table
-
-        return Table.from_columns(self).summarize_statistics()
+        return self.to_table().summarize_statistics()
 
     def correlation_with(self, other: Column) -> float:
         """
