@@ -4,39 +4,22 @@ from safeds.data.tabular.containers import Column
 
 
 @pytest.mark.parametrize(
-    ("values", "expected"),
+    ("values", "ignore_missing_values", "expected"),
     [
-        ([], 0),
-        ([1, 2, 3], 3),
-        ([1, 2, 1], 2),
-        ([1, 2, 3, None], 3),
+        ([], True, 0),
+        ([1, 2, 3], True, 3),
+        ([1, 2, 1], True, 2),
+        ([1, 2, 3, None], True, 3),
+        ([1, 2, 3, None], False, 4),
     ],
     ids=[
         "empty",
         "no duplicates",
         "some duplicate",
-        "with missing values",
+        "with missing values (ignored)",
+        "with missing values (not ignored)",
     ],
 )
-def test_should_return_number_of_distinct_values_ignoring_missing_values(values: list, expected: int) -> None:
-    column = Column("A", values)
-    assert column.distinct_value_count() == expected
-
-
-@pytest.mark.parametrize(
-    ("values", "expected"),
-    [
-        ([1, 2, 3, None], 4),
-        ([1, 2, None, None], 3),
-    ],
-    ids=[
-        "with one missing value",
-        "with several missing values",
-    ],
-)
-def test_should_return_number_of_distinct_values_including_missing_values_if_requested(
-    values: list,
-    expected: int,
-) -> None:
-    column = Column("A", values)
-    assert column.distinct_value_count(ignore_missing_values=False) == expected
+def test_should_return_number_of_distinct_values(values: list, ignore_missing_values: bool, expected: int) -> None:
+    column = Column("col", values)
+    assert column.distinct_value_count(ignore_missing_values=ignore_missing_values) == expected
