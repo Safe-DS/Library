@@ -1128,7 +1128,7 @@ class Column(Sequence[T_co]):
 
         Raises
         ------
-        TypeError
+        ColumnTypeError
             If the column is not numeric.
 
         Examples
@@ -1146,17 +1146,17 @@ class Column(Sequence[T_co]):
         """
         Return the variance of the values in the column.
 
-        The variance is the average of the squared differences from the mean.
-
-        Raises
-        ------
-        TypeError
-            If the column is not numeric.
+        The variance is the sum of the squared differences from the mean divided by the number of values minus one.
 
         Returns
         -------
         variance:
             The variance of the values in the column.
+
+        Raises
+        ------
+        ColumnTypeError
+            If the column is not numeric.
 
         Examples
         --------
