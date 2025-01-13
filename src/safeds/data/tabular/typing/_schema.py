@@ -1,22 +1,20 @@
 from __future__ import annotations
 
 import sys
-from typing import TYPE_CHECKING
+from collections.abc import Iterator, Mapping
+from typing import TYPE_CHECKING, Any
 
 from safeds._utils import _structural_hash
 from safeds._validation import _check_columns_exist
 
+from ._column_type import ColumnType
 from ._polars_column_type import _PolarsColumnType
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping
-
     import polars as pl
 
-    from ._column_type import ColumnType
 
-
-class Schema:
+class Schema(Mapping[str, ColumnType]):
     """The schema of a row or table."""
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -41,6 +39,9 @@ class Schema:
             check_dtypes=False,
         )
 
+    def __contains__(self, name: Any) -> bool:
+        return self.has_column(name)
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Schema):
             return NotImplemented
@@ -48,8 +49,17 @@ class Schema:
             return True
         return self._schema == other._schema
 
+    def __getitem__(self, key: str, /) -> ColumnType:
+        return self.get_column_type(key)
+
     def __hash__(self) -> int:
         return _structural_hash(tuple(self._schema.keys()), [str(type_) for type_ in self._schema.values()])
+
+    def __iter__(self) -> Iterator[str]:
+        return iter(self._schema.keys())
+
+    def __len__(self) -> int:
+        return self.column_count
 
     def __repr__(self) -> str:
         return f"Schema({self!s})"
@@ -108,7 +118,7 @@ class Schema:
 
     def get_column_type(self, name: str) -> ColumnType:
         """
-        Get the type of a column.
+        Get the type of a column. This is equivalent to using the `[]` operator (indexed access).
 
         Parameters
         ----------
@@ -131,6 +141,9 @@ class Schema:
         >>> schema = Schema({"a": ColumnType.int64(), "b": ColumnType.float32()})
         >>> schema.get_column_type("a")
         int64
+
+        >>> schema["b"]
+        float32
         """
         _check_columns_exist(self, name)
 
@@ -138,7 +151,7 @@ class Schema:
 
     def has_column(self, name: str) -> bool:
         """
-        Check if the table has a column with a specific name.
+        Check if the schema has a column with a specific name.  This is equivalent to using the `in` operator.
 
         Parameters
         ----------
@@ -148,7 +161,7 @@ class Schema:
         Returns
         -------
         has_column:
-            Whether the table has a column with the specified name.
+            Whether the schema has a column with the specified name.
 
         Examples
         --------
@@ -157,7 +170,7 @@ class Schema:
         >>> schema.has_column("a")
         True
 
-        >>> schema.has_column("c")
+        >>> "c" in schema
         False
         """
         return name in self._schema
