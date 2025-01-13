@@ -831,8 +831,8 @@ class Column(Sequence[T_co]):
         If the column is empty, the idness is 1.0.
 
         A high idness indicates that most values in the column are unique. In this case, you must be careful when using
-        the column for analysis, as a model may learn a mapping from this column to the target, which might not
-        generalize well.
+        the column for analysis, as a model might learn a mapping from this column to the target, which might not
+        generalize well. You can generally ignore this metric for floating point columns.
 
         Returns
         -------
@@ -855,7 +855,7 @@ class Column(Sequence[T_co]):
 
         return self._series.n_unique() / self.row_count
 
-    def max(self) -> T_co:
+    def max(self) -> T_co | None:
         """
         Return the maximum value in the column.
 
@@ -938,7 +938,7 @@ class Column(Sequence[T_co]):
 
         return self._series.median()
 
-    def min(self) -> T_co:
+    def min(self) -> T_co | None:
         """
         Return the minimum value in the column.
 
