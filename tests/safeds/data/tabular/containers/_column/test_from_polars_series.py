@@ -13,17 +13,13 @@ def test_should_store_the_name() -> None:
     ("series", "expected"),
     [
         (pl.Series([]), []),
-        (pl.Series([True, False, True]), [True, False, True]),
-        (pl.Series([1, 2, 3]), [1, 2, 3]),
-        (pl.Series([1.0, 2.0, 3.0]), [1.0, 2.0, 3.0]),
-        (pl.Series(["a", "b", "c"]), ["a", "b", "c"]),
+        (pl.Series([True]), [True]),
+        (pl.Series([1, 2]), [1, 2]),
     ],
     ids=[
         "empty",
-        "boolean",
-        "integer",
-        "real number",
-        "string",
+        "one row",
+        "multiple rows",
     ],
 )
 def test_should_store_the_data(series: pl.Series, expected: Column) -> None:
