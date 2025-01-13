@@ -45,16 +45,28 @@ class Column(Sequence[T_co]):
     Examples
     --------
     >>> from safeds.data.tabular.containers import Column
-    >>> Column("test", [1, 2, 3])
-    +------+
-    | test |
-    |  --- |
-    |  i64 |
-    +======+
-    |    1 |
-    |    2 |
-    |    3 |
-    +------+
+    >>> Column("a", [1, 2, 3])
+    +-----+
+    |   a |
+    | --- |
+    | i64 |
+    +=====+
+    |   1 |
+    |   2 |
+    |   3 |
+    +-----+
+
+    >>> from safeds.data.tabular.typing import ColumnType
+    >>> Column("a", [1, 2, 3], type_=ColumnType.string())
+    +-----+
+    | a   |
+    | --- |
+    | str |
+    +=====+
+    | 1   |
+    | 2   |
+    | 3   |
+    +-----+
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -138,7 +150,14 @@ class Column(Sequence[T_co]):
 
     @property
     def name(self) -> str:
-        """The name of the column."""
+        """
+        The name of the column.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [1, 2, 3])
+        """
         return self._series.name
 
     @property
@@ -195,7 +214,7 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3, 2])
+        >>> column = Column("a", [1, 2, 3, 2])
         >>> column.get_distinct_values()
         [1, 2, 3]
         """
@@ -242,7 +261,7 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3])
         >>> column.get_value(1)
         2
 
@@ -320,7 +339,7 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3])
         >>> column.all(lambda cell: cell > 0)
         True
 
@@ -395,7 +414,7 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3])
         >>> column.any(lambda cell: cell > 2)
         True
 
@@ -460,7 +479,7 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3])
         >>> column.count_if(lambda cell: cell > 1)
         2
 
@@ -540,7 +559,7 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3])
         >>> column.none(lambda cell: cell < 0)
         True
 
@@ -576,7 +595,7 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3])
         >>> column.rename("new_name")
         +----------+
         | new_name |
@@ -612,17 +631,17 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3])
         >>> column.transform(lambda cell: 2 * cell)
-        +------+
-        | test |
-        |  --- |
-        |  i64 |
-        +======+
-        |    2 |
-        |    4 |
-        |    6 |
-        +------+
+        +-----+
+        |   a |
+        | --- |
+        | i64 |
+        +=====+
+        |   2 |
+        |   4 |
+        |   6 |
+        +-----+
         """
         import polars as pl
 
@@ -705,12 +724,12 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column1 = Column("test", [1, 2, 3])
-        >>> column2 = Column("test", [2, 4, 6])
+        >>> column1 = Column("a", [1, 2, 3])
+        >>> column2 = Column("a", [2, 4, 6])
         >>> column1.correlation_with(column2)
         1.0
 
-        >>> column3 = Column("test", [3, 2, 1])
+        >>> column3 = Column("a", [3, 2, 1])
         >>> column1.correlation_with(column3)
         -1.0
         """
@@ -747,7 +766,7 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3, 2, None])
+        >>> column = Column("a", [1, 2, 3, 2, None])
         >>> column.distinct_value_count()
         3
 
@@ -778,11 +797,11 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column1 = Column("test", [1, 2, 3])
+        >>> column1 = Column("a", [1, 2, 3])
         >>> column1.idness()
         1.0
 
-        >>> column2 = Column("test", [1, 2, 3, 2])
+        >>> column2 = Column("a", [1, 2, 3, 2])
         >>> column2.idness()
         0.75
         """
@@ -803,7 +822,7 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3])
         >>> column.max()
         3
         """
@@ -834,7 +853,7 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3])
         >>> column.mean()
         2.0
         """
@@ -862,11 +881,11 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3])
         >>> column.median()
         2.0
 
-        >>> column = Column("test", [1, 2, 3, 4])
+        >>> column = Column("a", [1, 2, 3, 4])
         >>> column.median()
         2.5
         """
@@ -886,7 +905,7 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3])
         >>> column.min()
         1
         """
@@ -910,7 +929,7 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, None, 3])
+        >>> column = Column("a", [1, None, 3])
         >>> column.missing_value_count()
         1
         """
@@ -934,7 +953,7 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, None, 3, None])
+        >>> column = Column("a", [1, None, 3, None])
         >>> column.missing_value_ratio()
         0.5
         """
@@ -981,7 +1000,7 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [3, 1, 2, 1, 3])
+        >>> column = Column("a", [3, 1, 2, 1, 3])
         >>> column.mode()
         [1, 3]
         """
@@ -1021,7 +1040,7 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 1, 2, 3, None])
+        >>> column = Column("a", [1, 1, 2, 3, None])
         >>> column.stability()
         0.5
         """
@@ -1053,7 +1072,7 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3])
         >>> column.standard_deviation()
         1.0
         """
@@ -1080,7 +1099,7 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3])
         >>> column.variance()
         1.0
         """
@@ -1104,7 +1123,7 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3])
         >>> column.to_list()
         [1, 2, 3]
         """
@@ -1122,17 +1141,17 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3])
         >>> column.to_table()
-        +------+
-        | test |
-        |  --- |
-        |  i64 |
-        +======+
-        |    1 |
-        |    2 |
-        |    3 |
-        +------+
+        +-----+
+        |   a |
+        | --- |
+        | i64 |
+        +=====+
+        |   1 |
+        |   2 |
+        |   3 |
+        +-----+
         """
         from ._table import Table
 
