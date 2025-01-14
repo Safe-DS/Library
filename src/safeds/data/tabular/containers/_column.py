@@ -4,11 +4,10 @@ from collections.abc import Callable, Iterator, Sequence
 from typing import TYPE_CHECKING, Literal, TypeVar, overload
 
 from safeds._utils import _structural_hash
-from safeds._validation import _check_column_is_numeric
+from safeds._validation import _check_column_is_numeric, _check_indices
 from safeds.data.tabular.plotting import ColumnPlotter
 from safeds.data.tabular.typing._polars_column_type import _PolarsColumnType
 from safeds.exceptions import (
-    IndexOutOfBoundsError,
     LengthMismatchError,
     MissingValuesColumnError,
 )
@@ -21,6 +20,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.typing import ColumnType
     from safeds.exceptions import (
         ColumnTypeError,  # noqa: F401
+        IndexOutOfBoundsError,  # noqa: F401
     )
 
     from ._cell import Cell
@@ -300,21 +300,26 @@ class Column(Sequence[T_co]):
 
         Raises
         ------
-        IndexError
+        IndexOutOfBoundsError
             If the index is out of bounds.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("a", [1, 2, 3])
-        >>> column.get_value(1)
-        2
+        >>> column.get_value(0)
+        1
 
-        >>> column[1]
-        2
+        >>> column[0]
+        1
+
+        >>> column.get_value(-1)
+        3
+
+        >>> column[-1]
+        3
         """
-        if index < -self.row_count or index >= self.row_count:
-            raise IndexOutOfBoundsError(index)
+        _check_indices(self, index)
 
         return self._series.__getitem__(index)
 

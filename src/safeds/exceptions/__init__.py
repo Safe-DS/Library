@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING
 from ._data import (
     DuplicateIndexError,
     IllegalFormatError,
-    IndexOutOfBoundsError,
     MissingValuesColumnError,
     NonNumericColumnError,
     OutputLengthMismatchError,
@@ -53,6 +52,10 @@ class FileExtensionError(SafeDsError, ValueError):
     """Raised when a path has the wrong file extension."""
 
 
+class IndexOutOfBoundsError(IndexError):
+    """Raised when trying to access an invalid index."""
+
+
 class LengthMismatchError(SafeDsError, ValueError):
     """Raised when objects have different lengths."""
 
@@ -85,6 +88,7 @@ __all__ = [  # noqa: RUF022
     "ColumnTypeError",
     "DuplicateColumnError",
     "FileExtensionError",
+    "IndexOutOfBoundsError",
     "LengthMismatchError",
     "NotFittedError",
     "NotInvertibleError",
@@ -94,7 +98,6 @@ __all__ = [  # noqa: RUF022
     # Data exceptions
     "DuplicateIndexError",
     "IllegalFormatError",
-    "IndexOutOfBoundsError",
     "MissingValuesColumnError",
     "NonNumericColumnError",
     "OutputLengthMismatchError",
