@@ -6,8 +6,8 @@ from safeds.data.tabular.containers import Column, Table
 @pytest.mark.parametrize(
     ("column", "expected"),
     [
-        (Column("A", []), Table({"A": []})),
-        (Column("A", [1, 2, 3]), Table({"A": [1, 2, 3]})),
+        (Column("col1", []), Table({"col1": []})),
+        (Column("col1", [1, 2, 3]), Table({"col1": [1, 2, 3]})),
     ],
     ids=[
         "empty",

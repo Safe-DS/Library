@@ -18,5 +18,5 @@ from safeds.data.tabular.typing import ColumnType, Schema
         "two columns",
     ],
 )
-def test_should_size_be_greater_than_normal_object(schema: Schema) -> None:
+def test_should_be_larger_than_normal_object(schema: Schema) -> None:
     assert sys.getsizeof(schema) > sys.getsizeof(object())

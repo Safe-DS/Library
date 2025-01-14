@@ -218,7 +218,7 @@ class _MultiSizeImageList(ImageList):
 
     def get_image(self, index: int) -> Image:
         if index not in self._indices_to_image_size_dict:
-            raise IndexOutOfBoundsError(index)
+            raise IndexOutOfBoundsError(f"There is no element at index '{index}'.")
         return self._image_list_dict[self._indices_to_image_size_dict[index]].get_image(index)
 
     def index(self, image: Image) -> list[int]:
@@ -282,7 +282,7 @@ class _MultiSizeImageList(ImageList):
                 if index not in self._indices_to_image_size_dict:
                     wrong_indices.append(index)
             if len(wrong_indices) != 0:
-                raise IndexOutOfBoundsError(wrong_indices)
+                raise IndexOutOfBoundsError(f"There are no elements at indices {wrong_indices}.")
         images = []
         for index in indices:
             images.append(self._image_list_dict[self._indices_to_image_size_dict[index]].get_image(index))

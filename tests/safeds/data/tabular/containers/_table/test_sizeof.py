@@ -18,5 +18,5 @@ from safeds.data.tabular.containers import Table
         "with data",
     ],
 )
-def test_should_size_be_greater_than_normal_object(table: Table) -> None:
+def test_should_be_larger_than_normal_object(table: Table) -> None:
     assert sys.getsizeof(table) > sys.getsizeof(object())

@@ -101,7 +101,7 @@ class _EmptyImageList(ImageList):
         return 0
 
     def get_image(self, index: int) -> Image:
-        raise IndexOutOfBoundsError(index)
+        raise IndexOutOfBoundsError(f"There is no element at index '{index}'.")
 
     def index(self, _image: Image) -> list[int]:
         return []

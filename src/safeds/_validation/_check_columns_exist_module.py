@@ -49,15 +49,15 @@ def _check_columns_exist(table_or_schema: Table | Schema, requested_names: str |
 
 
 def _build_error_message(schema: Schema, unknown_names: list[str]) -> str:
-    message = "Could not find column(s):"
+    result = "Could not find column(s):"
 
     for unknown_name in unknown_names:
         similar_columns = _get_similar_column_names(schema, unknown_name)
-        message += f"\n    - '{unknown_name}'"
+        result += f"\n    - '{unknown_name}'"
         if similar_columns:
-            message += f": Did you mean one of {similar_columns}?"
+            result += f": Did you mean one of {similar_columns}?"
 
-    return message
+    return result
 
 
 def _get_similar_column_names(schema: Schema, name: str) -> list[str]:

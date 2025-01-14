@@ -23,29 +23,6 @@ class MissingValuesColumnError(Exception):
         )
 
 
-class IndexOutOfBoundsError(IndexError):
-    """
-    Exception raised for trying to access an element by an index that does not exist in the underlying data.
-
-    Parameters
-    ----------
-    index:
-        The wrongly used index.
-    """
-
-    def __init__(self, index: int | list[int] | slice):
-        if isinstance(index, list):
-            if len(index) == 1:
-                index = index[0]
-            else:
-                super().__init__(f"There are no elements at indices {index}.")
-                return
-        if isinstance(index, int):
-            super().__init__(f"There is no element at index '{index}'.")
-        else:
-            super().__init__(f"There is no element in the range [{index.start}, {index.stop}].")
-
-
 class DuplicateIndexError(IndexError):
     """
     Exception raised for trying to add an element with an index that does already exist in the underlying data.

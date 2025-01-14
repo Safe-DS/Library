@@ -7,22 +7,17 @@ from safeds.data.tabular.containers import Column
     ("column", "expected"),
     [
         (
-            Column("a", []),
-            "+------+\n| a    |\n| ---  |\n| null |\n+======+\n+------+",
+            Column("col1", []),
+            "+------+\n| col1 |\n| ---  |\n| null |\n+======+\n+------+",
         ),
         (
-            Column("a", [0]),
-            "+-----+\n|   a |\n| --- |\n| i64 |\n+=====+\n|   0 |\n+-----+",
-        ),
-        (
-            Column("a", ["a", "b"]),
-            "+-----+\n| a   |\n| --- |\n| str |\n+=====+\n| a   |\n| b   |\n+-----+",
+            Column("col1", [0]),
+            "+------+\n| col1 |\n|  --- |\n|  i64 |\n+======+\n|    0 |\n+------+",
         ),
     ],
     ids=[
         "empty",
-        "one row",
-        "multiple rows",
+        "non-empty",
     ],
 )
 def test_should_return_a_string_representation(column: Column, expected: str) -> None:

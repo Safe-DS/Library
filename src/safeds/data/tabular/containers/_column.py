@@ -1,17 +1,17 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Iterator, Sequence
-from typing import TYPE_CHECKING, Any, Literal, TypeVar, overload
+from typing import TYPE_CHECKING, Literal, TypeVar, overload
 
 from safeds._utils import _structural_hash
-from safeds._validation import _check_column_is_numeric
+from safeds._validation import (
+    _check_column_has_no_missing_values,
+    _check_column_is_numeric,
+    _check_indices,
+    _check_row_counts_are_equal,
+)
 from safeds.data.tabular.plotting import ColumnPlotter
 from safeds.data.tabular.typing._polars_column_type import _PolarsColumnType
-from safeds.exceptions import (
-    IndexOutOfBoundsError,
-    LengthMismatchError,
-    MissingValuesColumnError,
-)
 
 from ._lazy_cell import _LazyCell
 
@@ -19,6 +19,10 @@ if TYPE_CHECKING:
     from polars import Series
 
     from safeds.data.tabular.typing import ColumnType
+    from safeds.exceptions import (
+        ColumnTypeError,  # noqa: F401
+        IndexOutOfBoundsError,  # noqa: F401
+    )
 
     from ._cell import Cell
     from ._table import Table
@@ -40,21 +44,35 @@ class Column(Sequence[T_co]):
     name:
         The name of the column.
     data:
-        The data of the column. If None, an empty column is created.
+        The data of the column.
+    type_:
+        The type of the column. If `None` (default), the type is inferred from the data.
 
     Examples
     --------
     >>> from safeds.data.tabular.containers import Column
-    >>> Column("test", [1, 2, 3])
-    +------+
-    | test |
-    |  --- |
-    |  i64 |
-    +======+
-    |    1 |
-    |    2 |
-    |    3 |
-    +------+
+    >>> Column("a", [1, 2, 3])
+    +-----+
+    |   a |
+    | --- |
+    | i64 |
+    +=====+
+    |   1 |
+    |   2 |
+    |   3 |
+    +-----+
+
+    >>> from safeds.data.tabular.typing import ColumnType
+    >>> Column("a", [1, 2, 3], type_=ColumnType.string())
+    +-----+
+    | a   |
+    | --- |
+    | str |
+    +=====+
+    | 1   |
+    | 2   |
+    | 3   |
+    +-----+
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -71,13 +89,29 @@ class Column(Sequence[T_co]):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, name: str, data: Sequence[T_co]) -> None:
+    def __init__(
+        self,
+        name: str,
+        data: Sequence[T_co],
+        *,
+        type_: ColumnType | None = None,
+    ) -> None:
         import polars as pl
 
-        self._series: pl.Series = pl.Series(name, data, strict=False)
+        # Preprocessing
+        dtype = None if type_ is None else type_._polars_data_type
 
-    def __contains__(self, item: Any) -> bool:
-        return self._series.__contains__(item)
+        # Implementation
+        self._series: pl.Series = pl.Series(name, data, dtype=dtype, strict=False)
+
+    def __contains__(self, value: object) -> bool:
+        import polars as pl
+
+        try:
+            return self._series.__contains__(value)
+        except pl.InvalidOperationError:
+            # Happens if types are incompatible
+            return False
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Column):
@@ -96,12 +130,6 @@ class Column(Sequence[T_co]):
         if isinstance(index, int):
             return self.get_value(index)
         else:
-            start = index.start or 0
-            stop = index.stop or self.row_count
-            step = index.step or 1
-
-            if start < 0 or stop < 0 or step < 0:
-                raise IndexError("Negative values for start/stop/step of slices are not supported.")
             return self._from_polars_series(self._series.__getitem__(index))
 
     def __hash__(self) -> int:
@@ -132,22 +160,59 @@ class Column(Sequence[T_co]):
 
     @property
     def name(self) -> str:
-        """The name of the column."""
+        """
+        The name of the column.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [1, 2, 3])
+        >>> column.name
+        'a'
+        """
         return self._series.name
 
     @property
     def row_count(self) -> int:
-        """The number of rows in the column."""
+        """
+        The number of rows.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [1, 2, 3])
+        >>> column.row_count
+        3
+        """
         return self._series.len()
 
     @property
     def plot(self) -> ColumnPlotter:
-        """The plotter for the column."""
+        """
+        The plotter for the column.
+
+        Call methods of the plotter to create various plots for the column.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [1, 2, 3])
+        >>> plot = column.plot.box_plot()
+        """
         return ColumnPlotter(self)
 
     @property
     def type(self) -> ColumnType:
-        """The type of the column."""
+        """
+        The type of the column.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [1, 2, 3])
+        >>> column.type
+        int64
+        """
         return _PolarsColumnType(self._series.dtype)
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -189,7 +254,7 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3, 2])
+        >>> column = Column("a", [1, 2, 3, 2])
         >>> column.get_distinct_values()
         [1, 2, 3]
         """
@@ -213,7 +278,7 @@ class Column(Sequence[T_co]):
 
     def get_value(self, index: int) -> T_co:
         """
-        Return the column value at specified index. Equivalent to the `[]` operator (indexed access).
+        Return the column value at specified index. This is equivalent to the `[]` operator (indexed access).
 
         Nonnegative indices are counted from the beginning (starting at 0), negative indices from the end (starting at
         -1).
@@ -230,21 +295,26 @@ class Column(Sequence[T_co]):
 
         Raises
         ------
-        IndexError
+        IndexOutOfBoundsError
             If the index is out of bounds.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
-        >>> column.get_value(1)
-        2
+        >>> column = Column("a", [1, 2, 3])
+        >>> column.get_value(0)
+        1
 
-        >>> column[1]
-        2
+        >>> column[0]
+        1
+
+        >>> column.get_value(-1)
+        3
+
+        >>> column[-1]
+        3
         """
-        if index < -self.row_count or index >= self.row_count:
-            raise IndexOutOfBoundsError(index)
+        _check_indices(self, index)
 
         return self._series.__getitem__(index)
 
@@ -306,24 +376,25 @@ class Column(Sequence[T_co]):
         all_satisfy_predicate:
             Whether all values in the column satisfy the predicate.
 
-        Raises
-        ------
-        TypeError
-            If the predicate does not return a boolean cell.
-
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3, None])
         >>> column.all(lambda cell: cell > 0)
         True
 
         >>> column.all(lambda cell: cell < 3)
         False
+
+        >>> print(column.all(lambda cell: cell > 0, ignore_unknown=False))
+        None
+
+        >>> column.all(lambda cell: cell < 3, ignore_unknown=False)
+        False
         """
         import polars as pl
 
-        # Expressions only work on data frames/lazy frames, so we wrap the polars series first
+        # Expressions only work on data frames/lazy frames, so we wrap the polars Series first
         expression = predicate(_LazyCell(pl.col(self.name)))._polars_expression.all(ignore_nulls=ignore_unknown)
         return self._series.to_frame().select(expression).item()
 
@@ -381,24 +452,25 @@ class Column(Sequence[T_co]):
         any_satisfy_predicate:
             Whether any value in the column satisfies the predicate.
 
-        Raises
-        ------
-        TypeError
-            If the predicate does not return a boolean cell.
-
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3, None])
         >>> column.any(lambda cell: cell > 2)
         True
 
         >>> column.any(lambda cell: cell < 0)
         False
+
+        >>> column.any(lambda cell: cell > 2, ignore_unknown=False)
+        True
+
+        >>> print(column.any(lambda cell: cell < 0, ignore_unknown=False))
+        None
         """
         import polars as pl
 
-        # Expressions only work on data frames/lazy frames, so we wrap the polars series first
+        # Expressions only work on data frames/lazy frames, so we wrap the polars Series first
         expression = predicate(_LazyCell(pl.col(self.name)))._polars_expression.any(ignore_nulls=ignore_unknown)
         return self._series.to_frame().select(expression).item()
 
@@ -454,16 +526,16 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3, None])
         >>> column.count_if(lambda cell: cell > 1)
         2
 
-        >>> column.count_if(lambda cell: cell < 0)
-        0
+        >>> print(column.count_if(lambda cell: cell < 0, ignore_unknown=False))
+        None
         """
         import polars as pl
 
-        # Expressions only work on data frames/lazy frames, so we wrap the polars series first
+        # Expressions only work on data frames/lazy frames, so we wrap the polars Series first
         expression = predicate(_LazyCell(pl.col(self.name)))._polars_expression
         series = self._series.to_frame().select(expression.alias(self.name)).get_column(self.name)
 
@@ -526,26 +598,27 @@ class Column(Sequence[T_co]):
         none_satisfy_predicate:
             Whether no value in the column satisfies the predicate.
 
-        Raises
-        ------
-        TypeError
-            If the predicate does not return a boolean cell.
-
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3, None])
         >>> column.none(lambda cell: cell < 0)
         True
 
         >>> column.none(lambda cell: cell > 2)
         False
-        """
-        any_ = self.any(predicate, ignore_unknown=ignore_unknown)
-        if any_ is None:
-            return None
 
-        return not any_
+        >>> print(column.none(lambda cell: cell < 0, ignore_unknown=False))
+        None
+
+        >>> column.none(lambda cell: cell > 2, ignore_unknown=False)
+        False
+        """
+        import polars as pl
+
+        # Expressions only work on data frames/lazy frames, so we wrap the polars Series first
+        expression = predicate(_LazyCell(pl.col(self.name)))._polars_expression.not_().all(ignore_nulls=ignore_unknown)
+        return self._series.to_frame().select(expression).item()
 
     # ------------------------------------------------------------------------------------------------------------------
     # Transformations
@@ -564,23 +637,23 @@ class Column(Sequence[T_co]):
 
         Returns
         -------
-        renamed_column:
-            A new column with the new name.
+        new_column:
+            A column with the new name.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
-        >>> column.rename("new_name")
-        +----------+
-        | new_name |
-        |      --- |
-        |      i64 |
-        +==========+
-        |        1 |
-        |        2 |
-        |        3 |
-        +----------+
+        >>> column = Column("a", [1, 2, 3])
+        >>> column.rename("b")
+        +-----+
+        |   b |
+        | --- |
+        | i64 |
+        +=====+
+        |   1 |
+        |   2 |
+        |   3 |
+        +-----+
         """
         return self._from_polars_series(self._series.rename(new_name))
 
@@ -589,7 +662,7 @@ class Column(Sequence[T_co]):
         transformer: Callable[[Cell[T_co]], Cell[R_co]],
     ) -> Column[R_co]:
         """
-        Transform the valus in the column and return the result as a new column.
+        Transform the values in the column and return the result as a new column.
 
         **Note:** The original column is not modified.
 
@@ -600,29 +673,29 @@ class Column(Sequence[T_co]):
 
         Returns
         -------
-        transformed_column:
-            A new column with transformed values.
+        new_column:
+            A column with the transformed values.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3])
         >>> column.transform(lambda cell: 2 * cell)
-        +------+
-        | test |
-        |  --- |
-        |  i64 |
-        +======+
-        |    2 |
-        |    4 |
-        |    6 |
-        +------+
+        +-----+
+        |   a |
+        | --- |
+        | i64 |
+        +=====+
+        |   2 |
+        |   4 |
+        |   6 |
+        +-----+
         """
         import polars as pl
 
-        # Expressions only work on data frames/lazy frames, so we wrap the polars series first
+        # Expressions only work on data frames/lazy frames, so we wrap the polars Series first
         expression = transformer(_LazyCell(pl.col(self.name)))._polars_expression
-        series = self._series.to_frame().select(expression.alias(self.name)).get_column(self.name)
+        series = self._series.to_frame().with_columns(expression.alias(self.name)).get_column(self.name)
 
         return self._from_polars_series(series)
 
@@ -664,20 +737,21 @@ class Column(Sequence[T_co]):
         | idness              | 1.00000 |
         +---------------------+---------+
         """
-        from ._table import Table
-
-        return Table.from_columns(self).summarize_statistics()
+        return self.to_table().summarize_statistics()
 
     def correlation_with(self, other: Column) -> float:
         """
         Calculate the Pearson correlation between this column and another column.
 
-        The Pearson correlation is a value between -1 and 1 that indicates how much the two columns are linearly
+        The Pearson correlation is a value between -1 and 1 that indicates how much the two columns are **linearly**
         related:
 
         - A correlation of -1 indicates a perfect negative linear relationship.
         - A correlation of 0 indicates no linear relationship.
         - A correlation of 1 indicates a perfect positive linear relationship.
+
+        A value of 0 does not necessarily mean that the columns are independent. It only means that there is no linear
+        relationship between the columns.
 
         Parameters
         ----------
@@ -691,9 +765,9 @@ class Column(Sequence[T_co]):
 
         Raises
         ------
-        TypeError
+        ColumnTypeError
             If one of the columns is not numeric.
-        ValueError
+        LengthMismatchError
             If the columns have different lengths.
         ValueError
             If one of the columns has missing values.
@@ -701,24 +775,20 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column1 = Column("test", [1, 2, 3])
-        >>> column2 = Column("test", [2, 4, 6])
+        >>> column1 = Column("a", [1, 2, 3])
+        >>> column2 = Column("a", [2, 4, 6])
         >>> column1.correlation_with(column2)
         1.0
 
-        >>> column3 = Column("test", [3, 2, 1])
+        >>> column3 = Column("a", [3, 2, 1])
         >>> column1.correlation_with(column3)
         -1.0
         """
         import polars as pl
 
-        _check_column_is_numeric(self, operation="calculate the correlation")
-        _check_column_is_numeric(other, operation="calculate the correlation")
-
-        if self.row_count != other.row_count:
-            raise LengthMismatchError("")  # TODO: Add column names to error message
-        if self.missing_value_count() > 0 or other.missing_value_count() > 0:
-            raise MissingValuesColumnError("")  # TODO: Add column names to error message
+        _check_column_is_numeric(self, other_columns=[other], operation="calculate the correlation")
+        _check_row_counts_are_equal([self, other])
+        _check_column_has_no_missing_values(self, other_columns=[other], operation="calculate the correlation")
 
         return pl.DataFrame({"a": self._series, "b": other._series}).corr().item(row=1, column="a")
 
@@ -743,7 +813,7 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3, 2, None])
+        >>> column = Column("a", [1, 2, 3, 2, None])
         >>> column.distinct_value_count()
         3
 
@@ -763,8 +833,8 @@ class Column(Sequence[T_co]):
         If the column is empty, the idness is 1.0.
 
         A high idness indicates that most values in the column are unique. In this case, you must be careful when using
-        the column for analysis, as a model may learn a mapping from this column to the target, which might not
-        generalize well.
+        the column for analysis, as a model might learn a mapping from this column to the target, which might not
+        generalize well. You can generally ignore this metric for floating point columns.
 
         Returns
         -------
@@ -774,11 +844,11 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column1 = Column("test", [1, 2, 3])
+        >>> column1 = Column("a", [1, 2, 3])
         >>> column1.idness()
         1.0
 
-        >>> column2 = Column("test", [1, 2, 3, 2])
+        >>> column2 = Column("a", [1, 2, 3, 2])
         >>> column2.idness()
         0.75
         """
@@ -799,7 +869,7 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3])
         >>> column.max()
         3
         """
@@ -824,13 +894,13 @@ class Column(Sequence[T_co]):
 
         Raises
         ------
-        TypeError
+        ColumnTypeError
             If the column is not numeric.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3])
         >>> column.mean()
         2.0
         """
@@ -852,17 +922,17 @@ class Column(Sequence[T_co]):
 
         Raises
         ------
-        TypeError
+        ColumnTypeError
             If the column is not numeric.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3])
         >>> column.median()
         2.0
 
-        >>> column = Column("test", [1, 2, 3, 4])
+        >>> column = Column("a", [1, 2, 3, 4])
         >>> column.median()
         2.5
         """
@@ -882,7 +952,7 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3])
         >>> column.min()
         1
         """
@@ -906,8 +976,12 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, None, 3])
-        >>> column.missing_value_count()
+        >>> column1 = Column("a", [1, 2, 3])
+        >>> column1.missing_value_count()
+        0
+
+        >>> column2 = Column("a", [1, None, 3])
+        >>> column2.missing_value_count()
         1
         """
         return self._series.null_count()
@@ -930,9 +1004,17 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, None, 3, None])
-        >>> column.missing_value_ratio()
+        >>> column1 = Column("a", [1, 2, 3])
+        >>> column1.missing_value_ratio()
+        0.0
+
+        >>> column2 = Column("a", [1, None])
+        >>> column2.missing_value_ratio()
         0.5
+
+        >>> column3 = Column("a", [])
+        >>> column3.missing_value_ratio()
+        1.0
         """
         if self.row_count == 0:
             return 1.0  # All values are missing (since there are none)
@@ -977,7 +1059,7 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [3, 1, 2, 1, 3])
+        >>> column = Column("a", [3, 1, 2, 1, 3])
         >>> column.mode()
         [1, 3]
         """
@@ -1017,9 +1099,17 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 1, 2, 3, None])
-        >>> column.stability()
+        >>> column1 = Column("a", [1, 1, 2, 3, None])
+        >>> column1.stability()
         0.5
+
+        >>> column2 = Column("a", [1, 1, 1, 1])
+        >>> column2.stability()
+        1.0
+
+        >>> column3 = Column("a", [])
+        >>> column3.stability()
+        1.0
         """
         non_missing = self._series.drop_nulls()
         if non_missing.len() == 0:
@@ -1043,13 +1133,13 @@ class Column(Sequence[T_co]):
 
         Raises
         ------
-        TypeError
+        ColumnTypeError
             If the column is not numeric.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3])
         >>> column.standard_deviation()
         1.0
         """
@@ -1061,22 +1151,22 @@ class Column(Sequence[T_co]):
         """
         Return the variance of the values in the column.
 
-        The variance is the average of the squared differences from the mean.
-
-        Raises
-        ------
-        TypeError
-            If the column is not numeric.
+        The variance is the sum of the squared differences from the mean divided by the number of values minus one.
 
         Returns
         -------
         variance:
             The variance of the values in the column.
 
+        Raises
+        ------
+        ColumnTypeError
+            If the column is not numeric.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3])
         >>> column.variance()
         1.0
         """
@@ -1095,12 +1185,12 @@ class Column(Sequence[T_co]):
         Returns
         -------
         values:
-            The values of the column in a list.
+            The values of the column.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3])
         >>> column.to_list()
         [1, 2, 3]
         """
@@ -1118,17 +1208,17 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3])
         >>> column.to_table()
-        +------+
-        | test |
-        |  --- |
-        |  i64 |
-        +======+
-        |    1 |
-        |    2 |
-        |    3 |
-        +------+
+        +-----+
+        |   a |
+        | --- |
+        | i64 |
+        +=====+
+        |   1 |
+        |   2 |
+        |   3 |
+        +-----+
         """
         from ._table import Table
 

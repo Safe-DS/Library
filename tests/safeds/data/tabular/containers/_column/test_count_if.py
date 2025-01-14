@@ -30,7 +30,7 @@ def test_should_handle_boolean_logic(
     values: list,
     expected: int,
 ) -> None:
-    column = Column("a", values)
+    column = Column("col1", values)
     assert column.count_if(lambda value: value < 2) == expected
 
 
@@ -61,5 +61,5 @@ def test_should_handle_kleene_logic(
     values: list,
     expected: int | None,
 ) -> None:
-    column = Column("a", values)
+    column = Column("col1", values)
     assert column.count_if(lambda value: value < 2, ignore_unknown=False) == expected

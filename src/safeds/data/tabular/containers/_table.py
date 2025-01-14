@@ -458,7 +458,7 @@ class Table:
     @property
     def schema(self) -> Schema:
         """
-        The schema, which is a mapping from column names to their types.
+        The schema of the table, which is a mapping from column names to their types.
 
         Examples
         --------
@@ -1298,7 +1298,8 @@ class Table:
         >>> table.count_rows_if(lambda row: row["col1"] < row["col2"])
         1
 
-        >>> table.count_rows_if(lambda row: row["col1"] < row["col2"], ignore_unknown=False)
+        >>> print(table.count_rows_if(lambda row: row["col1"] < row["col2"], ignore_unknown=False))
+        None
         """
         expression = predicate(_LazyVectorizedRow(self))._polars_expression
         series = self._lazy_frame.select(expression.alias("count")).collect().get_column("count")
@@ -1784,8 +1785,8 @@ class Table:
         Parameters
         ----------
         start:
-            The start index of the slice. Non-negative indices count forward from the first row (index 0). Negative
-            indices count backward from the last row (index -1).
+            The start index of the slice. Nonnegative indices are counted from the beginning (starting at 0), negative
+            indices from the end (starting at -1).
         length:
             The length of the slice. If None, the slice contains all rows starting from `start`. Must greater than or
             equal to 0.

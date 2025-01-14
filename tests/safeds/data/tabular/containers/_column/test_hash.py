@@ -1,40 +1,67 @@
+from collections.abc import Callable
+
 import pytest
+from syrupy import SnapshotAssertion
 
 from safeds.data.tabular.containers import Column
 
 
 @pytest.mark.parametrize(
-    ("column", "expected"),
+    "column_factory",
     [
-        (Column("a", []), 570351198003906119),
-        (Column("a", [1, 2, 3]), 1036496604269026516),
+        lambda: Column("col1", []),
+        lambda: Column("col1", [1, 2]),
     ],
     ids=[
-        "empty",
-        "non-empty",
+        "no rows",
+        "with data",
     ],
 )
-def test_should_be_deterministic(column: Column, expected: int) -> None:
-    assert hash(column) == expected
+class TestContract:
+    def test_should_return_same_hash_for_equal_objects(self, column_factory: Callable[[], Column]) -> None:
+        column_1 = column_factory()
+        column_2 = column_factory()
+        assert hash(column_1) == hash(column_2)
+
+    def test_should_return_same_hash_in_different_processes(
+        self,
+        column_factory: Callable[[], Column],
+        snapshot: SnapshotAssertion,
+    ) -> None:
+        column = column_factory()
+        assert hash(column) == snapshot
 
 
 @pytest.mark.parametrize(
-    ("column1", "column2", "expected"),
+    ("column_1", "column_2"),
     [
-        (Column("a", []), Column("a", []), True),
-        (Column("a", [1, 2, 3]), Column("a", [1, 2, 3]), True),
-        (Column("a", []), Column("b", []), False),
-        (Column("a", [1, 2, 3]), Column("a", [1, 2]), False),
-        (Column("a", [1, 2, 3]), Column("a", ["1", "2", "3"]), False),
-        # We don't use the column values in the hash calculation
+        # different names
+        (
+            Column("col1", [1]),
+            Column("col2", [1]),
+        ),
+        # different types
+        (
+            Column("col1", [1]),
+            Column("col1", ["1"]),
+        ),
+        # too few rows
+        (
+            Column("col1", [1, 2]),
+            Column("col1", [1]),  # Needs at least one value, so the types match
+        ),
+        # too many rows
+        (
+            Column("col1", [1]),  # Needs at least one value, so the types match
+            Column("col1", [1, 2]),
+        ),
     ],
     ids=[
-        "equal empty",
-        "equal non-empty",
         "different names",
-        "different lengths",
         "different types",
+        "too few rows",
+        "too many rows",
     ],
 )
-def test_should_be_good_hash(column1: Column, column2: Column, expected: bool) -> None:
-    assert (hash(column1) == hash(column2)) == expected
+def test_should_be_good_hash(column_1: Column, column_2: Column) -> None:
+    assert hash(column_1) != hash(column_2)

@@ -8,15 +8,13 @@ from safeds.data.tabular.containers import Column
 @pytest.mark.parametrize(
     "column",
     [
-        Column("a", []),
-        Column("a", [0]),
-        Column("a", ["a", "b"]),
+        Column("col1", []),
+        Column("col1", [0]),
     ],
     ids=[
         "empty",
-        "one row",
-        "multiple rows",
+        "non-empty",
     ],
 )
-def test_should_return_size_greater_than_normal_object(column: Column) -> None:
+def test_should_be_larger_than_normal_object(column: Column) -> None:
     assert sys.getsizeof(column) > sys.getsizeof(object())

@@ -120,7 +120,7 @@ class Schema(Mapping[str, ColumnType]):
 
     def get_column_type(self, name: str) -> ColumnType:
         """
-        Get the type of a column. This is equivalent to using the `[]` operator (indexed access).
+        Get the type of a column. This is equivalent to the `[]` operator (indexed access).
 
         Parameters
         ----------

@@ -108,15 +108,15 @@ def _build_error_message_for_additional_columns(additional_columns: list[str]) -
 
 
 def _build_error_message_for_columns_in_wrong_order(expected: list[str], actual: list[str]) -> str:
-    message = "The columns are in the wrong order:\n"
-    message += f"    Expected: {expected}\n"
-    message += f"    Actual:   {actual}"
-    return message
+    result = "The columns are in the wrong order:\n"
+    result += f"    Expected: {expected}\n"
+    result += f"    Actual:   {actual}"
+    return result
 
 
 def _build_error_message_for_column_types(mismatched_types: list[tuple[str, pl.DataType, pl.DataType]]) -> str:
-    message = "The following columns have the wrong type:"
+    result = "The following columns have the wrong type:"
     for column_name, expected_type, actual_type in mismatched_types:
-        message += f"\n    - '{column_name}': Expected '{expected_type}', but got '{actual_type}'."
+        result += f"\n    - '{column_name}': Expected '{expected_type}', but got '{actual_type}'."
 
-    return message
+    return result

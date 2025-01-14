@@ -61,7 +61,7 @@ class Row(ABC, Mapping[str, Cell]):
     @property
     @abstractmethod
     def schema(self) -> Schema:
-        """The schema, which is a mapping from column names to their types."""
+        """The schema of the row, which is a mapping from column names to their types."""
 
     # ------------------------------------------------------------------------------------------------------------------
     # Column operations
@@ -70,7 +70,7 @@ class Row(ABC, Mapping[str, Cell]):
     @abstractmethod
     def get_cell(self, name: str) -> Cell:
         """
-        Get the cell in the specified column. This is equivalent to using the `[]` operator (indexed access).
+        Get the cell in the specified column. This is equivalent to the `[]` operator (indexed access).
 
         Parameters
         ----------
@@ -113,7 +113,7 @@ class Row(ABC, Mapping[str, Cell]):
     @abstractmethod
     def get_column_type(self, name: str) -> ColumnType:
         """
-        Get the type of a column. This is equivalent to using the `[]` operator (indexed access).
+        Get the type of a column.
 
         Parameters
         ----------
@@ -134,7 +134,7 @@ class Row(ABC, Mapping[str, Cell]):
     @abstractmethod
     def has_column(self, name: str) -> bool:
         """
-        Check if the row has a column with a specific name. This is equivalent to using the `in` operator.
+        Check if the row has a column with a specific name. This is equivalent to the `in` operator.
 
         Parameters
         ----------

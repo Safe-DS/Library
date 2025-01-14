@@ -16,25 +16,34 @@ if TYPE_CHECKING:
 def _check_column_is_numeric(
     column: Column,
     *,
+    other_columns: list[Column] | None = None,
     operation: str = "do a numeric operation",
 ) -> None:
     """
-    Check whether the column is numeric, and raise an error if it is not.
+    Check whether a column is numeric, and raise an error if it is not.
 
     Parameters
     ----------
     column:
         The column to check.
+    other_columns:
+        Other columns to check. This provides better error messages than checking each column individually.
     operation:
         The operation that is performed on the column. This is used in the error message.
 
     Raises
     ------
     ColumnTypeError
-        If the column is not numeric.
+        If a column is not numeric.
     """
-    if not column.type.is_numeric:
-        message = _build_error_message([column.name], operation)
+    if other_columns is None:
+        other_columns = []
+
+    columns = [column, *other_columns]
+    non_numeric_names = [col.name for col in columns if not col.type.is_numeric]
+
+    if non_numeric_names:
+        message = _build_error_message(non_numeric_names, operation)
         raise ColumnTypeError(message) from None
 
 

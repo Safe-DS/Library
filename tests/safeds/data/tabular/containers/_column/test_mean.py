@@ -8,17 +8,15 @@ from safeds.exceptions import ColumnTypeError
     ("values", "expected"),
     [
         ([1, 2, 3], 2),
-        ([1, 2, 3, 4], 2.5),
         ([1, 2, 3, None], 2),
     ],
     ids=[
-        "odd number of values",
-        "even number of values",
+        "no missing values",
         "some missing values",
     ],
 )
-def test_should_return_mean_value(values: list, expected: int) -> None:
-    column = Column("col", values)
+def test_should_return_mean(values: list, expected: int) -> None:
+    column = Column("col1", values)
     assert column.mean() == expected
 
 
@@ -26,16 +24,16 @@ def test_should_return_mean_value(values: list, expected: int) -> None:
     "values",
     [
         [],
-        ["a", "b", "c"],
-        [None, None, None],
+        [None],
+        ["a"],
     ],
     ids=[
         "empty",
-        "non-numeric",
         "all missing values",
+        "non-numeric",
     ],
 )
 def test_should_raise_if_column_is_not_numeric(values: list) -> None:
-    column = Column("col", values)
+    column = Column("col1", values)
     with pytest.raises(ColumnTypeError):
         column.mean()

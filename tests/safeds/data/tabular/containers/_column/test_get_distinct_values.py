@@ -11,40 +11,26 @@ if TYPE_CHECKING:
 
 
 @pytest.mark.parametrize(
-    ("values", "expected"),
+    ("values", "ignore_missing_values", "expected"),
     [
-        ([], []),
-        ([1, None, None], [1]),
-        ([None, None, None], []),
-        ([1, 2, 3], [1, 2, 3]),
-        ([1, 1, 2, 3], [1, 2, 3]),
-        (["a", "b", "b", "c"], ["a", "b", "c"]),
+        ([], True, []),
+        ([1, 2, 3], True, [1, 2, 3]),
+        ([1, 2, 1], True, [1, 2]),
+        ([1, 2, 3, None], True, [1, 2, 3]),
+        ([1, 2, 3, None], False, [1, 2, 3, None]),
+        ([None], True, []),
+        ([None], False, [None]),
     ],
     ids=[
         "empty",
-        "some missing values",
-        "only missing values",
         "no duplicates",
-        "integer duplicates",
-        "string duplicates",
+        "some duplicate",
+        "with missing values (ignored)",
+        "with missing values (not ignored)",
+        "only missing values (ignored)",
+        "only missing values (not ignored)",
     ],
 )
-def test_should_get_unique_values_ignoring_missing_values(values: list[Any], expected: list[Any]) -> None:
-    column: Column = Column("", values)
-    assert column.get_distinct_values() == expected
-
-
-@pytest.mark.parametrize(
-    ("values", "expected"),
-    [
-        ([1, None, None], [1, None]),
-        ([None, None, None], [None]),
-    ],
-    ids=[
-        "some missing values",
-        "only missing values",
-    ],
-)
-def test_should_get_unique_values_including_missing_values_if_requested(values: list[Any], expected: list[Any]) -> None:
-    column: Column = Column("", values)
-    assert column.get_distinct_values(ignore_missing_values=False) == expected
+def test_should_get_distinct_values(values: list[Any], ignore_missing_values: bool, expected: list[Any]) -> None:
+    column: Column = Column("col1", values)
+    assert column.get_distinct_values(ignore_missing_values=ignore_missing_values) == expected

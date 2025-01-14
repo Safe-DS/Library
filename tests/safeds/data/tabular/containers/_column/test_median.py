@@ -17,8 +17,8 @@ from safeds.exceptions import ColumnTypeError
         "some missing values",
     ],
 )
-def test_should_return_median_value(values: list, expected: int) -> None:
-    column = Column("A", values)
+def test_should_return_median(values: list, expected: int) -> None:
+    column = Column("col1", values)
     assert column.median() == expected
 
 
@@ -26,16 +26,16 @@ def test_should_return_median_value(values: list, expected: int) -> None:
     "values",
     [
         [],
-        ["a", "b", "c"],
-        [None, None, None],
+        [None],
+        ["a"],
     ],
     ids=[
         "empty",
-        "non-numeric",
         "all missing values",
+        "non-numeric",
     ],
 )
 def test_should_raise_if_column_is_not_numeric(values: list) -> None:
-    column = Column("A", values)
+    column = Column("col1", values)
     with pytest.raises(ColumnTypeError):
         column.median()

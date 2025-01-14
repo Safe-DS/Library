@@ -7,7 +7,7 @@ from safeds.data.tabular.containers import Column
     "values",
     [
         [],
-        [1, 2, 3],
+        [0],
     ],
     ids=[
         "empty",
@@ -15,5 +15,5 @@ from safeds.data.tabular.containers import Column
     ],
 )
 def test_should_return_list_of_column_values(values: list) -> None:
-    column = Column("col", values)
+    column = Column("col1", values)
     assert column.to_list() == values

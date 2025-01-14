@@ -16,7 +16,7 @@ from safeds.exceptions import ColumnTypeError
     ],
 )
 def test_should_return_standard_deviation(values: list, expected: int) -> None:
-    column = Column("A", values)
+    column = Column("col1", values)
     assert column.standard_deviation() == expected
 
 
@@ -24,16 +24,16 @@ def test_should_return_standard_deviation(values: list, expected: int) -> None:
     "values",
     [
         [],
-        ["a", "b", "c"],
-        [None, None, None],
+        [None],
+        ["a"],
     ],
     ids=[
         "empty",
-        "non-numeric",
         "all missing values",
+        "non-numeric",
     ],
 )
 def test_should_raise_if_column_is_not_numeric(values: list) -> None:
-    column = Column("A", values)
+    column = Column("col1", values)
     with pytest.raises(ColumnTypeError):
         column.standard_deviation()
