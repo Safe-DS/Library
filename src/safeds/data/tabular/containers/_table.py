@@ -831,7 +831,7 @@ class Table:
         Related
         -------
         - [select_columns][safeds.data.tabular.containers._table.Table.select_columns]:
-            Keep only a subset of the columns. This method accepts either column names, or a predicate.
+            Keep only a subset of the columns.
         - [remove_columns_with_missing_values][safeds.data.tabular.containers._table.Table.remove_columns_with_missing_values]
         - [remove_non_numeric_columns][safeds.data.tabular.containers._table.Table.remove_non_numeric_columns]
         """
@@ -900,7 +900,7 @@ class Table:
         - [KNearestNeighborsImputer][safeds.data.tabular.transformation._k_nearest_neighbors_imputer.KNearestNeighborsImputer]:
             Replace missing values with a value computed from the nearest neighbors.
         - [select_columns][safeds.data.tabular.containers._table.Table.select_columns]:
-            Keep only a subset of the columns. This method accepts either column names, or a predicate.
+            Keep only a subset of the columns.
         - [remove_columns][safeds.data.tabular.containers._table.Table.remove_columns]:
             Remove columns from the table by name.
         - [remove_non_numeric_columns][safeds.data.tabular.containers._table.Table.remove_non_numeric_columns]
@@ -955,7 +955,7 @@ class Table:
         Related
         -------
         - [select_columns][safeds.data.tabular.containers._table.Table.select_columns]:
-            Keep only a subset of the columns. This method accepts either column names, or a predicate.
+            Keep only a subset of the columns.
         - [remove_columns][safeds.data.tabular.containers._table.Table.remove_columns]:
             Remove columns from the table by name.
         - [remove_columns_with_missing_values][safeds.data.tabular.containers._table.Table.remove_columns_with_missing_values]
@@ -1113,21 +1113,17 @@ class Table:
 
     def select_columns(
         self,
-        selector: str | list[str] | Callable[[Column], bool],
+        selector: str | list[str],
     ) -> Table:
         """
         Select a subset of the columns and return the result as a new table.
 
-        **Notes:**
-
-        - The original table is not modified.
-        - If the `selector` is a custom function, this operation must fully load the data into memory, which can be
-          expensive.
+        **Note:** The original table is not modified.
 
         Parameters
         ----------
         selector:
-            The names of the columns to keep, or a predicate that decides whether to keep a column.
+            The columns to keep.
 
         Returns
         -------
@@ -1161,23 +1157,11 @@ class Table:
         - [remove_columns_with_missing_values][safeds.data.tabular.containers._table.Table.remove_columns_with_missing_values]
         - [remove_non_numeric_columns][safeds.data.tabular.containers._table.Table.remove_non_numeric_columns]
         """
-        import polars as pl
+        _check_columns_exist(self, selector)
 
-        # Select by predicate
-        if callable(selector):
-            return Table._from_polars_lazy_frame(
-                pl.LazyFrame(
-                    [column._series for column in self.to_columns() if selector(column)],
-                ),
-            )
-
-        # Select by column names
-        else:
-            _check_columns_exist(self, selector)
-
-            return Table._from_polars_lazy_frame(
-                self._lazy_frame.select(selector),
-            )
+        return Table._from_polars_lazy_frame(
+            self._lazy_frame.select(selector),
+        )
 
     def transform_columns(
         self,
