@@ -12,12 +12,16 @@ from tests.helpers import assert_cell_operation_works
         (3, 1.5, False),
         (1.5, 3, True),
         (1.5, 1.5, False),
+        (None, 3, None),
+        (3, None, None),
     ],
     ids=[
         "int - int",
         "int - float",
         "float - int",
         "float - float",
+        "left is None",
+        "right is None",
     ],
 )
 class TestShouldComputeLessThan:

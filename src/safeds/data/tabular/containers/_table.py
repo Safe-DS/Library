@@ -40,6 +40,7 @@ if TYPE_CHECKING:
     from torch import Tensor
     from torch.utils.data import DataLoader, Dataset
 
+    from safeds._typing import _BooleanCell
     from safeds.data.labeled.containers import TabularDataset
     from safeds.data.tabular.transformation import (
         InvertibleTableTransformer,
@@ -1279,7 +1280,7 @@ class Table:
     @overload
     def count_rows_if(
         self,
-        predicate: Callable[[Row], Cell[bool]],
+        predicate: Callable[[Row], _BooleanCell],
         *,
         ignore_unknown: Literal[True] = ...,
     ) -> int: ...
@@ -1287,14 +1288,14 @@ class Table:
     @overload
     def count_rows_if(
         self,
-        predicate: Callable[[Row], Cell[bool]],
+        predicate: Callable[[Row], _BooleanCell],
         *,
         ignore_unknown: bool,
     ) -> int | None: ...
 
     def count_rows_if(
         self,
-        predicate: Callable[[Row], Cell[bool]],
+        predicate: Callable[[Row], _BooleanCell],
         *,
         ignore_unknown: bool = True,
     ) -> int | None:
@@ -1345,7 +1346,7 @@ class Table:
 
     def filter_rows(
         self,
-        predicate: Callable[[Row], Cell[bool]],
+        predicate: Callable[[Row], _BooleanCell],
     ) -> Table:
         """
         Keep only rows that satisfy a condition and return the result as a new table.
@@ -1392,7 +1393,7 @@ class Table:
     def filter_rows_by_column(
         self,
         name: str,
-        predicate: Callable[[Cell], Cell[bool]],
+        predicate: Callable[[Cell], _BooleanCell],
     ) -> Table:
         """
         Keep only rows that satisfy a condition on a specific column and return the result as a new table.
@@ -1487,7 +1488,7 @@ class Table:
 
     def remove_rows(
         self,
-        predicate: Callable[[Row], Cell[bool]],
+        predicate: Callable[[Row], _BooleanCell],
     ) -> Table:
         """
         Remove rows that satisfy a condition and return the result as a new table.
@@ -1539,7 +1540,7 @@ class Table:
     def remove_rows_by_column(
         self,
         name: str,
-        predicate: Callable[[Cell], Cell[bool]],
+        predicate: Callable[[Cell], _BooleanCell],
     ) -> Table:
         """
         Remove rows that satisfy a condition on a specific column and return the result as a new table.

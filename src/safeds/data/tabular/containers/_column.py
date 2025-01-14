@@ -18,6 +18,7 @@ from ._lazy_cell import _LazyCell
 if TYPE_CHECKING:
     from polars import Series
 
+    from safeds._typing import _BooleanCell
     from safeds.data.tabular.typing import ColumnType
     from safeds.exceptions import (  # noqa: F401
         ColumnTypeError,
@@ -324,7 +325,7 @@ class Column(Sequence[T_co]):
     @overload
     def all(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool]],
+        predicate: Callable[[Cell[T_co]], _BooleanCell],
         *,
         ignore_unknown: Literal[True] = ...,
     ) -> bool: ...
@@ -332,14 +333,14 @@ class Column(Sequence[T_co]):
     @overload
     def all(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool]],
+        predicate: Callable[[Cell[T_co]], _BooleanCell],
         *,
         ignore_unknown: bool,
     ) -> bool | None: ...
 
     def all(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool]],
+        predicate: Callable[[Cell[T_co]], _BooleanCell],
         *,
         ignore_unknown: bool = True,
     ) -> bool | None:
@@ -400,7 +401,7 @@ class Column(Sequence[T_co]):
     @overload
     def any(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool]],
+        predicate: Callable[[Cell[T_co]], _BooleanCell],
         *,
         ignore_unknown: Literal[True] = ...,
     ) -> bool: ...
@@ -408,14 +409,14 @@ class Column(Sequence[T_co]):
     @overload
     def any(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool]],
+        predicate: Callable[[Cell[T_co]], _BooleanCell],
         *,
         ignore_unknown: bool,
     ) -> bool | None: ...
 
     def any(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool]],
+        predicate: Callable[[Cell[T_co]], _BooleanCell],
         *,
         ignore_unknown: bool = True,
     ) -> bool | None:
@@ -476,7 +477,7 @@ class Column(Sequence[T_co]):
     @overload
     def count_if(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool]],
+        predicate: Callable[[Cell[T_co]], _BooleanCell],
         *,
         ignore_unknown: Literal[True] = ...,
     ) -> int: ...
@@ -484,14 +485,14 @@ class Column(Sequence[T_co]):
     @overload
     def count_if(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool]],
+        predicate: Callable[[Cell[T_co]], _BooleanCell],
         *,
         ignore_unknown: bool,
     ) -> int | None: ...
 
     def count_if(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool]],
+        predicate: Callable[[Cell[T_co]], _BooleanCell],
         *,
         ignore_unknown: bool = True,
     ) -> int | None:
@@ -546,7 +547,7 @@ class Column(Sequence[T_co]):
     @overload
     def none(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool]],
+        predicate: Callable[[Cell[T_co]], _BooleanCell],
         *,
         ignore_unknown: Literal[True] = ...,
     ) -> bool: ...
@@ -554,14 +555,14 @@ class Column(Sequence[T_co]):
     @overload
     def none(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool]],
+        predicate: Callable[[Cell[T_co]], _BooleanCell],
         *,
         ignore_unknown: bool,
     ) -> bool | None: ...
 
     def none(
         self,
-        predicate: Callable[[Cell[T_co]], Cell[bool]],
+        predicate: Callable[[Cell[T_co]], _BooleanCell],
         *,
         ignore_unknown: bool = True,
     ) -> bool | None:
