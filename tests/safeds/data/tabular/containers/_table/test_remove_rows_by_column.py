@@ -12,7 +12,7 @@ from safeds.exceptions import ColumnNotFoundError
         (
             lambda: Table({"col1": [], "col2": []}),
             "col1",
-            lambda _: Cell.from_literal(False),  # noqa: FBT003
+            lambda _: Cell.constant(False),  # noqa: FBT003
             Table({"col1": [], "col2": []}),
         ),
         (

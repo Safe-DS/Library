@@ -93,7 +93,7 @@ def test_should_return_true_if_objects_are_identical(column: Column) -> None:
     ("column", "other"),
     [
         (Column("col1", []), None),
-        (Column("col1", []), Cell.from_literal(1)),
+        (Column("col1", []), Cell.constant(1)),
     ],
     ids=[
         "Column vs. None",

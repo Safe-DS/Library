@@ -1,12 +1,14 @@
 from __future__ import annotations
 
-import datetime
 from abc import ABC, abstractmethod
-from decimal import Decimal
-from typing import TYPE_CHECKING, Any, Generic, TypeAlias, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 if TYPE_CHECKING:
+    import datetime as python_datetime
+
     import polars as pl
+
+    from safeds._typing import _ConvertibleToCell, _PythonLiteral
 
     from ._string_cell import StringCell
     from ._temporal_cell import TemporalCell
@@ -14,11 +16,6 @@ if TYPE_CHECKING:
 T_co = TypeVar("T_co", covariant=True)
 P_contra = TypeVar("P_contra", contravariant=True)
 R_co = TypeVar("R_co", covariant=True)
-
-
-_NumericLiteral: TypeAlias = int | float | Decimal
-_TemporalLiteral: TypeAlias = datetime.date | datetime.time | datetime.datetime | datetime.timedelta
-_PythonLiteral: TypeAlias = _NumericLiteral | bool | str | bytes | _TemporalLiteral | None
 
 
 # TODO: Rethink whether T_co should include None, also affects Cell operations ('<' return Cell[bool | None] etc.)
@@ -36,9 +33,9 @@ class Cell(ABC, Generic[T_co]):
     # ------------------------------------------------------------------------------------------------------------------
 
     @staticmethod
-    def from_literal(value: _PythonLiteral) -> Cell:
+    def constant(value: _PythonLiteral | None) -> Cell:
         """
-        Create a new cell from a literal value.
+        Create a cell with a constant value.
 
         Parameters
         ----------
@@ -55,6 +52,192 @@ class Cell(ABC, Generic[T_co]):
         from ._lazy_cell import _LazyCell  # circular import
 
         return _LazyCell(pl.lit(value))
+
+    @staticmethod
+    def date(
+        year: int | Cell[int],
+        month: int | Cell[int],
+        day: int | Cell[int],
+    ) -> Cell[python_datetime.date]:
+        """
+        Create a cell with a date.
+
+        Parameters
+        ----------
+        year:
+            The year.
+        month:
+            The month. Must be between 1 and 12.
+        day:
+            The day. Must be between 1 and 31.
+
+        Returns
+        -------
+        cell:
+            The created cell.
+        """
+        import polars as pl
+
+        from ._lazy_cell import _LazyCell  # circular import
+
+        year = _to_polars_expression(year)
+        month = _to_polars_expression(month)
+        day = _to_polars_expression(day)
+
+        return _LazyCell(pl.date(year, month, day))
+
+    @staticmethod
+    def datetime(
+        year: int | Cell[int],
+        month: int | Cell[int],
+        day: int | Cell[int],
+        *,
+        hour: int | Cell[int] = 0,
+        minute: int | Cell[int] = 0,
+        second: int | Cell[int] = 0,
+        microsecond: int | Cell[int] = 0,
+    ) -> Cell[python_datetime.datetime]:
+        """
+        Create a cell with a datetime.
+
+        Parameters
+        ----------
+        year:
+            The year.
+        month:
+            The month. Must be between 1 and 12.
+        day:
+            The day. Must be between 1 and 31.
+        hour:
+            The hour. Must be between 0 and 23.
+        minute:
+            The minute. Must be between 0 and 59.
+        second:
+            The second. Must be between 0 and 59.
+        microsecond:
+            The microsecond. Must be between 0 and 999,999.
+
+        Returns
+        -------
+        cell:
+            The created cell.
+        """
+        import polars as pl
+
+        from ._lazy_cell import _LazyCell  # circular import
+
+        year = _to_polars_expression(year)
+        month = _to_polars_expression(month)
+        day = _to_polars_expression(day)
+        hour = _to_polars_expression(hour)
+        minute = _to_polars_expression(minute)
+        second = _to_polars_expression(second)
+        microsecond = _to_polars_expression(microsecond)
+
+        return _LazyCell(pl.datetime(year, month, day, hour, minute, second, microsecond))
+
+    @staticmethod
+    def duration(
+        *,
+        weeks: int | Cell[int] = 0,
+        days: int | Cell[int] = 0,
+        hours: int | Cell[int] = 0,
+        minutes: int | Cell[int] = 0,
+        seconds: int | Cell[int] = 0,
+        milliseconds: int | Cell[int] = 0,
+        microseconds: int | Cell[int] = 0,
+        nanoseconds: int | Cell[int] = 0,
+    ) -> Cell[python_datetime.timedelta]:
+        """
+        Create a cell with a duration.
+
+        Parameters
+        ----------
+        weeks:
+            The number of weeks.
+        days:
+            The number of days.
+        hours:
+            The number of hours.
+        minutes:
+            The number of minutes.
+        seconds:
+            The number of seconds.
+        milliseconds:
+            The number of milliseconds.
+        microseconds:
+            The number of microseconds.
+        nanoseconds:
+            The number of nanoseconds.
+
+        Returns
+        -------
+        cell:
+            The created cell.
+        """
+        import polars as pl
+
+        from ._lazy_cell import _LazyCell  # circular import
+
+        weeks = _to_polars_expression(weeks)
+        days = _to_polars_expression(days)
+        hours = _to_polars_expression(hours)
+        minutes = _to_polars_expression(minutes)
+        seconds = _to_polars_expression(seconds)
+        milliseconds = _to_polars_expression(milliseconds)
+        microseconds = _to_polars_expression(microseconds)
+        nanoseconds = _to_polars_expression(nanoseconds)
+
+        return _LazyCell(
+            pl.duration(
+                weeks=weeks,
+                days=days,
+                hours=hours,
+                minutes=minutes,
+                seconds=seconds,
+                milliseconds=milliseconds,
+                microseconds=microseconds,
+                nanoseconds=nanoseconds,
+            ),
+        )
+
+    @staticmethod
+    def time(
+        hour: int | Cell[int],
+        minute: int | Cell[int],
+        second: int | Cell[int],
+        *,
+        microsecond: int | Cell[int] = 0,
+    ) -> Cell[python_datetime.time]:
+        """
+        Create a cell with a time.
+
+        Parameters
+        ----------
+        hour:
+            The hour. Must be between 0 and 23.
+        minute:
+            The minute. Must be between 0 and 59.
+        second:
+            The second. Must be between 0 and 59.
+        microsecond:
+            The microsecond. Must be between 0 and 999,999.
+
+        Returns
+        -------
+        cell:
+            The created cell.
+        """
+        import polars as pl
+
+        from ._lazy_cell import _LazyCell  # circular import
+
+        hour = _to_polars_expression(hour)
+        minute = _to_polars_expression(minute)
+        second = _to_polars_expression(second)
+        microsecond = _to_polars_expression(microsecond)
+
+        return _LazyCell(pl.time(hour, minute, second, microsecond))
 
     @staticmethod
     def first_not_none(cells: list[Cell]) -> Cell:
@@ -788,14 +971,14 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__le__(other)
 
-    def lt(self, other: Any) -> Cell[bool]:
+    def lt(self, other: _ConvertibleToCell) -> Cell[bool | None]:
         """
         Check if less than a value. This is equivalent to the `<` operator.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [1, 2])
+        >>> column = Column("a", [1, 2, None])
         >>> column.transform(lambda cell: cell.lt(2))
         +-------+
         | a     |
@@ -804,6 +987,7 @@ class Cell(ABC, Generic[T_co]):
         +=======+
         | true  |
         | false |
+        | null  |
         +-------+
 
         >>> column.transform(lambda cell: cell < 2)
@@ -814,6 +998,7 @@ class Cell(ABC, Generic[T_co]):
         +=======+
         | true  |
         | false |
+        | null  |
         +-------+
         """
         return self.__lt__(other)
@@ -834,3 +1019,12 @@ class Cell(ABC, Generic[T_co]):
 
         This method is needed because the `__eq__` method is used for element-wise comparisons.
         """
+
+
+def _to_polars_expression(cell: _ConvertibleToCell) -> pl.Expr:
+    import polars as pl
+
+    if isinstance(cell, Cell):
+        return cell._polars_expression
+    else:
+        return pl.lit(cell)
