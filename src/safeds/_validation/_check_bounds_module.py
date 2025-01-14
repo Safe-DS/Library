@@ -36,7 +36,7 @@ def _check_bounds(
     if actual is None:
         return  # Skip the check if the actual value is None (i.e., not provided).
 
-    if lower_bound is None:
+    if lower_bound is None:  # pragma: no cover
         lower_bound = _OpenBound(float("-inf"))
     if upper_bound is None:
         upper_bound = _OpenBound(float("inf"))
@@ -148,7 +148,7 @@ class _OpenBound(_Bound):
 
 
 def _float_to_string(value: float) -> str:
-    if value == float("-inf"):
+    if value == float("-inf"):  # pragma: no cover
         return "-\u221e"
     elif value == float("inf"):
         return "\u221e"

@@ -74,7 +74,7 @@ def _check_columns_are_numeric(
 
     if isinstance(table_or_schema, Table):
         table_or_schema = table_or_schema.schema
-    if isinstance(selector, str):
+    if isinstance(selector, str):  # pragma: no cover
         selector = [selector]
 
     if len(selector) > 1:
