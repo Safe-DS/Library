@@ -596,8 +596,8 @@ class Table:
         - [add_columns][safeds.data.tabular.containers._table.Table.add_columns]:
             Add column objects to the table.
         - [add_index_column][safeds.data.tabular.containers._table.Table.add_index_column]
-        - [transform_column][safeds.data.tabular.containers._table.Table.transform_column]:
-            Transform an existing column with a custom function.
+        - [transform_columns][safeds.data.tabular.containers._table.Table.transform_columns]:
+            Transform existing columns with a custom function.
         """
         _check_columns_dont_exist(self, name)
 
@@ -2427,8 +2427,8 @@ class Table:
         -------
         - [inverse_transform_table][safeds.data.tabular.containers._table.Table.inverse_transform_table]:
             Inverse-transform the table with a fitted, invertible transformer.
-        - [transform_column][safeds.data.tabular.containers._table.Table.transform_column]:
-            Transform a single column with a custom function.
+        - [transform_columns][safeds.data.tabular.containers._table.Table.transform_columns]:
+            Transform columns with a custom function.
         """
         return fitted_transformer.transform(self)
 
