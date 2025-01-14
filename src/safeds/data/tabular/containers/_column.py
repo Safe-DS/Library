@@ -19,9 +19,11 @@ if TYPE_CHECKING:
     from polars import Series
 
     from safeds.data.tabular.typing import ColumnType
-    from safeds.exceptions import (
-        ColumnTypeError,  # noqa: F401
-        IndexOutOfBoundsError,  # noqa: F401
+    from safeds.exceptions import (  # noqa: F401
+        ColumnTypeError,
+        IndexOutOfBoundsError,
+        LengthMismatchError,
+        MissingValuesError,
     )
 
     from ._cell import Cell
@@ -30,9 +32,6 @@ if TYPE_CHECKING:
 
 T_co = TypeVar("T_co", covariant=True)
 R_co = TypeVar("R_co", covariant=True)
-
-
-# TODO: Rethink whether T_co should include None, also affects Cell operations ('<' return Cell[bool | None] etc.)
 
 
 class Column(Sequence[T_co]):
