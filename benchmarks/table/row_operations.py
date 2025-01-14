@@ -50,8 +50,8 @@ def _run_split_rows() -> None:
     table_2._lazy_frame.collect()
 
 
-def _run_transform_column() -> None:
-    table.transform_column("column_0", lambda value: value * 2)._lazy_frame.collect()
+def _run_transform_columns() -> None:
+    table.transform_columns("column_0", lambda value: value * 2)._lazy_frame.collect()
 
 
 if __name__ == "__main__":
@@ -101,7 +101,7 @@ if __name__ == "__main__":
             number=REPETITIONS,
         ),
         "transform_column": timeit(
-            _run_transform_column,
+            _run_transform_columns,
             number=REPETITIONS,
         ),
     }
