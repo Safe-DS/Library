@@ -13,16 +13,16 @@ if TYPE_CHECKING:
     from safeds.data.tabular.typing import Schema
 
 
-def _check_columns_exist(table_or_schema: Table | Schema, requested_names: str | list[str]) -> None:
+def _check_columns_exist(table_or_schema: Table | Schema, selector: str | list[str]) -> None:
     """
-    Check whether the specified column names exist, and raise an error if they do not.
+    Check whether the specified columns exist, and raise an error if they do not.
 
     Parameters
     ----------
     table_or_schema:
         The table or schema to check.
-    requested_names:
-        The column names to check.
+    selector:
+        The columns to check.
 
     Raises
     ------
@@ -33,16 +33,16 @@ def _check_columns_exist(table_or_schema: Table | Schema, requested_names: str |
 
     if isinstance(table_or_schema, Table):
         table_or_schema = table_or_schema.schema
-    if isinstance(requested_names, str):
-        requested_names = [requested_names]
+    if isinstance(selector, str):
+        selector = [selector]
 
-    if len(requested_names) > 1:
+    if len(selector) > 1:
         # Create a set for faster containment checks
         known_names: Container = set(table_or_schema.column_names)
     else:
         known_names = table_or_schema.column_names
 
-    unknown_names = [name for name in requested_names if name not in known_names]
+    unknown_names = [name for name in selector if name not in known_names]
     if unknown_names:
         message = _build_error_message(table_or_schema, unknown_names)
         raise ColumnNotFoundError(message) from None
