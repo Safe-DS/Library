@@ -200,7 +200,7 @@ class _SingleSizeImageList(ImageList):
         if batch_size is None:
             batch_size = self._batch_size
         if batch_size * batch_number >= len(self):
-            raise IndexOutOfBoundsError(batch_size * batch_number)
+            raise IndexOutOfBoundsError(f"There is no element at index '{batch_size * batch_number}'.")
         max_index = batch_size * (batch_number + 1) if batch_size * (batch_number + 1) < len(self) else len(self)
         return (
             self._tensor[
@@ -311,7 +311,7 @@ class _SingleSizeImageList(ImageList):
 
     def get_image(self, index: int) -> Image:
         if index not in self._indices_to_tensor_positions:
-            raise IndexOutOfBoundsError(index)
+            raise IndexOutOfBoundsError(f"There is no element at index '{index}'.")
         return Image(self._tensor[self._indices_to_tensor_positions[index]])
 
     def index(self, image: Image) -> list[int]:
@@ -433,7 +433,7 @@ class _SingleSizeImageList(ImageList):
                 if index not in self._indices_to_tensor_positions:
                     wrong_indices.append(index)
             if len(wrong_indices) != 0:
-                raise IndexOutOfBoundsError(wrong_indices)
+                raise IndexOutOfBoundsError(f"There are no elements at indices {wrong_indices}.")
         return [Image(self._tensor[self._indices_to_tensor_positions[index]]) for index in indices]
 
     def change_channel(self, channel: int) -> ImageList:
