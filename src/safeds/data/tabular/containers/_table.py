@@ -1298,7 +1298,8 @@ class Table:
         >>> table.count_rows_if(lambda row: row["col1"] < row["col2"])
         1
 
-        >>> table.count_rows_if(lambda row: row["col1"] < row["col2"], ignore_unknown=False)
+        >>> print(table.count_rows_if(lambda row: row["col1"] < row["col2"], ignore_unknown=False))
+        None
         """
         expression = predicate(_LazyVectorizedRow(self))._polars_expression
         series = self._lazy_frame.select(expression.alias("count")).collect().get_column("count")

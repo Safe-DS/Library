@@ -376,24 +376,25 @@ class Column(Sequence[T_co]):
         all_satisfy_predicate:
             Whether all values in the column satisfy the predicate.
 
-        Raises
-        ------
-        TypeError
-            If the predicate does not return a boolean cell.
-
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3, None])
         >>> column.all(lambda cell: cell > 0)
         True
 
         >>> column.all(lambda cell: cell < 3)
         False
+
+        >>> print(column.all(lambda cell: cell > 0, ignore_unknown=False))
+        None
+
+        >>> column.all(lambda cell: cell < 3, ignore_unknown=False)
+        False
         """
         import polars as pl
 
-        # Expressions only work on data frames/lazy frames, so we wrap the polars series first
+        # Expressions only work on data frames/lazy frames, so we wrap the polars Series first
         expression = predicate(_LazyCell(pl.col(self.name)))._polars_expression.all(ignore_nulls=ignore_unknown)
         return self._series.to_frame().select(expression).item()
 
@@ -451,24 +452,25 @@ class Column(Sequence[T_co]):
         any_satisfy_predicate:
             Whether any value in the column satisfies the predicate.
 
-        Raises
-        ------
-        TypeError
-            If the predicate does not return a boolean cell.
-
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3, None])
         >>> column.any(lambda cell: cell > 2)
         True
 
         >>> column.any(lambda cell: cell < 0)
         False
+
+        >>> column.any(lambda cell: cell > 2, ignore_unknown=False)
+        True
+
+        >>> print(column.any(lambda cell: cell < 0, ignore_unknown=False))
+        None
         """
         import polars as pl
 
-        # Expressions only work on data frames/lazy frames, so we wrap the polars series first
+        # Expressions only work on data frames/lazy frames, so we wrap the polars Series first
         expression = predicate(_LazyCell(pl.col(self.name)))._polars_expression.any(ignore_nulls=ignore_unknown)
         return self._series.to_frame().select(expression).item()
 
@@ -524,16 +526,16 @@ class Column(Sequence[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3, None])
         >>> column.count_if(lambda cell: cell > 1)
         2
 
-        >>> column.count_if(lambda cell: cell < 0)
-        0
+        >>> print(column.count_if(lambda cell: cell < 0, ignore_unknown=False))
+        None
         """
         import polars as pl
 
-        # Expressions only work on data frames/lazy frames, so we wrap the polars series first
+        # Expressions only work on data frames/lazy frames, so we wrap the polars Series first
         expression = predicate(_LazyCell(pl.col(self.name)))._polars_expression
         series = self._series.to_frame().select(expression.alias(self.name)).get_column(self.name)
 
@@ -596,26 +598,27 @@ class Column(Sequence[T_co]):
         none_satisfy_predicate:
             Whether no value in the column satisfies the predicate.
 
-        Raises
-        ------
-        TypeError
-            If the predicate does not return a boolean cell.
-
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [1, 2, 3])
+        >>> column = Column("a", [1, 2, 3, None])
         >>> column.none(lambda cell: cell < 0)
         True
 
         >>> column.none(lambda cell: cell > 2)
         False
-        """
-        any_ = self.any(predicate, ignore_unknown=ignore_unknown)
-        if any_ is None:
-            return None
 
-        return not any_
+        >>> print(column.none(lambda cell: cell < 0, ignore_unknown=False))
+        None
+
+        >>> column.none(lambda cell: cell > 2, ignore_unknown=False)
+        False
+        """
+        import polars as pl
+
+        # Expressions only work on data frames/lazy frames, so we wrap the polars Series first
+        expression = predicate(_LazyCell(pl.col(self.name)))._polars_expression.not_().all(ignore_nulls=ignore_unknown)
+        return self._series.to_frame().select(expression).item()
 
     # ------------------------------------------------------------------------------------------------------------------
     # Transformations
@@ -690,7 +693,7 @@ class Column(Sequence[T_co]):
         """
         import polars as pl
 
-        # Expressions only work on data frames/lazy frames, so we wrap the polars series first
+        # Expressions only work on data frames/lazy frames, so we wrap the polars Series first
         expression = transformer(_LazyCell(pl.col(self.name)))._polars_expression
         series = self._series.to_frame().with_columns(expression.alias(self.name)).get_column(self.name)
 
