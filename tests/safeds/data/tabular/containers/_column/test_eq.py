@@ -2,38 +2,86 @@ from typing import Any
 
 import pytest
 
-from safeds.data.tabular.containers import Column, Table
+from safeds.data.tabular.containers import Cell, Column
 
 
 @pytest.mark.parametrize(
-    ("column1", "column2", "expected"),
+    ("column_1", "column_2", "expected"),
     [
-        (Column("a", []), Column("a", []), True),
-        (Column("a", [1, 2, 3]), Column("a", [1, 2, 3]), True),
-        (Column("a", []), Column("b", []), False),
-        (Column("a", [1, 2, 3]), Column("a", [1, 2, 4]), False),
-        (Column("a", [1, 2, 3]), Column("a", ["1", "2", "3"]), False),
+        # equal (no rows)
+        (
+            Column("col1", []),
+            Column("col1", []),
+            True,
+        ),
+        # equal (with data)
+        (
+            Column("col1", [1]),
+            Column("col1", [1]),
+            True,
+        ),
+        # not equal (different column names)
+        (
+            Column("col1", [1]),
+            Column("col2", [1]),
+            False,
+        ),
+        # not equal (different types)
+        (
+            Column("col1", [1]),
+            Column("col1", ["1"]),
+            False,
+        ),
+        # not equal (too few rows)
+        (
+            Column("col1", [1, 2]),
+            Column("col1", [1]),  # Needs at least one value, so the types match
+            False,
+        ),
+        # not equal (too many rows)
+        (
+            Column("col1", [1]),  # Needs at least one value, so the types match
+            Column("col1", [1, 2]),
+            False,
+        ),
+        # not equal (different row order)
+        (
+            Column("col1", [1, 2]),
+            Column("col1", [2, 1]),
+            False,
+        ),
+        # not equal (different values)
+        (
+            Column("col1", [1, 2]),
+            Column("col1", [1, 3]),
+            False,
+        ),
     ],
     ids=[
-        "equal (empty)",
-        "equal (non-empty)",
-        "different names",
-        "different values",
-        "different types",
+        # Equal
+        "equal (no rows)",
+        "equal (with data)",
+        # Not equal
+        "not equal (different names)",
+        "not equal (different types)",
+        "not equal (too few rows)",
+        "not equal (too many rows)",
+        "not equal (different row order)",
+        "not equal (different values)",
     ],
 )
-def test_should_return_whether_two_columns_are_equal(column1: Column, column2: Column, expected: bool) -> None:
-    assert (column1.__eq__(column2)) == expected
+def test_should_return_whether_objects_are_equal(column_1: Column, column_2: Column, expected: bool) -> None:
+    assert (column_1.__eq__(column_2)) == expected
 
 
 @pytest.mark.parametrize(
     "column",
     [
-        Column("a", []),
-        Column("a", [1, 2, 3]),
+        Column("col1", []),
+        Column("col1", [1]),
     ],
     ids=[
-        "empty",
+        "no rows",
         "non-empty",
     ],
 )
@@ -44,13 +92,13 @@ def test_should_return_true_if_objects_are_identical(column: Column) -> None:
 @pytest.mark.parametrize(
     ("column", "other"),
     [
-        (Column("a", []), None),
-        (Column("a", [1, 2, 3]), Table({})),
+        (Column("col1", []), None),
+        (Column("col1", []), Cell.from_literal(1)),
     ],
     ids=[
         "Column vs. None",
-        "Column vs. Table",
+        "Column vs. Cell",
     ],
 )
-def test_should_return_not_implemented_if_other_is_not_column(column: Column, other: Any) -> None:
+def test_should_return_not_implemented_if_other_has_different_type(column: Column, other: Any) -> None:
     assert (column.__eq__(other)) is NotImplemented
