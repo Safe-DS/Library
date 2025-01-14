@@ -3,6 +3,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
+from ..typing import ColumnType
+
 if TYPE_CHECKING:
     import datetime as python_datetime
 
@@ -1002,6 +1004,26 @@ class Cell(ABC, Generic[T_co]):
         +-------+
         """
         return self.__lt__(other)
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Other
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @abstractmethod
+    def cast(self, type_: ColumnType) -> Cell:
+        """
+        Cast the cell to a different type.
+
+        Parameters
+        ----------
+        type_:
+            The type to cast to.
+
+        Returns
+        -------
+        cell:
+            The cast cell.
+        """
 
     # ------------------------------------------------------------------------------------------------------------------
     # Internal

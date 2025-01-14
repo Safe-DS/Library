@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, TypeVar
 
 from safeds._utils import _structural_hash
+from safeds.data.tabular.typing import ColumnType
 
 from ._cell import Cell
 
@@ -198,6 +199,13 @@ class _LazyCell(Cell[T]):
         from ._lazy_temporal_cell import _LazyTemporalCell  # circular import
 
         return _LazyTemporalCell(self._expression)
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Other
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def cast(self, type_: ColumnType) -> Cell:
+        return _wrap(self._expression.cast(type_._polars_data_type))
 
     # ------------------------------------------------------------------------------------------------------------------
     # Internal
