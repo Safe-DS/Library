@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from safeds._utils import _structural_hash
+from safeds._utils import _safe_collect_lazy_frame, _structural_hash
 from safeds._validation import _check_columns_are_numeric, _check_columns_exist
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import NotFittedError
@@ -117,8 +117,8 @@ class RangeScaler(InvertibleTableTransformer):
             raise ValueError("The RangeScaler cannot be fitted because the table contains 0 rows")
 
         # Learn the transformation
-        _data_min = table._lazy_frame.select(column_names).min().collect()
-        _data_max = table._lazy_frame.select(column_names).max().collect()
+        _data_min = _safe_collect_lazy_frame(table._lazy_frame.select(column_names).min())
+        _data_max = _safe_collect_lazy_frame(table._lazy_frame.select(column_names).max())
 
         # Create a copy with the learned transformation
         result = RangeScaler(min_=self._min, max_=self._max, selector=column_names)

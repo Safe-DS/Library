@@ -4,7 +4,12 @@ from typing import TYPE_CHECKING, Any, Literal, overload
 
 from safeds._config import _get_device, _init_default_device
 from safeds._config._polars import _get_polars_config
-from safeds._utils import _compute_duplicates, _structural_hash
+from safeds._utils import (
+    _compute_duplicates,
+    _safe_collect_lazy_frame,
+    _safe_collect_lazy_frame_schema,
+    _structural_hash,
+)
 from safeds._validation import (
     _check_bounds,
     _check_columns_dont_exist,
@@ -388,7 +393,7 @@ class Table:
     @property
     def _data_frame(self) -> pl.DataFrame:
         if self.__data_frame_cache is None:
-            self.__data_frame_cache = self._lazy_frame.collect()
+            self.__data_frame_cache = _safe_collect_lazy_frame(self._lazy_frame)
 
         return self.__data_frame_cache
 
@@ -470,7 +475,9 @@ class Table:
             'b': int64
         })
         """
-        return Schema._from_polars_schema(self._lazy_frame.collect_schema())
+        return Schema._from_polars_schema(
+            _safe_collect_lazy_frame_schema(self._lazy_frame),
+        )
 
     # ------------------------------------------------------------------------------------------------------------------
     # Column operations
@@ -716,7 +723,7 @@ class Table:
         """
         _check_columns_exist(self, name)
         return Column._from_polars_series(
-            self._lazy_frame.select(name).collect().get_column(name),
+            _safe_collect_lazy_frame(self._lazy_frame.select(name)).get_column(name),
         )
 
     def get_column_type(self, name: str) -> ColumnType:
@@ -1329,7 +1336,7 @@ class Table:
         None
         """
         expression = predicate(_LazyVectorizedRow(self))._polars_expression
-        series = self._lazy_frame.select(expression.alias("count")).collect().get_column("count")
+        series = _safe_collect_lazy_frame(self._lazy_frame.select(expression.alias("count"))).get_column("count")
 
         if ignore_unknown or series.null_count() == 0:
             return series.sum()
@@ -1747,14 +1754,17 @@ class Table:
 
         # polar's `all_horizontal` raises a `ComputeError` if there are no columns
         selected = self._lazy_frame.select(cs.numeric() & cs.by_name(selector))
-        if not selected.collect_schema().names():
+        selected_names = _safe_collect_lazy_frame_schema(selected).names()
+        if not selected_names:
             return self
 
         # Multiply z-score by standard deviation instead of dividing the distance by it, to avoid division by zero
         non_outlier_mask = pl.all_horizontal(
-            selected.select(
-                pl.all().is_null() | ((pl.all() - pl.all().mean()).abs() <= (z_score_threshold * pl.all().std())),
-            ).collect(),
+            _safe_collect_lazy_frame(
+                selected.select(
+                    pl.all().is_null() | ((pl.all() - pl.all().mean()).abs() <= (z_score_threshold * pl.all().std())),
+                ),
+            ),
         )
 
         return Table._from_polars_lazy_frame(
@@ -2360,7 +2370,7 @@ class Table:
         # Can be removed once https://github.com/pola-rs/polars/issues/20670 is fixed
         if mode == "right" and len(left_names) > 1:
             # We must collect because of https://github.com/pola-rs/polars/issues/20671
-            result = result.collect().drop(left_names).lazy()
+            result = _safe_collect_lazy_frame(result).drop(left_names).lazy()
 
         return self._from_polars_lazy_frame(
             result,
@@ -2495,7 +2505,7 @@ class Table:
 
         # Compute suitable types for the output columns
         frame = self._lazy_frame
-        schema = frame.collect_schema()
+        schema = _safe_collect_lazy_frame_schema(frame)
         for name, type_ in schema.items():
             # polars fails to determine supertype of temporal types and u32
             if not type_.is_numeric() and not type_.is_(pl.Null):

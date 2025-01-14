@@ -4,7 +4,7 @@ import sys
 from abc import ABC, abstractmethod
 from typing import Any
 
-from safeds._utils import _structural_hash
+from safeds._utils import _safe_collect_lazy_frame, _structural_hash
 from safeds._validation import _check_columns_are_numeric, _check_columns_exist
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import NotFittedError
@@ -276,7 +276,7 @@ class _Mean(SimpleImputer.Strategy):
         return "Mean"
 
     def _get_replacement(self, table: Table) -> dict[str, Any]:
-        return table._lazy_frame.mean().collect().to_dict()
+        return _safe_collect_lazy_frame(table._lazy_frame.mean()).to_dict()
 
 
 class _Median(SimpleImputer.Strategy):
@@ -292,7 +292,7 @@ class _Median(SimpleImputer.Strategy):
         return "Median"
 
     def _get_replacement(self, table: Table) -> dict[str, Any]:
-        return table._lazy_frame.median().collect().to_dict()
+        return _safe_collect_lazy_frame(table._lazy_frame.median()).to_dict()
 
 
 class _Mode(SimpleImputer.Strategy):

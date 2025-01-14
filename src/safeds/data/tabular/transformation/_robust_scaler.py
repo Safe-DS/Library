@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from safeds._utils import _safe_collect_lazy_frame
 from safeds._validation import _check_columns_are_numeric, _check_columns_exist
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import NotFittedError
@@ -90,9 +91,9 @@ class RobustScaler(InvertibleTableTransformer):
         if table.row_count == 0:
             raise ValueError("The RobustScaler cannot be fitted because the table contains 0 rows")
 
-        _data_median = table._lazy_frame.select(column_names).median().collect()
-        q1 = table._lazy_frame.select(column_names).quantile(0.25).collect()
-        q3 = table._lazy_frame.select(column_names).quantile(0.75).collect()
+        _data_median = _safe_collect_lazy_frame(table._lazy_frame.select(column_names).median())
+        q1 = _safe_collect_lazy_frame(table._lazy_frame.select(column_names).quantile(0.25))
+        q3 = _safe_collect_lazy_frame(table._lazy_frame.select(column_names).quantile(0.75))
         _data_scale = q3 - q1
 
         # To make sure there is no division by zero
