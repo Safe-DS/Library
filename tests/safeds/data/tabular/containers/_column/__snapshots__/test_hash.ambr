@@ -1,0 +1,7 @@
+# serializer version: 1
+# name: TestContract.test_should_return_same_hash_in_different_processes[no rows]
+  4672390948227033042
+# ---
+# name: TestContract.test_should_return_same_hash_in_different_processes[with data]
+  1767527344622728528
+# ---
