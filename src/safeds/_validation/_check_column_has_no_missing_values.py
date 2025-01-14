@@ -31,7 +31,7 @@ def _check_column_has_no_missing_values(
     MissingValuesError:
         If a has missing values.
     """
-    if other_columns is None:
+    if other_columns is None:  # pragma: no cover
         other_columns = []
 
     columns = [column, *other_columns]
