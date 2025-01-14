@@ -60,6 +60,10 @@ class LengthMismatchError(SafeDsError, ValueError):
     """Raised when objects have different lengths."""
 
 
+class MissingValuesError(Exception):
+    """Raised when an operation cannot be performed on missing values."""
+
+
 class NotFittedError(SafeDsError, RuntimeError):
     """Raised when an object (e.g. a transformer or model) is not fitted."""
 
@@ -90,6 +94,7 @@ __all__ = [  # noqa: RUF022
     "FileExtensionError",
     "IndexOutOfBoundsError",
     "LengthMismatchError",
+    "MissingValuesError",
     "NotFittedError",
     "NotInvertibleError",
     "OutOfBoundsError",

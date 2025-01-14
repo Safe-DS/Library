@@ -1,6 +1,11 @@
-from collections.abc import Sequence
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from safeds.exceptions import IndexOutOfBoundsError
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 def _check_indices(
@@ -8,7 +13,7 @@ def _check_indices(
     indices: int | list[int],
     *,
     allow_negative: bool = True,
-):
+) -> None:
     """
     Check if indices are valid for the provided sequence.
 
@@ -39,4 +44,4 @@ def _check_indices(
 
 
 def _build_error_message(illegal_indices: list[int], min_legal: int, max_legal: int) -> str:
-    return f"The indices '{illegal_indices}' are outside the legal interval [{min_legal}, {max_legal}]."
+    return f"The indices {illegal_indices} are outside the legal interval [{min_legal}, {max_legal}]."

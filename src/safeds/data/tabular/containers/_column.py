@@ -4,13 +4,14 @@ from collections.abc import Callable, Iterator, Sequence
 from typing import TYPE_CHECKING, Literal, TypeVar, overload
 
 from safeds._utils import _structural_hash
-from safeds._validation import _check_column_is_numeric, _check_indices
+from safeds._validation import (
+    _check_column_has_no_missing_values,
+    _check_column_is_numeric,
+    _check_indices,
+    _check_row_counts_are_equal,
+)
 from safeds.data.tabular.plotting import ColumnPlotter
 from safeds.data.tabular.typing._polars_column_type import _PolarsColumnType
-from safeds.exceptions import (
-    LengthMismatchError,
-    MissingValuesColumnError,
-)
 
 from ._lazy_cell import _LazyCell
 
@@ -742,12 +743,15 @@ class Column(Sequence[T_co]):
         """
         Calculate the Pearson correlation between this column and another column.
 
-        The Pearson correlation is a value between -1 and 1 that indicates how much the two columns are linearly
+        The Pearson correlation is a value between -1 and 1 that indicates how much the two columns are **linearly**
         related:
 
         - A correlation of -1 indicates a perfect negative linear relationship.
         - A correlation of 0 indicates no linear relationship.
         - A correlation of 1 indicates a perfect positive linear relationship.
+
+        A value of 0 does not necessarily mean that the columns are independent. It only means that there is no linear
+        relationship between the columns.
 
         Parameters
         ----------
@@ -782,13 +786,9 @@ class Column(Sequence[T_co]):
         """
         import polars as pl
 
-        _check_column_is_numeric(self, operation="calculate the correlation")
-        _check_column_is_numeric(other, operation="calculate the correlation")
-
-        if self.row_count != other.row_count:
-            raise LengthMismatchError("")  # TODO: Add column names to error message
-        if self.missing_value_count() > 0 or other.missing_value_count() > 0:
-            raise MissingValuesColumnError("")  # TODO: Add column names to error message
+        _check_column_is_numeric(self, other_columns=[other], operation="calculate the correlation")
+        _check_row_counts_are_equal([self, other])
+        _check_column_has_no_missing_values(self, other_columns=[other], operation="calculate the correlation")
 
         return pl.DataFrame({"a": self._series, "b": other._series}).corr().item(row=1, column="a")
 
