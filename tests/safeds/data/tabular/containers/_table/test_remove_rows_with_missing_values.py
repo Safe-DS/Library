@@ -68,7 +68,7 @@ class TestHappyPath:
         column_names: str | list[str] | None,
         expected: Table,
     ) -> None:
-        actual = table_factory().remove_rows_with_missing_values(column_names=column_names)
+        actual = table_factory().remove_rows_with_missing_values(selector=column_names)
         assert actual == expected
 
     def test_should_not_mutate_receiver(
@@ -78,5 +78,5 @@ class TestHappyPath:
         expected: Table,  # noqa: ARG002
     ) -> None:
         original = table_factory()
-        original.remove_rows_with_missing_values(column_names=column_names)
+        original.remove_rows_with_missing_values(selector=column_names)
         assert original == table_factory()
