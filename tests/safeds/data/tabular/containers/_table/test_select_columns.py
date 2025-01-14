@@ -15,11 +15,6 @@ from safeds.exceptions import ColumnNotFoundError
             Table({}),
         ),
         (
-            lambda: Table({}),
-            lambda column: column.name.endswith("1"),
-            Table({}),
-        ),
-        (
             lambda: Table({"col1": [], "col2": []}),
             [],
             Table({}),
@@ -34,11 +29,6 @@ from safeds.exceptions import ColumnNotFoundError
             ["col1", "col2"],
             Table({"col1": [], "col2": []}),
         ),
-        (
-            lambda: Table({"col1": [], "col2": []}),
-            lambda column: column.name.endswith("1"),
-            Table({"col1": []}),
-        ),
         # Related to https://github.com/Safe-DS/Library/issues/115
         (
             lambda: Table({"A": [1], "B": [2], "C": [3]}),
@@ -48,11 +38,9 @@ from safeds.exceptions import ColumnNotFoundError
     ],
     ids=[
         "empty table, empty list",
-        "empty table, predicate",
         "non-empty table, empty list",
         "non-empty table, single column",
         "non-empty table, multiple columns",
-        "non-empty table, predicate",
         "swapped order",
     ],
 )

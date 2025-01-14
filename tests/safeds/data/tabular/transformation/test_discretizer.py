@@ -66,7 +66,7 @@ class TestFit:
         error_message: str | None,
     ) -> None:
         with pytest.raises(error, match=error_message):
-            Discretizer(column_names=columns).fit(table)
+            Discretizer(selector=columns).fit(table)
 
     def test_should_not_change_original_transformer(self) -> None:
         table = Table(
@@ -79,7 +79,7 @@ class TestFit:
         transformer.fit(table)
 
         assert transformer._wrapped_transformer is None
-        assert transformer._column_names is None
+        assert transformer._selector is None
 
 
 class TestTransform:
@@ -134,7 +134,7 @@ class TestTransform:
             },
         )
 
-        transformer = Discretizer(column_names=columns).fit(table_to_fit)
+        transformer = Discretizer(selector=columns).fit(table_to_fit)
 
         with pytest.raises(error, match=error_message):
             transformer.transform(table_to_transform)
@@ -210,7 +210,7 @@ class TestFitAndTransform:
         column_names: list[str] | None,
         expected: Table,
     ) -> None:
-        fitted_transformer, transformed_table = Discretizer(column_names=column_names).fit_and_transform(table)
+        fitted_transformer, transformed_table = Discretizer(selector=column_names).fit_and_transform(table)
         assert fitted_transformer.is_fitted
         assert transformed_table == expected
 
@@ -252,7 +252,7 @@ class TestFitAndTransform:
         bin_count: int,
         expected: Table,
     ) -> None:
-        fitted_transformer, transformed_table = Discretizer(bin_count, column_names="col1").fit_and_transform(table)
+        fitted_transformer, transformed_table = Discretizer(bin_count, selector="col1").fit_and_transform(table)
         assert fitted_transformer.is_fitted
         assert transformed_table == expected
 

@@ -30,10 +30,10 @@ def transformers_numeric() -> list[TableTransformer]:
         The list of numeric transformers to test.
     """
     return [
-        StandardScaler(column_names="col1"),
-        RangeScaler(column_names="col1"),
-        Discretizer(column_names="col1"),
-        RobustScaler(column_names="col1"),
+        StandardScaler(selector="col1"),
+        RangeScaler(selector="col1"),
+        Discretizer(selector="col1"),
+        RobustScaler(selector="col1"),
     ]
 
 
@@ -50,8 +50,8 @@ def transformers_non_numeric() -> list[TableTransformer]:
         The list of non-numeric transformers to test.
     """
     return [
-        OneHotEncoder(column_names="col1"),
-        LabelEncoder(column_names="col1"),
+        OneHotEncoder(selector="col1"),
+        LabelEncoder(selector="col1"),
     ]
 
 

@@ -175,7 +175,7 @@ class TestFit:
         )
 
         with pytest.raises(ColumnNotFoundError):
-            SimpleImputer(strategy, column_names=["b", "c"]).fit(table)
+            SimpleImputer(strategy, selector=["b", "c"]).fit(table)
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
     def test_should_raise_if_table_contains_no_rows(self, strategy: SimpleImputer.Strategy) -> None:
@@ -197,7 +197,7 @@ class TestFit:
         strategy: SimpleImputer.Strategy,
     ) -> None:
         with pytest.raises(ColumnTypeError):
-            SimpleImputer(strategy, column_names=col_names).fit(table)
+            SimpleImputer(strategy, selector=col_names).fit(table)
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
     def test_should_not_change_original_transformer(self, strategy: SimpleImputer.Strategy) -> None:
@@ -210,7 +210,7 @@ class TestFit:
         transformer = SimpleImputer(strategy)
         transformer.fit(table)
 
-        assert transformer._column_names is None
+        assert transformer._selector is None
         assert transformer._replacement is None
 
 
@@ -411,7 +411,7 @@ class TestFitAndTransform:
             )
             fitted_transformer, transformed_table = SimpleImputer(
                 strategy,
-                column_names=column_names,
+                selector=column_names,
                 value_to_replace=value_to_replace,
             ).fit_and_transform(table)
 

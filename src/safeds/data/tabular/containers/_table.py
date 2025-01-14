@@ -775,7 +775,7 @@ class Table:
 
     def remove_columns(
         self,
-        names: str | list[str],
+        selector: str | list[str],
         *,
         ignore_unknown_names: bool = False,
     ) -> Table:
@@ -786,8 +786,8 @@ class Table:
 
         Parameters
         ----------
-        names:
-            The names of the columns to remove.
+        selector:
+            The columns to remove.
         ignore_unknown_names:
             If set to True, columns that are not present in the table will be ignored.
             If set to False, an error will be raised if any of the specified columns do not exist.
@@ -831,18 +831,18 @@ class Table:
         Related
         -------
         - [select_columns][safeds.data.tabular.containers._table.Table.select_columns]:
-            Keep only a subset of the columns. This method accepts either column names, or a predicate.
+            Keep only a subset of the columns.
         - [remove_columns_with_missing_values][safeds.data.tabular.containers._table.Table.remove_columns_with_missing_values]
         - [remove_non_numeric_columns][safeds.data.tabular.containers._table.Table.remove_non_numeric_columns]
         """
-        if isinstance(names, str):
-            names = [names]
+        if isinstance(selector, str):
+            selector = [selector]
 
         if not ignore_unknown_names:
-            _check_columns_exist(self, names)
+            _check_columns_exist(self, selector)
 
         return Table._from_polars_lazy_frame(
-            self._lazy_frame.drop(names, strict=not ignore_unknown_names),
+            self._lazy_frame.drop(selector, strict=not ignore_unknown_names),
         )
 
     def remove_columns_with_missing_values(
@@ -900,7 +900,7 @@ class Table:
         - [KNearestNeighborsImputer][safeds.data.tabular.transformation._k_nearest_neighbors_imputer.KNearestNeighborsImputer]:
             Replace missing values with a value computed from the nearest neighbors.
         - [select_columns][safeds.data.tabular.containers._table.Table.select_columns]:
-            Keep only a subset of the columns. This method accepts either column names, or a predicate.
+            Keep only a subset of the columns.
         - [remove_columns][safeds.data.tabular.containers._table.Table.remove_columns]:
             Remove columns from the table by name.
         - [remove_non_numeric_columns][safeds.data.tabular.containers._table.Table.remove_non_numeric_columns]
@@ -955,7 +955,7 @@ class Table:
         Related
         -------
         - [select_columns][safeds.data.tabular.containers._table.Table.select_columns]:
-            Keep only a subset of the columns. This method accepts either column names, or a predicate.
+            Keep only a subset of the columns.
         - [remove_columns][safeds.data.tabular.containers._table.Table.remove_columns]:
             Remove columns from the table by name.
         - [remove_columns_with_missing_values][safeds.data.tabular.containers._table.Table.remove_columns_with_missing_values]
@@ -1113,21 +1113,17 @@ class Table:
 
     def select_columns(
         self,
-        selector: str | list[str] | Callable[[Column], bool],
+        selector: str | list[str],
     ) -> Table:
         """
         Select a subset of the columns and return the result as a new table.
 
-        **Notes:**
-
-        - The original table is not modified.
-        - If the `selector` is a custom function, this operation must fully load the data into memory, which can be
-          expensive.
+        **Note:** The original table is not modified.
 
         Parameters
         ----------
         selector:
-            The names of the columns to keep, or a predicate that decides whether to keep a column.
+            The columns to keep.
 
         Returns
         -------
@@ -1161,23 +1157,11 @@ class Table:
         - [remove_columns_with_missing_values][safeds.data.tabular.containers._table.Table.remove_columns_with_missing_values]
         - [remove_non_numeric_columns][safeds.data.tabular.containers._table.Table.remove_non_numeric_columns]
         """
-        import polars as pl
+        _check_columns_exist(self, selector)
 
-        # Select by predicate
-        if callable(selector):
-            return Table._from_polars_lazy_frame(
-                pl.LazyFrame(
-                    [column._series for column in self.to_columns() if selector(column)],
-                ),
-            )
-
-        # Select by column names
-        else:
-            _check_columns_exist(self, selector)
-
-            return Table._from_polars_lazy_frame(
-                self._lazy_frame.select(selector),
-            )
+        return Table._from_polars_lazy_frame(
+            self._lazy_frame.select(selector),
+        )
 
     def transform_columns(
         self,
@@ -1611,7 +1595,7 @@ class Table:
     def remove_rows_with_missing_values(
         self,
         *,
-        column_names: str | list[str] | None = None,
+        selector: str | list[str] | None = None,
     ) -> Table:
         """
         Remove rows that contain missing values in the specified columns and return the result as a new table.
@@ -1624,8 +1608,8 @@ class Table:
 
         Parameters
         ----------
-        column_names:
-            The names of the columns to check. If None, all columns are checked.
+        selector:
+            The columns to check. If None, all columns are checked.
 
         Returns
         -------
@@ -1645,7 +1629,7 @@ class Table:
         |   1 |   4 |
         +-----+-----+
 
-        >>> table.remove_rows_with_missing_values(column_names=["b"])
+        >>> table.remove_rows_with_missing_values(selector=["b"])
         +------+-----+
         |    a |   b |
         |  --- | --- |
@@ -1669,18 +1653,18 @@ class Table:
         - [remove_duplicate_rows][safeds.data.tabular.containers._table.Table.remove_duplicate_rows]
         - [remove_rows_with_outliers][safeds.data.tabular.containers._table.Table.remove_rows_with_outliers]
         """
-        if isinstance(column_names, list) and not column_names:
+        if isinstance(selector, list) and not selector:
             # polars panics in this case
             return self
 
         return Table._from_polars_lazy_frame(
-            self._lazy_frame.drop_nulls(subset=column_names),
+            self._lazy_frame.drop_nulls(subset=selector),
         )
 
     def remove_rows_with_outliers(
         self,
         *,
-        column_names: str | list[str] | None = None,
+        selector: str | list[str] | None = None,
         z_score_threshold: float = 3,
     ) -> Table:
         """
@@ -1701,8 +1685,8 @@ class Table:
 
         Parameters
         ----------
-        column_names:
-            Names of the columns to consider. If None, all numeric columns are considered.
+        selector:
+            The columns to check. If None, all columns are checked.
         z_score_threshold:
             The z-score threshold for detecting outliers. Must be greater than or equal to 0.
 
@@ -1755,14 +1739,14 @@ class Table:
             lower_bound=_ClosedBound(0),
         )
 
-        if column_names is None:
-            column_names = self.column_names
+        if selector is None:
+            selector = self.column_names
 
         import polars as pl
         import polars.selectors as cs
 
         # polar's `all_horizontal` raises a `ComputeError` if there are no columns
-        selected = self._lazy_frame.select(cs.numeric() & cs.by_name(column_names))
+        selected = self._lazy_frame.select(cs.numeric() & cs.by_name(selector))
         if not selected.collect_schema().names():
             return self
 
@@ -2268,9 +2252,9 @@ class Table:
         right_table:
             The table to join with the left table.
         left_names:
-            Name or list of names of columns to join on in the left table.
+            Names of columns to join on in the left table.
         right_names:
-            Name or list of names of columns to join on in the right table.
+            Names of columns to join on in the right table.
         mode:
             Specify which type of join you want to use.
 

@@ -36,7 +36,7 @@ class TestFit:
         )
 
         with pytest.raises(ColumnNotFoundError):
-            KNearestNeighborsImputer(neighbor_count=5, column_names=["col2", "col3"]).fit(table)
+            KNearestNeighborsImputer(neighbor_count=5, selector=["col2", "col3"]).fit(table)
 
     def test_should_raise_if_table_contains_no_rows(self) -> None:
         with pytest.raises(
@@ -55,7 +55,7 @@ class TestFit:
         transformer = KNearestNeighborsImputer(neighbor_count=5)
         transformer.fit(table)
 
-        assert transformer._column_names is None
+        assert transformer._selector is None
         assert transformer._wrapped_transformer is None
 
 
@@ -154,7 +154,7 @@ class TestFitAndTransform:
     ) -> None:
         fitted_transformer, transformed_table = KNearestNeighborsImputer(
             neighbor_count=1,
-            column_names=None,
+            selector=None,
             value_to_replace=None,
         ).fit_and_transform(table)
         assert fitted_transformer.is_fitted

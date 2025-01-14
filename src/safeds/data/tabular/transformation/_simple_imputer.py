@@ -22,7 +22,7 @@ class SimpleImputer(TableTransformer):
         How to replace missing values.
     value_to_replace:
         The value that should be replaced.
-    column_names:
+    selector:
         The list of columns used to fit the transformer. If `None`, all columns are used.
 
     Examples
@@ -95,10 +95,10 @@ class SimpleImputer(TableTransformer):
         self,
         strategy: SimpleImputer.Strategy,
         *,
-        column_names: str | list[str] | None = None,
+        selector: str | list[str] | None = None,
         value_to_replace: float | str | None = None,
     ) -> None:
-        super().__init__(column_names)
+        super().__init__(selector)
 
         # Parameters
         self._strategy = strategy
@@ -165,17 +165,17 @@ class SimpleImputer(TableTransformer):
             data.
         """
         if isinstance(self._strategy, _Mean | _Median):
-            if self._column_names is None:
+            if self._selector is None:
                 column_names = [name for name in table.column_names if table.get_column_type(name).is_numeric]
             else:
-                column_names = self._column_names
+                column_names = self._selector
                 _check_columns_exist(table, column_names)
                 _check_columns_are_numeric(table, column_names, operation="fit a SimpleImputer")
         else:  # noqa: PLR5501
-            if self._column_names is None:
+            if self._selector is None:
                 column_names = table.column_names
             else:
-                column_names = self._column_names
+                column_names = self._selector
                 _check_columns_exist(table, column_names)
 
         if table.row_count == 0:
@@ -185,7 +185,7 @@ class SimpleImputer(TableTransformer):
         replacement = self._strategy._get_replacement(table)
 
         # Create a copy with the learned transformation
-        result = SimpleImputer(self._strategy, column_names=column_names, value_to_replace=self._value_to_replace)
+        result = SimpleImputer(self._strategy, selector=column_names, value_to_replace=self._value_to_replace)
         result._replacement = replacement
 
         return result
@@ -216,14 +216,13 @@ class SimpleImputer(TableTransformer):
         import polars as pl
 
         # Used in favor of is_fitted, so the type checker is happy
-        if self._column_names is None or self._replacement is None:
+        if self._selector is None or self._replacement is None:
             raise NotFittedError(kind="transformer")
 
-        _check_columns_exist(table, self._column_names)
+        _check_columns_exist(table, self._selector)
 
         columns = [
-            (pl.col(name).replace(old=self._value_to_replace, new=self._replacement[name]))
-            for name in self._column_names
+            (pl.col(name).replace(old=self._value_to_replace, new=self._replacement[name])) for name in self._selector
         ]
 
         return Table._from_polars_lazy_frame(

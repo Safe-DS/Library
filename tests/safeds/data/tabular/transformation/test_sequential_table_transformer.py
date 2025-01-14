@@ -139,11 +139,11 @@ class TestInverseTransform:
     @pytest.mark.parametrize(
         "transformers",
         [
-            [Discretizer(bin_count=3, column_names="col1")],
+            [Discretizer(bin_count=3, selector="col1")],
             [SimpleImputer(SimpleImputer.Strategy.constant(0))],
             [SimpleImputer(SimpleImputer.Strategy.constant(0)), Discretizer(bin_count=3)],
             [
-                LabelEncoder(column_names="col2", partial_order=["a", "b", "c"]),
+                LabelEncoder(selector="col2", partial_order=["a", "b", "c"]),
                 SimpleImputer(SimpleImputer.Strategy.mean()),
             ],
         ],
@@ -170,11 +170,11 @@ class TestInverseTransform:
         "transformers",
         [
             [OneHotEncoder()],
-            [OneHotEncoder(), StandardScaler(column_names=["col1", "col3"])],
+            [OneHotEncoder(), StandardScaler(selector=["col1", "col3"])],
             [
-                LabelEncoder(column_names="col2", partial_order=["a", "b", "c"]),
+                LabelEncoder(selector="col2", partial_order=["a", "b", "c"]),
                 OneHotEncoder(),
-                StandardScaler(column_names=["col1", "col3"]),
+                StandardScaler(selector=["col1", "col3"]),
             ],
             [LabelEncoder(), LabelEncoder()],
         ],

@@ -94,7 +94,7 @@ class TestHappyPath:
         expected: Table,
     ) -> None:
         actual = table_factory().remove_rows_with_outliers(
-            column_names=column_names,
+            selector=column_names,
             z_score_threshold=z_score_threshold,
         )
         assert actual == expected
@@ -108,7 +108,7 @@ class TestHappyPath:
     ) -> None:
         original = table_factory()
         original.remove_rows_with_outliers(
-            column_names=column_names,
+            selector=column_names,
             z_score_threshold=z_score_threshold,
         )
         assert original == table_factory()

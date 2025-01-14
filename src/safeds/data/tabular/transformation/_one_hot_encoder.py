@@ -42,7 +42,7 @@ class OneHotEncoder(InvertibleTableTransformer):
 
     Parameters
     ----------
-    column_names:
+    selector:
         The list of columns used to fit the transformer. If `None`, all non-numeric columns are used.
     separator:
         The separator used to separate the original column name from the value in the new column names.
@@ -73,10 +73,10 @@ class OneHotEncoder(InvertibleTableTransformer):
     def __init__(
         self,
         *,
-        column_names: str | list[str] | None = None,
+        selector: str | list[str] | None = None,
         separator: str = "__",
     ) -> None:
-        super().__init__(column_names)
+        super().__init__(selector)
 
         # Parameters
         self._separator = separator
@@ -142,10 +142,10 @@ class OneHotEncoder(InvertibleTableTransformer):
         ValueError
             If the table contains 0 rows.
         """
-        if self._column_names is None:
+        if self._selector is None:
             column_names = [name for name in table.column_names if not table.get_column_type(name).is_numeric]
         else:
-            column_names = self._column_names
+            column_names = self._selector
             _check_columns_exist(table, column_names)
             _warn_if_columns_are_numeric(table, column_names)
 
@@ -175,7 +175,7 @@ class OneHotEncoder(InvertibleTableTransformer):
                 mapping[name].append((new_name, value))
 
         # Create a copy with the learned transformation
-        result = OneHotEncoder(column_names=column_names, separator=self._separator)
+        result = OneHotEncoder(selector=column_names, separator=self._separator)
         result._new_column_names = new_column_names
         result._mapping = mapping
 
@@ -207,21 +207,21 @@ class OneHotEncoder(InvertibleTableTransformer):
         import polars as pl
 
         # Used in favor of is_fitted, so the type checker is happy
-        if self._column_names is None or self._mapping is None:
+        if self._selector is None or self._mapping is None:
             raise NotFittedError(kind="transformer")
 
         # TODO: raise schema error instead
-        _check_columns_exist(table, self._column_names)
+        _check_columns_exist(table, self._selector)
 
         expressions = [
             # UInt8 can be used without conversion in scikit-learn
             pl.col(column_name).eq_missing(value).alias(new_name).cast(pl.UInt8)
-            for column_name in self._column_names
+            for column_name in self._selector
             for new_name, value in self._mapping[column_name]
         ]
 
         return Table._from_polars_lazy_frame(
-            table._lazy_frame.with_columns(expressions).drop(self._column_names),
+            table._lazy_frame.with_columns(expressions).drop(self._selector),
         )
 
     def inverse_transform(self, transformed_table: Table) -> Table:
@@ -252,7 +252,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         import polars as pl
 
         # Used in favor of is_fitted, so the type checker is happy
-        if self._column_names is None or self._new_column_names is None or self._mapping is None:
+        if self._selector is None or self._new_column_names is None or self._mapping is None:
             raise NotFittedError(kind="transformer")
 
         _check_columns_exist(transformed_table, self._new_column_names)

@@ -75,7 +75,7 @@ def _check_schema(
 
 
 def _check_types(expected_schema: Schema, actual_schema: Schema, *, check_types: _TypeCheckingMode) -> None:
-    if check_types == "off":
+    if check_types == "off":  # pragma: no cover
         return
 
     mismatched_types: list[tuple[str, pl.DataType, pl.DataType]] = []

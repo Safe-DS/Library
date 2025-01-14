@@ -15,7 +15,7 @@ class TableTransformer(ABC):
 
     Parameters
     ----------
-    column_names:
+    selector:
         The list of columns used to fit the transformer. If `None`, all suitable columns are used.
     """
 
@@ -25,18 +25,18 @@ class TableTransformer(ABC):
 
     # The decorator is needed so the class really cannot be instantiated
     @abstractmethod
-    def __init__(self, column_names: str | list[str] | None) -> None:
-        if isinstance(column_names, str):
-            column_names = [column_names]
+    def __init__(self, selector: str | list[str] | None) -> None:
+        if isinstance(selector, str):
+            selector = [selector]
 
-        self._column_names: list[str] | None = column_names
+        self._selector: list[str] | None = selector
 
     # The decorator ensures that the method is overridden in all subclasses
     @abstractmethod
     def __hash__(self) -> int:
         return _structural_hash(
             self.__class__.__qualname__,
-            self._column_names,
+            self._selector,
             self.is_fitted,
         )
 

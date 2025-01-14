@@ -49,21 +49,19 @@ def _check_column_is_numeric(
 
 def _check_columns_are_numeric(
     table_or_schema: Table | Schema,
-    column_names: str | list[str],
+    selector: str | list[str],
     *,
     operation: str = "do a numeric operation",
 ) -> None:
     """
-    Check if the columns with the specified names are numeric and raise an error if they are not.
-
-    Missing columns are ignored. Use `_check_columns_exist` to check for missing columns.
+    Check if the specified columns are numeric and raise an error if they are not. Missing columns are ignored.
 
     Parameters
     ----------
     table_or_schema:
         The table or schema to check.
-    column_names:
-        The column names to check.
+    selector:
+        The columns to check.
     operation:
         The operation that is performed on the columns. This is used in the error message.
 
@@ -76,17 +74,17 @@ def _check_columns_are_numeric(
 
     if isinstance(table_or_schema, Table):
         table_or_schema = table_or_schema.schema
-    if isinstance(column_names, str):
-        column_names = [column_names]
+    if isinstance(selector, str):  # pragma: no cover
+        selector = [selector]
 
-    if len(column_names) > 1:
+    if len(selector) > 1:
         # Create a set for faster containment checks
         known_names: Container = set(table_or_schema.column_names)
     else:
         known_names = table_or_schema.column_names
 
     non_numeric_names = [
-        name for name in column_names if name in known_names and not table_or_schema.get_column_type(name).is_numeric
+        name for name in selector if name in known_names and not table_or_schema.get_column_type(name).is_numeric
     ]
     if non_numeric_names:
         message = _build_error_message(non_numeric_names, operation)

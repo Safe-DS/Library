@@ -24,7 +24,7 @@ class Discretizer(TableTransformer):
     ----------
     bin_count:
         The number of bins to be created.
-    column_names:
+    selector:
         The list of columns used to fit the transformer. If `None`, all numeric columns are used.
 
     Raises
@@ -41,9 +41,9 @@ class Discretizer(TableTransformer):
         self,
         bin_count: int = 5,
         *,
-        column_names: str | list[str] | None = None,
+        selector: str | list[str] | None = None,
     ) -> None:
-        TableTransformer.__init__(self, column_names)
+        TableTransformer.__init__(self, selector)
 
         _check_bounds("bin_count", bin_count, lower_bound=_ClosedBound(2))
 
@@ -104,10 +104,10 @@ class Discretizer(TableTransformer):
         if table.row_count == 0:
             raise ValueError("The Discretizer cannot be fitted because the table contains 0 rows")
 
-        if self._column_names is None:
+        if self._selector is None:
             column_names = [name for name in table.column_names if table.get_column_type(name).is_numeric]
         else:
-            column_names = self._column_names
+            column_names = self._selector
             _check_columns_exist(table, column_names)
             _check_columns_are_numeric(table, column_names, operation="fit a Discretizer")
 
@@ -117,7 +117,7 @@ class Discretizer(TableTransformer):
             table.select_columns(column_names)._data_frame,
         )
 
-        result = Discretizer(self._bin_count, column_names=column_names)
+        result = Discretizer(self._bin_count, selector=column_names)
         result._wrapped_transformer = wrapped_transformer
 
         return result
@@ -150,21 +150,21 @@ class Discretizer(TableTransformer):
             If one of the columns, that should be fitted is non-numeric.
         """
         # Transformer has not been fitted yet
-        if self._wrapped_transformer is None or self._column_names is None:
+        if self._wrapped_transformer is None or self._selector is None:
             raise NotFittedError(kind="transformer")
 
         if table.row_count == 0:
             raise ValueError("The table cannot be transformed because it contains 0 rows")
 
         # Input table does not contain all columns used to fit the transformer
-        _check_columns_exist(table, self._column_names)
+        _check_columns_exist(table, self._selector)
 
-        for column in self._column_names:
+        for column in self._selector:
             if not table.get_column(column).type.is_numeric:
                 raise NonNumericColumnError(f"{column} is of type {table.get_column(column).type}.")
 
         new_data = self._wrapped_transformer.transform(
-            table.select_columns(self._column_names)._data_frame,
+            table.select_columns(self._selector)._data_frame,
         )
         return Table._from_polars_lazy_frame(
             table._lazy_frame.update(new_data.lazy()),
