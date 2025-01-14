@@ -21,7 +21,7 @@ class KNearestNeighborsImputer(TableTransformer):
     ----------
     neighbor_count:
         The number of neighbors to consider when imputing missing values.
-    column_names:
+    selector:
         The list of columns used to impute missing values. If 'None', all columns are used.
     value_to_replace:
         The placeholder for the missing values. All occurrences of`missing_values` will be imputed.
@@ -35,10 +35,10 @@ class KNearestNeighborsImputer(TableTransformer):
         self,
         neighbor_count: int,
         *,
-        column_names: str | list[str] | None = None,
+        selector: str | list[str] | None = None,
         value_to_replace: float | str | None = None,
     ) -> None:
-        super().__init__(column_names)
+        super().__init__(selector)
 
         _check_bounds(name="neighbor_count", actual=neighbor_count, lower_bound=_ClosedBound(1))
 
@@ -106,10 +106,10 @@ class KNearestNeighborsImputer(TableTransformer):
         if table.row_count == 0:
             raise ValueError("The KNearestNeighborsImputer cannot be fitted because the table contains 0 rows.")
 
-        if self._column_names is None:
+        if self._selector is None:
             column_names = table.column_names
         else:
-            column_names = self._column_names
+            column_names = self._selector
             _check_columns_exist(table, column_names)
 
         value_to_replace = self._value_to_replace
@@ -125,7 +125,7 @@ class KNearestNeighborsImputer(TableTransformer):
             table.select_columns(column_names)._data_frame,
         )
 
-        result = KNearestNeighborsImputer(self._neighbor_count, column_names=column_names)
+        result = KNearestNeighborsImputer(self._neighbor_count, selector=column_names)
         result._wrapped_transformer = wrapped_transformer
 
         return result
@@ -153,13 +153,13 @@ class KNearestNeighborsImputer(TableTransformer):
         ColumnNotFoundError
             If one of the columns, that should be transformed is not in the table.
         """
-        if self._column_names is None or self._wrapped_transformer is None:
+        if self._selector is None or self._wrapped_transformer is None:
             raise NotFittedError(kind="transformer")
 
-        _check_columns_exist(table, self._column_names)
+        _check_columns_exist(table, self._selector)
 
         new_data = self._wrapped_transformer.transform(
-            table.select_columns(self._column_names)._data_frame,
+            table.select_columns(self._selector)._data_frame,
         )
 
         return Table._from_polars_lazy_frame(

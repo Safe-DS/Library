@@ -756,7 +756,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         label_dict: dict[str, str] = config.id2label
         column_name = "label"
         labels_table = Table({column_name: [label for _, label in label_dict.items()]})
-        one_hot_encoder = OneHotEncoder(column_names=[column_name]).fit(labels_table)
+        one_hot_encoder = OneHotEncoder(selector=[column_name]).fit(labels_table)
 
         in_conversion = InputConversionImageToColumn(input_size)
 

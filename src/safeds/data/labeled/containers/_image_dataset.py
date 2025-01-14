@@ -448,7 +448,7 @@ class _ColumnAsTensor:
             )
             # TODO: should not one-hot-encode the target. label encoding without order is sufficient. should also not
             #  be done automatically?
-            self._one_hot_encoder = OneHotEncoder(column_names=self._column_name).fit(column_as_table)
+            self._one_hot_encoder = OneHotEncoder(selector=self._column_name).fit(column_as_table)
         self._tensor = torch.Tensor(
             self._one_hot_encoder.transform(column_as_table)._data_frame.to_torch(dtype=pl.Float32),
         ).to(_get_device())

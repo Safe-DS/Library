@@ -23,7 +23,7 @@ class RangeScaler(InvertibleTableTransformer):
         The minimum of the new range after the transformation
     max_:
         The maximum of the new range after the transformation
-    column_names:
+    selector:
         The list of columns used to fit the transformer. If `None`, all numeric columns are used.
 
     Raises
@@ -36,8 +36,8 @@ class RangeScaler(InvertibleTableTransformer):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, *, column_names: str | list[str] | None = None, min_: float = 0.0, max_: float = 1.0) -> None:
-        super().__init__(column_names)
+    def __init__(self, *, selector: str | list[str] | None = None, min_: float = 0.0, max_: float = 1.0) -> None:
+        super().__init__(selector)
 
         if min_ >= max_:
             raise ValueError('Parameter "max_" must be greater than parameter "min_".')
@@ -106,10 +106,10 @@ class RangeScaler(InvertibleTableTransformer):
         ValueError
             If the table contains 0 rows.
         """
-        if self._column_names is None:
+        if self._selector is None:
             column_names = [name for name in table.column_names if table.get_column_type(name).is_numeric]
         else:
-            column_names = self._column_names
+            column_names = self._selector
             _check_columns_exist(table, column_names)
             _check_columns_are_numeric(table, column_names, operation="fit a RangeScaler")
 
@@ -121,7 +121,7 @@ class RangeScaler(InvertibleTableTransformer):
         _data_max = table._lazy_frame.select(column_names).max().collect()
 
         # Create a copy with the learned transformation
-        result = RangeScaler(min_=self._min, max_=self._max, column_names=column_names)
+        result = RangeScaler(min_=self._min, max_=self._max, selector=column_names)
         result._data_min = _data_min
         result._data_max = _data_max
 
@@ -155,11 +155,11 @@ class RangeScaler(InvertibleTableTransformer):
         import polars as pl
 
         # Used in favor of is_fitted, so the type checker is happy
-        if self._column_names is None or self._data_min is None or self._data_max is None:
+        if self._selector is None or self._data_min is None or self._data_max is None:
             raise NotFittedError(kind="transformer")
 
-        _check_columns_exist(table, self._column_names)
-        _check_columns_are_numeric(table, self._column_names, operation="transform with a RangeScaler")
+        _check_columns_exist(table, self._selector)
+        _check_columns_are_numeric(table, self._selector, operation="transform with a RangeScaler")
 
         columns = [
             (
@@ -168,7 +168,7 @@ class RangeScaler(InvertibleTableTransformer):
                 * (self._max - self._min)
                 + self._min
             )
-            for name in self._column_names
+            for name in self._selector
         ]
 
         return Table._from_polars_lazy_frame(
@@ -203,13 +203,13 @@ class RangeScaler(InvertibleTableTransformer):
         import polars as pl
 
         # Used in favor of is_fitted, so the type checker is happy
-        if self._column_names is None or self._data_min is None or self._data_max is None:
+        if self._selector is None or self._data_min is None or self._data_max is None:
             raise NotFittedError(kind="transformer")
 
-        _check_columns_exist(transformed_table, self._column_names)
+        _check_columns_exist(transformed_table, self._selector)
         _check_columns_are_numeric(
             transformed_table,
-            self._column_names,
+            self._selector,
             operation="inverse-transform with a RangeScaler",
         )
 
@@ -220,7 +220,7 @@ class RangeScaler(InvertibleTableTransformer):
                 * (self._data_max.get_column(name) - self._data_min.get_column(name))
                 + self._data_min.get_column(name)
             )
-            for name in self._column_names
+            for name in self._selector
         ]
 
         return Table._from_polars_lazy_frame(

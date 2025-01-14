@@ -30,7 +30,7 @@ def test_forward_model(device: Device) -> None:
     table_2 = table_2.add_columns([(table_1.slice_rows(start=14)).get_column("value").rename("target")])
     train_table, test_table = table_2.split_rows(0.8)
 
-    ss = StandardScaler(column_names="value")
+    ss = StandardScaler(selector="value")
     _, train_table = ss.fit_and_transform(train_table)
     _, test_table = ss.fit_and_transform(test_table)
     model = NeuralNetworkRegressor(

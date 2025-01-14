@@ -15,11 +15,11 @@ class TestFit:
         )
 
         with pytest.raises(ColumnNotFoundError):
-            RobustScaler(column_names=["col2", "col3"]).fit(table)
+            RobustScaler(selector=["col2", "col3"]).fit(table)
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
         with pytest.raises(ColumnTypeError):
-            RobustScaler(column_names=["col1", "col2"]).fit(
+            RobustScaler(selector=["col1", "col2"]).fit(
                 Table({"col1": ["one", "two", "apple"], "col2": ["three", "four", "banana"]}),
             )
 
@@ -37,7 +37,7 @@ class TestFit:
         transformer = RobustScaler()
         transformer.fit(table)
 
-        assert transformer._column_names is None
+        assert transformer._selector is None
         assert transformer._data_median is None
         assert transformer._data_scale is None
 
@@ -99,7 +99,7 @@ class TestTransform:
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
         with pytest.raises(ColumnTypeError):
-            RobustScaler(column_names=["col1", "col2"]).fit(Table({"col1": [1, 2, 3], "col2": [2, 3, 4]})).transform(
+            RobustScaler(selector=["col1", "col2"]).fit(Table({"col1": [1, 2, 3], "col2": [2, 3, 4]})).transform(
                 Table({"col1": ["a", "b", "c"], "col2": ["b", "c", "e"]}),
             )
 
@@ -149,7 +149,7 @@ class TestFitAndTransform:
         column_names: list[str] | None,
         expected: Table,
     ) -> None:
-        fitted_transformer, transformed_table = RobustScaler(column_names=column_names).fit_and_transform(table)
+        fitted_transformer, transformed_table = RobustScaler(selector=column_names).fit_and_transform(table)
         assert fitted_transformer.is_fitted
         assert_tables_are_equal(transformed_table, expected)
 
@@ -221,7 +221,7 @@ class TestInverseTransform:
 
     def test_should_raise_if_column_not_found(self) -> None:
         with pytest.raises(ColumnNotFoundError):
-            RobustScaler(column_names=["col1", "col2"]).fit(
+            RobustScaler(selector=["col1", "col2"]).fit(
                 Table({"col1": [1, 2, 3, 4], "col2": [2, 3, 4, 5]}),
             ).inverse_transform(
                 Table({"col3": [0, 1, 2, 3]}),
@@ -229,7 +229,7 @@ class TestInverseTransform:
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
         with pytest.raises(ColumnTypeError):
-            RobustScaler(column_names=["col1", "col2"]).fit(
+            RobustScaler(selector=["col1", "col2"]).fit(
                 Table({"col1": [1, 2, 3, 4], "col2": [2, 3, 4, 5]}),
             ).inverse_transform(
                 Table({"col1": ["one", "two", "apple"], "col2": ["three", "four", "banana"]}),

@@ -21,7 +21,7 @@ class RobustScaler(InvertibleTableTransformer):
 
     Parameters
     ----------
-    column_names:
+    selector:
         The list of columns used to fit the transformer. If `None`, all numeric columns are used.
     """
 
@@ -29,8 +29,8 @@ class RobustScaler(InvertibleTableTransformer):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, *, column_names: str | list[str] | None = None) -> None:
-        super().__init__(column_names)
+    def __init__(self, *, selector: str | list[str] | None = None) -> None:
+        super().__init__(selector)
 
         # Internal state
         self._data_median: pl.DataFrame | None = None
@@ -80,10 +80,10 @@ class RobustScaler(InvertibleTableTransformer):
         """
         import polars as pl
 
-        if self._column_names is None:
+        if self._selector is None:
             column_names = [name for name in table.column_names if table.get_column_type(name).is_numeric]
         else:
-            column_names = self._column_names
+            column_names = self._selector
             _check_columns_exist(table, column_names)
             _check_columns_are_numeric(table, column_names, operation="fit a RobustScaler")
 
@@ -102,7 +102,7 @@ class RobustScaler(InvertibleTableTransformer):
             )
 
         # Create a copy with the learned transformation
-        result = RobustScaler(column_names=column_names)
+        result = RobustScaler(selector=column_names)
         result._data_median = _data_median
         result._data_scale = _data_scale
 
@@ -136,15 +136,15 @@ class RobustScaler(InvertibleTableTransformer):
         import polars as pl
 
         # Used in favor of is_fitted, so the type checker is happy
-        if self._column_names is None or self._data_median is None or self._data_scale is None:
+        if self._selector is None or self._data_median is None or self._data_scale is None:
             raise NotFittedError(kind="transformer")
 
-        _check_columns_exist(table, self._column_names)
-        _check_columns_are_numeric(table, self._column_names, operation="transform with a RobustScaler")
+        _check_columns_exist(table, self._selector)
+        _check_columns_are_numeric(table, self._selector, operation="transform with a RobustScaler")
 
         columns = [
             (pl.col(name) - self._data_median.get_column(name)) / self._data_scale.get_column(name)
-            for name in self._column_names
+            for name in self._selector
         ]
 
         return Table._from_polars_lazy_frame(
@@ -179,19 +179,19 @@ class RobustScaler(InvertibleTableTransformer):
         import polars as pl
 
         # Used in favor of is_fitted, so the type checker is happy
-        if self._column_names is None or self._data_median is None or self._data_scale is None:
+        if self._selector is None or self._data_median is None or self._data_scale is None:
             raise NotFittedError(kind="transformer")
 
-        _check_columns_exist(transformed_table, self._column_names)
+        _check_columns_exist(transformed_table, self._selector)
         _check_columns_are_numeric(
             transformed_table,
-            self._column_names,
+            self._selector,
             operation="inverse-transform with a RobustScaler",
         )
 
         columns = [
             pl.col(name) * self._data_scale.get_column(name) + self._data_median.get_column(name)
-            for name in self._column_names
+            for name in self._selector
         ]
 
         return Table._from_polars_lazy_frame(
