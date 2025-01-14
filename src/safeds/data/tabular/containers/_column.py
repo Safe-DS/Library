@@ -129,12 +129,6 @@ class Column(Sequence[T_co]):
         if isinstance(index, int):
             return self.get_value(index)
         else:
-            start = index.start or 0
-            stop = index.stop or self.row_count
-            step = index.step or 1
-
-            if start < 0 or stop < 0 or step < 0:
-                raise IndexError("Negative values for start/stop/step of slices are not supported.")
             return self._from_polars_series(self._series.__getitem__(index))
 
     def __hash__(self) -> int:
@@ -283,7 +277,7 @@ class Column(Sequence[T_co]):
 
     def get_value(self, index: int) -> T_co:
         """
-        Return the column value at specified index. Equivalent to the `[]` operator (indexed access).
+        Return the column value at specified index. This is equivalent to the `[]` operator (indexed access).
 
         Nonnegative indices are counted from the beginning (starting at 0), negative indices from the end (starting at
         -1).
