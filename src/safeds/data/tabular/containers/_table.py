@@ -596,8 +596,8 @@ class Table:
         - [add_columns][safeds.data.tabular.containers._table.Table.add_columns]:
             Add column objects to the table.
         - [add_index_column][safeds.data.tabular.containers._table.Table.add_index_column]
-        - [transform_column][safeds.data.tabular.containers._table.Table.transform_column]:
-            Transform an existing column with a custom function.
+        - [transform_columns][safeds.data.tabular.containers._table.Table.transform_columns]:
+            Transform existing columns with a custom function.
         """
         _check_columns_dont_exist(self, name)
 
@@ -1179,22 +1179,23 @@ class Table:
                 self._lazy_frame.select(selector),
             )
 
-    def transform_column(
+    def transform_columns(
         self,
-        name: str,
-        transformer: Callable[[Cell], Cell],
+        selector: str | list[str],
+        transformer: Callable[[Cell], Cell] | Callable[[Cell, Row], Cell],
     ) -> Table:
         """
-        Transform a column with a custom function and return the result as a new table.
+        Transform columns with a custom function and return the result as a new table.
 
         **Note:** The original table is not modified.
 
         Parameters
         ----------
-        name:
-            The name of the column to transform.
+        selector:
+            The names of the columns to transform.
         transformer:
-            The function that computes the new values of the column.
+            The function that computes the new values. It may take either a single cell or a cell and the entire row as
+            arguments (see examples).
 
         Returns
         -------
@@ -1210,7 +1211,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
-        >>> table.transform_column("a", lambda cell: cell + 1)
+        >>> table.transform_columns("a", lambda cell: cell + 1)
         +-----+-----+
         |   a |   b |
         | --- | --- |
@@ -1221,6 +1222,28 @@ class Table:
         |   4 |   6 |
         +-----+-----+
 
+        >>> table.transform_columns(["a", "b"], lambda cell: cell + 1)
+        +-----+-----+
+        |   a |   b |
+        | --- | --- |
+        | i64 | i64 |
+        +===========+
+        |   2 |   5 |
+        |   3 |   6 |
+        |   4 |   7 |
+        +-----+-----+
+
+        >>> table.transform_columns("a", lambda cell, row: cell + row["b"])
+        +-----+-----+
+        |   a |   b |
+        | --- | --- |
+        | i64 | i64 |
+        +===========+
+        |   5 |   4 |
+        |   7 |   5 |
+        |   9 |   6 |
+        +-----+-----+
+
         Related
         -------
         - [add_computed_column][safeds.data.tabular.containers._table.Table.add_computed_column]:
@@ -1228,14 +1251,34 @@ class Table:
         - [transform_table][safeds.data.tabular.containers._table.Table.transform_table]:
             Transform the entire table with a fitted transformer.
         """
-        _check_columns_exist(self, name)
-
         import polars as pl
 
-        expression = transformer(_LazyCell(pl.col(name)))
+        _check_columns_exist(self, selector)
+
+        if isinstance(selector, str):
+            selector = [selector]
+
+        parameter_count = transformer.__code__.co_argcount
+        if parameter_count == 1:
+            # Transformer only takes a cell
+            expressions = [
+                transformer(  # type: ignore[call-arg]
+                    _LazyCell(pl.col(name)),
+                )._polars_expression.alias(name)
+                for name in selector
+            ]
+        else:
+            # Transformer takes a cell and the entire row
+            expressions = [
+                transformer(  # type: ignore[call-arg]
+                    _LazyCell(pl.col(name)),
+                    _LazyVectorizedRow(self),
+                )._polars_expression.alias(name)
+                for name in selector
+            ]
 
         return Table._from_polars_lazy_frame(
-            self._lazy_frame.with_columns(expression._polars_expression.alias(name)),
+            self._lazy_frame.with_columns(*expressions),
         )
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -2384,8 +2427,8 @@ class Table:
         -------
         - [inverse_transform_table][safeds.data.tabular.containers._table.Table.inverse_transform_table]:
             Inverse-transform the table with a fitted, invertible transformer.
-        - [transform_column][safeds.data.tabular.containers._table.Table.transform_column]:
-            Transform a single column with a custom function.
+        - [transform_columns][safeds.data.tabular.containers._table.Table.transform_columns]:
+            Transform columns with a custom function.
         """
         return fitted_transformer.transform(self)
 
