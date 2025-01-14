@@ -18,6 +18,8 @@ if TYPE_CHECKING:
         ([1, 2, 1], True, [1, 2]),
         ([1, 2, 3, None], True, [1, 2, 3]),
         ([1, 2, 3, None], False, [1, 2, 3, None]),
+        ([None], True, []),
+        ([None], False, [None]),
     ],
     ids=[
         "empty",
@@ -25,6 +27,8 @@ if TYPE_CHECKING:
         "some duplicate",
         "with missing values (ignored)",
         "with missing values (not ignored)",
+        "only missing values (ignored)",
+        "only missing values (not ignored)",
     ],
 )
 def test_should_get_distinct_values(values: list[Any], ignore_missing_values: bool, expected: list[Any]) -> None:
