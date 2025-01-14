@@ -199,6 +199,25 @@ class _LazyCell(Cell[T]):
         return _LazyTemporalCell(self._expression)
 
     # ------------------------------------------------------------------------------------------------------------------
+    # Comparison operations
+    # ------------------------------------------------------------------------------------------------------------------
+    def eq(self, other: _ConvertibleToCell, *, propagate_missing_values: bool = True) -> _BooleanCell:
+        other = _unwrap(other)
+
+        if propagate_missing_values:
+            return _wrap(self._expression.eq(other))
+        else:
+            return _wrap(self._expression.eq_missing(other))
+
+    def neq(self, other: _ConvertibleToCell, *, propagate_missing_values: bool = True) -> _BooleanCell:
+        other = _unwrap(other)
+
+        if propagate_missing_values:
+            return _wrap(self._expression.ne(other))
+        else:
+            return _wrap(self._expression.ne_missing(other))
+
+    # ------------------------------------------------------------------------------------------------------------------
     # Other
     # ------------------------------------------------------------------------------------------------------------------
 

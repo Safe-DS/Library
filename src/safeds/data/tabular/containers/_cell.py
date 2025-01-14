@@ -818,9 +818,23 @@ class Cell(ABC, Generic[T_co]):
     # Comparison operations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def eq(self, other: _ConvertibleToCell) -> _BooleanCell:
+    @abstractmethod
+    def eq(
+        self,
+        other: _ConvertibleToCell,
+        *,
+        propagate_missing_values: bool = True,
+    ) -> _BooleanCell:
         """
         Check if equal to a value. The default behavior is equivalent to the `==` operator.
+
+        Missing values (indicated by `None`) are handled as follows:
+
+        - If `propagate_missing_values` is `True` (default), the result will be a missing value if either the cell or
+          the other value is a missing value. Here, `None == None` is `None`. The intuition is that we do not know the
+          result of the comparison if we do not know the values, which is consistent with the other cell operations.
+        - If `propagate_missing_values` is `False`, `None` will be treated as a regular value. Here, `None == None`
+          is `True`. This behavior is useful, if you want to work with missing values, e.g. to filter them out.
 
         Examples
         --------
@@ -847,12 +861,43 @@ class Cell(ABC, Generic[T_co]):
         | true  |
         | null  |
         +-------+
-        """
-        return self.__eq__(other)
 
-    def neq(self, other: _ConvertibleToCell) -> _BooleanCell:
+        >>> column.transform(lambda cell: cell.eq(2, propagate_missing_values=False))
+        +-------+
+        | a     |
+        | ---   |
+        | bool  |
+        +=======+
+        | false |
+        | true  |
+        | false |
+        +-------+
+        """
+
+    @abstractmethod
+    def neq(
+        self,
+        other: _ConvertibleToCell,
+        *,
+        propagate_missing_values: bool = True,
+    ) -> _BooleanCell:
         """
         Check if not equal to a value. The default behavior is equivalent to the `!=` operator.
+
+        Missing values (indicated by `None`) are handled as follows:
+
+        - If `propagate_missing_values` is `True` (default), the result will be a missing value if either the cell or
+          the other value is a missing value. Here, `None != None` is `None`. The intuition is that we do not know the
+          result of the comparison if we do not know the values, which is consistent with the other cell operations.
+        - If `propagate_missing_values` is `False`, `None` will be treated as a regular value. Here, `None != None`
+          is `False`. This behavior is useful, if you want to work with missing values, e.g. to filter them out.
+
+        Parameters
+        ----------
+        other:
+            The value to compare to.
+        propagate_missing_values:
+            Whether to propagate missing values.
 
         Examples
         --------
@@ -879,8 +924,18 @@ class Cell(ABC, Generic[T_co]):
         | false |
         | null  |
         +-------+
+
+        >>> column.transform(lambda cell: cell.neq(2, propagate_missing_values=False))
+        +-------+
+        | a     |
+        | ---   |
+        | bool  |
+        +=======+
+        | true  |
+        | false |
+        | true  |
+        +-------+
         """
-        return self.__ne__(other)
 
     def ge(self, other: _ConvertibleToCell) -> _BooleanCell:
         """
