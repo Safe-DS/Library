@@ -820,12 +820,12 @@ class Cell(ABC, Generic[T_co]):
 
     def eq(self, other: _ConvertibleToCell) -> _BooleanCell:
         """
-        Check if equal to a value. This is equivalent to the `==` operator.
+        Check if equal to a value. The default behavior is equivalent to the `==` operator.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [1, 2])
+        >>> column = Column("a", [1, 2, None])
         >>> column.transform(lambda cell: cell.eq(2))
         +-------+
         | a     |
@@ -834,6 +834,7 @@ class Cell(ABC, Generic[T_co]):
         +=======+
         | false |
         | true  |
+        | null  |
         +-------+
 
         >>> column.transform(lambda cell: cell == 2)
@@ -844,18 +845,19 @@ class Cell(ABC, Generic[T_co]):
         +=======+
         | false |
         | true  |
+        | null  |
         +-------+
         """
         return self.__eq__(other)
 
     def neq(self, other: _ConvertibleToCell) -> _BooleanCell:
         """
-        Check if not equal to a value. This is equivalent to the `!=` operator.
+        Check if not equal to a value. The default behavior is equivalent to the `!=` operator.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [1, 2])
+        >>> column = Column("a", [1, 2, None])
         >>> column.transform(lambda cell: cell.neq(2))
         +-------+
         | a     |
@@ -864,6 +866,7 @@ class Cell(ABC, Generic[T_co]):
         +=======+
         | true  |
         | false |
+        | null  |
         +-------+
 
         >>> column.transform(lambda cell: cell != 2)
@@ -874,6 +877,7 @@ class Cell(ABC, Generic[T_co]):
         +=======+
         | true  |
         | false |
+        | null  |
         +-------+
         """
         return self.__ne__(other)
@@ -885,7 +889,7 @@ class Cell(ABC, Generic[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [1, 2])
+        >>> column = Column("a", [1, 2, None])
         >>> column.transform(lambda cell: cell.ge(2))
         +-------+
         | a     |
@@ -894,6 +898,7 @@ class Cell(ABC, Generic[T_co]):
         +=======+
         | false |
         | true  |
+        | null  |
         +-------+
 
         >>> column.transform(lambda cell: cell >= 2)
@@ -904,6 +909,7 @@ class Cell(ABC, Generic[T_co]):
         +=======+
         | false |
         | true  |
+        | null  |
         +-------+
         """
         return self.__ge__(other)
@@ -915,7 +921,7 @@ class Cell(ABC, Generic[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [1, 2])
+        >>> column = Column("a", [1, 2, None])
         >>> column.transform(lambda cell: cell.gt(2))
         +-------+
         | a     |
@@ -924,6 +930,7 @@ class Cell(ABC, Generic[T_co]):
         +=======+
         | false |
         | false |
+        | null  |
         +-------+
 
         >>> column.transform(lambda cell: cell > 2)
@@ -934,6 +941,7 @@ class Cell(ABC, Generic[T_co]):
         +=======+
         | false |
         | false |
+        | null  |
         +-------+
         """
         return self.__gt__(other)
@@ -945,7 +953,7 @@ class Cell(ABC, Generic[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [1, 2])
+        >>> column = Column("a", [1, 2, None])
         >>> column.transform(lambda cell: cell.le(2))
         +------+
         | a    |
@@ -954,6 +962,7 @@ class Cell(ABC, Generic[T_co]):
         +======+
         | true |
         | true |
+        | null |
         +------+
 
         >>> column.transform(lambda cell: cell <= 2)
@@ -964,6 +973,7 @@ class Cell(ABC, Generic[T_co]):
         +======+
         | true |
         | true |
+        | null |
         +------+
         """
         return self.__le__(other)

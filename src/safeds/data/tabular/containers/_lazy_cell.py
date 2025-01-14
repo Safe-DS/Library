@@ -67,7 +67,7 @@ class _LazyCell(Cell[T]):
 
     def __eq__(self, other: _ConvertibleToCell) -> _BooleanCell:  # type: ignore[override]
         other = _unwrap(other)
-        return _wrap(self._expression.eq_missing(other))
+        return _wrap(self._expression.__eq__(other))
 
     def __ge__(self, other: _ConvertibleToCell) -> _BooleanCell:
         other = _unwrap(other)
@@ -87,7 +87,7 @@ class _LazyCell(Cell[T]):
 
     def __ne__(self, other: _ConvertibleToCell) -> _BooleanCell:  # type: ignore[override]
         other = _unwrap(other)
-        return _wrap(self._expression.ne_missing(other))
+        return _wrap(self._expression.__ne__(other))
 
     # Numeric operators --------------------------------------------------------
 
