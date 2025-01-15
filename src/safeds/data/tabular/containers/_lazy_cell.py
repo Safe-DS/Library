@@ -9,11 +9,9 @@ from ._cell import Cell, _unwrap
 if TYPE_CHECKING:
     import polars as pl
 
-    from safeds._typing import _BooleanCell, _ConvertibleToBooleanCell, _ConvertibleToCell
+    from safeds._typing import _ConvertibleToBooleanCell, _ConvertibleToCell
+    from safeds.data.tabular.query import StringCell, TemporalCell
     from safeds.data.tabular.typing import ColumnType
-
-    from ._string_cell import StringCell
-    from ._temporal_cell import TemporalCell
 
 T = TypeVar("T")
 
@@ -34,58 +32,58 @@ class _LazyCell(Cell[T]):
 
     # "Boolean" operators (actually bitwise) -----------------------------------
 
-    def __invert__(self) -> _BooleanCell:
+    def __invert__(self) -> Cell[bool | None]:
         import polars as pl
 
         return _wrap(self._expression.cast(pl.Boolean).__invert__())
 
-    def __and__(self, other: _ConvertibleToBooleanCell) -> _BooleanCell:
+    def __and__(self, other: _ConvertibleToBooleanCell) -> Cell[bool | None]:
         other = _unwrap(other)
         return _wrap(self._expression.__and__(other))
 
-    def __rand__(self, other: _ConvertibleToBooleanCell) -> _BooleanCell:
+    def __rand__(self, other: _ConvertibleToBooleanCell) -> Cell[bool | None]:
         other = _unwrap(other)
         return _wrap(self._expression.__rand__(other))
 
-    def __or__(self, other: _ConvertibleToBooleanCell) -> _BooleanCell:
+    def __or__(self, other: _ConvertibleToBooleanCell) -> Cell[bool | None]:
         other = _unwrap(other)
         return _wrap(self._expression.__or__(other))
 
-    def __ror__(self, other: _ConvertibleToBooleanCell) -> _BooleanCell:
+    def __ror__(self, other: _ConvertibleToBooleanCell) -> Cell[bool | None]:
         other = _unwrap(other)
         return _wrap(self._expression.__ror__(other))
 
-    def __xor__(self, other: _ConvertibleToBooleanCell) -> _BooleanCell:
+    def __xor__(self, other: _ConvertibleToBooleanCell) -> Cell[bool | None]:
         other = _unwrap(other)
         return _wrap(self._expression.__xor__(other))
 
-    def __rxor__(self, other: _ConvertibleToBooleanCell) -> _BooleanCell:
+    def __rxor__(self, other: _ConvertibleToBooleanCell) -> Cell[bool | None]:
         other = _unwrap(other)
         return _wrap(self._expression.__rxor__(other))
 
     # Comparison ---------------------------------------------------------------
 
-    def __eq__(self, other: _ConvertibleToCell) -> _BooleanCell:  # type: ignore[override]
+    def __eq__(self, other: _ConvertibleToCell) -> Cell[bool | None]:  # type: ignore[override]
         other = _unwrap(other)
         return _wrap(self._expression.__eq__(other))
 
-    def __ge__(self, other: _ConvertibleToCell) -> _BooleanCell:
+    def __ge__(self, other: _ConvertibleToCell) -> Cell[bool | None]:
         other = _unwrap(other)
         return _wrap(self._expression.__ge__(other))
 
-    def __gt__(self, other: _ConvertibleToCell) -> _BooleanCell:
+    def __gt__(self, other: _ConvertibleToCell) -> Cell[bool | None]:
         other = _unwrap(other)
         return _wrap(self._expression.__gt__(other))
 
-    def __le__(self, other: _ConvertibleToCell) -> _BooleanCell:
+    def __le__(self, other: _ConvertibleToCell) -> Cell[bool | None]:
         other = _unwrap(other)
         return _wrap(self._expression.__le__(other))
 
-    def __lt__(self, other: _ConvertibleToCell) -> _BooleanCell:
+    def __lt__(self, other: _ConvertibleToCell) -> Cell[bool | None]:
         other = _unwrap(other)
         return _wrap(self._expression.__lt__(other))
 
-    def __ne__(self, other: _ConvertibleToCell) -> _BooleanCell:  # type: ignore[override]
+    def __ne__(self, other: _ConvertibleToCell) -> Cell[bool | None]:  # type: ignore[override]
         other = _unwrap(other)
         return _wrap(self._expression.__ne__(other))
 
@@ -182,20 +180,20 @@ class _LazyCell(Cell[T]):
 
     @property
     def str(self) -> StringCell:
-        from ._lazy_string_cell import _LazyStringCell  # circular import
+        from safeds.data.tabular.query._lazy_string_cell import _LazyStringCell  # circular import
 
         return _LazyStringCell(self._expression)
 
     @property
     def dt(self) -> TemporalCell:
-        from ._lazy_temporal_cell import _LazyTemporalCell  # circular import
+        from safeds.data.tabular.query._lazy_temporal_cell import _LazyTemporalCell  # circular import
 
         return _LazyTemporalCell(self._expression)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Comparison operations
     # ------------------------------------------------------------------------------------------------------------------
-    def eq(self, other: _ConvertibleToCell, *, propagate_missing_values: bool = True) -> _BooleanCell:
+    def eq(self, other: _ConvertibleToCell, *, propagate_missing_values: bool = True) -> Cell[bool | None]:
         other = _unwrap(other)
 
         if propagate_missing_values:
@@ -203,7 +201,7 @@ class _LazyCell(Cell[T]):
         else:
             return _wrap(self._expression.eq_missing(other))
 
-    def neq(self, other: _ConvertibleToCell, *, propagate_missing_values: bool = True) -> _BooleanCell:
+    def neq(self, other: _ConvertibleToCell, *, propagate_missing_values: bool = True) -> Cell[bool | None]:
         other = _unwrap(other)
 
         if propagate_missing_values:

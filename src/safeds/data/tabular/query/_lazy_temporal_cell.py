@@ -3,14 +3,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-
-from ._lazy_cell import _LazyCell
-from ._temporal_cell import TemporalCell
+from safeds.data.tabular.containers._lazy_cell import _LazyCell
+from safeds.data.tabular.query._temporal_cell import TemporalCell
 
 if TYPE_CHECKING:
     import polars as pl
 
-    from ._cell import Cell
+    from safeds.data.tabular.containers._cell import Cell
 
 
 class _LazyTemporalCell(TemporalCell):
@@ -31,30 +30,30 @@ class _LazyTemporalCell(TemporalCell):
     # Temporal operations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def century(self) -> Cell[int]:
+    def century(self) -> Cell[int | None]:
         return _LazyCell(self._expression.dt.century())
 
-    def weekday(self) -> Cell[int]:
+    def weekday(self) -> Cell[int | None]:
         return _LazyCell(self._expression.dt.weekday())
 
-    def week(self) -> Cell[int]:
+    def week(self) -> Cell[int | None]:
         return _LazyCell(self._expression.dt.week())
 
-    def year(self) -> Cell[int]:
+    def year(self) -> Cell[int | None]:
         return _LazyCell(self._expression.dt.year())
 
-    def month(self) -> Cell[int]:
+    def month(self) -> Cell[int | None]:
         return _LazyCell(self._expression.dt.month())
 
-    def day(self) -> Cell[int]:
+    def day(self) -> Cell[int | None]:
         return _LazyCell(self._expression.dt.day())
 
-    def datetime_to_string(self, format_string: str = "%Y/%m/%d %H:%M:%S") -> Cell[str]:
+    def datetime_to_string(self, format_string: str = "%Y/%m/%d %H:%M:%S") -> Cell[str | None]:
         if not _check_format_string(format_string):
             raise ValueError("Invalid format string")
         return _LazyCell(self._expression.dt.to_string(format=format_string))
 
-    def date_to_string(self, format_string: str = "%F") -> Cell[str]:
+    def date_to_string(self, format_string: str = "%F") -> Cell[str | None]:
         if not _check_format_string(format_string):
             # Fehler in _check_format_string
             raise ValueError("Invalid format string")
@@ -69,7 +68,7 @@ class _LazyTemporalCell(TemporalCell):
             return NotImplemented
         if self is other:
             return True
-        return self._expression.meta.eq(other._expression.meta)
+        return self._expression.meta.eq(other._expression)
 
 
 def _check_format_string(format_string: str) -> bool:

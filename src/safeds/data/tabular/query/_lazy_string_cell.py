@@ -4,16 +4,15 @@ from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _ClosedBound
-
-from ._lazy_cell import _LazyCell
-from ._string_cell import StringCell
+from safeds.data.tabular.containers._lazy_cell import _LazyCell
+from safeds.data.tabular.query._string_cell import StringCell
 
 if TYPE_CHECKING:
     import datetime
 
     import polars as pl
 
-    from ._cell import Cell
+    from safeds.data.tabular.containers._cell import Cell
 
 
 class _LazyStringCell(StringCell):
@@ -34,28 +33,28 @@ class _LazyStringCell(StringCell):
     # String operations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def contains(self, substring: str) -> Cell[bool]:
+    def contains(self, substring: str) -> Cell[bool | None]:
         return _LazyCell(self._expression.str.contains(substring, literal=True))
 
-    def length(self, optimize_for_ascii: bool = False) -> Cell[int]:
+    def length(self, optimize_for_ascii: bool = False) -> Cell[int | None]:
         if optimize_for_ascii:
             return _LazyCell(self._expression.str.len_bytes())
         else:
             return _LazyCell(self._expression.str.len_chars())
 
-    def ends_with(self, suffix: str) -> Cell[bool]:
+    def ends_with(self, suffix: str) -> Cell[bool | None]:
         return _LazyCell(self._expression.str.ends_with(suffix))
 
     def index_of(self, substring: str) -> Cell[int | None]:
         return _LazyCell(self._expression.str.find(substring, literal=True))
 
-    def replace(self, old: str, new: str) -> Cell[str]:
+    def replace(self, old: str, new: str) -> Cell[str | None]:
         return _LazyCell(self._expression.str.replace_all(old, new, literal=True))
 
-    def starts_with(self, prefix: str) -> Cell[bool]:
+    def starts_with(self, prefix: str) -> Cell[bool | None]:
         return _LazyCell(self._expression.str.starts_with(prefix))
 
-    def substring(self, start: int = 0, length: int | None = None) -> Cell[str]:
+    def substring(self, start: int = 0, length: int | None = None) -> Cell[str | None]:
         _check_bounds("length", length, lower_bound=_ClosedBound(0))
 
         return _LazyCell(self._expression.str.slice(start, length))
@@ -74,19 +73,19 @@ class _LazyStringCell(StringCell):
 
         return _LazyCell(self._expression.cast(pl.Float64, strict=False))
 
-    def to_lowercase(self) -> Cell[str]:
+    def to_lowercase(self) -> Cell[str | None]:
         return _LazyCell(self._expression.str.to_lowercase())
 
-    def to_uppercase(self) -> Cell[str]:
+    def to_uppercase(self) -> Cell[str | None]:
         return _LazyCell(self._expression.str.to_uppercase())
 
-    def trim(self) -> Cell[str]:
+    def trim(self) -> Cell[str | None]:
         return _LazyCell(self._expression.str.strip_chars())
 
-    def trim_end(self) -> Cell[str]:
+    def trim_end(self) -> Cell[str | None]:
         return _LazyCell(self._expression.str.strip_chars_end())
 
-    def trim_start(self) -> Cell[str]:
+    def trim_start(self) -> Cell[str | None]:
         return _LazyCell(self._expression.str.strip_chars_start())
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -98,4 +97,4 @@ class _LazyStringCell(StringCell):
             return NotImplemented
         if self is other:
             return True
-        return self._expression.meta.eq(other._expression.meta)
+        return self._expression.meta.eq(other._expression)

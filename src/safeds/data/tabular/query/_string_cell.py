@@ -8,6 +8,8 @@ if TYPE_CHECKING:
 
     from safeds.data.tabular.containers import Cell
 
+# TODO: examples with None
+
 
 class StringCell(ABC):
     """
@@ -32,7 +34,7 @@ class StringCell(ABC):
     """
 
     @abstractmethod
-    def contains(self, substring: str) -> Cell[bool]:
+    def contains(self, substring: str) -> Cell[bool | None]:
         """
         Check if the string value in the cell contains the substring.
 
@@ -55,7 +57,7 @@ class StringCell(ABC):
         """
 
     @abstractmethod
-    def ends_with(self, suffix: str) -> Cell[bool]:
+    def ends_with(self, suffix: str) -> Cell[bool | None]:
         """
         Check if the string value in the cell ends with the suffix.
 
@@ -109,7 +111,7 @@ class StringCell(ABC):
         """
 
     @abstractmethod
-    def length(self, *, optimize_for_ascii: bool = False) -> Cell[int]:
+    def length(self, *, optimize_for_ascii: bool = False) -> Cell[int | None]:
         """
         Get the number of characters of the string value in the cell.
 
@@ -141,7 +143,7 @@ class StringCell(ABC):
         """
 
     @abstractmethod
-    def replace(self, old: str, new: str) -> Cell[str]:
+    def replace(self, old: str, new: str) -> Cell[str | None]:
         """
         Replace occurrences of the old substring with the new substring in the string value in the cell.
 
@@ -174,7 +176,7 @@ class StringCell(ABC):
         """
 
     @abstractmethod
-    def starts_with(self, prefix: str) -> Cell[bool]:
+    def starts_with(self, prefix: str) -> Cell[bool | None]:
         """
         Check if the string value in the cell starts with the prefix.
 
@@ -197,7 +199,7 @@ class StringCell(ABC):
         """
 
     @abstractmethod
-    def substring(self, start: int = 0, length: int | None = None) -> Cell[str]:
+    def substring(self, start: int = 0, length: int | None = None) -> Cell[str | None]:
         """
         Get a substring of the string value in the cell.
 
@@ -360,7 +362,7 @@ class StringCell(ABC):
         """
 
     @abstractmethod
-    def to_lowercase(self) -> Cell[str]:
+    def to_lowercase(self) -> Cell[str | None]:
         """
         Convert the string value in the cell to lowercase.
 
@@ -386,7 +388,7 @@ class StringCell(ABC):
         """
 
     @abstractmethod
-    def to_uppercase(self) -> Cell[str]:
+    def to_uppercase(self) -> Cell[str | None]:
         """
         Convert the string value in the cell to uppercase.
 
@@ -412,7 +414,7 @@ class StringCell(ABC):
         """
 
     @abstractmethod
-    def trim(self) -> Cell[str]:
+    def trim(self) -> Cell[str | None]:
         """
         Remove whitespace from the start and end of the string value in the cell.
 
@@ -439,7 +441,7 @@ class StringCell(ABC):
         """
 
     @abstractmethod
-    def trim_end(self) -> Cell[str]:
+    def trim_end(self) -> Cell[str | None]:
         """
         Remove whitespace from the end of the string value in the cell.
 
@@ -466,7 +468,7 @@ class StringCell(ABC):
         """
 
     @abstractmethod
-    def trim_start(self) -> Cell[str]:
+    def trim_start(self) -> Cell[str | None]:
         """
         Remove whitespace from the start of the string value in the cell.
 

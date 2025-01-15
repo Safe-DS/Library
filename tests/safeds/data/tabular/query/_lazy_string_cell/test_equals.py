@@ -3,8 +3,9 @@ from typing import Any
 import polars as pl
 import pytest
 
-from safeds.data.tabular.containers import StringCell, Table
-from safeds.data.tabular.containers._lazy_string_cell import _LazyStringCell
+from safeds.data.tabular.containers import Table
+from safeds.data.tabular.query import StringCell
+from safeds.data.tabular.query._lazy_string_cell import _LazyStringCell
 
 
 @pytest.mark.parametrize(

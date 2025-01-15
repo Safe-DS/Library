@@ -7,6 +7,9 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import Cell
 
 
+# TODO: Examples with None
+
+
 class TemporalCell(ABC):
     """
     Namespace for operations on temporal data.
@@ -29,7 +32,7 @@ class TemporalCell(ABC):
     """
 
     @abstractmethod
-    def century(self) -> Cell[int]:
+    def century(self) -> Cell[int | None]:
         """
         Get the century of the underlying date(time) data.
 
@@ -53,7 +56,7 @@ class TemporalCell(ABC):
         """
 
     @abstractmethod
-    def weekday(self) -> Cell[int]:
+    def weekday(self) -> Cell[int | None]:
         """
         Get the weekday of the underlying date(time) data.
 
@@ -77,7 +80,7 @@ class TemporalCell(ABC):
         """
 
     @abstractmethod
-    def week(self) -> Cell[int]:
+    def week(self) -> Cell[int | None]:
         """
         Get the week of the underlying date(time) data.
 
@@ -101,7 +104,7 @@ class TemporalCell(ABC):
         """
 
     @abstractmethod
-    def year(self) -> Cell[int]:
+    def year(self) -> Cell[int | None]:
         """
         Get the year of the underlying date(time) data.
 
@@ -125,7 +128,7 @@ class TemporalCell(ABC):
         """
 
     @abstractmethod
-    def month(self) -> Cell[int]:
+    def month(self) -> Cell[int | None]:
         """
         Get the month of the underlying date(time) data.
 
@@ -149,7 +152,7 @@ class TemporalCell(ABC):
         """
 
     @abstractmethod
-    def day(self) -> Cell[int]:
+    def day(self) -> Cell[int | None]:
         """
         Get the day of the underlying date(time) data.
 
@@ -173,7 +176,7 @@ class TemporalCell(ABC):
         """
 
     @abstractmethod
-    def datetime_to_string(self, format_string: str = "%Y/%m/%d %H:%M:%S") -> Cell[str]:
+    def datetime_to_string(self, format_string: str = "%Y/%m/%d %H:%M:%S") -> Cell[str | None]:
         """
         Convert the date value in the cell to a string.
 
@@ -208,7 +211,7 @@ class TemporalCell(ABC):
         """
 
     @abstractmethod
-    def date_to_string(self, format_string: str = "%F") -> Cell[str]:
+    def date_to_string(self, format_string: str = "%F") -> Cell[str | None]:
         """
         Convert the date value in the cell to a string.
 

@@ -9,16 +9,14 @@ if TYPE_CHECKING:
     import polars as pl
 
     from safeds._typing import (
-        _BooleanCell,
         _ConvertibleToBooleanCell,
         _ConvertibleToCell,
         _ConvertibleToIntCell,
         _PythonLiteral,
     )
+    from safeds.data.tabular.query._string_cell import StringCell
+    from safeds.data.tabular.query._temporal_cell import TemporalCell
     from safeds.data.tabular.typing import ColumnType
-
-    from ._string_cell import StringCell
-    from ._temporal_cell import TemporalCell
 
 T_co = TypeVar("T_co", covariant=True)
 P = TypeVar("P")
@@ -400,46 +398,46 @@ class Cell(ABC, Generic[T_co]):
     # "Boolean" operators (actually bitwise) -----------------------------------
 
     @abstractmethod
-    def __invert__(self) -> _BooleanCell: ...
+    def __invert__(self) -> Cell[bool | None]: ...
 
     @abstractmethod
-    def __and__(self, other: _ConvertibleToBooleanCell) -> _BooleanCell: ...
+    def __and__(self, other: _ConvertibleToBooleanCell) -> Cell[bool | None]: ...
 
     @abstractmethod
-    def __rand__(self, other: _ConvertibleToBooleanCell) -> _BooleanCell: ...
+    def __rand__(self, other: _ConvertibleToBooleanCell) -> Cell[bool | None]: ...
 
     @abstractmethod
-    def __or__(self, other: _ConvertibleToBooleanCell) -> _BooleanCell: ...
+    def __or__(self, other: _ConvertibleToBooleanCell) -> Cell[bool | None]: ...
 
     @abstractmethod
-    def __ror__(self, other: _ConvertibleToBooleanCell) -> _BooleanCell: ...
+    def __ror__(self, other: _ConvertibleToBooleanCell) -> Cell[bool | None]: ...
 
     @abstractmethod
-    def __xor__(self, other: _ConvertibleToBooleanCell) -> _BooleanCell: ...
+    def __xor__(self, other: _ConvertibleToBooleanCell) -> Cell[bool | None]: ...
 
     @abstractmethod
-    def __rxor__(self, other: _ConvertibleToBooleanCell) -> _BooleanCell: ...
+    def __rxor__(self, other: _ConvertibleToBooleanCell) -> Cell[bool | None]: ...
 
     # Comparison ---------------------------------------------------------------
 
     @abstractmethod
-    def __eq__(self, other: _ConvertibleToCell) -> _BooleanCell:  # type: ignore[override]
+    def __eq__(self, other: _ConvertibleToCell) -> Cell[bool | None]:  # type: ignore[override]
         ...
 
     @abstractmethod
-    def __ge__(self, other: _ConvertibleToCell) -> _BooleanCell: ...
+    def __ge__(self, other: _ConvertibleToCell) -> Cell[bool | None]: ...
 
     @abstractmethod
-    def __gt__(self, other: _ConvertibleToCell) -> _BooleanCell: ...
+    def __gt__(self, other: _ConvertibleToCell) -> Cell[bool | None]: ...
 
     @abstractmethod
-    def __le__(self, other: _ConvertibleToCell) -> _BooleanCell: ...
+    def __le__(self, other: _ConvertibleToCell) -> Cell[bool | None]: ...
 
     @abstractmethod
-    def __lt__(self, other: _ConvertibleToCell) -> _BooleanCell: ...
+    def __lt__(self, other: _ConvertibleToCell) -> Cell[bool | None]: ...
 
     @abstractmethod
-    def __ne__(self, other: _ConvertibleToCell) -> _BooleanCell:  # type: ignore[override]
+    def __ne__(self, other: _ConvertibleToCell) -> Cell[bool | None]:  # type: ignore[override]
         ...
 
     # Numeric operators --------------------------------------------------------
@@ -566,7 +564,7 @@ class Cell(ABC, Generic[T_co]):
     # Boolean operations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def not_(self) -> _BooleanCell:
+    def not_(self) -> Cell[bool | None]:
         """
         Negate a boolean. This is equivalent to the `~` operator.
 
@@ -601,7 +599,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__invert__()
 
-    def and_(self, other: _ConvertibleToBooleanCell) -> _BooleanCell:
+    def and_(self, other: _ConvertibleToBooleanCell) -> Cell[bool | None]:
         """
         Perform a boolean AND operation. This is equivalent to the `&` operator.
 
@@ -636,7 +634,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__and__(other)
 
-    def or_(self, other: _ConvertibleToBooleanCell) -> _BooleanCell:
+    def or_(self, other: _ConvertibleToBooleanCell) -> Cell[bool | None]:
         """
         Perform a boolean OR operation. This is equivalent to the `|` operator.
 
@@ -670,7 +668,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__or__(other)
 
-    def xor(self, other: _ConvertibleToBooleanCell) -> _BooleanCell:
+    def xor(self, other: _ConvertibleToBooleanCell) -> Cell[bool | None]:
         """
         Perform a boolean XOR operation. This is equivalent to the `^` operator.
 
@@ -1006,7 +1004,7 @@ class Cell(ABC, Generic[T_co]):
         other: _ConvertibleToCell,
         *,
         propagate_missing_values: bool = True,
-    ) -> _BooleanCell:
+    ) -> Cell[bool | None]:
         """
         Check if equal to a value. The default behavior is equivalent to the `==` operator.
 
@@ -1062,7 +1060,7 @@ class Cell(ABC, Generic[T_co]):
         other: _ConvertibleToCell,
         *,
         propagate_missing_values: bool = True,
-    ) -> _BooleanCell:
+    ) -> Cell[bool | None]:
         """
         Check if not equal to a value. The default behavior is equivalent to the `!=` operator.
 
@@ -1119,7 +1117,7 @@ class Cell(ABC, Generic[T_co]):
         +-------+
         """
 
-    def ge(self, other: _ConvertibleToCell) -> _BooleanCell:
+    def ge(self, other: _ConvertibleToCell) -> Cell[bool | None]:
         """
         Check if greater than or equal to a value. This is equivalent to the `>=` operator.
 
@@ -1151,7 +1149,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__ge__(other)
 
-    def gt(self, other: _ConvertibleToCell) -> _BooleanCell:
+    def gt(self, other: _ConvertibleToCell) -> Cell[bool | None]:
         """
         Check if greater than a value. This is equivalent to the `>` operator.
 
@@ -1183,7 +1181,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__gt__(other)
 
-    def le(self, other: _ConvertibleToCell) -> _BooleanCell:
+    def le(self, other: _ConvertibleToCell) -> Cell[bool | None]:
         """
         Check if less than or equal to a value. This is equivalent to the `<=` operator.
 
@@ -1215,7 +1213,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__le__(other)
 
-    def lt(self, other: _ConvertibleToCell) -> _BooleanCell:
+    def lt(self, other: _ConvertibleToCell) -> Cell[bool | None]:
         """
         Check if less than a value. This is equivalent to the `<` operator.
 

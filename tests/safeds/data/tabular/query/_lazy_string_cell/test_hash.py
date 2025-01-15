@@ -1,8 +1,8 @@
 import polars as pl
 import pytest
 
-from safeds.data.tabular.containers import StringCell
-from safeds.data.tabular.containers._lazy_string_cell import _LazyStringCell
+from safeds.data.tabular.query import StringCell
+from safeds.data.tabular.query._lazy_string_cell import _LazyStringCell
 
 
 def test_should_be_deterministic() -> None:
