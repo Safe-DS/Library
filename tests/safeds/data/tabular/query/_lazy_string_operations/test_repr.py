@@ -7,7 +7,7 @@ from safeds.data.tabular.query import StringOperations
 
 
 @pytest.mark.parametrize(
-    ("cell", "expected"),
+    ("ops", "expected"),
     [
         (
             Cell.constant("a").str,
@@ -23,6 +23,6 @@ from safeds.data.tabular.query import StringOperations
         "column",
     ],
 )
-def test_should_return_a_string_representation(cell: StringOperations, expected: str) -> None:
+def test_should_return_a_string_representation(ops: StringOperations, expected: str) -> None:
     # We do not care about the exact string representation, this is only for debugging
-    assert repr(cell) == expected
+    assert repr(ops) == expected

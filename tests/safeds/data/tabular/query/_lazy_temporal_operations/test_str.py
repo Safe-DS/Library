@@ -7,7 +7,7 @@ from safeds.data.tabular.query import TemporalOperations
 
 
 @pytest.mark.parametrize(
-    ("cell", "expected"),
+    ("ops", "expected"),
     [
         (
             Cell.duration(hours=1).dt,
@@ -23,6 +23,6 @@ from safeds.data.tabular.query import TemporalOperations
         "column",
     ],
 )
-def test_should_return_a_string_representation(cell: TemporalOperations, expected: str) -> None:
+def test_should_return_a_string_representation(ops: TemporalOperations, expected: str) -> None:
     # We do not care about the exact string representation, this is only for debugging
-    assert str(cell) == expected
+    assert str(ops) == expected
