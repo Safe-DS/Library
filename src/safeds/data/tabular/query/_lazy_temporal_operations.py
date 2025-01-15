@@ -4,7 +4,8 @@ from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds.data.tabular.containers._lazy_cell import _LazyCell
-from safeds.data.tabular.query._temporal_cell import TemporalCell
+
+from ._temporal_operations import TemporalOperations
 
 if TYPE_CHECKING:
     import polars as pl
@@ -12,7 +13,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers._cell import Cell
 
 
-class _LazyTemporalCell(TemporalCell):
+class _LazyTemporalOperations(TemporalOperations):
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
@@ -64,7 +65,7 @@ class _LazyTemporalCell(TemporalCell):
     # ------------------------------------------------------------------------------------------------------------------
 
     def _equals(self, other: object) -> bool:
-        if not isinstance(other, _LazyTemporalCell):
+        if not isinstance(other, _LazyTemporalOperations):
             return NotImplemented
         if self is other:
             return True

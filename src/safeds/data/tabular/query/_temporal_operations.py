@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 # TODO: Examples with None
 
 
-class TemporalCell(ABC):
+class TemporalOperations(ABC):
     """
     Namespace for operations on temporal data.
 

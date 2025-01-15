@@ -14,8 +14,7 @@ if TYPE_CHECKING:
         _ConvertibleToIntCell,
         _PythonLiteral,
     )
-    from safeds.data.tabular.query._string_cell import StringCell
-    from safeds.data.tabular.query._temporal_cell import TemporalCell
+    from safeds.data.tabular.query import StringOperations, TemporalOperations
     from safeds.data.tabular.typing import ColumnType
 
 T_co = TypeVar("T_co", covariant=True)
@@ -519,7 +518,7 @@ class Cell(ABC, Generic[T_co]):
 
     @property
     @abstractmethod
-    def str(self) -> StringCell:
+    def str(self) -> StringOperations:
         """
         Namespace for operations on strings.
 
@@ -540,7 +539,7 @@ class Cell(ABC, Generic[T_co]):
 
     @property
     @abstractmethod
-    def dt(self) -> TemporalCell:
+    def dt(self) -> TemporalOperations:
         """
         Namespace for operations on temporal values.
 

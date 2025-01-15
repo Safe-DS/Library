@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     import polars as pl
 
     from safeds._typing import _ConvertibleToBooleanCell, _ConvertibleToCell
-    from safeds.data.tabular.query import StringCell, TemporalCell
+    from safeds.data.tabular.query import StringOperations, TemporalOperations
     from safeds.data.tabular.typing import ColumnType
 
 T = TypeVar("T")
@@ -179,16 +179,16 @@ class _LazyCell(Cell[T]):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def str(self) -> StringCell:
-        from safeds.data.tabular.query._lazy_string_cell import _LazyStringCell  # circular import
+    def str(self) -> StringOperations:
+        from safeds.data.tabular.query._lazy_string_operations import _LazyStringOperations  # circular import
 
-        return _LazyStringCell(self._expression)
+        return _LazyStringOperations(self._expression)
 
     @property
-    def dt(self) -> TemporalCell:
-        from safeds.data.tabular.query._lazy_temporal_cell import _LazyTemporalCell  # circular import
+    def dt(self) -> TemporalOperations:
+        from safeds.data.tabular.query._lazy_temporal_operations import _LazyTemporalOperations  # circular import
 
-        return _LazyTemporalCell(self._expression)
+        return _LazyTemporalOperations(self._expression)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Comparison operations

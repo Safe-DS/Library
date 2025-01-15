@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 # TODO: examples with None
 
 
-class StringCell(ABC):
+class StringOperations(ABC):
     """
     Namespace for operations on strings.
 

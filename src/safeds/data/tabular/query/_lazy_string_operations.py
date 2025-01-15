@@ -5,7 +5,8 @@ from typing import TYPE_CHECKING
 from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _ClosedBound
 from safeds.data.tabular.containers._lazy_cell import _LazyCell
-from safeds.data.tabular.query._string_cell import StringCell
+
+from ._string_operations import StringOperations
 
 if TYPE_CHECKING:
     import datetime
@@ -15,7 +16,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers._cell import Cell
 
 
-class _LazyStringCell(StringCell):
+class _LazyStringOperations(StringOperations):
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
@@ -93,7 +94,7 @@ class _LazyStringCell(StringCell):
     # ------------------------------------------------------------------------------------------------------------------
 
     def _equals(self, other: object) -> bool:
-        if not isinstance(other, _LazyStringCell):
+        if not isinstance(other, _LazyStringOperations):
             return NotImplemented
         if self is other:
             return True
