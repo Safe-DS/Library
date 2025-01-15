@@ -166,7 +166,7 @@ class _LazyCell(Cell[T]):
         return _structural_hash(self._expression.meta.serialize())
 
     def __repr__(self) -> str:
-        return self._expression.__repr__()
+        return f"_LazyCell({self._expression})"
 
     def __sizeof__(self) -> int:
         return self._expression.__sizeof__()

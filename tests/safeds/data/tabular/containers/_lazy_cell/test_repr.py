@@ -10,11 +10,11 @@ from safeds.data.tabular.containers._lazy_cell import _LazyCell
     [
         (
             Cell.constant(1),
-            "dyn int: 1",
+            "_LazyCell(dyn int: 1)",
         ),
         (
             _LazyCell(pl.col("a")),
-            'col("a")',
+            '_LazyCell(col("a"))',
         ),
     ],
     ids=[
@@ -24,4 +24,4 @@ from safeds.data.tabular.containers._lazy_cell import _LazyCell
 )
 def test_should_return_a_string_representation(cell: Cell, expected: str) -> None:
     # We do not care about the exact string representation, this is only for debugging
-    assert expected in repr(cell)
+    assert repr(cell) == expected
