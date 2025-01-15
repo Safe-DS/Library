@@ -80,7 +80,7 @@ class Cell(ABC, Generic[T_co]):
         """
         Create a cell with a date.
 
-        Invalid dates are converted to cells with missing values (`None`).
+        Invalid dates are converted to missing values (`None`).
 
         Parameters
         ----------
@@ -146,7 +146,7 @@ class Cell(ABC, Generic[T_co]):
         """
         Create a cell with a datetime.
 
-        Invalid datetimes are converted to cells with missing values (`None`).
+        Invalid datetimes are converted to missing values (`None`).
 
         Parameters
         ----------
@@ -169,6 +169,32 @@ class Cell(ABC, Generic[T_co]):
         -------
         cell:
             The created cell.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [1, 2, None])
+        >>> column.transform(lambda _: Cell.datetime(2025, 1, 15, hour=12))
+        +---------------------+
+        | a                   |
+        | ---                 |
+        | datetime[μs]        |
+        +=====================+
+        | 2025-01-15 12:00:00 |
+        | 2025-01-15 12:00:00 |
+        | 2025-01-15 12:00:00 |
+        +---------------------+
+
+        >>> column.transform(lambda cell: Cell.datetime(2025, 1, 15, hour=cell))
+        +---------------------+
+        | a                   |
+        | ---                 |
+        | datetime[μs]        |
+        +=====================+
+        | 2025-01-15 01:00:00 |
+        | 2025-01-15 02:00:00 |
+        | null                |
+        +---------------------+
         """
         import polars as pl
 
@@ -182,7 +208,12 @@ class Cell(ABC, Generic[T_co]):
         second = _unwrap(second)
         microsecond = _unwrap(microsecond)
 
-        return _LazyCell(pl.datetime(year, month, day, hour, minute, second, microsecond))
+        # By default, microseconds overflow into seconds
+        return _LazyCell(
+            pl.when(microsecond <= 999_999)
+            .then(pl.datetime(year, month, day, hour, minute, second, microsecond))
+            .otherwise(None),
+        )
 
     @staticmethod
     def duration(
@@ -194,10 +225,11 @@ class Cell(ABC, Generic[T_co]):
         seconds: _ConvertibleToIntCell = 0,
         milliseconds: _ConvertibleToIntCell = 0,
         microseconds: _ConvertibleToIntCell = 0,
-        nanoseconds: _ConvertibleToIntCell = 0,
     ) -> Cell[python_datetime.timedelta | None]:
         """
         Create a cell with a duration.
+
+        Invalid durations are converted to missing values (`None`).
 
         Parameters
         ----------
@@ -215,13 +247,37 @@ class Cell(ABC, Generic[T_co]):
             The number of milliseconds.
         microseconds:
             The number of microseconds.
-        nanoseconds:
-            The number of nanoseconds.
 
         Returns
         -------
         cell:
             The created cell.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [1, 2, None])
+        >>> column.transform(lambda _: Cell.duration(hours=1))
+        +--------------+
+        | a            |
+        | ---          |
+        | duration[μs] |
+        +==============+
+        | 1h           |
+        | 1h           |
+        | 1h           |
+        +--------------+
+
+        >>> column.transform(lambda cell: Cell.duration(hours = cell))
+        +--------------+
+        | a            |
+        | ---          |
+        | duration[μs] |
+        +==============+
+        | 1h           |
+        | 2h           |
+        | null         |
+        +--------------+
         """
         import polars as pl
 
@@ -234,7 +290,6 @@ class Cell(ABC, Generic[T_co]):
         seconds = _unwrap(seconds)
         milliseconds = _unwrap(milliseconds)
         microseconds = _unwrap(microseconds)
-        nanoseconds = _unwrap(nanoseconds)
 
         return _LazyCell(
             pl.duration(
@@ -245,7 +300,6 @@ class Cell(ABC, Generic[T_co]):
                 seconds=seconds,
                 milliseconds=milliseconds,
                 microseconds=microseconds,
-                nanoseconds=nanoseconds,
             ),
         )
 
@@ -260,7 +314,7 @@ class Cell(ABC, Generic[T_co]):
         """
         Create a cell with a time.
 
-        Invalid times are converted to cells with missing values (`None`).
+        Invalid times are converted to missing values (`None`).
 
         Parameters
         ----------

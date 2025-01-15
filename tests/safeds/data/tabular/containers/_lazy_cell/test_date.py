@@ -10,15 +10,18 @@ from safeds.data.tabular.containers import Cell
 @pytest.mark.parametrize(
     ("year", "month", "day", "expected"),
     [
-        (2025, 1, 1, date(2025, 1, 1)),
-        (Cell.constant(2025), Cell.constant(1), Cell.constant(1), date(2025, 1, 1)),
-        (None, 1, 1, None),
-        (2025, None, 1, None),
-        (2025, 0, 1, None),
-        (2025, 13, 1, None),
-        (2025, 1, None, None),
-        (2025, 1, 0, None),
-        (2025, 1, 32, None),
+        (1, 2, 3, date(1, 2, 3)),
+        (Cell.constant(1), Cell.constant(2), Cell.constant(3), date(1, 2, 3)),
+        # invalid year
+        (None, 2, 3, None),
+        # invalid month
+        (1, None, 3, None),
+        (1, 0, 3, None),
+        (1, 13, 3, None),
+        # invalid day
+        (1, 2, None, None),
+        (1, 2, 0, None),
+        (1, 2, 32, None),
     ],
     ids=[
         "int components",
