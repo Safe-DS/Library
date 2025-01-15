@@ -67,7 +67,7 @@ def assert_cell_operation_works(
     transformer: Callable[[Cell], Cell],
     expected: Any,
     *,
-    type_: ColumnType | None = None,
+    type_if_none: ColumnType | None = None,
 ) -> None:
     """
     Assert that a cell operation works as expected.
@@ -80,13 +80,14 @@ def assert_cell_operation_works(
         The transformer to apply to the cells.
     expected:
         The expected value of the transformed cell.
-    type_:
-        The type of the column. By default, it is inferred from the value.
+    type_if_none:
+        The type of the column if value is `None`.
     """
+    type_ = type_if_none if value is None else None
     column = Column("A", [value], type_=type_)
     transformed_column = column.transform(transformer)
     actual = transformed_column[0]
-    assert actual == expected
+    assert actual == expected, f"Expected {expected}, but got {actual}."
 
 
 def assert_row_operation_works(
