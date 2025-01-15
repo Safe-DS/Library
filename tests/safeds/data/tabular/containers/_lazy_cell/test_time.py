@@ -46,7 +46,7 @@ from safeds.data.tabular.containers import Cell
         "microsecond is too high",
     ],
 )
-def test_should_return_constant_value(
+def test_should_return_time(
     hour: _ConvertibleToIntCell,
     minute: _ConvertibleToIntCell,
     second: _ConvertibleToIntCell,

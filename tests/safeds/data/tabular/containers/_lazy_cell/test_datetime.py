@@ -10,7 +10,16 @@ from safeds.data.tabular.containers import Cell
 @pytest.mark.parametrize(
     ("year", "month", "day", "hour", "minute", "second", "microsecond", "expected"),
     [
-        (1, 2, 3, 4, 5, 6, 7, datetime(1, 2, 3, 4, 5, 6, 7)),  # noqa: DTZ001
+        (
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            datetime(1, 2, 3, 4, 5, 6, 7),  # noqa: DTZ001
+        ),
         (
             Cell.constant(1),
             Cell.constant(2),
@@ -72,7 +81,7 @@ from safeds.data.tabular.containers import Cell
         "microsecond is too high",
     ],
 )
-def test_should_return_constant_value(
+def test_should_return_datetime(
     year: _ConvertibleToIntCell,
     month: _ConvertibleToIntCell,
     day: _ConvertibleToIntCell,

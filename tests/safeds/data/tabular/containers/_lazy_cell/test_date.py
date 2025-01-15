@@ -35,7 +35,7 @@ from safeds.data.tabular.containers import Cell
         "day is too high",
     ],
 )
-def test_should_return_constant_value(
+def test_should_return_date(
     year: _ConvertibleToIntCell,
     month: _ConvertibleToIntCell,
     day: _ConvertibleToIntCell,
