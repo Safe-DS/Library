@@ -5,6 +5,7 @@ from polars.testing import assert_frame_equal
 
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Cell, Column, Row, Table
+from safeds.data.tabular.typing import ColumnType
 
 
 def assert_tables_are_equal(
@@ -65,6 +66,8 @@ def assert_cell_operation_works(
     value: Any,
     transformer: Callable[[Cell], Cell],
     expected: Any,
+    *,
+    type_: ColumnType | None = None,
 ) -> None:
     """
     Assert that a cell operation works as expected.
@@ -77,8 +80,10 @@ def assert_cell_operation_works(
         The transformer to apply to the cells.
     expected:
         The expected value of the transformed cell.
+    type_:
+        The type of the column. By default, it is inferred from the value.
     """
-    column = Column("A", [value])
+    column = Column("A", [value], type_=type_)
     transformed_column = column.transform(transformer)
     actual = transformed_column[0]
     assert actual == expected

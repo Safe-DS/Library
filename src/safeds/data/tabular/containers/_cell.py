@@ -434,10 +434,13 @@ class Cell(ABC, Generic[T_co]):
         """
         Negate a boolean. This is equivalent to the `~` operator.
 
+        Do **not** use the `not` operator. Its behavior cannot be overwritten in Python, so it will not work as
+        expected.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [True, False])
+        >>> column = Column("a", [True, False, None])
         >>> column.transform(lambda cell: cell.not_())
         +-------+
         | a     |
@@ -446,6 +449,7 @@ class Cell(ABC, Generic[T_co]):
         +=======+
         | false |
         | true  |
+        | null  |
         +-------+
 
         >>> column.transform(lambda cell: ~cell)
@@ -456,6 +460,7 @@ class Cell(ABC, Generic[T_co]):
         +=======+
         | false |
         | true  |
+        | null  |
         +-------+
         """
         return self.__invert__()
@@ -464,28 +469,33 @@ class Cell(ABC, Generic[T_co]):
         """
         Perform a boolean AND operation. This is equivalent to the `&` operator.
 
+        Do **not** use the `and` operator. Its behavior cannot be overwritten in Python, so it will not work as
+        expected.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [True, False])
-        >>> column.transform(lambda cell: cell.and_(False))
+        >>> column = Column("a", [True, False, None])
+        >>> column.transform(lambda cell: cell.and_(True))
         +-------+
         | a     |
         | ---   |
         | bool  |
         +=======+
+        | true  |
         | false |
-        | false |
+        | null  |
         +-------+
 
-        >>> column.transform(lambda cell: cell & False)
+        >>> column.transform(lambda cell: cell & True)
         +-------+
         | a     |
         | ---   |
         | bool  |
         +=======+
+        | true  |
         | false |
-        | false |
+        | null  |
         +-------+
         """
         return self.__and__(other)
@@ -494,29 +504,33 @@ class Cell(ABC, Generic[T_co]):
         """
         Perform a boolean OR operation. This is equivalent to the `|` operator.
 
+        Do **not** use the `or` operator. Its behavior cannot be overwritten in Python, so it will not work as expected.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [True, False])
-        >>> column.transform(lambda cell: cell.or_(True))
-        +------+
-        | a    |
-        | ---  |
-        | bool |
-        +======+
-        | true |
-        | true |
-        +------+
+        >>> column = Column("a", [True, False, None])
+        >>> column.transform(lambda cell: cell.or_(False))
+        +-------+
+        | a     |
+        | ---   |
+        | bool  |
+        +=======+
+        | true  |
+        | false |
+        | null  |
+        +-------+
 
-        >>> column.transform(lambda cell: cell | True)
-        +------+
-        | a    |
-        | ---  |
-        | bool |
-        +======+
-        | true |
-        | true |
-        +------+
+        >>> column.transform(lambda cell: cell | False)
+        +-------+
+        | a     |
+        | ---   |
+        | bool  |
+        +=======+
+        | true  |
+        | false |
+        | null  |
+        +-------+
         """
         return self.__or__(other)
 
@@ -527,7 +541,7 @@ class Cell(ABC, Generic[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [True, False])
+        >>> column = Column("a", [True, False, None])
         >>> column.transform(lambda cell: cell.xor(True))
         +-------+
         | a     |
@@ -536,6 +550,7 @@ class Cell(ABC, Generic[T_co]):
         +=======+
         | false |
         | true  |
+        | null  |
         +-------+
 
         >>> column.transform(lambda cell: cell ^ True)
@@ -546,6 +561,7 @@ class Cell(ABC, Generic[T_co]):
         +=======+
         | false |
         | true  |
+        | null  |
         +-------+
         """
         return self.__xor__(other)
