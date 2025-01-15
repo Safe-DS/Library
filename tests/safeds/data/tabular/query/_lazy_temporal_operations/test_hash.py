@@ -43,7 +43,7 @@ class TestContract:
             Cell.duration(hours=1).dt,
             Cell.duration(hours=2).dt,
         ),
-        # different column
+        # different columns
         (
             _LazyCell(pl.col("a")).dt,
             _LazyCell(pl.col("b")).dt,
@@ -56,7 +56,7 @@ class TestContract:
     ],
     ids=[
         "different durations",
-        "different column",
+        "different columns",
         "different cell kinds",
     ],
 )

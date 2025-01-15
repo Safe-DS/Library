@@ -38,12 +38,12 @@ class TestContract:
 @pytest.mark.parametrize(
     ("ops_1", "ops_2"),
     [
-        # different constant value
+        # different constant values
         (
             Cell.constant("a").str,
             Cell.constant("b").str,
         ),
-        # different column
+        # different columns
         (
             _LazyCell(pl.col("a")).str,
             _LazyCell(pl.col("b")).str,
@@ -55,8 +55,8 @@ class TestContract:
         ),
     ],
     ids=[
-        "different constant value",
-        "different column",
+        "different constant values",
+        "different columns",
         "different cell kinds",
     ],
 )

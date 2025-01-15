@@ -34,31 +34,31 @@ from safeds.data.tabular.containers._lazy_cell import _LazyCell
             _LazyCell(pl.col("a")),
             True,
         ),
-        # not equal (different constant value)
+        # not equal (different constant values)
         (
             Cell.constant(1),
             Cell.constant(2),
             False,
         ),
-        # not equal (different constant type)
+        # not equal (different constant types)
         (
             Cell.constant(1),
             Cell.constant("1"),
             False,
         ),
-        # not equal (different date, int)
+        # not equal (different dates, int)
         (
             Cell.date(2025, 1, 15),
             Cell.date(2024, 1, 15),
             False,
         ),
-        # not equal (different date, column)
+        # not equal (different dates, column)
         (
             Cell.date(_LazyCell(pl.col("a")), 1, 15),
             Cell.date(_LazyCell(pl.col("b")), 1, 15),
             False,
         ),
-        # not equal (different column)
+        # not equal (different columns)
         (
             _LazyCell(pl.col("a")),
             _LazyCell(pl.col("b")),
@@ -78,11 +78,11 @@ from safeds.data.tabular.containers._lazy_cell import _LazyCell
         "equal (date, column)",
         "equal (column)",
         # Not equal
-        "not equal (different constant value)",
-        "not equal (different constant type)",
-        "not equal (different date, int)",
-        "not equal (different date, column)",
-        "not equal (different column)",
+        "not equal (different constant values)",
+        "not equal (different constant types)",
+        "not equal (different dates, int)",
+        "not equal (different dates, column)",
+        "not equal (different columns)",
         "not equal (different cell kinds)",
     ],
 )

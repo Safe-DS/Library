@@ -41,27 +41,27 @@ class TestContract:
 @pytest.mark.parametrize(
     ("cell_1", "cell_2"),
     [
-        # different constant value
+        # different constant values
         (
             Cell.constant(1),
             Cell.constant(2),
         ),
-        # different constant type
+        # different constant types
         (
             Cell.constant(1),
             Cell.constant("1"),
         ),
-        # different date, int
+        # different dates, int
         (
             Cell.date(2025, 1, 15),
             Cell.date(2024, 1, 15),
         ),
-        # different date, column
+        # different dates, column
         (
             Cell.date(_LazyCell(pl.col("a")), 1, 15),
             Cell.date(_LazyCell(pl.col("b")), 1, 15),
         ),
-        # different column
+        # different columns
         (
             _LazyCell(pl.col("a")),
             _LazyCell(pl.col("b")),
@@ -73,11 +73,11 @@ class TestContract:
         ),
     ],
     ids=[
-        "different constant value",
-        "different constant type",
-        "different date, int",
-        "different date, column",
-        "different column",
+        "different constant values",
+        "different constant types",
+        "different dates, int",
+        "different dates, column",
+        "different columns",
         "different cell kinds",
     ],
 )
