@@ -83,9 +83,9 @@ class Cell(ABC, Generic[T_co]):
 
         from ._lazy_cell import _LazyCell  # circular import
 
-        year = _to_polars_expression(year)
-        month = _to_polars_expression(month)
-        day = _to_polars_expression(day)
+        year = _unwrap(year)
+        month = _unwrap(month)
+        day = _unwrap(day)
 
         return _LazyCell(pl.date(year, month, day))
 
@@ -129,13 +129,13 @@ class Cell(ABC, Generic[T_co]):
 
         from ._lazy_cell import _LazyCell  # circular import
 
-        year = _to_polars_expression(year)
-        month = _to_polars_expression(month)
-        day = _to_polars_expression(day)
-        hour = _to_polars_expression(hour)
-        minute = _to_polars_expression(minute)
-        second = _to_polars_expression(second)
-        microsecond = _to_polars_expression(microsecond)
+        year = _unwrap(year)
+        month = _unwrap(month)
+        day = _unwrap(day)
+        hour = _unwrap(hour)
+        minute = _unwrap(minute)
+        second = _unwrap(second)
+        microsecond = _unwrap(microsecond)
 
         return _LazyCell(pl.datetime(year, month, day, hour, minute, second, microsecond))
 
@@ -182,14 +182,14 @@ class Cell(ABC, Generic[T_co]):
 
         from ._lazy_cell import _LazyCell  # circular import
 
-        weeks = _to_polars_expression(weeks)
-        days = _to_polars_expression(days)
-        hours = _to_polars_expression(hours)
-        minutes = _to_polars_expression(minutes)
-        seconds = _to_polars_expression(seconds)
-        milliseconds = _to_polars_expression(milliseconds)
-        microseconds = _to_polars_expression(microseconds)
-        nanoseconds = _to_polars_expression(nanoseconds)
+        weeks = _unwrap(weeks)
+        days = _unwrap(days)
+        hours = _unwrap(hours)
+        minutes = _unwrap(minutes)
+        seconds = _unwrap(seconds)
+        milliseconds = _unwrap(milliseconds)
+        microseconds = _unwrap(microseconds)
+        nanoseconds = _unwrap(nanoseconds)
 
         return _LazyCell(
             pl.duration(
@@ -235,10 +235,10 @@ class Cell(ABC, Generic[T_co]):
 
         from ._lazy_cell import _LazyCell  # circular import
 
-        hour = _to_polars_expression(hour)
-        minute = _to_polars_expression(minute)
-        second = _to_polars_expression(second)
-        microsecond = _to_polars_expression(microsecond)
+        hour = _unwrap(hour)
+        minute = _unwrap(minute)
+        second = _unwrap(second)
+        microsecond = _unwrap(microsecond)
 
         return _LazyCell(pl.time(hour, minute, second, microsecond))
 
@@ -250,7 +250,7 @@ class Cell(ABC, Generic[T_co]):
         Parameters
         ----------
         cells:
-            The list of cells to be searched.
+            The list of cells to be checked.
 
         Returns
         -------
@@ -261,7 +261,11 @@ class Cell(ABC, Generic[T_co]):
 
         from ._lazy_cell import _LazyCell  # circular import
 
-        return _LazyCell(pl.coalesce([cell._polars_expression for cell in cells]))
+        # `coalesce` raises in this case
+        if not cells:
+            return Cell.constant(None)
+
+        return _LazyCell(pl.coalesce([_unwrap(cell) for cell in cells]))
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
@@ -1155,10 +1159,10 @@ class Cell(ABC, Generic[T_co]):
         """
 
 
-def _to_polars_expression(cell: _ConvertibleToCell) -> pl.Expr:
+def _unwrap(cell_proxy: _ConvertibleToCell) -> pl.Expr:
     import polars as pl
 
-    if isinstance(cell, Cell):
-        return cell._polars_expression
+    if isinstance(cell_proxy, Cell):
+        return cell_proxy._polars_expression
     else:
-        return pl.lit(cell)
+        return pl.lit(cell_proxy)

@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
 from safeds._utils import _structural_hash
 
-from ._cell import Cell
+from ._cell import Cell, _unwrap
 
 if TYPE_CHECKING:
     import polars as pl
@@ -234,12 +234,5 @@ class _LazyCell(Cell[T]):
         return self._expression.meta.eq(other._expression)
 
 
-def _wrap(other: pl.Expr) -> Any:
-    return _LazyCell(other)
-
-
-def _unwrap(other: _ConvertibleToCell) -> Any:
-    if isinstance(other, Cell):
-        return other._polars_expression
-
-    return other
+def _wrap(expression: pl.Expr) -> Cell:
+    return _LazyCell(expression)
