@@ -1,7 +1,7 @@
 from datetime import date
 
 import pytest
-from helpers import assert_cell_operation_works
+from tests.helpers import assert_cell_operation_works
 
 from safeds._typing import _ConvertibleToIntCell
 from safeds.data.tabular.containers import Cell
