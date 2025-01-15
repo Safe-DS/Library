@@ -1,25 +1,64 @@
+from collections.abc import Callable
+
 import polars as pl
 import pytest
+from syrupy import SnapshotAssertion
 
+from safeds.data.tabular.containers import Cell
+from safeds.data.tabular.containers._lazy_cell import _LazyCell
 from safeds.data.tabular.query import StringOperations
-from safeds.data.tabular.query._lazy_string_operations import _LazyStringOperations
-
-
-def test_should_be_deterministic() -> None:
-    cell = _LazyStringOperations(pl.col("a"))
-    assert hash(cell) == 8162512882156938440
 
 
 @pytest.mark.parametrize(
-    ("cell1", "cell2", "expected"),
+    "ops_factory",
     [
-        (_LazyStringOperations(pl.col("a")), _LazyStringOperations(pl.col("a")), True),
-        (_LazyStringOperations(pl.col("a")), _LazyStringOperations(pl.col("b")), False),
+        lambda: Cell.constant("a").str,
+        lambda: _LazyCell(pl.col("a")).str,
     ],
     ids=[
-        "equal",
-        "different",
+        "constant",
+        "column",
     ],
 )
-def test_should_be_good_hash(cell1: StringOperations, cell2: StringOperations, expected: bool) -> None:
-    assert (hash(cell1) == hash(cell2)) == expected
+class TestContract:
+    def test_should_return_same_hash_for_equal_objects(self, ops_factory: Callable[[], StringOperations]) -> None:
+        ops_1 = ops_factory()
+        ops_2 = ops_factory()
+        assert hash(ops_1) == hash(ops_2)
+
+    def test_should_return_same_hash_in_different_processes(
+        self,
+        ops_factory: Callable[[], StringOperations],
+        snapshot: SnapshotAssertion,
+    ) -> None:
+        ops = ops_factory()
+        assert hash(ops) == snapshot
+
+
+@pytest.mark.parametrize(
+    ("ops_1", "ops_2"),
+    [
+        # different constant value
+        (
+            Cell.constant("a").str,
+            Cell.constant("b").str,
+        ),
+        # different column
+        (
+            _LazyCell(pl.col("a")).str,
+            _LazyCell(pl.col("b")).str,
+        ),
+        # different cell kinds
+        (
+            Cell.constant("a").str,
+            _LazyCell(pl.col("a")).str,
+        ),
+    ],
+    ids=[
+        "different constant value",
+        "different column",
+        "different cell kinds",
+    ],
+)
+def test_should_be_good_hash(ops_1: StringOperations, ops_2: StringOperations) -> None:
+    assert hash(ops_1) != hash(ops_2)
