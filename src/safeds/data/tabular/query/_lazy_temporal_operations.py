@@ -21,11 +21,24 @@ class _LazyTemporalOperations(TemporalOperations):
     def __init__(self, expression: pl.Expr) -> None:
         self._expression: pl.Expr = expression
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, _LazyTemporalOperations):
+            return NotImplemented
+        if self is other:
+            return True
+        return self._expression.meta.eq(other._expression)
+
     def __hash__(self) -> int:
         return _structural_hash(self._expression.meta.serialize())
 
+    def __repr__(self) -> str:
+        return f"_LazyTemporalOperations({self._expression})"
+
     def __sizeof__(self) -> int:
         return self._expression.__sizeof__()
+
+    def __str__(self) -> str:
+        return f"({self._expression}).dt"
 
     # ------------------------------------------------------------------------------------------------------------------
     # Temporal operations
@@ -59,17 +72,6 @@ class _LazyTemporalOperations(TemporalOperations):
             # Fehler in _check_format_string
             raise ValueError("Invalid format string")
         return _LazyCell(self._expression.dt.to_string(format=format_string))
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # Internal
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def _equals(self, other: object) -> bool:
-        if not isinstance(other, _LazyTemporalOperations):
-            return NotImplemented
-        if self is other:
-            return True
-        return self._expression.meta.eq(other._expression)
 
 
 def _check_format_string(format_string: str) -> bool:

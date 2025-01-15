@@ -31,6 +31,29 @@ class TemporalOperations(ABC):
     +------------+
     """
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # Dunder methods
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @abstractmethod
+    def __eq__(self, other: object) -> bool: ...
+
+    @abstractmethod
+    def __hash__(self) -> int: ...
+
+    @abstractmethod
+    def __repr__(self) -> str: ...
+
+    @abstractmethod
+    def __sizeof__(self) -> int: ...
+
+    @abstractmethod
+    def __str__(self) -> str: ...
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # String operations
+    # ------------------------------------------------------------------------------------------------------------------
+
     @abstractmethod
     def century(self) -> Cell[int | None]:
         """
@@ -242,16 +265,4 @@ class TemporalOperations(ABC):
         +============+
         | 2022-01-09 |
         +------------+
-        """
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # Internal
-    # ------------------------------------------------------------------------------------------------------------------
-
-    @abstractmethod
-    def _equals(self, other: object) -> bool:
-        """
-        Check if this cell is equal to another object.
-
-        This method is needed because the `__eq__` method is used for element-wise comparisons.
         """

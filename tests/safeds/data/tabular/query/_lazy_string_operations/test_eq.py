@@ -24,12 +24,12 @@ def test_should_return_whether_two_cells_are_equal(
     cell2: StringOperations,
     expected: bool,
 ) -> None:
-    assert (cell1._equals(cell2)) == expected
+    assert (cell1.__eq__(cell2)) == expected
 
 
 def test_should_return_true_if_objects_are_identical() -> None:
     cell = _LazyStringOperations(pl.col("a"))
-    assert (cell._equals(cell)) is True
+    assert (cell.__eq__(cell)) is True
 
 
 @pytest.mark.parametrize(
@@ -44,4 +44,4 @@ def test_should_return_true_if_objects_are_identical() -> None:
     ],
 )
 def test_should_return_not_implemented_if_other_is_not_cell(cell: StringOperations, other: Any) -> None:
-    assert (cell._equals(other)) is NotImplemented
+    assert (cell.__eq__(other)) is NotImplemented

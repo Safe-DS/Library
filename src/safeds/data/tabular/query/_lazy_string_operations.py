@@ -24,11 +24,24 @@ class _LazyStringOperations(StringOperations):
     def __init__(self, expression: pl.Expr) -> None:
         self._expression: pl.Expr = expression
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, _LazyStringOperations):
+            return NotImplemented
+        if self is other:
+            return True
+        return self._expression.meta.eq(other._expression)
+
     def __hash__(self) -> int:
         return _structural_hash(self._expression.meta.serialize())
 
+    def __repr__(self) -> str:
+        return f"_LazyStringOperations({self._expression})"
+
     def __sizeof__(self) -> int:
         return self._expression.__sizeof__()
+
+    def __str__(self) -> str:
+        return f"({self._expression}).str"
 
     # ------------------------------------------------------------------------------------------------------------------
     # String operations
@@ -88,14 +101,3 @@ class _LazyStringOperations(StringOperations):
 
     def trim_start(self) -> Cell[str | None]:
         return _LazyCell(self._expression.str.strip_chars_start())
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # Internal
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def _equals(self, other: object) -> bool:
-        if not isinstance(other, _LazyStringOperations):
-            return NotImplemented
-        if self is other:
-            return True
-        return self._expression.meta.eq(other._expression)
