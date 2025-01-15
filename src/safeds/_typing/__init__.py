@@ -13,12 +13,14 @@ _ConvertibleToCell: TypeAlias = _PythonLiteral | Cell | None
 _BooleanCell: TypeAlias = Cell[bool | None]
 # We cannot restrict `Cell`, because `Row.get_cell` returns a `Cell[Any]`.
 _ConvertibleToBooleanCell: TypeAlias = bool | Cell | None
+_ConvertibleToIntCell: TypeAlias = int | Cell | None
 
 
 __all__ = [
     "_BooleanCell",
     "_ConvertibleToBooleanCell",
     "_ConvertibleToCell",
+    "_ConvertibleToIntCell",
     "_NumericLiteral",
     "_PythonLiteral",
     "_TemporalLiteral",

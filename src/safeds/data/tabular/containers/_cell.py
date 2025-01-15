@@ -8,7 +8,13 @@ if TYPE_CHECKING:
 
     import polars as pl
 
-    from safeds._typing import _BooleanCell, _ConvertibleToBooleanCell, _ConvertibleToCell, _PythonLiteral
+    from safeds._typing import (
+        _BooleanCell,
+        _ConvertibleToBooleanCell,
+        _ConvertibleToCell,
+        _ConvertibleToIntCell,
+        _PythonLiteral,
+    )
     from safeds.data.tabular.typing import ColumnType
 
     from ._string_cell import StringCell
@@ -52,9 +58,9 @@ class Cell(ABC, Generic[T_co]):
 
     @staticmethod
     def date(
-        year: int | Cell[int],
-        month: int | Cell[int],
-        day: int | Cell[int],
+        year: _ConvertibleToIntCell,
+        month: _ConvertibleToIntCell,
+        day: _ConvertibleToIntCell,
     ) -> Cell[python_datetime.date | None]:
         """
         Create a cell with a date.
@@ -85,14 +91,14 @@ class Cell(ABC, Generic[T_co]):
 
     @staticmethod
     def datetime(
-        year: int | Cell[int],
-        month: int | Cell[int],
-        day: int | Cell[int],
+        year: _ConvertibleToIntCell,
+        month: _ConvertibleToIntCell,
+        day: _ConvertibleToIntCell,
         *,
-        hour: int | Cell[int] = 0,
-        minute: int | Cell[int] = 0,
-        second: int | Cell[int] = 0,
-        microsecond: int | Cell[int] = 0,
+        hour: _ConvertibleToIntCell = 0,
+        minute: _ConvertibleToIntCell = 0,
+        second: _ConvertibleToIntCell = 0,
+        microsecond: _ConvertibleToIntCell = 0,
     ) -> Cell[python_datetime.datetime | None]:
         """
         Create a cell with a datetime.
@@ -136,14 +142,14 @@ class Cell(ABC, Generic[T_co]):
     @staticmethod
     def duration(
         *,
-        weeks: int | Cell[int] = 0,
-        days: int | Cell[int] = 0,
-        hours: int | Cell[int] = 0,
-        minutes: int | Cell[int] = 0,
-        seconds: int | Cell[int] = 0,
-        milliseconds: int | Cell[int] = 0,
-        microseconds: int | Cell[int] = 0,
-        nanoseconds: int | Cell[int] = 0,
+        weeks: _ConvertibleToIntCell = 0,
+        days: _ConvertibleToIntCell = 0,
+        hours: _ConvertibleToIntCell = 0,
+        minutes: _ConvertibleToIntCell = 0,
+        seconds: _ConvertibleToIntCell = 0,
+        milliseconds: _ConvertibleToIntCell = 0,
+        microseconds: _ConvertibleToIntCell = 0,
+        nanoseconds: _ConvertibleToIntCell = 0,
     ) -> Cell[python_datetime.timedelta | None]:
         """
         Create a cell with a duration.

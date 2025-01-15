@@ -231,7 +231,7 @@ class _LazyCell(Cell[T]):
             return NotImplemented
         if self is other:
             return True
-        return self._expression.meta.eq(other._expression.meta)
+        return self._expression.meta.eq(other._expression)
 
 
 def _wrap(other: pl.Expr) -> Any:

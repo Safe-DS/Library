@@ -13,7 +13,7 @@ from safeds.exceptions import ColumnNotFoundError
         (
             lambda: Table({"col1": []}),
             "col1",
-            lambda _: Cell.from_literal(None),
+            lambda _: Cell.constant(None),
             Table({"col1": []}),
         ),
         # no rows (computed value)
@@ -27,7 +27,7 @@ from safeds.exceptions import ColumnNotFoundError
         (
             lambda: Table({"col1": [1, 2]}),
             "col1",
-            lambda _: Cell.from_literal(None),
+            lambda _: Cell.constant(None),
             Table({"col1": [None, None]}),
         ),
         # non-empty (computed value)
@@ -41,7 +41,7 @@ from safeds.exceptions import ColumnNotFoundError
         (
             lambda: Table({"col1": [1, 2], "col2": [3, 4]}),
             ["col1", "col2"],
-            lambda _: Cell.from_literal(None),
+            lambda _: Cell.constant(None),
             Table({"col1": [None, None], "col2": [None, None]}),
         ),
         # multiple columns transformed (computed value)
