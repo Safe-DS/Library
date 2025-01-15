@@ -49,6 +49,21 @@ class Cell(ABC, Generic[T_co]):
         -------
         cell:
             The created cell.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [1, 2, None])
+        >>> column.transform(lambda _: Cell.constant(3))
+        +-----+
+        |   a |
+        | --- |
+        | i32 |
+        +=====+
+        |   3 |
+        |   3 |
+        |   3 |
+        +-----+
         """
         import polars as pl
 
@@ -65,6 +80,8 @@ class Cell(ABC, Generic[T_co]):
         """
         Create a cell with a date.
 
+        Invalid dates are converted to cells with missing values (`None`).
+
         Parameters
         ----------
         year:
@@ -78,6 +95,32 @@ class Cell(ABC, Generic[T_co]):
         -------
         cell:
             The created cell.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [1, 2, None])
+        >>> column.transform(lambda _: Cell.date(2025, 1, 15))
+        +------------+
+        | a          |
+        | ---        |
+        | date       |
+        +============+
+        | 2025-01-15 |
+        | 2025-01-15 |
+        | 2025-01-15 |
+        +------------+
+
+        >>> column.transform(lambda cell: Cell.date(2025, cell, 15))
+        +------------+
+        | a          |
+        | ---        |
+        | date       |
+        +============+
+        | 2025-01-15 |
+        | 2025-02-15 |
+        | null       |
+        +------------+
         """
         import polars as pl
 
@@ -102,6 +145,8 @@ class Cell(ABC, Generic[T_co]):
     ) -> Cell[python_datetime.datetime | None]:
         """
         Create a cell with a datetime.
+
+        Invalid datetimes are converted to cells with missing values (`None`).
 
         Parameters
         ----------
@@ -215,6 +260,8 @@ class Cell(ABC, Generic[T_co]):
         """
         Create a cell with a time.
 
+        Invalid times are converted to cells with missing values (`None`).
+
         Parameters
         ----------
         hour:
@@ -230,6 +277,32 @@ class Cell(ABC, Generic[T_co]):
         -------
         cell:
             The created cell.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [1, 2, None])
+        >>> column.transform(lambda _: Cell.time(12, 0, 0))
+        +----------+
+        | a        |
+        | ---      |
+        | time     |
+        +==========+
+        | 12:00:00 |
+        | 12:00:00 |
+        | 12:00:00 |
+        +----------+
+
+        >>> column.transform(lambda cell: Cell.time(12, cell, 0, microsecond=1))
+        +-----------------+
+        | a               |
+        | ---             |
+        | time            |
+        +=================+
+        | 12:01:00.000001 |
+        | 12:02:00.000001 |
+        | null            |
+        +-----------------+
         """
         import polars as pl
 
@@ -240,7 +313,10 @@ class Cell(ABC, Generic[T_co]):
         second = _unwrap(second)
         microsecond = _unwrap(microsecond)
 
-        return _LazyCell(pl.time(hour, minute, second, microsecond))
+        # By default, microseconds overflow into seconds
+        return _LazyCell(
+            pl.when(microsecond <= 999_999).then(pl.time(hour, minute, second, microsecond)).otherwise(None),
+        )
 
     @staticmethod
     def first_not_none(cells: list[Cell[P]]) -> Cell[P | None]:
@@ -1139,6 +1215,22 @@ class Cell(ABC, Generic[T_co]):
         -------
         cell:
             The cast cell.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> from safeds.data.tabular.typing import ColumnType
+        >>> column = Column("a", [1, 2, None])
+        >>> column.transform(lambda cell: cell.cast(ColumnType.string()))
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        | 1    |
+        | 2    |
+        | null |
+        +------+
         """
 
     # ------------------------------------------------------------------------------------------------------------------
