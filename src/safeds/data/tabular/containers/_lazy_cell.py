@@ -95,16 +95,10 @@ class _LazyCell(Cell[T]):
         return _wrap(self._expression.__abs__())
 
     def __ceil__(self) -> Cell:
-        import polars as pl
-
-        # polars does not yet implement floor for integers
-        return _wrap(self._expression.cast(pl.Float64).ceil())
+        return _wrap(self._expression.ceil())
 
     def __floor__(self) -> Cell:
-        import polars as pl
-
-        # polars does not yet implement floor for integers
-        return _wrap(self._expression.cast(pl.Float64).floor())
+        return _wrap(self._expression.floor())
 
     def __neg__(self) -> Cell:
         return _wrap(self._expression.__neg__())

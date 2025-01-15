@@ -577,16 +577,17 @@ class Cell(ABC, Generic[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [1, -2])
+        >>> column = Column("a", [1, -2, None])
         >>> column.transform(lambda cell: cell.abs())
-        +-----+
-        |   a |
-        | --- |
-        | i64 |
-        +=====+
-        |   1 |
-        |   2 |
-        +-----+
+        +------+
+        |    a |
+        |  --- |
+        |  i64 |
+        +======+
+        |    1 |
+        |    2 |
+        | null |
+        +------+
         """
         return self.__abs__()
 
@@ -597,7 +598,7 @@ class Cell(ABC, Generic[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [1.1, 2.9])
+        >>> column = Column("a", [1.1, 3.0, None])
         >>> column.transform(lambda cell: cell.ceil())
         +---------+
         |       a |
@@ -606,6 +607,7 @@ class Cell(ABC, Generic[T_co]):
         +=========+
         | 2.00000 |
         | 3.00000 |
+        |    null |
         +---------+
         """
         return self.__ceil__()
@@ -617,7 +619,7 @@ class Cell(ABC, Generic[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [1.1, 2.9])
+        >>> column = Column("a", [1.1, 3.0, None])
         >>> column.transform(lambda cell: cell.floor())
         +---------+
         |       a |
@@ -625,28 +627,41 @@ class Cell(ABC, Generic[T_co]):
         |     f64 |
         +=========+
         | 1.00000 |
-        | 2.00000 |
+        | 3.00000 |
+        |    null |
         +---------+
         """
         return self.__floor__()
 
     def neg(self) -> Cell:
         """
-        Negate the value.
+        Negate the value. This is equivalent to the unary `-` operator.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [1, -2])
+        >>> column = Column("a", [1, -2, None])
         >>> column.transform(lambda cell: cell.neg())
-        +-----+
-        |   a |
-        | --- |
-        | i64 |
-        +=====+
-        |  -1 |
-        |   2 |
-        +-----+
+        +------+
+        |    a |
+        |  --- |
+        |  i64 |
+        +======+
+        |   -1 |
+        |    2 |
+        | null |
+        +------+
+
+        >>> column.transform(lambda cell: -cell)
+        +------+
+        |    a |
+        |  --- |
+        |  i64 |
+        +======+
+        |   -1 |
+        |    2 |
+        | null |
+        +------+
         """
         return self.__neg__()
 
@@ -657,26 +672,28 @@ class Cell(ABC, Generic[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [1, 2])
+        >>> column = Column("a", [1, 2, None])
         >>> column.transform(lambda cell: cell.add(3))
-        +-----+
-        |   a |
-        | --- |
-        | i64 |
-        +=====+
-        |   4 |
-        |   5 |
-        +-----+
+        +------+
+        |    a |
+        |  --- |
+        |  i64 |
+        +======+
+        |    4 |
+        |    5 |
+        | null |
+        +------+
 
         >>> column.transform(lambda cell: cell + 3)
-        +-----+
-        |   a |
-        | --- |
-        | i64 |
-        +=====+
-        |   4 |
-        |   5 |
-        +-----+
+        +------+
+        |    a |
+        |  --- |
+        |  i64 |
+        +======+
+        |    4 |
+        |    5 |
+        | null |
+        +------+
         """
         return self.__add__(other)
 
@@ -687,7 +704,7 @@ class Cell(ABC, Generic[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [6, 8])
+        >>> column = Column("a", [6, 8, None])
         >>> column.transform(lambda cell: cell.div(2))
         +---------+
         |       a |
@@ -696,6 +713,7 @@ class Cell(ABC, Generic[T_co]):
         +=========+
         | 3.00000 |
         | 4.00000 |
+        |    null |
         +---------+
 
         >>> column.transform(lambda cell: cell / 2)
@@ -706,6 +724,7 @@ class Cell(ABC, Generic[T_co]):
         +=========+
         | 3.00000 |
         | 4.00000 |
+        |    null |
         +---------+
         """
         return self.__truediv__(other)
@@ -717,26 +736,30 @@ class Cell(ABC, Generic[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [5, 6])
+        >>> column = Column("a", [5, 6, -1, None])
         >>> column.transform(lambda cell: cell.mod(3))
-        +-----+
-        |   a |
-        | --- |
-        | i64 |
-        +=====+
-        |   2 |
-        |   0 |
-        +-----+
+        +------+
+        |    a |
+        |  --- |
+        |  i64 |
+        +======+
+        |    2 |
+        |    0 |
+        |    2 |
+        | null |
+        +------+
 
         >>> column.transform(lambda cell: cell % 3)
-        +-----+
-        |   a |
-        | --- |
-        | i64 |
-        +=====+
-        |   2 |
-        |   0 |
-        +-----+
+        +------+
+        |    a |
+        |  --- |
+        |  i64 |
+        +======+
+        |    2 |
+        |    0 |
+        |    2 |
+        | null |
+        +------+
         """
         return self.__mod__(other)
 
@@ -747,26 +770,28 @@ class Cell(ABC, Generic[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [2, 3])
+        >>> column = Column("a", [2, 3, None])
         >>> column.transform(lambda cell: cell.mul(4))
-        +-----+
-        |   a |
-        | --- |
-        | i64 |
-        +=====+
-        |   8 |
-        |  12 |
-        +-----+
+        +------+
+        |    a |
+        |  --- |
+        |  i64 |
+        +======+
+        |    8 |
+        |   12 |
+        | null |
+        +------+
 
         >>> column.transform(lambda cell: cell * 4)
-        +-----+
-        |   a |
-        | --- |
-        | i64 |
-        +=====+
-        |   8 |
-        |  12 |
-        +-----+
+        +------+
+        |    a |
+        |  --- |
+        |  i64 |
+        +======+
+        |    8 |
+        |   12 |
+        | null |
+        +------+
         """
         return self.__mul__(other)
 
@@ -777,56 +802,61 @@ class Cell(ABC, Generic[T_co]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [2, 3])
+        >>> column = Column("a", [2, 3, None])
         >>> column.transform(lambda cell: cell.pow(3))
-        +-----+
-        |   a |
-        | --- |
-        | i64 |
-        +=====+
-        |   8 |
-        |  27 |
-        +-----+
+        +------+
+        |    a |
+        |  --- |
+        |  i64 |
+        +======+
+        |    8 |
+        |   27 |
+        | null |
+        +------+
+
 
         >>> column.transform(lambda cell: cell ** 3)
-        +-----+
-        |   a |
-        | --- |
-        | i64 |
-        +=====+
-        |   8 |
-        |  27 |
-        +-----+
+        +------+
+        |    a |
+        |  --- |
+        |  i64 |
+        +======+
+        |    8 |
+        |   27 |
+        | null |
+        +------+
         """
         return self.__pow__(other)
 
     def sub(self, other: _ConvertibleToCell) -> Cell:
         """
-        Subtract a value. This is equivalent to the `-` operator.
+        Subtract a value. This is equivalent to the binary `-` operator.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [5, 6])
+        >>> column = Column("a", [5, 6, None])
         >>> column.transform(lambda cell: cell.sub(3))
-        +-----+
-        |   a |
-        | --- |
-        | i64 |
-        +=====+
-        |   2 |
-        |   3 |
-        +-----+
+        +------+
+        |    a |
+        |  --- |
+        |  i64 |
+        +======+
+        |    2 |
+        |    3 |
+        | null |
+        +------+
 
         >>> column.transform(lambda cell: cell - 3)
-        +-----+
-        |   a |
-        | --- |
-        | i64 |
-        +=====+
-        |   2 |
-        |   3 |
-        +-----+
+        +------+
+        |    a |
+        |  --- |
+        |  i64 |
+        +======+
+        |    2 |
+        |    3 |
+        | null |
+        +------+
         """
         return self.__sub__(other)
 
