@@ -126,11 +126,13 @@ class Cell(ABC, Generic[T_co]):
 
         from ._lazy_cell import _LazyCell  # circular import
 
-        year = _unwrap(year)
-        month = _unwrap(month)
-        day = _unwrap(day)
-
-        return _LazyCell(pl.date(year, month, day))
+        return _LazyCell(
+            pl.date(
+                year=_unwrap(year),
+                month=_unwrap(month),
+                day=_unwrap(day),
+            ),
+        )
 
     @staticmethod
     def datetime(
@@ -200,18 +202,18 @@ class Cell(ABC, Generic[T_co]):
 
         from ._lazy_cell import _LazyCell  # circular import
 
-        year = _unwrap(year)
-        month = _unwrap(month)
-        day = _unwrap(day)
-        hour = _unwrap(hour)
-        minute = _unwrap(minute)
-        second = _unwrap(second)
-        microsecond = _unwrap(microsecond)
+        pl_year = _unwrap(year)
+        pl_month = _unwrap(month)
+        pl_day = _unwrap(day)
+        pl_hour = _unwrap(hour)
+        pl_minute = _unwrap(minute)
+        pl_second = _unwrap(second)
+        pl_microsecond = _unwrap(microsecond)
 
         # By default, microseconds overflow into seconds
         return _LazyCell(
-            pl.when(microsecond <= 999_999)
-            .then(pl.datetime(year, month, day, hour, minute, second, microsecond))
+            pl.when(pl_microsecond <= 999_999)
+            .then(pl.datetime(pl_year, pl_month, pl_day, pl_hour, pl_minute, pl_second, pl_microsecond))
             .otherwise(None),
         )
 
@@ -283,33 +285,25 @@ class Cell(ABC, Generic[T_co]):
 
         from ._lazy_cell import _LazyCell  # circular import
 
-        weeks = _unwrap(weeks)
-        days = _unwrap(days)
-        hours = _unwrap(hours)
-        minutes = _unwrap(minutes)
-        seconds = _unwrap(seconds)
-        milliseconds = _unwrap(milliseconds)
-        microseconds = _unwrap(microseconds)
-
         return _LazyCell(
             pl.duration(
-                weeks=weeks,
-                days=days,
-                hours=hours,
-                minutes=minutes,
-                seconds=seconds,
-                milliseconds=milliseconds,
-                microseconds=microseconds,
+                weeks=_unwrap(weeks),
+                days=_unwrap(days),
+                hours=_unwrap(hours),
+                minutes=_unwrap(minutes),
+                seconds=_unwrap(seconds),
+                milliseconds=_unwrap(milliseconds),
+                microseconds=_unwrap(microseconds),
             ),
         )
 
     @staticmethod
     def time(
-        hour: int | Cell[int],
-        minute: int | Cell[int],
-        second: int | Cell[int],
+        hour: _ConvertibleToIntCell,
+        minute: _ConvertibleToIntCell,
+        second: _ConvertibleToIntCell,
         *,
-        microsecond: int | Cell[int] = 0,
+        microsecond: _ConvertibleToIntCell = 0,
     ) -> Cell[python_datetime.time | None]:
         """
         Create a cell with a time.
@@ -362,14 +356,16 @@ class Cell(ABC, Generic[T_co]):
 
         from ._lazy_cell import _LazyCell  # circular import
 
-        hour = _unwrap(hour)
-        minute = _unwrap(minute)
-        second = _unwrap(second)
-        microsecond = _unwrap(microsecond)
+        pl_hour = _unwrap(hour)
+        pl_minute = _unwrap(minute)
+        pl_second = _unwrap(second)
+        pl_microsecond = _unwrap(microsecond)
 
         # By default, microseconds overflow into seconds
         return _LazyCell(
-            pl.when(microsecond <= 999_999).then(pl.time(hour, minute, second, microsecond)).otherwise(None),
+            pl.when(pl_microsecond <= 999_999)
+            .then(pl.time(pl_hour, pl_minute, pl_second, pl_microsecond))
+            .otherwise(None),
         )
 
     @staticmethod
