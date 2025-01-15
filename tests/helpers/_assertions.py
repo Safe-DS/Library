@@ -45,7 +45,7 @@ def assert_tables_are_equal(
     )
 
 
-def assert_that_tabular_datasets_are_equal(table1: TabularDataset, table2: TabularDataset) -> None:
+def assert_tabular_datasets_are_equal(table1: TabularDataset, table2: TabularDataset) -> None:
     """
     Assert that two tabular datasets are equal.
 
@@ -81,7 +81,7 @@ def assert_cell_operation_works(
     expected:
         The expected value of the transformed cell.
     type_if_none:
-        The type of the column if value is `None`.
+        The type of the column if the value is `None`.
     """
     type_ = type_if_none if value is None else None
     column = Column("A", [value], type_=type_)

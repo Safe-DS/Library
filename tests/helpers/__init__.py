@@ -2,7 +2,7 @@ from ._assertions import (
     assert_cell_operation_works,
     assert_row_operation_works,
     assert_tables_are_equal,
-    assert_that_tabular_datasets_are_equal,
+    assert_tabular_datasets_are_equal,
 )
 from ._devices import (
     configure_test_with_device,
@@ -41,7 +41,7 @@ __all__ = [
     "assert_cell_operation_works",
     "assert_row_operation_works",
     "assert_tables_are_equal",
-    "assert_that_tabular_datasets_are_equal",
+    "assert_tabular_datasets_are_equal",
     "configure_test_with_device",
     "device_cpu",
     "device_cuda",
