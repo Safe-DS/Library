@@ -10,12 +10,12 @@ from safeds.data.tabular.containers import Cell, Row, Table
     [
         (
             lambda: Table({}),
-            lambda _: Cell.from_literal(False),  # noqa: FBT003
+            lambda _: Cell.constant(False),  # noqa: FBT003
             Table({}),
         ),
         (
             lambda: Table({"col1": []}),
-            lambda _: Cell.from_literal(False),  # noqa: FBT003
+            lambda _: Cell.constant(False),  # noqa: FBT003
             Table({"col1": []}),
         ),
         (

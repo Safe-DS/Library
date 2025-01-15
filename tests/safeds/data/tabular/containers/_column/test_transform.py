@@ -10,7 +10,7 @@ from safeds.data.tabular.containers import Cell, Column
     [
         (
             lambda: Column("col1", []),
-            lambda _: Cell.from_literal(None),
+            lambda _: Cell.constant(None),
             Column("col1", []),
         ),
         (
@@ -20,7 +20,7 @@ from safeds.data.tabular.containers import Cell, Column
         ),
         (
             lambda: Column("col1", [1, 2, 3]),
-            lambda _: Cell.from_literal(None),
+            lambda _: Cell.constant(None),
             Column("col1", [None, None, None]),
         ),
         (

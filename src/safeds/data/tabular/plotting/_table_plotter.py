@@ -3,7 +3,7 @@ from __future__ import annotations
 import warnings
 from typing import TYPE_CHECKING
 
-from safeds._utils import _figure_to_image
+from safeds._utils import _figure_to_image, _safe_collect_lazy_frame
 from safeds._validation import _check_bounds, _check_columns_are_numeric, _check_columns_exist, _ClosedBound
 from safeds.exceptions import ColumnTypeError, NonNumericColumnError
 
@@ -380,7 +380,8 @@ class TablePlotter:
                 agg_list.append(pl.col(name).mean().alias(f"{name}_mean"))
                 agg_list.append(pl.count(name).alias(f"{name}_count"))
                 agg_list.append(pl.std(name, ddof=0).alias(f"{name}_std"))
-            grouped = self._table._lazy_frame.sort(x_name).group_by(x_name, maintain_order=True).agg(agg_list).collect()
+            grouped_lazy = self._table._lazy_frame.sort(x_name).group_by(x_name, maintain_order=True).agg(agg_list)
+            grouped = _safe_collect_lazy_frame(grouped_lazy)
 
             x = grouped.get_column(x_name)
             y_s = []
@@ -575,8 +576,8 @@ class TablePlotter:
 
             # Calculate the moving average
             mean_col = pl.col(y_name).mean().alias(y_name)
-            grouped = self._table._lazy_frame.sort(x_name).group_by(x_name, maintain_order=True).agg(mean_col).collect()
-            data = grouped
+            grouped_lazy = self._table._lazy_frame.sort(x_name).group_by(x_name, maintain_order=True).agg(mean_col)
+            data = _safe_collect_lazy_frame(grouped_lazy)
             moving_average = data.select([pl.col(y_name).rolling_mean(window_size).alias("moving_average")])
             # set up the arrays for plotting
             y_data_with_nan = moving_average["moving_average"].to_numpy()

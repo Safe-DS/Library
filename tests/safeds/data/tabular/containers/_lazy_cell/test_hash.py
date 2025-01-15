@@ -1,27 +1,85 @@
-from typing import Any
+from collections.abc import Callable
 
 import polars as pl
 import pytest
+from syrupy import SnapshotAssertion
 
 from safeds.data.tabular.containers import Cell
 from safeds.data.tabular.containers._lazy_cell import _LazyCell
 
 
-def test_should_be_deterministic() -> None:
-    cell: Cell[Any] = _LazyCell(pl.col("a"))
-    assert hash(cell) == 8162512882156938440
+@pytest.mark.parametrize(
+    "cell_factory",
+    [
+        lambda: Cell.constant(1),
+        lambda: Cell.date(2025, 1, 15),
+        lambda: Cell.date(_LazyCell(pl.col("a")), 1, 15),
+        lambda: _LazyCell(pl.col("a")),
+    ],
+    ids=[
+        "constant",
+        "date, int",
+        "date, column",
+        "column",
+    ],
+)
+class TestContract:
+    def test_should_return_same_hash_for_equal_objects(self, cell_factory: Callable[[], Cell]) -> None:
+        cell_1 = cell_factory()
+        cell_2 = cell_factory()
+        assert hash(cell_1) == hash(cell_2)
+
+    def test_should_return_same_hash_in_different_processes(
+        self,
+        cell_factory: Callable[[], Cell],
+        snapshot: SnapshotAssertion,
+    ) -> None:
+        cell = cell_factory()
+        assert hash(cell) == snapshot
 
 
 @pytest.mark.parametrize(
-    ("cell1", "cell2", "expected"),
+    ("cell_1", "cell_2"),
     [
-        (_LazyCell(pl.col("a")), _LazyCell(pl.col("a")), True),
-        (_LazyCell(pl.col("a")), _LazyCell(pl.col("b")), False),
+        # different constant value
+        (
+            Cell.constant(1),
+            Cell.constant(2),
+        ),
+        # different constant type
+        (
+            Cell.constant(1),
+            Cell.constant("1"),
+        ),
+        # different date, int
+        (
+            Cell.date(2025, 1, 15),
+            Cell.date(2024, 1, 15),
+        ),
+        # different date, column
+        (
+            Cell.date(_LazyCell(pl.col("a")), 1, 15),
+            Cell.date(_LazyCell(pl.col("b")), 1, 15),
+        ),
+        # different column
+        (
+            _LazyCell(pl.col("a")),
+            _LazyCell(pl.col("b")),
+        ),
+        # different cell kinds
+        (
+            Cell.date(23, 1, 15),
+            Cell.time(23, 1, 15),
+        ),
     ],
     ids=[
-        "equal",
-        "different",
+        "different constant value",
+        "different constant type",
+        "different date, int",
+        "different date, column",
+        "different column",
+        "different cell kinds",
     ],
 )
-def test_should_be_good_hash(cell1: Cell, cell2: Cell, expected: bool) -> None:
-    assert (hash(cell1) == hash(cell2)) == expected
+def test_should_be_good_hash(cell_1: Cell, cell_2: Cell) -> None:
+    assert hash(cell_1) != hash(cell_2)

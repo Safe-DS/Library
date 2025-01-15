@@ -12,19 +12,19 @@ from safeds.exceptions import DuplicateColumnError
         (
             lambda: Table({}),
             "col1",
-            lambda _: Cell.from_literal(None),
+            lambda _: Cell.constant(None),
             Table({"col1": []}),
         ),
         (
             lambda: Table({"col1": []}),
             "col2",
-            lambda _: Cell.from_literal(None),
+            lambda _: Cell.constant(None),
             Table({"col1": [], "col2": []}),
         ),
         (
             lambda: Table({"col1": [1, 2, 3]}),
             "col2",
-            lambda _: Cell.from_literal(None),
+            lambda _: Cell.constant(None),
             Table({"col1": [1, 2, 3], "col2": [None, None, None]}),
         ),
         (

@@ -3,40 +3,120 @@ from typing import Any
 import polars as pl
 import pytest
 
-from safeds.data.tabular.containers import Cell, Table
+from safeds.data.tabular.containers import Cell, Column
 from safeds.data.tabular.containers._lazy_cell import _LazyCell
 
 
 @pytest.mark.parametrize(
-    ("cell1", "cell2", "expected"),
+    ("cell_1", "cell_2", "expected"),
     [
-        (_LazyCell(pl.col("a")), _LazyCell(pl.col("a")), True),
-        (_LazyCell(pl.col("a")), _LazyCell(pl.col("b")), False),
+        # equal (constant)
+        (
+            Cell.constant(1),
+            Cell.constant(1),
+            True,
+        ),
+        # equal (date, int)
+        (
+            Cell.date(2025, 1, 15),
+            Cell.date(2025, 1, 15),
+            True,
+        ),
+        # equal (date, column)
+        (
+            Cell.date(_LazyCell(pl.col("a")), 1, 15),
+            Cell.date(_LazyCell(pl.col("a")), 1, 15),
+            True,
+        ),
+        # equal (column)
+        (
+            _LazyCell(pl.col("a")),
+            _LazyCell(pl.col("a")),
+            True,
+        ),
+        # not equal (different constant value)
+        (
+            Cell.constant(1),
+            Cell.constant(2),
+            False,
+        ),
+        # not equal (different constant type)
+        (
+            Cell.constant(1),
+            Cell.constant("1"),
+            False,
+        ),
+        # not equal (different date, int)
+        (
+            Cell.date(2025, 1, 15),
+            Cell.date(2024, 1, 15),
+            False,
+        ),
+        # not equal (different date, column)
+        (
+            Cell.date(_LazyCell(pl.col("a")), 1, 15),
+            Cell.date(_LazyCell(pl.col("b")), 1, 15),
+            False,
+        ),
+        # not equal (different column)
+        (
+            _LazyCell(pl.col("a")),
+            _LazyCell(pl.col("b")),
+            False,
+        ),
+        # not equal (different cell kinds)
+        (
+            Cell.date(23, 1, 15),
+            Cell.time(23, 1, 15),
+            False,
+        ),
     ],
     ids=[
-        "equal",
-        "different",
+        # Equal
+        "equal (constant)",
+        "equal (date, int)",
+        "equal (date, column)",
+        "equal (column)",
+        # Not equal
+        "not equal (different constant value)",
+        "not equal (different constant type)",
+        "not equal (different date, int)",
+        "not equal (different date, column)",
+        "not equal (different column)",
+        "not equal (different cell kinds)",
     ],
 )
-def test_should_return_whether_two_cells_are_equal(cell1: Cell, cell2: Cell, expected: bool) -> None:
-    assert (cell1._equals(cell2)) == expected
+def test_should_return_whether_objects_are_equal(cell_1: Cell, cell_2: Cell, expected: bool) -> None:
+    assert (cell_1._equals(cell_2)) == expected
 
 
-def test_should_return_true_if_objects_are_identical() -> None:
-    cell: Cell[Any] = _LazyCell(pl.col("a"))
+@pytest.mark.parametrize(
+    "cell",
+    [
+        Cell.constant(1),
+        Cell.date(2025, 1, 15),
+        _LazyCell(pl.col("a")),
+    ],
+    ids=[
+        "constant",
+        "date",
+        "column",
+    ],
+)
+def test_should_return_true_if_objects_are_identical(cell: Cell) -> None:
     assert (cell._equals(cell)) is True
 
 
 @pytest.mark.parametrize(
     ("cell", "other"),
     [
-        (_LazyCell(pl.col("a")), None),
-        (_LazyCell(pl.col("a")), Table({})),
+        (Cell.constant(1), None),
+        (Cell.constant(1), Column("col1", [1])),
     ],
     ids=[
         "Cell vs. None",
-        "Cell vs. Table",
+        "Cell vs. Column",
     ],
 )
-def test_should_return_not_implemented_if_other_is_not_cell(cell: Cell, other: Any) -> None:
+def test_should_return_not_implemented_if_other_has_different_type(cell: Cell, other: Any) -> None:
     assert (cell._equals(other)) is NotImplemented

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from safeds._utils import _safe_collect_lazy_frame
 from safeds._validation import _check_columns_are_numeric, _check_columns_exist
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import NotFittedError
@@ -86,8 +87,8 @@ class StandardScaler(InvertibleTableTransformer):
             raise ValueError("The StandardScaler cannot be fitted because the table contains 0 rows")
 
         # Learn the transformation (ddof=0 is used to match the behavior of scikit-learn)
-        _data_mean = table._lazy_frame.select(column_names).mean().collect()
-        _data_standard_deviation = table._lazy_frame.select(column_names).std(ddof=0).collect()
+        _data_mean = _safe_collect_lazy_frame(table._lazy_frame.select(column_names).mean())
+        _data_standard_deviation = _safe_collect_lazy_frame(table._lazy_frame.select(column_names).std(ddof=0))
 
         # Create a copy with the learned transformation
         result = StandardScaler(selector=column_names)

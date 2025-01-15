@@ -56,6 +56,10 @@ class IndexOutOfBoundsError(IndexError):
     """Raised when trying to access an invalid index."""
 
 
+class LazyComputationError(SafeDsError, RuntimeError):
+    """Raised when a lazy computation fails."""
+
+
 class LengthMismatchError(SafeDsError, ValueError):
     """Raised when objects have different lengths."""
 
@@ -93,6 +97,7 @@ __all__ = [  # noqa: RUF022
     "DuplicateColumnError",
     "FileExtensionError",
     "IndexOutOfBoundsError",
+    "LazyComputationError",
     "LengthMismatchError",
     "MissingValuesError",
     "NotFittedError",

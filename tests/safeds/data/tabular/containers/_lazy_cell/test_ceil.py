@@ -2,6 +2,7 @@ import math
 
 import pytest
 
+from safeds.data.tabular.typing import ColumnType
 from tests.helpers import assert_cell_operation_works
 
 
@@ -14,6 +15,7 @@ from tests.helpers import assert_cell_operation_works
         (10.5, 11),
         (-10, -10),
         (-10.5, -10),
+        (None, None),
     ],
     ids=[
         "zero int",
@@ -22,11 +24,12 @@ from tests.helpers import assert_cell_operation_works
         "positive float",
         "negative int",
         "negative float",
+        "None",
     ],
 )
-class TestShouldReturnCeilOfCell:
-    def test_dunder_method(self, value: float, expected: float) -> None:
-        assert_cell_operation_works(value, lambda cell: math.ceil(cell), expected)
+class TestShouldReturnCeiling:
+    def test_dunder_method(self, value: float | None, expected: float | None) -> None:
+        assert_cell_operation_works(value, lambda cell: math.ceil(cell), expected, type_if_none=ColumnType.float64())
 
-    def test_named_method(self, value: float, expected: float) -> None:
-        assert_cell_operation_works(value, lambda cell: cell.ceil(), expected)
+    def test_named_method(self, value: float | None, expected: float | None) -> None:
+        assert_cell_operation_works(value, lambda cell: cell.ceil(), expected, type_if_none=ColumnType.float64())
