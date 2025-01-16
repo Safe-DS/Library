@@ -22,13 +22,13 @@ class DatetimeOperations(ABC):
     >>> from safeds.data.tabular.containers import Column
     >>> import datetime
     >>> column = Column("a", [datetime.date(2022, 1, 9)])
-    >>> column.transform(lambda cell: cell.dt.date_to_string("%Y/%m/%d"))
+    >>> column.transform(lambda cell: cell.dt.date_to_string("%d.%m.%Y"))
     +------------+
-    | example    |
+    | a          |
     | ---        |
     | str        |
     +============+
-    | 2022/01/09 |
+    | 09.01.2022 |
     +------------+
     """
 
@@ -71,13 +71,13 @@ class DatetimeOperations(ABC):
         >>> import datetime
         >>> column = Column("a", [datetime.date(2022, 1, 1)])
         >>> column.transform(lambda cell: cell.dt.century())
-        +---------+
-        | example |
-        |     --- |
-        |     i32 |
-        +=========+
-        |      21 |
-        +---------+
+        +-----+
+        |   a |
+        | --- |
+        | i32 |
+        +=====+
+        |  21 |
+        +-----+
         """
 
     @abstractmethod
@@ -96,13 +96,13 @@ class DatetimeOperations(ABC):
         >>> import datetime
         >>> column = Column("a", [datetime.date(2022, 1, 1)])
         >>> column.transform(lambda cell: cell.dt.weekday())
-        +---------+
-        | example |
-        |     --- |
-        |      i8 |
-        +=========+
-        |       6 |
-        +---------+
+        +-----+
+        |   a |
+        | --- |
+        |  i8 |
+        +=====+
+        |   6 |
+        +-----+
         """
 
     @abstractmethod
@@ -112,6 +112,7 @@ class DatetimeOperations(ABC):
 
         Returns
         -------
+        cell:
             A cell containing the week as integer.
 
         Examples
@@ -120,13 +121,13 @@ class DatetimeOperations(ABC):
         >>> import datetime
         >>> column = Column("a", [datetime.date(2022, 1, 1)])
         >>> column.transform(lambda cell: cell.dt.week())
-        +---------+
-        | example |
-        |     --- |
-        |      i8 |
-        +=========+
-        |      52 |
-        +---------+
+        +-----+
+        |   a |
+        | --- |
+        |  i8 |
+        +=====+
+        |  52 |
+        +-----+
         """
 
     @abstractmethod
@@ -136,6 +137,7 @@ class DatetimeOperations(ABC):
 
         Returns
         -------
+        cell:
             A cell containing the year as integer.
 
         Examples
@@ -144,13 +146,13 @@ class DatetimeOperations(ABC):
         >>> import datetime
         >>> column = Column("a", [datetime.date(2022, 1, 9)])
         >>> column.transform(lambda cell: cell.dt.year())
-        +---------+
-        | example |
-        |     --- |
-        |     i32 |
-        +=========+
-        |    2022 |
-        +---------+
+        +------+
+        |    a |
+        |  --- |
+        |  i32 |
+        +======+
+        | 2022 |
+        +------+
         """
 
     @abstractmethod
@@ -160,6 +162,7 @@ class DatetimeOperations(ABC):
 
         Returns
         -------
+        cell:
             A cell containing the month as integer.
 
         Examples
@@ -168,13 +171,13 @@ class DatetimeOperations(ABC):
         >>> import datetime
         >>> column = Column("a", [datetime.date(2022, 1, 9)])
         >>> column.transform(lambda cell: cell.dt.month())
-        +---------+
-        | example |
-        |     --- |
-        |      i8 |
-        +=========+
-        |       1 |
-        +---------+
+        +-----+
+        |   a |
+        | --- |
+        |  i8 |
+        +=====+
+        |   1 |
+        +-----+
         """
 
     @abstractmethod
@@ -184,6 +187,7 @@ class DatetimeOperations(ABC):
 
         Returns
         -------
+        cell:
             A cell containing the day as integer.
 
         Examples
@@ -192,13 +196,13 @@ class DatetimeOperations(ABC):
         >>> import datetime
         >>> column = Column("a", [datetime.date(2022, 1, 9)])
         >>> column.transform(lambda cell: cell.dt.day())
-        +---------+
-        | example |
-        |     --- |
-        |      i8 |
-        +=========+
-        |       9 |
-        +---------+
+        +-----+
+        |   a |
+        | --- |
+        |  i8 |
+        +=====+
+        |   9 |
+        +-----+
         """
 
     @abstractmethod
@@ -213,7 +217,7 @@ class DatetimeOperations(ABC):
 
         Returns
         -------
-        date:
+        cell:
             The string value.
 
         Raises
@@ -228,7 +232,7 @@ class DatetimeOperations(ABC):
         >>> column = Column("a", [ datetime.datetime(2022, 1, 9, 23, 29, 1, tzinfo=datetime.UTC)])
         >>> column.transform(lambda cell: cell.dt.datetime_to_string())
         +---------------------+
-        | example             |
+        | a                   |
         | ---                 |
         | str                 |
         +=====================+
@@ -248,9 +252,8 @@ class DatetimeOperations(ABC):
 
         Returns
         -------
-        date:
+        cell:
             The string value.
-
 
         ValueError
             If the formatstring is invalid.
@@ -262,7 +265,7 @@ class DatetimeOperations(ABC):
         >>> column = Column("a", [datetime.date(2022, 1, 9)])
         >>> column.transform(lambda cell: cell.dt.date_to_string())
         +------------+
-        | example    |
+        | a          |
         | ---        |
         | str        |
         +============+
