@@ -8,6 +8,8 @@ from safeds.data.tabular.containers._lazy_cell import _LazyCell
 from ._datetime_operations import DatetimeOperations
 
 if TYPE_CHECKING:
+    import datetime as python_datetime
+
     import polars as pl
 
     from safeds.data.tabular.containers._cell import Cell
@@ -41,34 +43,71 @@ class _LazyDatetimeOperations(DatetimeOperations):
         return f"({self._expression}).dt"
 
     # ------------------------------------------------------------------------------------------------------------------
-    # Temporal operations
+    # Extract components
     # ------------------------------------------------------------------------------------------------------------------
 
     def century(self) -> Cell[int | None]:
         return _LazyCell(self._expression.dt.century())
 
-    def weekday(self) -> Cell[int | None]:
-        return _LazyCell(self._expression.dt.weekday())
-
-    def week(self) -> Cell[int | None]:
-        return _LazyCell(self._expression.dt.week())
-
-    def year(self) -> Cell[int | None]:
-        return _LazyCell(self._expression.dt.year())
-
-    def month(self) -> Cell[int | None]:
-        return _LazyCell(self._expression.dt.month())
+    def date(self) -> Cell[python_datetime.date | None]:
+        return _LazyCell(self._expression.dt.date())
 
     def day(self) -> Cell[int | None]:
         return _LazyCell(self._expression.dt.day())
 
+    def day_of_year(self) -> Cell[int | None]:
+        return _LazyCell(self._expression.dt.ordinal_day())
+
     def hour(self) -> Cell[int | None]:
         return _LazyCell(self._expression.dt.hour())
 
-    def to_string(self, format_string: str = "%F") -> Cell[str | None]:
-        if not _check_format_string(format_string):
+    def microsecond(self) -> Cell[int | None]:
+        return _LazyCell(self._expression.dt.microsecond())
+
+    def millennium(self) -> Cell[int | None]:
+        return _LazyCell(self._expression.dt.millennium())
+
+    def millisecond(self) -> Cell[int | None]:
+        return _LazyCell(self._expression.dt.millisecond())
+
+    def minute(self) -> Cell[int | None]:
+        return _LazyCell(self._expression.dt.minute())
+
+    def month(self) -> Cell[int | None]:
+        return _LazyCell(self._expression.dt.month())
+
+    def quarter(self) -> Cell[int | None]:
+        return _LazyCell(self._expression.dt.quarter())
+
+    def second(self) -> Cell[int | None]:
+        return _LazyCell(self._expression.dt.second())
+
+    def time(self) -> Cell[python_datetime.time | None]:
+        return _LazyCell(self._expression.dt.time())
+
+    def week(self) -> Cell[int | None]:
+        return _LazyCell(self._expression.dt.week())
+
+    def weekday(self) -> Cell[int | None]:
+        return _LazyCell(self._expression.dt.weekday())
+
+    def year(self) -> Cell[int | None]:
+        return _LazyCell(self._expression.dt.year())
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Other operations
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def is_in_leap_year(self) -> Cell[bool | None]:
+        return _LazyCell(self._expression.dt.is_leap_year())
+
+    def to_string(self, *, format: str = "iso:strict") -> Cell[str | None]:
+        if not _check_format_string(format):
             raise ValueError("Invalid format string")
-        return _LazyCell(self._expression.dt.to_string(format=format_string))
+        return _LazyCell(self._expression.dt.to_string(format=format))
+
+    def unix_time(self) -> Cell[int | None]:
+        return _LazyCell(self._expression.dt.epoch())
 
 
 def _check_format_string(format_string: str) -> bool:
