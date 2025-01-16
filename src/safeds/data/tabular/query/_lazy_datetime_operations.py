@@ -65,14 +65,8 @@ class _LazyDatetimeOperations(DatetimeOperations):
     def hour(self) -> Cell[int | None]:
         return _LazyCell(self._expression.dt.hour())
 
-    def datetime_to_string(self, format_string: str = "%Y/%m/%d %H:%M:%S") -> Cell[str | None]:
+    def to_string(self, format_string: str = "%F") -> Cell[str | None]:
         if not _check_format_string(format_string):
-            raise ValueError("Invalid format string")
-        return _LazyCell(self._expression.dt.to_string(format=format_string))
-
-    def date_to_string(self, format_string: str = "%F") -> Cell[str | None]:
-        if not _check_format_string(format_string):
-            # Fehler in _check_format_string
             raise ValueError("Invalid format string")
         return _LazyCell(self._expression.dt.to_string(format=format_string))
 

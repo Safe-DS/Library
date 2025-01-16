@@ -19,16 +19,17 @@ class DatetimeOperations(ABC):
 
     Examples
     --------
+    >>> from datetime import date
     >>> from safeds.data.tabular.containers import Column
-    >>> import datetime
-    >>> column = Column("a", [datetime.date(2022, 1, 9)])
-    >>> column.transform(lambda cell: cell.dt.date_to_string("%d.%m.%Y"))
+    >>> column = Column("a", [date(2022, 1, 9), date(2024, 6, 12)])
+    >>> column.transform(lambda cell: cell.dt.to_string("%d.%m.%Y"))
     +------------+
     | a          |
     | ---        |
     | str        |
     +============+
     | 09.01.2022 |
+    | 12.06.2024 |
     +------------+
     """
 
@@ -206,44 +207,9 @@ class DatetimeOperations(ABC):
         """
 
     @abstractmethod
-    def datetime_to_string(self, format_string: str = "%Y/%m/%d %H:%M:%S") -> Cell[str | None]:
+    def to_string(self, format_string: str = "%F") -> Cell[str | None]:
         """
-        Convert the date value in the cell to a string.
-
-        Parameters
-        ----------
-        format_string:
-            The format string it will be used to convert the data into the string.
-
-        Returns
-        -------
-        cell:
-            The string value.
-
-        Raises
-        ------
-        ValueError
-            If the formatstring is invalid.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Column
-        >>> import datetime
-        >>> column = Column("a", [ datetime.datetime(2022, 1, 9, 23, 29, 1, tzinfo=datetime.UTC)])
-        >>> column.transform(lambda cell: cell.dt.datetime_to_string())
-        +---------------------+
-        | a                   |
-        | ---                 |
-        | str                 |
-        +=====================+
-        | 2022/01/09 23:29:01 |
-        +---------------------+
-        """
-
-    @abstractmethod
-    def date_to_string(self, format_string: str = "%F") -> Cell[str | None]:
-        """
-        Convert the date value in the cell to a string.
+        Convert the datetime/date/time value in the cell to a string.
 
         Parameters
         ----------
@@ -263,7 +229,7 @@ class DatetimeOperations(ABC):
         >>> from safeds.data.tabular.containers import Column
         >>> import datetime
         >>> column = Column("a", [datetime.date(2022, 1, 9)])
-        >>> column.transform(lambda cell: cell.dt.date_to_string())
+        >>> column.transform(lambda cell: cell.dt.to_string())
         +------------+
         | a          |
         | ---        |
