@@ -2,6 +2,6 @@
 # name: TestContract.test_should_return_same_hash_in_different_processes[column]
   8162512882156938440
 # ---
-# name: TestContract.test_should_return_same_hash_in_different_processes[duration]
-  2005674043565732975
+# name: TestContract.test_should_return_same_hash_in_different_processes[time]
+  1565184979992361175
 # ---

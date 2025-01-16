@@ -6,29 +6,29 @@ from syrupy import SnapshotAssertion
 
 from safeds.data.tabular.containers import Cell
 from safeds.data.tabular.containers._lazy_cell import _LazyCell
-from safeds.data.tabular.query import TemporalOperations
+from safeds.data.tabular.query import DatetimeOperations
 
 
 @pytest.mark.parametrize(
     "ops_factory",
     [
-        lambda: Cell.duration(hours=1).dt,
+        lambda: Cell.time(1, 0, 0).dt,
         lambda: _LazyCell(pl.col("a")).dt,
     ],
     ids=[
-        "duration",
+        "time",
         "column",
     ],
 )
 class TestContract:
-    def test_should_return_same_hash_for_equal_objects(self, ops_factory: Callable[[], TemporalOperations]) -> None:
+    def test_should_return_same_hash_for_equal_objects(self, ops_factory: Callable[[], DatetimeOperations]) -> None:
         ops_1 = ops_factory()
         ops_2 = ops_factory()
         assert hash(ops_1) == hash(ops_2)
 
     def test_should_return_same_hash_in_different_processes(
         self,
-        ops_factory: Callable[[], TemporalOperations],
+        ops_factory: Callable[[], DatetimeOperations],
         snapshot: SnapshotAssertion,
     ) -> None:
         ops = ops_factory()
@@ -38,10 +38,10 @@ class TestContract:
 @pytest.mark.parametrize(
     ("ops_1", "ops_2"),
     [
-        # different durations
+        # different times
         (
-            Cell.duration(hours=1).dt,
-            Cell.duration(hours=2).dt,
+            Cell.time(1, 0, 0).dt,
+            Cell.time(2, 0, 0).dt,
         ),
         # different columns
         (
@@ -50,15 +50,15 @@ class TestContract:
         ),
         # different cell kinds
         (
-            Cell.duration(hours=1).dt,
+            Cell.time(1, 0, 0).dt,
             _LazyCell(pl.col("a")).dt,
         ),
     ],
     ids=[
-        "different durations",
+        "different times",
         "different columns",
         "different cell kinds",
     ],
 )
-def test_should_be_good_hash(ops_1: TemporalOperations, ops_2: TemporalOperations) -> None:
+def test_should_be_good_hash(ops_1: DatetimeOperations, ops_2: DatetimeOperations) -> None:
     assert hash(ops_1) != hash(ops_2)

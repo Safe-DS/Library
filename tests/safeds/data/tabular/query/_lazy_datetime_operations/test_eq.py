@@ -5,16 +5,16 @@ import pytest
 
 from safeds.data.tabular.containers import Cell, Column
 from safeds.data.tabular.containers._lazy_cell import _LazyCell
-from safeds.data.tabular.query import TemporalOperations
+from safeds.data.tabular.query import DatetimeOperations
 
 
 @pytest.mark.parametrize(
     ("ops_1", "ops_2", "expected"),
     [
-        # equal (duration)
+        # equal (time)
         (
-            Cell.duration(hours=1).dt,
-            Cell.duration(hours=1).dt,
+            Cell.time(1, 0, 0).dt,
+            Cell.time(1, 0, 0).dt,
             True,
         ),
         # equal (column)
@@ -23,10 +23,10 @@ from safeds.data.tabular.query import TemporalOperations
             _LazyCell(pl.col("a")).dt,
             True,
         ),
-        # not equal (different durations)
+        # not equal (different times)
         (
-            Cell.duration(hours=1).dt,
-            Cell.duration(hours=2).dt,
+            Cell.time(1, 0, 0).dt,
+            Cell.time(2, 0, 0).dt,
             False,
         ),
         # not equal (different columns)
@@ -37,24 +37,24 @@ from safeds.data.tabular.query import TemporalOperations
         ),
         # not equal (different cell kinds)
         (
-            Cell.duration(hours=1).dt,
+            Cell.time(1, 0, 0).dt,
             _LazyCell(pl.col("a")).dt,
             False,
         ),
     ],
     ids=[
         # Equal
-        "equal (duration)",
+        "equal (time)",
         "equal (column)",
         # Not equal
-        "not equal (different durations)",
+        "not equal (different times)",
         "not equal (different columns)",
         "not equal (different cell kinds)",
     ],
 )
 def test_should_return_whether_objects_are_equal(
-    ops_1: TemporalOperations,
-    ops_2: TemporalOperations,
+    ops_1: DatetimeOperations,
+    ops_2: DatetimeOperations,
     expected: bool,
 ) -> None:
     assert (ops_1.__eq__(ops_2)) == expected
@@ -63,28 +63,28 @@ def test_should_return_whether_objects_are_equal(
 @pytest.mark.parametrize(
     "ops",
     [
-        Cell.duration(hours=1).dt,
+        Cell.time(1, 0, 0).dt,
         _LazyCell(pl.col("a")).dt,
     ],
     ids=[
-        "duration",
+        "time",
         "column",
     ],
 )
-def test_should_return_true_if_objects_are_identical(ops: TemporalOperations) -> None:
+def test_should_return_true_if_objects_are_identical(ops: DatetimeOperations) -> None:
     assert (ops.__eq__(ops)) is True
 
 
 @pytest.mark.parametrize(
     ("ops", "other"),
     [
-        (Cell.duration(hours=1).dt, None),
-        (Cell.duration(hours=1).dt, Column("col1", [1])),
+        (Cell.time(1, 0, 0).dt, None),
+        (Cell.time(1, 0, 0).dt, Column("col1", [1])),
     ],
     ids=[
-        "TemporalOperations vs. None",
-        "TemporalOperations vs. Column",
+        "DatetimeOperations vs. None",
+        "DatetimeOperations vs. Column",
     ],
 )
-def test_should_return_not_implemented_if_other_has_different_type(ops: TemporalOperations, other: Any) -> None:
+def test_should_return_not_implemented_if_other_has_different_type(ops: DatetimeOperations, other: Any) -> None:
     assert (ops.__eq__(other)) is NotImplemented
