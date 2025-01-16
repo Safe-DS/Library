@@ -84,6 +84,7 @@ plugins:
             show_signature: false
             show_symbol_type_heading: true
             show_symbol_type_toc: true
+            summary: true
   - gen-files:
       scripts:
         - docs/reference/generate_reference_pages.py
