@@ -28,13 +28,13 @@ class Cell(ABC, Generic[T_co]):
     You only need to interact with this class in callbacks passed to higher-order functions. Most operations are grouped
     into namespaces, which are accessed through the following attributes:
 
-    -`dt` (operations on datetime/date/time values)
-    -`dur` (operations on durations)
-    -`math` (mathematical operations on numbers)
-    -`str` (operations on strings)
+    - `dt`: Operations on datetime/date/time values
+    - `dur`: Operations on durations
+    - `math`: Mathematical operations on numbers
+    - `str`: Operations on strings
 
-    This class only has methods that are not specific to a data type (e.g. `cast`), and methods with corresponding
-    operators (e.g. `add` for `+`).
+    This class only has methods that are not specific to a data type (e.g. `cast`), methods with corresponding
+    operators (e.g. `add` for `+`), and static methods to create new cells.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -618,10 +618,15 @@ class Cell(ABC, Generic[T_co]):
 
     def not_(self) -> Cell[bool | None]:
         """
-        Negate a boolean. This is equivalent to the `~` operator.
+        Negate a Boolean. This is equivalent to the `~` operator.
 
         Do **not** use the `not` operator. Its behavior cannot be overwritten in Python, so it will not work as
         expected.
+
+        Returns
+        -------
+        cell:
+            The result of the Boolean negation.
 
         Examples
         --------
@@ -653,10 +658,20 @@ class Cell(ABC, Generic[T_co]):
 
     def and_(self, other: _ConvertibleToBooleanCell) -> Cell[bool | None]:
         """
-        Perform a boolean AND operation. This is equivalent to the `&` operator.
+        Perform a Boolean AND operation. This is equivalent to the `&` operator.
 
         Do **not** use the `and` operator. Its behavior cannot be overwritten in Python, so it will not work as
         expected.
+
+        Parameters
+        ----------
+        other:
+            The right operand.
+
+        Returns
+        -------
+        cell:
+            The result of the conjunction.
 
         Examples
         --------
@@ -688,9 +703,19 @@ class Cell(ABC, Generic[T_co]):
 
     def or_(self, other: _ConvertibleToBooleanCell) -> Cell[bool | None]:
         """
-        Perform a boolean OR operation. This is equivalent to the `|` operator.
+        Perform a Boolean OR operation. This is equivalent to the `|` operator.
 
         Do **not** use the `or` operator. Its behavior cannot be overwritten in Python, so it will not work as expected.
+
+        Parameters
+        ----------
+        other:
+            The right operand.
+
+        Returns
+        -------
+        cell:
+            The result of the disjunction.
 
         Examples
         --------
@@ -722,7 +747,17 @@ class Cell(ABC, Generic[T_co]):
 
     def xor(self, other: _ConvertibleToBooleanCell) -> Cell[bool | None]:
         """
-        Perform a boolean XOR operation. This is equivalent to the `^` operator.
+        Perform a Boolean XOR operation. This is equivalent to the `^` operator.
+
+        Parameters
+        ----------
+        other:
+            The right operand.
+
+        Returns
+        -------
+        cell:
+            The result of the exclusive or.
 
         Examples
         --------
@@ -760,6 +795,11 @@ class Cell(ABC, Generic[T_co]):
         """
         Negate the value. This is equivalent to the unary `-` operator.
 
+        Returns
+        -------
+        cell:
+            The negated value.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
@@ -791,6 +831,16 @@ class Cell(ABC, Generic[T_co]):
     def add(self, other: _ConvertibleToCell) -> Cell:
         """
         Add a value. This is equivalent to the `+` operator.
+
+        Parameters
+        ----------
+        other:
+            The right operand.
+
+        Returns
+        -------
+        cell:
+            The result of the addition.
 
         Examples
         --------
@@ -824,6 +874,16 @@ class Cell(ABC, Generic[T_co]):
         """
         Divide by a value. This is equivalent to the `/` operator.
 
+        Parameters
+        ----------
+        other:
+            The right operand.
+
+        Returns
+        -------
+        cell:
+            The result of the division.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
@@ -855,6 +915,16 @@ class Cell(ABC, Generic[T_co]):
     def mod(self, other: _ConvertibleToCell) -> Cell:
         """
         Perform a modulo operation. This is equivalent to the `%` operator.
+
+        Parameters
+        ----------
+        other:
+            The right operand.
+
+        Returns
+        -------
+        cell:
+            The result of the modulo operation.
 
         Examples
         --------
@@ -890,6 +960,16 @@ class Cell(ABC, Generic[T_co]):
         """
         Multiply by a value. This is equivalent to the `*` operator.
 
+        Parameters
+        ----------
+        other:
+            The right operand.
+
+        Returns
+        -------
+        cell:
+            The result of the multiplication.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
@@ -922,6 +1002,16 @@ class Cell(ABC, Generic[T_co]):
         """
         Raise to a power. This is equivalent to the `**` operator.
 
+        Parameters
+        ----------
+        other:
+            The right operand.
+
+        Returns
+        -------
+        cell:
+            The result of the exponentiation.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
@@ -936,7 +1026,6 @@ class Cell(ABC, Generic[T_co]):
         |   27 |
         | null |
         +------+
-
 
         >>> column.transform(lambda cell: cell ** 3)
         +------+
@@ -954,6 +1043,16 @@ class Cell(ABC, Generic[T_co]):
     def sub(self, other: _ConvertibleToCell) -> Cell:
         """
         Subtract a value. This is equivalent to the binary `-` operator.
+
+        Parameters
+        ----------
+        other:
+            The right operand.
+
+        Returns
+        -------
+        cell:
+            The result of the subtraction.
 
         Examples
         --------
@@ -1004,6 +1103,18 @@ class Cell(ABC, Generic[T_co]):
           result of the comparison if we do not know the values, which is consistent with the other cell operations.
         - If `propagate_missing_values` is `False`, `None` will be treated as a regular value. Here, `None == None`
           is `True`. This behavior is useful, if you want to work with missing values, e.g. to filter them out.
+
+        Parameters
+        ----------
+        other:
+            The value to compare to.
+        propagate_missing_values:
+            Whether to propagate missing values.
+
+        Returns
+        -------
+        cell:
+            The result of the comparison.
 
         Examples
         --------
@@ -1068,6 +1179,11 @@ class Cell(ABC, Generic[T_co]):
         propagate_missing_values:
             Whether to propagate missing values.
 
+        Returns
+        -------
+        cell:
+            The result of the comparison.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
@@ -1110,6 +1226,16 @@ class Cell(ABC, Generic[T_co]):
         """
         Check if greater than or equal to a value. This is equivalent to the `>=` operator.
 
+        Parameters
+        ----------
+        other:
+            The value to compare to.
+
+        Returns
+        -------
+        cell:
+            The result of the comparison.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
@@ -1141,6 +1267,16 @@ class Cell(ABC, Generic[T_co]):
     def gt(self, other: _ConvertibleToCell) -> Cell[bool | None]:
         """
         Check if greater than a value. This is equivalent to the `>` operator.
+
+        Parameters
+        ----------
+        other:
+            The value to compare to.
+
+        Returns
+        -------
+        cell:
+            The result of the comparison.
 
         Examples
         --------
@@ -1174,6 +1310,16 @@ class Cell(ABC, Generic[T_co]):
         """
         Check if less than or equal to a value. This is equivalent to the `<=` operator.
 
+        Parameters
+        ----------
+        other:
+            The value to compare to.
+
+        Returns
+        -------
+        cell:
+            The result of the comparison.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
@@ -1205,6 +1351,16 @@ class Cell(ABC, Generic[T_co]):
     def lt(self, other: _ConvertibleToCell) -> Cell[bool | None]:
         """
         Check if less than a value. This is equivalent to the `<` operator.
+
+        Parameters
+        ----------
+        other:
+            The value to compare to.
+
+        Returns
+        -------
+        cell:
+            The result of the comparison.
 
         Examples
         --------
