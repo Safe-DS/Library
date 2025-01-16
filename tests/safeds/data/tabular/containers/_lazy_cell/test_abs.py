@@ -25,9 +25,8 @@ from tests.helpers import assert_cell_operation_works
         "None",
     ],
 )
-class TestShouldReturnAbsoluteValue:
-    def test_dunder_method(self, value: float | None, expected: float | None) -> None:
-        assert_cell_operation_works(value, lambda cell: abs(cell), expected, type_if_none=ColumnType.float64())
+def test_should_return_absolute_value(value: float | None, expected: float | None) -> None:
+    assert_cell_operation_works(value, lambda cell: abs(cell), expected, type_if_none=ColumnType.float64())
 
-    def test_named_method(self, value: float | None, expected: float | None) -> None:
-        assert_cell_operation_works(value, lambda cell: cell.abs(), expected, type_if_none=ColumnType.float64())
+
+# The corresponding named method is inside the `math` namespace.

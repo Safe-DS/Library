@@ -14,7 +14,7 @@ if TYPE_CHECKING:
         _ConvertibleToIntCell,
         _PythonLiteral,
     )
-    from safeds.data.tabular.query import StringOperations, TemporalOperations
+    from safeds.data.tabular.query import DatetimeOperations, DurationOperations, MathOperations, StringOperations
     from safeds.data.tabular.typing import ColumnType
 
 T_co = TypeVar("T_co", covariant=True)
@@ -25,7 +25,16 @@ class Cell(ABC, Generic[T_co]):
     """
     A single value in a table.
 
-    You only need to interact with this class in callbacks passed to higher-order functions.
+    You only need to interact with this class in callbacks passed to higher-order functions. Most operations are grouped
+    into namespaces, which are accessed through the following attributes:
+
+    -`dt` (operations on datetime/date/time values)
+    -`dur` (operations on durations)
+    -`math` (mathematical operations on numbers)
+    -`str` (operations on strings)
+
+    This class only has methods that are not specific to a data type (e.g. `cast`), and methods with corresponding
+    operators (e.g. `add` for `+`).
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -125,9 +134,9 @@ class Cell(ABC, Generic[T_co]):
 
         return _LazyCell(
             pl.date(
-                year=_unwrap(year),
-                month=_unwrap(month),
-                day=_unwrap(day),
+                year=_to_polars_expression(year),
+                month=_to_polars_expression(month),
+                day=_to_polars_expression(day),
             ),
         )
 
@@ -199,13 +208,13 @@ class Cell(ABC, Generic[T_co]):
 
         from ._lazy_cell import _LazyCell  # circular import
 
-        pl_year = _unwrap(year)
-        pl_month = _unwrap(month)
-        pl_day = _unwrap(day)
-        pl_hour = _unwrap(hour)
-        pl_minute = _unwrap(minute)
-        pl_second = _unwrap(second)
-        pl_microsecond = _unwrap(microsecond)
+        pl_year = _to_polars_expression(year)
+        pl_month = _to_polars_expression(month)
+        pl_day = _to_polars_expression(day)
+        pl_hour = _to_polars_expression(hour)
+        pl_minute = _to_polars_expression(minute)
+        pl_second = _to_polars_expression(second)
+        pl_microsecond = _to_polars_expression(microsecond)
 
         # By default, microseconds overflow into seconds
         return _LazyCell(
@@ -284,13 +293,13 @@ class Cell(ABC, Generic[T_co]):
 
         return _LazyCell(
             pl.duration(
-                weeks=_unwrap(weeks),
-                days=_unwrap(days),
-                hours=_unwrap(hours),
-                minutes=_unwrap(minutes),
-                seconds=_unwrap(seconds),
-                milliseconds=_unwrap(milliseconds),
-                microseconds=_unwrap(microseconds),
+                weeks=_to_polars_expression(weeks),
+                days=_to_polars_expression(days),
+                hours=_to_polars_expression(hours),
+                minutes=_to_polars_expression(minutes),
+                seconds=_to_polars_expression(seconds),
+                milliseconds=_to_polars_expression(milliseconds),
+                microseconds=_to_polars_expression(microseconds),
             ),
         )
 
@@ -353,10 +362,10 @@ class Cell(ABC, Generic[T_co]):
 
         from ._lazy_cell import _LazyCell  # circular import
 
-        pl_hour = _unwrap(hour)
-        pl_minute = _unwrap(minute)
-        pl_second = _unwrap(second)
-        pl_microsecond = _unwrap(microsecond)
+        pl_hour = _to_polars_expression(hour)
+        pl_minute = _to_polars_expression(minute)
+        pl_second = _to_polars_expression(second)
+        pl_microsecond = _to_polars_expression(microsecond)
 
         # By default, microseconds overflow into seconds
         return _LazyCell(
@@ -388,7 +397,7 @@ class Cell(ABC, Generic[T_co]):
         if not cells:
             return Cell.constant(None)
 
-        return _LazyCell(pl.coalesce([_unwrap(cell) for cell in cells]))
+        return _LazyCell(pl.coalesce([_to_polars_expression(cell) for cell in cells]))
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
@@ -518,6 +527,72 @@ class Cell(ABC, Generic[T_co]):
 
     @property
     @abstractmethod
+    def dt(self) -> DatetimeOperations:
+        """
+        Namespace for operations on datetime/date/time values.
+
+        Examples
+        --------
+        >>> from datetime import datetime
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [datetime(2025, 1, 1), datetime(2024, 1, 1)])
+        >>> column.transform(lambda cell: cell.dt.year())
+        +------+
+        |    a |
+        |  --- |
+        |  i32 |
+        +======+
+        | 2025 |
+        | 2024 |
+        +------+
+        """
+
+    @property
+    @abstractmethod
+    def dur(self) -> DurationOperations:
+        """
+        Namespace for operations on durations.
+
+        Examples
+        --------
+        >>> from datetime import timedelta
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [timedelta(hours=1), timedelta(hours=2)])
+        >>> column.transform(lambda cell: cell.dur.full_hours())
+        +-----+
+        |   a |
+        | --- |
+        | i64 |
+        +=====+
+        |   1 |
+        |   2 |
+        +-----+
+        """
+
+    @property
+    @abstractmethod
+    def math(self) -> MathOperations:
+        """
+        Namespace for mathematical operations.
+
+        Examples
+        --------
+        >>> from datetime import timedelta
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [1, -2])
+        >>> column.transform(lambda cell: cell.math.abs())
+        +-----+
+        |   a |
+        | --- |
+        | i64 |
+        +=====+
+        |   1 |
+        |   2 |
+        +-----+
+        """
+
+    @property
+    @abstractmethod
     def str(self) -> StringOperations:
         """
         Namespace for operations on strings.
@@ -535,28 +610,6 @@ class Cell(ABC, Generic[T_co]):
         |   2 |
         |   5 |
         +-----+
-        """
-
-    @property
-    @abstractmethod
-    def dt(self) -> TemporalOperations:
-        """
-        Namespace for operations on temporal values.
-
-        Examples
-        --------
-        >>> import datetime
-        >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [datetime.datetime(2025, 1, 1), datetime.datetime(2024, 1, 1)])
-        >>> column.transform(lambda cell: cell.dt.year())
-        +------+
-        |    a |
-        |  --- |
-        |  i32 |
-        +======+
-        | 2025 |
-        | 2024 |
-        +------+
         """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -702,69 +755,6 @@ class Cell(ABC, Generic[T_co]):
     # ------------------------------------------------------------------------------------------------------------------
     # Numeric operations
     # ------------------------------------------------------------------------------------------------------------------
-
-    def abs(self) -> Cell:
-        """
-        Get the absolute value.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [1, -2, None])
-        >>> column.transform(lambda cell: cell.abs())
-        +------+
-        |    a |
-        |  --- |
-        |  i64 |
-        +======+
-        |    1 |
-        |    2 |
-        | null |
-        +------+
-        """
-        return self.__abs__()
-
-    def ceil(self) -> Cell:
-        """
-        Round up to the nearest integer.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [1.1, 3.0, None])
-        >>> column.transform(lambda cell: cell.ceil())
-        +---------+
-        |       a |
-        |     --- |
-        |     f64 |
-        +=========+
-        | 2.00000 |
-        | 3.00000 |
-        |    null |
-        +---------+
-        """
-        return self.__ceil__()
-
-    def floor(self) -> Cell:
-        """
-        Round down to the nearest integer.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [1.1, 3.0, None])
-        >>> column.transform(lambda cell: cell.floor())
-        +---------+
-        |       a |
-        |     --- |
-        |     f64 |
-        +=========+
-        | 1.00000 |
-        | 3.00000 |
-        |    null |
-        +---------+
-        """
-        return self.__floor__()
 
     def neg(self) -> Cell:
         """
@@ -1249,13 +1239,13 @@ class Cell(ABC, Generic[T_co]):
     # ------------------------------------------------------------------------------------------------------------------
 
     @abstractmethod
-    def cast(self, type_: ColumnType) -> Cell:
+    def cast(self, type: ColumnType) -> Cell:
         """
         Cast the cell to a different type.
 
         Parameters
         ----------
-        type_:
+        type:
             The type to cast to.
 
         Returns
@@ -1298,7 +1288,7 @@ class Cell(ABC, Generic[T_co]):
         """
 
 
-def _unwrap(cell_proxy: _ConvertibleToCell) -> pl.Expr:
+def _to_polars_expression(cell_proxy: _ConvertibleToCell) -> pl.Expr:
     import polars as pl
 
     if isinstance(cell_proxy, Cell):
