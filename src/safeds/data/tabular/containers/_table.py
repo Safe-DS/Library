@@ -65,11 +65,11 @@ class Table:
 
     To create a `Table` call the constructor or use one of the following static methods:
 
-    - [from_csv_file][safeds.data.tabular.containers._table.Table.from_csv_file]: Create a table from a CSV file.
-    - [from_json_file][safeds.data.tabular.containers._table.Table.from_json_file]: Create a table from a JSON file.
-    - [from_parquet_file][safeds.data.tabular.containers._table.Table.from_parquet_file]: Create a table from a Parquet file.
-    - [from_columns][safeds.data.tabular.containers._table.Table.from_columns]: Create a table from a list of columns.
-    - [from_dict][safeds.data.tabular.containers._table.Table.from_dict]: Create a table from a dictionary.
+    - [`from_csv_file`][safeds.data.tabular.containers._table.Table.from_csv_file]: Create a table from a CSV file.
+    - [`from_json_file`][safeds.data.tabular.containers._table.Table.from_json_file]: Create a table from a JSON file.
+    - [`from_parquet_file`][safeds.data.tabular.containers._table.Table.from_parquet_file]: Create a table from a Parquet file.
+    - [`from_columns`][safeds.data.tabular.containers._table.Table.from_columns]: Create a table from a list of columns.
+    - [`from_dict`][safeds.data.tabular.containers._table.Table.from_dict]: Create a table from a dictionary.
 
     Parameters
     ----------
@@ -195,8 +195,8 @@ class Table:
 
         Related
         -------
-        - [from_json_file][safeds.data.tabular.containers._table.Table.from_json_file]
-        - [from_parquet_file][safeds.data.tabular.containers._table.Table.from_parquet_file]
+        - [`from_json_file`][safeds.data.tabular.containers._table.Table.from_json_file]
+        - [`from_parquet_file`][safeds.data.tabular.containers._table.Table.from_parquet_file]
         """
         import polars as pl
 
@@ -279,8 +279,8 @@ class Table:
 
         Related
         -------
-        - [from_csv_file][safeds.data.tabular.containers._table.Table.from_csv_file]
-        - [from_parquet_file][safeds.data.tabular.containers._table.Table.from_parquet_file]
+        - [`from_csv_file`][safeds.data.tabular.containers._table.Table.from_csv_file]
+        - [`from_parquet_file`][safeds.data.tabular.containers._table.Table.from_parquet_file]
         """
         import polars as pl
 
@@ -326,8 +326,8 @@ class Table:
 
         Related
         -------
-        - [from_csv_file][safeds.data.tabular.containers._table.Table.from_csv_file]
-        - [from_json_file][safeds.data.tabular.containers._table.Table.from_json_file]
+        - [`from_csv_file`][safeds.data.tabular.containers._table.Table.from_csv_file]
+        - [`from_json_file`][safeds.data.tabular.containers._table.Table.from_json_file]
         """
         import polars as pl
 
@@ -528,9 +528,9 @@ class Table:
 
         Related
         -------
-        - [add_computed_column][safeds.data.tabular.containers._table.Table.add_computed_column]:
+        - [`add_computed_column`][safeds.data.tabular.containers._table.Table.add_computed_column]:
             Add a column with values computed from other columns.
-        - [add_index_column][safeds.data.tabular.containers._table.Table.add_index_column]
+        - [`add_index_column`][safeds.data.tabular.containers._table.Table.add_index_column]
         """
         from polars.exceptions import DuplicateError, ShapeError
 
@@ -598,10 +598,10 @@ class Table:
 
         Related
         -------
-        - [add_columns][safeds.data.tabular.containers._table.Table.add_columns]:
+        - [`add_columns`][safeds.data.tabular.containers._table.Table.add_columns]:
             Add column objects to the table.
-        - [add_index_column][safeds.data.tabular.containers._table.Table.add_index_column]
-        - [transform_columns][safeds.data.tabular.containers._table.Table.transform_columns]:
+        - [`add_index_column`][safeds.data.tabular.containers._table.Table.add_index_column]
+        - [`transform_columns`][safeds.data.tabular.containers._table.Table.transform_columns]:
             Transform existing columns with a custom function.
         """
         _check_columns_dont_exist(self, name)
@@ -669,9 +669,9 @@ class Table:
 
         Related
         -------
-        - [add_columns][safeds.data.tabular.containers._table.Table.add_columns]:
+        - [`add_columns`][safeds.data.tabular.containers._table.Table.add_columns]:
             Add column objects to the table.
-        - [add_computed_column][safeds.data.tabular.containers._table.Table.add_computed_column]:
+        - [`add_computed_column`][safeds.data.tabular.containers._table.Table.add_computed_column]:
             Add a column with values computed from other columns.
         """
         _check_columns_dont_exist(self, name)
@@ -835,10 +835,10 @@ class Table:
 
         Related
         -------
-        - [select_columns][safeds.data.tabular.containers._table.Table.select_columns]:
+        - [`select_columns`][safeds.data.tabular.containers._table.Table.select_columns]:
             Keep only a subset of the columns.
-        - [remove_columns_with_missing_values][safeds.data.tabular.containers._table.Table.remove_columns_with_missing_values]
-        - [remove_non_numeric_columns][safeds.data.tabular.containers._table.Table.remove_non_numeric_columns]
+        - [`remove_columns_with_missing_values`][safeds.data.tabular.containers._table.Table.remove_columns_with_missing_values]
+        - [`remove_non_numeric_columns`][safeds.data.tabular.containers._table.Table.remove_non_numeric_columns]
         """
         if isinstance(selector, str):
             selector = [selector]
@@ -899,16 +899,16 @@ class Table:
 
         Related
         -------
-        - [remove_rows_with_missing_values][safeds.data.tabular.containers._table.Table.remove_rows_with_missing_values]
-        - [SimpleImputer][safeds.data.tabular.transformation._simple_imputer.SimpleImputer]:
+        - [`remove_rows_with_missing_values`][safeds.data.tabular.containers._table.Table.remove_rows_with_missing_values]
+        - [`SimpleImputer`][safeds.data.tabular.transformation._simple_imputer.SimpleImputer]:
             Replace missing values with a constant value or a statistic of the column.
-        - [KNearestNeighborsImputer][safeds.data.tabular.transformation._k_nearest_neighbors_imputer.KNearestNeighborsImputer]:
+        - [`KNearestNeighborsImputer`][safeds.data.tabular.transformation._k_nearest_neighbors_imputer.KNearestNeighborsImputer]:
             Replace missing values with a value computed from the nearest neighbors.
-        - [select_columns][safeds.data.tabular.containers._table.Table.select_columns]:
+        - [`select_columns`][safeds.data.tabular.containers._table.Table.select_columns]:
             Keep only a subset of the columns.
-        - [remove_columns][safeds.data.tabular.containers._table.Table.remove_columns]:
+        - [`remove_columns`][safeds.data.tabular.containers._table.Table.remove_columns]:
             Remove columns from the table by name.
-        - [remove_non_numeric_columns][safeds.data.tabular.containers._table.Table.remove_non_numeric_columns]
+        - [`remove_non_numeric_columns`][safeds.data.tabular.containers._table.Table.remove_non_numeric_columns]
         """
         import polars as pl
 
@@ -959,11 +959,11 @@ class Table:
 
         Related
         -------
-        - [select_columns][safeds.data.tabular.containers._table.Table.select_columns]:
+        - [`select_columns`][safeds.data.tabular.containers._table.Table.select_columns]:
             Keep only a subset of the columns.
-        - [remove_columns][safeds.data.tabular.containers._table.Table.remove_columns]:
+        - [`remove_columns`][safeds.data.tabular.containers._table.Table.remove_columns]:
             Remove columns from the table by name.
-        - [remove_columns_with_missing_values][safeds.data.tabular.containers._table.Table.remove_columns_with_missing_values]
+        - [`remove_columns_with_missing_values`][safeds.data.tabular.containers._table.Table.remove_columns_with_missing_values]
         """
         import polars.selectors as cs
 
@@ -1157,10 +1157,10 @@ class Table:
 
         Related
         -------
-        - [remove_columns][safeds.data.tabular.containers._table.Table.remove_columns]:
+        - [`remove_columns`][safeds.data.tabular.containers._table.Table.remove_columns]:
             Remove columns from the table by name.
-        - [remove_columns_with_missing_values][safeds.data.tabular.containers._table.Table.remove_columns_with_missing_values]
-        - [remove_non_numeric_columns][safeds.data.tabular.containers._table.Table.remove_non_numeric_columns]
+        - [`remove_columns_with_missing_values`][safeds.data.tabular.containers._table.Table.remove_columns_with_missing_values]
+        - [`remove_non_numeric_columns`][safeds.data.tabular.containers._table.Table.remove_non_numeric_columns]
         """
         _check_columns_exist(self, selector)
 
@@ -1235,9 +1235,9 @@ class Table:
 
         Related
         -------
-        - [add_computed_column][safeds.data.tabular.containers._table.Table.add_computed_column]:
+        - [`add_computed_column`][safeds.data.tabular.containers._table.Table.add_computed_column]:
             Add a new column that is computed from other columns.
-        - [transform_table][safeds.data.tabular.containers._table.Table.transform_table]:
+        - [`transform_table`][safeds.data.tabular.containers._table.Table.transform_table]:
             Transform the entire table with a fitted transformer.
         """
         import polars as pl
@@ -1375,11 +1375,11 @@ class Table:
 
         Related
         -------
-        - [filter_rows_by_column][safeds.data.tabular.containers._table.Table.filter_rows_by_column]:
+        - [`filter_rows_by_column`][safeds.data.tabular.containers._table.Table.filter_rows_by_column]:
             Keep only rows that satisfy a condition on a specific column.
-        - [remove_duplicate_rows][safeds.data.tabular.containers._table.Table.remove_duplicate_rows]
-        - [remove_rows_with_missing_values][safeds.data.tabular.containers._table.Table.remove_rows_with_missing_values]
-        - [remove_rows_with_outliers][safeds.data.tabular.containers._table.Table.remove_rows_with_outliers]
+        - [`remove_duplicate_rows`][safeds.data.tabular.containers._table.Table.remove_duplicate_rows]
+        - [`remove_rows_with_missing_values`][safeds.data.tabular.containers._table.Table.remove_rows_with_missing_values]
+        - [`remove_rows_with_outliers`][safeds.data.tabular.containers._table.Table.remove_rows_with_outliers]
         """
         mask = predicate(_LazyVectorizedRow(self))
 
@@ -1429,11 +1429,11 @@ class Table:
 
         Related
         -------
-        - [filter_rows][safeds.data.tabular.containers._table.Table.filter_rows]:
+        - [`filter_rows`][safeds.data.tabular.containers._table.Table.filter_rows]:
             Keep only rows that satisfy a condition.
-        - [remove_duplicate_rows][safeds.data.tabular.containers._table.Table.remove_duplicate_rows]
-        - [remove_rows_with_missing_values][safeds.data.tabular.containers._table.Table.remove_rows_with_missing_values]
-        - [remove_rows_with_outliers][safeds.data.tabular.containers._table.Table.remove_rows_with_outliers]
+        - [`remove_duplicate_rows`][safeds.data.tabular.containers._table.Table.remove_duplicate_rows]
+        - [`remove_rows_with_missing_values`][safeds.data.tabular.containers._table.Table.remove_rows_with_missing_values]
+        - [`remove_rows_with_outliers`][safeds.data.tabular.containers._table.Table.remove_rows_with_outliers]
         """
         _check_columns_exist(self, name)
 
@@ -1472,12 +1472,12 @@ class Table:
 
         Related
         -------
-        - [filter_rows][safeds.data.tabular.containers._table.Table.filter_rows]:
+        - [`filter_rows`][safeds.data.tabular.containers._table.Table.filter_rows]:
             Keep only rows that satisfy a condition.
-        - [filter_rows_by_column][safeds.data.tabular.containers._table.Table.filter_rows_by_column]:
+        - [`filter_rows_by_column`][safeds.data.tabular.containers._table.Table.filter_rows_by_column]:
             Keep only rows that satisfy a condition on a specific column.
-        - [remove_rows_with_missing_values][safeds.data.tabular.containers._table.Table.remove_rows_with_missing_values]
-        - [remove_rows_with_outliers][safeds.data.tabular.containers._table.Table.remove_rows_with_outliers]
+        - [`remove_rows_with_missing_values`][safeds.data.tabular.containers._table.Table.remove_rows_with_missing_values]
+        - [`remove_rows_with_outliers`][safeds.data.tabular.containers._table.Table.remove_rows_with_outliers]
         """
         return Table._from_polars_lazy_frame(
             self._lazy_frame.unique(maintain_order=True),
@@ -1518,15 +1518,15 @@ class Table:
 
         Related
         -------
-        - [filter_rows][safeds.data.tabular.containers._table.Table.filter_rows]:
+        - [`filter_rows`][safeds.data.tabular.containers._table.Table.filter_rows]:
             Keep only rows that satisfy a condition.
-        - [filter_rows_by_column][safeds.data.tabular.containers._table.Table.filter_rows_by_column]:
+        - [`filter_rows_by_column`][safeds.data.tabular.containers._table.Table.filter_rows_by_column]:
             Keep only rows that satisfy a condition on a specific column.
-        - [remove_rows_by_column][safeds.data.tabular.containers._table.Table.filter_rows_by_column]:
+        - [`remove_rows_by_column`][safeds.data.tabular.containers._table.Table.filter_rows_by_column]:
             Remove rows that satisfy a condition on a specific column.
-        - [remove_duplicate_rows][safeds.data.tabular.containers._table.Table.remove_duplicate_rows]
-        - [remove_rows_with_missing_values][safeds.data.tabular.containers._table.Table.remove_rows_with_missing_values]
-        - [remove_rows_with_outliers][safeds.data.tabular.containers._table.Table.remove_rows_with_outliers]
+        - [`remove_duplicate_rows`][safeds.data.tabular.containers._table.Table.remove_duplicate_rows]
+        - [`remove_rows_with_missing_values`][safeds.data.tabular.containers._table.Table.remove_rows_with_missing_values]
+        - [`remove_rows_with_outliers`][safeds.data.tabular.containers._table.Table.remove_rows_with_outliers]
         """
         mask = predicate(_LazyVectorizedRow(self))
 
@@ -1577,15 +1577,15 @@ class Table:
 
         Related
         -------
-        - [filter_rows][safeds.data.tabular.containers._table.Table.filter_rows]:
+        - [`filter_rows`][safeds.data.tabular.containers._table.Table.filter_rows]:
             Keep only rows that satisfy a condition.
-        - [filter_rows_by_column][safeds.data.tabular.containers._table.Table.filter_rows_by_column]:
+        - [`filter_rows_by_column`][safeds.data.tabular.containers._table.Table.filter_rows_by_column]:
             Keep only rows that satisfy a condition on a specific column.
-        - [remove_rows][safeds.data.tabular.containers._table.Table.remove_rows]:
+        - [`remove_rows`][safeds.data.tabular.containers._table.Table.remove_rows]:
             Remove rows that satisfy a condition.
-        - [remove_duplicate_rows][safeds.data.tabular.containers._table.Table.remove_duplicate_rows]
-        - [remove_rows_with_missing_values][safeds.data.tabular.containers._table.Table.remove_rows_with_missing_values]
-        - [remove_rows_with_outliers][safeds.data.tabular.containers._table.Table.remove_rows_with_outliers]
+        - [`remove_duplicate_rows`][safeds.data.tabular.containers._table.Table.remove_duplicate_rows]
+        - [`remove_rows_with_missing_values`][safeds.data.tabular.containers._table.Table.remove_rows_with_missing_values]
+        - [`remove_rows_with_outliers`][safeds.data.tabular.containers._table.Table.remove_rows_with_outliers]
         """
         _check_columns_exist(self, name)
 
@@ -1646,17 +1646,17 @@ class Table:
 
         Related
         -------
-        - [remove_columns_with_missing_values][safeds.data.tabular.containers._table.Table.remove_columns_with_missing_values]
-        - [SimpleImputer][safeds.data.tabular.transformation._simple_imputer.SimpleImputer]:
+        - [`remove_columns_with_missing_values`][safeds.data.tabular.containers._table.Table.remove_columns_with_missing_values]
+        - [`SimpleImputer`][safeds.data.tabular.transformation._simple_imputer.SimpleImputer]:
             Replace missing values with a constant value or a statistic of the column.
-        - [KNearestNeighborsImputer][safeds.data.tabular.transformation._k_nearest_neighbors_imputer.KNearestNeighborsImputer]:
+        - [`KNearestNeighborsImputer`][safeds.data.tabular.transformation._k_nearest_neighbors_imputer.KNearestNeighborsImputer]:
             Replace missing values with a value computed from the nearest neighbors.
-        - [filter_rows][safeds.data.tabular.containers._table.Table.filter_rows]:
+        - [`filter_rows`][safeds.data.tabular.containers._table.Table.filter_rows]:
             Keep only rows that satisfy a condition.
-        - [filter_rows_by_column][safeds.data.tabular.containers._table.Table.filter_rows_by_column]:
+        - [`filter_rows_by_column`][safeds.data.tabular.containers._table.Table.filter_rows_by_column]:
             Keep only rows that satisfy a condition on a specific column.
-        - [remove_duplicate_rows][safeds.data.tabular.containers._table.Table.remove_duplicate_rows]
-        - [remove_rows_with_outliers][safeds.data.tabular.containers._table.Table.remove_rows_with_outliers]
+        - [`remove_duplicate_rows`][safeds.data.tabular.containers._table.Table.remove_duplicate_rows]
+        - [`remove_rows_with_outliers`][safeds.data.tabular.containers._table.Table.remove_rows_with_outliers]
         """
         if isinstance(selector, list) and not selector:
             # polars panics in this case
@@ -1731,12 +1731,12 @@ class Table:
 
         Related
         -------
-        - [filter_rows][safeds.data.tabular.containers._table.Table.filter_rows]:
+        - [`filter_rows`][safeds.data.tabular.containers._table.Table.filter_rows]:
             Keep only rows that satisfy a condition.
-        - [filter_rows_by_column][safeds.data.tabular.containers._table.Table.filter_rows_by_column]:
+        - [`filter_rows_by_column`][safeds.data.tabular.containers._table.Table.filter_rows_by_column]:
             Keep only rows that satisfy a condition on a specific column.
-        - [remove_duplicate_rows][safeds.data.tabular.containers._table.Table.remove_duplicate_rows]
-        - [remove_rows_with_missing_values][safeds.data.tabular.containers._table.Table.remove_rows_with_missing_values]
+        - [`remove_duplicate_rows`][safeds.data.tabular.containers._table.Table.remove_duplicate_rows]
+        - [`remove_rows_with_missing_values`][safeds.data.tabular.containers._table.Table.remove_rows_with_missing_values]
         """
         _check_bounds(
             "z_score_threshold",
@@ -1905,7 +1905,7 @@ class Table:
 
         Related
         -------
-        - [sort_rows_by_column][safeds.data.tabular.containers._table.Table.sort_rows_by_column]:
+        - [`sort_rows_by_column`][safeds.data.tabular.containers._table.Table.sort_rows_by_column]:
             Sort the rows by a specific column.
         """
         key = key_selector(_LazyVectorizedRow(self))
@@ -1963,7 +1963,7 @@ class Table:
 
         Related
         -------
-        - [sort_rows][safeds.data.tabular.containers._table.Table.sort_rows]:
+        - [`sort_rows`][safeds.data.tabular.containers._table.Table.sort_rows]:
             Sort the rows by a value computed from an entire row.
         """
         _check_columns_exist(self, name)
@@ -2101,7 +2101,7 @@ class Table:
 
         Related
         -------
-        - [add_tables_as_rows][safeds.data.tabular.containers._table.Table.add_tables_as_rows]
+        - [`add_tables_as_rows`][safeds.data.tabular.containers._table.Table.add_tables_as_rows]
         """
         import polars as pl
 
@@ -2158,7 +2158,7 @@ class Table:
 
         Related
         -------
-        - [add_tables_as_columns][safeds.data.tabular.containers._table.Table.add_tables_as_columns]
+        - [`add_tables_as_columns`][safeds.data.tabular.containers._table.Table.add_tables_as_columns]
         """
         import polars as pl
 
@@ -2221,7 +2221,7 @@ class Table:
 
         Related
         -------
-        - [transform_table][safeds.data.tabular.containers._table.Table.transform_table]:
+        - [`transform_table`][safeds.data.tabular.containers._table.Table.transform_table]:
             Transform the table with a fitted transformer.
         """
         return fitted_transformer.inverse_transform(self)
@@ -2417,9 +2417,9 @@ class Table:
 
         Related
         -------
-        - [inverse_transform_table][safeds.data.tabular.containers._table.Table.inverse_transform_table]:
+        - [`inverse_transform_table`][safeds.data.tabular.containers._table.Table.inverse_transform_table]:
             Inverse-transform the table with a fitted, invertible transformer.
-        - [transform_columns][safeds.data.tabular.containers._table.Table.transform_columns]:
+        - [`transform_columns`][safeds.data.tabular.containers._table.Table.transform_columns]:
             Transform columns with a custom function.
         """
         return fitted_transformer.transform(self)
@@ -2575,8 +2575,8 @@ class Table:
 
         Related
         -------
-        - [to_json_file][safeds.data.tabular.containers._table.Table.to_json_file]
-        - [to_parquet_file][safeds.data.tabular.containers._table.Table.to_parquet_file]
+        - [`to_json_file`][safeds.data.tabular.containers._table.Table.to_json_file]
+        - [`to_parquet_file`][safeds.data.tabular.containers._table.Table.to_parquet_file]
         """
         path = _normalize_and_check_file_path(path, ".csv", [".csv"])
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -2631,8 +2631,8 @@ class Table:
 
         Related
         -------
-        - [to_csv_file][safeds.data.tabular.containers._table.Table.to_csv_file]
-        - [to_parquet_file][safeds.data.tabular.containers._table.Table.to_parquet_file]
+        - [`to_csv_file`][safeds.data.tabular.containers._table.Table.to_csv_file]
+        - [`to_parquet_file`][safeds.data.tabular.containers._table.Table.to_parquet_file]
         """
         path = _normalize_and_check_file_path(path, ".json", [".json"])
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -2665,8 +2665,8 @@ class Table:
 
         Related
         -------
-        - [to_csv_file][safeds.data.tabular.containers._table.Table.to_csv_file]
-        - [to_json_file][safeds.data.tabular.containers._table.Table.to_json_file]
+        - [`to_csv_file`][safeds.data.tabular.containers._table.Table.to_csv_file]
+        - [`to_json_file`][safeds.data.tabular.containers._table.Table.to_json_file]
         """
         path = _normalize_and_check_file_path(path, ".parquet", [".parquet"])
         path.parent.mkdir(parents=True, exist_ok=True)
