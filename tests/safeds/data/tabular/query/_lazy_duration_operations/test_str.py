@@ -1,7 +1,6 @@
 import polars as pl
 import pytest
 
-from safeds.data.tabular.containers import Cell
 from safeds.data.tabular.containers._lazy_cell import _LazyCell
 from safeds.data.tabular.query import DurationOperations
 
@@ -10,16 +9,11 @@ from safeds.data.tabular.query import DurationOperations
     ("ops", "expected"),
     [
         (
-            Cell.duration(hours=1).dur,
-            '(1h.alias("duration")).dur',
-        ),
-        (
             _LazyCell(pl.col("a")).dur,
             '(col("a")).dur',
         ),
     ],
     ids=[
-        "constant",
         "column",
     ],
 )

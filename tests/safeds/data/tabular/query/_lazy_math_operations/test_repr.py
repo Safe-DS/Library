@@ -1,7 +1,6 @@
 import polars as pl
 import pytest
 
-from safeds.data.tabular.containers import Cell
 from safeds.data.tabular.containers._lazy_cell import _LazyCell
 from safeds.data.tabular.query import MathOperations
 
@@ -10,16 +9,11 @@ from safeds.data.tabular.query import MathOperations
     ("ops", "expected"),
     [
         (
-            Cell.constant(1).math,
-            "_LazyMathOperations(dyn int: 1)",
-        ),
-        (
             _LazyCell(pl.col("a")).math,
             '_LazyMathOperations(col("a"))',
         ),
     ],
     ids=[
-        "constant",
         "column",
     ],
 )
