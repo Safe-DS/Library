@@ -65,13 +65,11 @@ class Table:
 
     To create a `Table` call the constructor or use one of the following static methods:
 
-    | Method                                                                             | Description                            |
-    | ---------------------------------------------------------------------------------- | -------------------------------------- |
-    | [from_csv_file][safeds.data.tabular.containers._table.Table.from_csv_file]         | Create a table from a CSV file.        |
-    | [from_json_file][safeds.data.tabular.containers._table.Table.from_json_file]       | Create a table from a JSON file.       |
-    | [from_parquet_file][safeds.data.tabular.containers._table.Table.from_parquet_file] | Create a table from a Parquet file.    |
-    | [from_columns][safeds.data.tabular.containers._table.Table.from_columns]           | Create a table from a list of columns. |
-    | [from_dict][safeds.data.tabular.containers._table.Table.from_dict]                 | Create a table from a dictionary.      |
+    - [from_csv_file][safeds.data.tabular.containers._table.Table.from_csv_file]: Create a table from a CSV file.
+    - [from_json_file][safeds.data.tabular.containers._table.Table.from_json_file]: Create a table from a JSON file.
+    - [from_parquet_file][safeds.data.tabular.containers._table.Table.from_parquet_file]: Create a table from a Parquet file.
+    - [from_columns][safeds.data.tabular.containers._table.Table.from_columns]: Create a table from a list of columns.
+    - [from_dict][safeds.data.tabular.containers._table.Table.from_dict]: Create a table from a dictionary.
 
     Parameters
     ----------
