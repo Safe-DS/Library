@@ -84,7 +84,7 @@ def assert_cell_operation_works(
         The type of the column if the value is `None`.
     """
     type_ = type_if_none if value is None else None
-    column = Column("A", [value], type=type_)
+    column = Column("a", [value], type=type_)
     transformed_column = column.transform(transformer)
     actual = transformed_column[0]
     assert actual == expected, f"Expected {expected}, but got {actual}."

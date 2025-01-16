@@ -38,3 +38,43 @@ class _LazyDurationOperations(DurationOperations):
 
     def __str__(self) -> str:
         return f"({self._expression}).dur"
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Duration operations
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def abs(self) -> Cell[None]:
+        return _LazyCell(self._expression.abs())
+
+    def full_weeks(self) -> Cell[int | None]:
+        import polars as pl
+
+        # We must round towards zero
+        return _LazyCell((self._expression.dt.total_days() / 7).cast(pl.Int64()))
+
+    def full_days(self) -> Cell[int | None]:
+        return _LazyCell(self._expression.dt.total_days())
+
+    def full_hours(self) -> Cell[int | None]:
+        return _LazyCell(self._expression.dt.total_hours())
+
+    def full_minutes(self) -> Cell[int | None]:
+        return _LazyCell(self._expression.dt.total_minutes())
+
+    def full_seconds(self) -> Cell[int | None]:
+        return _LazyCell(self._expression.dt.total_seconds())
+
+    def full_milliseconds(self) -> Cell[int | None]:
+        return _LazyCell(self._expression.dt.total_milliseconds())
+
+    def full_microseconds(self) -> Cell[int | None]:
+        return _LazyCell(self._expression.dt.total_microseconds())
+
+    def to_string(
+        self,
+        *,
+        format: Literal["iso", "pretty"] = "iso",
+    ) -> Cell[str | None]:
+        polars_format = "iso" if format == "iso" else "polars"
+
+        return _LazyCell(self._expression.dt.to_string(polars_format))
