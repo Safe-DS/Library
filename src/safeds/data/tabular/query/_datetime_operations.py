@@ -6,11 +6,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import datetime as python_datetime
 
+    from safeds._typing import _ConvertibleToIntCell
     from safeds.data.tabular.containers import Cell
-
-
-# TODO: Examples with None
-# TODO: add hour etc.
 
 
 class DatetimeOperations(ABC):
@@ -731,21 +728,91 @@ class DatetimeOperations(ABC):
         +-------+
         """
 
-    # TODO: update documentation
     @abstractmethod
-    def to_string(self, *, format: str = "iso") -> Cell[str | None]:
+    def replace(
+        self,
+        *,
+        year: _ConvertibleToIntCell = None,
+        month: _ConvertibleToIntCell = None,
+        day: _ConvertibleToIntCell = None,
+        hour: _ConvertibleToIntCell = None,
+        minute: _ConvertibleToIntCell = None,
+        second: _ConvertibleToIntCell = None,
+        microsecond: _ConvertibleToIntCell = None,
+    ) -> Cell:
         """
-        Convert the datetime/date/time value in the cell to a string.
+        Replace components of a datetime or date.
+
+        If a component is not provided, it is not changed. Components that are not applicable to the object are ignored,
+        e.g. setting the hour of a date. Invalid results are converted to missing values (`None`).
 
         Parameters
         ----------
-        format:
-            The format string it will be used to convert the data into the string.
+        year:
+            The new year.
+        month:
+            The new month. Must be between 1 and 12.
+        day:
+            The new day. Must be between 1 and 31.
+        hour:
+            The new hour. Must be between 0 and 23.
+        minute:
+            The new minute. Must be between 0 and 59.
+        second:
+            The new second. Must be between 0 and 59.
+        microsecond:
+            The new microsecond. Must be between 0 and 999999.
 
         Returns
         -------
         cell:
-            The string value.
+            The new datetime or date.
+
+        Examples
+        --------
+        >>> from datetime import datetime, date, time
+        >>> from safeds.data.tabular.containers import Column
+        >>> column1 = Column("a", [datetime(2000, 1, 1), None])
+        >>> column1.transform(lambda cell: cell.dt.replace(month=2, day=2, hour=2))
+        +---------------------+
+        | a                   |
+        | ---                 |
+        | datetime[μs]        |
+        +=====================+
+        | 2000-02-02 02:00:00 |
+        | null                |
+        +---------------------+
+
+        >>> column2 = Column("a", [date(2000, 1, 1), None])
+        >>> column2.transform(lambda cell: cell.dt.replace(month=2, day=2, hour=2))
+        +------------+
+        | a          |
+        | ---        |
+        | date       |
+        +============+
+        | 2000-02-02 |
+        | null       |
+        +------------+
+        """
+
+    # TODO: explain format string + more examples
+    @abstractmethod
+    def to_string(self, *, format: str = "iso") -> Cell[str | None]:
+        """
+        Convert a datetime, date, or time to a string.
+
+        The format can be either the special value "iso" to create ISO 8601 strings or a custom format string. The
+        custom format string can contain the following placeholders:
+
+        Parameters
+        ----------
+        format:
+            The format to use.
+
+        Returns
+        -------
+        cell:
+            The string representation.
 
         Raises
         ------
@@ -756,7 +823,7 @@ class DatetimeOperations(ABC):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> import datetime
-        >>> column = Column("a", [datetime.datetime(2022, 1, 9, 1)])
+        >>> column = Column("a", [datetime.date(2022, 1, 9)])
         >>> column.transform(lambda cell: cell.dt.to_string())
         +------------+
         | a          |

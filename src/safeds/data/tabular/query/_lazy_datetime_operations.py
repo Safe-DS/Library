@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 
     import polars as pl
 
+    from safeds._typing import _ConvertibleToIntCell
     from safeds.data.tabular.containers._cell import Cell
 
 
@@ -101,8 +102,33 @@ class _LazyDatetimeOperations(DatetimeOperations):
     def is_in_leap_year(self) -> Cell[bool | None]:
         return _LazyCell(self._expression.dt.is_leap_year())
 
-    def to_string(self, *, format: str = "iso:strict") -> Cell[str | None]:
-        if not _check_format_string(format):
+    def replace(
+        self,
+        *,
+        year: _ConvertibleToIntCell = None,
+        month: _ConvertibleToIntCell = None,
+        day: _ConvertibleToIntCell = None,
+        hour: _ConvertibleToIntCell = None,
+        minute: _ConvertibleToIntCell = None,
+        second: _ConvertibleToIntCell = None,
+        microsecond: _ConvertibleToIntCell = None,
+    ) -> Cell:
+        return _LazyCell(
+            self._expression.dt.replace(
+                year=year,
+                month=month,
+                day=day,
+                hour=hour,
+                minute=minute,
+                second=second,
+                microsecond=microsecond,
+            ),
+        )
+
+    def to_string(self, *, format: str = "iso") -> Cell[str | None]:
+        if format == "iso":
+            format = "iso:strict"  # noqa: A001
+        elif not _check_format_string(format):
             raise ValueError("Invalid format string")
         return _LazyCell(self._expression.dt.to_string(format=format))
 
