@@ -14,7 +14,7 @@ def test_should_store_the_name() -> None:
     [
         (Column("col1", []), []),
         (Column("col1", [1]), [1]),
-        (Column("col1", [1], type_=ColumnType.string()), ["1"]),
+        (Column("col1", [1], type=ColumnType.string()), ["1"]),
     ],
     ids=[
         "empty",
@@ -31,7 +31,7 @@ def test_should_store_the_data(column: Column, expected: list) -> None:
     [
         (Column("col1", []), ColumnType.null()),
         (Column("col1", [1]), ColumnType.int64()),
-        (Column("col1", [1], type_=ColumnType.string()), ColumnType.string()),
+        (Column("col1", [1], type=ColumnType.string()), ColumnType.string()),
     ],
     ids=[
         "empty",

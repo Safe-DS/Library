@@ -8,7 +8,7 @@ from safeds.exceptions import ColumnNotFoundError, ColumnTypeError, NotFittedErr
 class TestInit:
     def test_should_raise_value_error(self) -> None:
         with pytest.raises(ValueError, match='Parameter "max_" must be greater than parameter "min_".'):
-            _ = RangeScaler(min_=10, max_=0)
+            _ = RangeScaler(min=10, max=0)
 
 
 class TestFit:
@@ -187,8 +187,8 @@ class TestFitAndTransform:
         expected: Table,
     ) -> None:
         fitted_transformer, transformed_table = RangeScaler(
-            min_=-10.0,
-            max_=10.0,
+            min=-10.0,
+            max=10.0,
             selector=column_names,
         ).fit_and_transform(
             table,

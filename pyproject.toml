@@ -146,6 +146,8 @@ ignore = [
     "FBT001",
     # boolean-default-value-in-function-definition (we leave it to the call-site)
     "FBT002",
+    # builtin-argument-shadowing (we want readable parameter names in our API)
+    "A002",
     # builtin-attribute-shadowing (not an issue)
     "A003",
     # implicit-return (can add a return even though all cases are covered)

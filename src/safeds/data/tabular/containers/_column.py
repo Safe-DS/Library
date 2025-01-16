@@ -44,7 +44,7 @@ class Column(Sequence[T_co]):
         The name of the column.
     data:
         The data of the column.
-    type_:
+    type:
         The type of the column. If `None` (default), the type is inferred from the data.
 
     Examples
@@ -62,7 +62,7 @@ class Column(Sequence[T_co]):
     +-----+
 
     >>> from safeds.data.tabular.typing import ColumnType
-    >>> Column("a", [1, 2, 3], type_=ColumnType.string())
+    >>> Column("a", [1, 2, 3], type=ColumnType.string())
     +-----+
     | a   |
     | --- |
@@ -93,12 +93,12 @@ class Column(Sequence[T_co]):
         name: str,
         data: Sequence[T_co],
         *,
-        type_: ColumnType | None = None,
+        type: ColumnType | None = None,
     ) -> None:
         import polars as pl
 
         # Preprocessing
-        dtype = None if type_ is None else type_._polars_data_type
+        dtype = None if type is None else type._polars_data_type
 
         # Implementation
         self._series: pl.Series = pl.Series(name, data, dtype=dtype, strict=False)
