@@ -20,7 +20,7 @@ class StringOperations(ABC):
     Examples
     --------
     >>> from safeds.data.tabular.containers import Column
-    >>> column = Column("example", ["ab", "bc", "cd"])
+    >>> column = Column("a", ["ab", "bc", "cd"])
     >>> column.transform(lambda cell: cell.str.to_uppercase())
     +---------+
     | example |
@@ -74,7 +74,7 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("example", ["ab", "bc", "cd"])
+        >>> column = Column("a", ["ab", "bc", "cd"])
         >>> column.count_if(lambda cell: cell.str.contains("b"))
         2
         """
@@ -97,7 +97,7 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("example", ["ab", "bc", "cd"])
+        >>> column = Column("a", ["ab", "bc", "cd"])
         >>> column.count_if(lambda cell: cell.str.ends_with("c"))
         1
         """
@@ -120,7 +120,7 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("example", ["ab", "bc", "cd"])
+        >>> column = Column("a", ["ab", "bc", "cd"])
         >>> column.transform(lambda cell: cell.str.index_of("b"))
         +---------+
         | example |
@@ -152,7 +152,7 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("example", ["", "a", "abc"])
+        >>> column = Column("a", ["", "a", "abc"])
         >>> column.transform(lambda cell: cell.str.length())
         +---------+
         | example |
@@ -185,7 +185,7 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("example", ["ab", "bc", "cd"])
+        >>> column = Column("a", ["ab", "bc", "cd"])
         >>> column.transform(lambda cell: cell.str.replace("b", "z"))
         +---------+
         | example |
@@ -216,7 +216,7 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("example", ["ab", "bc", "cd"])
+        >>> column = Column("a", ["ab", "bc", "cd"])
         >>> column.count_if(lambda cell: cell.str.starts_with("a"))
         1
         """
@@ -247,7 +247,7 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("example", ["abc", "def", "ghi"])
+        >>> column = Column("a", ["abc", "def", "ghi"])
         >>> column.transform(lambda cell: cell.str.substring(1, 2))
         +---------+
         | example |
@@ -273,7 +273,7 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("example", ["2021-01-01", "2021-02-01", "abc"])
+        >>> column = Column("a", ["2021-01-01", "2021-02-01", "abc"])
         >>> column.transform(lambda cell: cell.str.to_date())
         +------------+
         | example    |
@@ -299,7 +299,7 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("example", ["2021-01-01T00:00:00z", "2021-02-01T00:00:00z", "abc"])
+        >>> column = Column("a", ["2021-01-01T00:00:00z", "2021-02-01T00:00:00z", "abc"])
         >>> column.transform(lambda cell: cell.str.to_datetime())
         +-------------------------+
         | example                 |
@@ -325,7 +325,7 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("example", ["1", "3.4", "5.6", "abc"])
+        >>> column = Column("a", ["1", "3.4", "5.6", "abc"])
         >>> column.transform(lambda cell: cell.str.to_float())
         +---------+
         | example |
@@ -357,7 +357,7 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column1 = Column("example", ["1", "2", "3", "abc"])
+        >>> column1 = Column("a", ["1", "2", "3", "abc"])
         >>> column1.transform(lambda cell: cell.str.to_int())
         +---------+
         | example |
@@ -370,7 +370,7 @@ class StringOperations(ABC):
         |    null |
         +---------+
 
-        >>> column2 = Column("example", ["1", "10", "11", "abc"])
+        >>> column2 = Column("a", ["1", "10", "11", "abc"])
         >>> column2.transform(lambda cell: cell.str.to_int(base=2))
         +---------+
         | example |
@@ -397,7 +397,7 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("example", ["AB", "BC", "CD"])
+        >>> column = Column("a", ["AB", "BC", "CD"])
         >>> column.transform(lambda cell: cell.str.to_lowercase())
         +---------+
         | example |
@@ -423,7 +423,7 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("example", ["ab", "bc", "cd"])
+        >>> column = Column("a", ["ab", "bc", "cd"])
         >>> column.transform(lambda cell: cell.str.to_uppercase())
         +---------+
         | example |
@@ -449,7 +449,7 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("example", ["", " abc", "abc ", " abc "])
+        >>> column = Column("a", ["", " abc", "abc ", " abc "])
         >>> column.transform(lambda cell: cell.str.trim())
         +---------+
         | example |
@@ -476,7 +476,7 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("example", ["", " abc", "abc ", " abc "])
+        >>> column = Column("a", ["", " abc", "abc ", " abc "])
         >>> column.transform(lambda cell: cell.str.trim_end())
         +---------+
         | example |
@@ -503,7 +503,7 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("example", ["", " abc", "abc ", " abc "])
+        >>> column = Column("a", ["", " abc", "abc ", " abc "])
         >>> column.transform(lambda cell: cell.str.trim_start())
         +---------+
         | example |

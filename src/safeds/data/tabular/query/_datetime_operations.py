@@ -8,11 +8,12 @@ if TYPE_CHECKING:
 
 
 # TODO: Examples with None
+# TODO: add hour etc.
 
 
-class TemporalOperations(ABC):
+class DatetimeOperations(ABC):
     """
-    Namespace for operations on temporal data.
+    Namespace for operations on datetimes, dates, and times.
 
     This class cannot be instantiated directly. It can only be accessed using the `dt` attribute of a cell.
 
@@ -20,7 +21,7 @@ class TemporalOperations(ABC):
     --------
     >>> from safeds.data.tabular.containers import Column
     >>> import datetime
-    >>> column = Column("example", [datetime.date(2022, 1, 9)])
+    >>> column = Column("a", [datetime.date(2022, 1, 9)])
     >>> column.transform(lambda cell: cell.dt.date_to_string("%Y/%m/%d"))
     +------------+
     | example    |
@@ -51,7 +52,7 @@ class TemporalOperations(ABC):
     def __str__(self) -> str: ...
 
     # ------------------------------------------------------------------------------------------------------------------
-    # String operations
+    # Datetime operations
     # ------------------------------------------------------------------------------------------------------------------
 
     @abstractmethod
@@ -61,13 +62,14 @@ class TemporalOperations(ABC):
 
         Returns
         -------
+        cell:
             A cell containing the century as integer.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> import datetime
-        >>> column = Column("example", [datetime.date(2022, 1, 1)])
+        >>> column = Column("a", [datetime.date(2022, 1, 1)])
         >>> column.transform(lambda cell: cell.dt.century())
         +---------+
         | example |
@@ -85,13 +87,14 @@ class TemporalOperations(ABC):
 
         Returns
         -------
+        cell:
             A cell containing the weekday as integer.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> import datetime
-        >>> column = Column("example", [datetime.date(2022, 1, 1)])
+        >>> column = Column("a", [datetime.date(2022, 1, 1)])
         >>> column.transform(lambda cell: cell.dt.weekday())
         +---------+
         | example |
@@ -115,7 +118,7 @@ class TemporalOperations(ABC):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> import datetime
-        >>> column = Column("example", [datetime.date(2022, 1, 1)])
+        >>> column = Column("a", [datetime.date(2022, 1, 1)])
         >>> column.transform(lambda cell: cell.dt.week())
         +---------+
         | example |
@@ -139,7 +142,7 @@ class TemporalOperations(ABC):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> import datetime
-        >>> column = Column("example", [datetime.date(2022, 1, 9)])
+        >>> column = Column("a", [datetime.date(2022, 1, 9)])
         >>> column.transform(lambda cell: cell.dt.year())
         +---------+
         | example |
@@ -163,7 +166,7 @@ class TemporalOperations(ABC):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> import datetime
-        >>> column = Column("example", [datetime.date(2022, 1, 9)])
+        >>> column = Column("a", [datetime.date(2022, 1, 9)])
         >>> column.transform(lambda cell: cell.dt.month())
         +---------+
         | example |
@@ -187,7 +190,7 @@ class TemporalOperations(ABC):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> import datetime
-        >>> column = Column("example", [datetime.date(2022, 1, 9)])
+        >>> column = Column("a", [datetime.date(2022, 1, 9)])
         >>> column.transform(lambda cell: cell.dt.day())
         +---------+
         | example |
@@ -222,7 +225,7 @@ class TemporalOperations(ABC):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> import datetime
-        >>> column = Column("example", [ datetime.datetime(2022, 1, 9, 23, 29, 1, tzinfo=datetime.UTC)])
+        >>> column = Column("a", [ datetime.datetime(2022, 1, 9, 23, 29, 1, tzinfo=datetime.UTC)])
         >>> column.transform(lambda cell: cell.dt.datetime_to_string())
         +---------------------+
         | example             |
@@ -256,7 +259,7 @@ class TemporalOperations(ABC):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> import datetime
-        >>> column = Column("example", [datetime.date(2022, 1, 9)])
+        >>> column = Column("a", [datetime.date(2022, 1, 9)])
         >>> column.transform(lambda cell: cell.dt.date_to_string())
         +------------+
         | example    |

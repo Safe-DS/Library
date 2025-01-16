@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from safeds._utils import _structural_hash
 from safeds.data.tabular.containers._lazy_cell import _LazyCell
 
-from ._temporal_operations import TemporalOperations
+from ._datetime_operations import DatetimeOperations
 
 if TYPE_CHECKING:
     import polars as pl
@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers._cell import Cell
 
 
-class _LazyTemporalOperations(TemporalOperations):
+class _LazyDatetimeOperations(DatetimeOperations):
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ class _LazyTemporalOperations(TemporalOperations):
         self._expression: pl.Expr = expression
 
     def __eq__(self, other: object) -> bool:
-        if not isinstance(other, _LazyTemporalOperations):
+        if not isinstance(other, _LazyDatetimeOperations):
             return NotImplemented
         if self is other:
             return True
@@ -32,7 +32,7 @@ class _LazyTemporalOperations(TemporalOperations):
         return _structural_hash(self._expression.meta.serialize())
 
     def __repr__(self) -> str:
-        return f"_LazyTemporalOperations({self._expression})"
+        return f"_LazyDatetimeOperations({self._expression})"
 
     def __sizeof__(self) -> int:
         return self._expression.__sizeof__()
@@ -61,6 +61,9 @@ class _LazyTemporalOperations(TemporalOperations):
 
     def day(self) -> Cell[int | None]:
         return _LazyCell(self._expression.dt.day())
+
+    def hour(self) -> Cell[int | None]:
+        return _LazyCell(self._expression.dt.hour())
 
     def datetime_to_string(self, format_string: str = "%Y/%m/%d %H:%M:%S") -> Cell[str | None]:
         if not _check_format_string(format_string):

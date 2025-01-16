@@ -82,6 +82,7 @@ class _LazyStringOperations(StringOperations):
     def to_int(self, *, base: int = 10) -> Cell[int | None]:
         return _LazyCell(self._expression.str.to_integer(base=base, strict=False))
 
+    # TODO: keep this or just cast?
     def to_float(self) -> Cell[float | None]:
         import polars as pl
 
