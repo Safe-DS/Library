@@ -6,9 +6,14 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import datetime
 
+    from safeds._typing import _ConvertibleToIntCell, _ConvertibleToStringCell
     from safeds.data.tabular.containers import Cell
 
 # TODO: examples with None
+# TODO: add more methods
+#  - reverse
+#  - to_time
+#  - ...
 
 
 class StringOperations(ABC):
@@ -22,15 +27,15 @@ class StringOperations(ABC):
     >>> from safeds.data.tabular.containers import Column
     >>> column = Column("a", ["ab", "bc", "cd"])
     >>> column.transform(lambda cell: cell.str.to_uppercase())
-    +---------+
-    | example |
-    | ---     |
-    | str     |
-    +=========+
-    | AB      |
-    | BC      |
-    | CD      |
-    +---------+
+    +-----+
+    | a   |
+    | --- |
+    | str |
+    +=====+
+    | AB  |
+    | BC  |
+    | CD  |
+    +-----+
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -57,7 +62,7 @@ class StringOperations(ABC):
     # ------------------------------------------------------------------------------------------------------------------
 
     @abstractmethod
-    def contains(self, substring: str) -> Cell[bool | None]:
+    def contains(self, substring: _ConvertibleToStringCell) -> Cell[bool | None]:
         """
         Check if the string value in the cell contains the substring.
 
@@ -74,13 +79,22 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["ab", "bc", "cd"])
-        >>> column.count_if(lambda cell: cell.str.contains("b"))
-        2
+        >>> column = Column("a", ["ab", "bc", "cd", None])
+        >>> column.transform(lambda cell: cell.str.contains("b"))
+        +-------+
+        | a     |
+        | ---   |
+        | bool  |
+        +=======+
+        | true  |
+        | true  |
+        | false |
+        | null  |
+        +-------+
         """
 
     @abstractmethod
-    def ends_with(self, suffix: str) -> Cell[bool | None]:
+    def ends_with(self, suffix: _ConvertibleToStringCell) -> Cell[bool | None]:
         """
         Check if the string value in the cell ends with the suffix.
 
@@ -97,13 +111,22 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["ab", "bc", "cd"])
-        >>> column.count_if(lambda cell: cell.str.ends_with("c"))
-        1
+        >>> column = Column("a", ["ab", "bc", "cd", None])
+        >>> column.transform(lambda cell: cell.str.ends_with("c"))
+        +-------+
+        | a     |
+        | ---   |
+        | bool  |
+        +=======+
+        | false |
+        | true  |
+        | false |
+        | null  |
+        +-------+
         """
 
     @abstractmethod
-    def index_of(self, substring: str) -> Cell[int | None]:
+    def index_of(self, substring: _ConvertibleToStringCell) -> Cell[int | None]:
         """
         Get the index of the first occurrence of the substring in the string value in the cell.
 
@@ -120,17 +143,18 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["ab", "bc", "cd"])
+        >>> column = Column("a", ["ab", "bc", "cd", None])
         >>> column.transform(lambda cell: cell.str.index_of("b"))
-        +---------+
-        | example |
-        |     --- |
-        |     u32 |
-        +=========+
-        |       1 |
-        |       0 |
-        |    null |
-        +---------+
+        +------+
+        |    a |
+        |  --- |
+        |  u32 |
+        +======+
+        |    1 |
+        |    0 |
+        | null |
+        | null |
+        +------+
         """
 
     @abstractmethod
@@ -152,21 +176,22 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["", "a", "abc"])
+        >>> column = Column("a", ["", "a", "abc", None])
         >>> column.transform(lambda cell: cell.str.length())
-        +---------+
-        | example |
-        |     --- |
-        |     u32 |
-        +=========+
-        |       0 |
-        |       1 |
-        |       3 |
-        +---------+
+        +------+
+        |    a |
+        |  --- |
+        |  u32 |
+        +======+
+        |    0 |
+        |    1 |
+        |    3 |
+        | null |
+        +------+
         """
 
     @abstractmethod
-    def replace(self, old: str, new: str) -> Cell[str | None]:
+    def replace(self, old: _ConvertibleToStringCell, new: _ConvertibleToStringCell) -> Cell[str | None]:
         """
         Replace occurrences of the old substring with the new substring in the string value in the cell.
 
@@ -185,21 +210,22 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["ab", "bc", "cd"])
+        >>> column = Column("a", ["ab", "bc", "cd", None])
         >>> column.transform(lambda cell: cell.str.replace("b", "z"))
-        +---------+
-        | example |
-        | ---     |
-        | str     |
-        +=========+
-        | az      |
-        | zc      |
-        | cd      |
-        +---------+
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        | az   |
+        | zc   |
+        | cd   |
+        | null |
+        +------+
         """
 
     @abstractmethod
-    def starts_with(self, prefix: str) -> Cell[bool | None]:
+    def starts_with(self, prefix: _ConvertibleToStringCell) -> Cell[bool | None]:
         """
         Check if the string value in the cell starts with the prefix.
 
@@ -216,13 +242,27 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["ab", "bc", "cd"])
-        >>> column.count_if(lambda cell: cell.str.starts_with("a"))
-        1
+        >>> column = Column("a", ["ab", "bc", "cd", None])
+        >>> column.transform(lambda cell: cell.str.starts_with("a"))
+        +-------+
+        | a     |
+        | ---   |
+        | bool  |
+        +=======+
+        | true  |
+        | false |
+        | false |
+        | null  |
+        +-------+
         """
 
     @abstractmethod
-    def substring(self, start: int = 0, length: int | None = None) -> Cell[str | None]:
+    def substring(
+        self,
+        *,
+        start: _ConvertibleToIntCell = 0,
+        length: _ConvertibleToIntCell = None,
+    ) -> Cell[str | None]:
         """
         Get a substring of the string value in the cell.
 
@@ -247,19 +287,21 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["abc", "def", "ghi"])
-        >>> column.transform(lambda cell: cell.str.substring(1, 2))
-        +---------+
-        | example |
-        | ---     |
-        | str     |
-        +=========+
-        | bc      |
-        | ef      |
-        | hi      |
-        +---------+
+        >>> column = Column("a", ["abc", "def", "ghi", None])
+        >>> column.transform(lambda cell: cell.str.substring(start=1, length=2))
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        | bc   |
+        | ef   |
+        | hi   |
+        | null |
+        +------+
         """
 
+    # TODO: add format parameter
     @abstractmethod
     def to_date(self) -> Cell[datetime.date | None]:
         """
@@ -273,19 +315,21 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["2021-01-01", "2021-02-01", "abc"])
+        >>> column = Column("a", ["2021-01-01", "2021-02-01", "abc", None])
         >>> column.transform(lambda cell: cell.str.to_date())
         +------------+
-        | example    |
+        | a          |
         | ---        |
         | date       |
         +============+
         | 2021-01-01 |
         | 2021-02-01 |
         | null       |
+        | null       |
         +------------+
         """
 
+    # TODO: add format parameter
     @abstractmethod
     def to_datetime(self) -> Cell[datetime.datetime | None]:
         """
@@ -299,48 +343,22 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["2021-01-01T00:00:00z", "2021-02-01T00:00:00z", "abc"])
+        >>> column = Column("a", ["2021-01-01T00:00:00z", "2021-02-01T00:00:00z", "abc", None])
         >>> column.transform(lambda cell: cell.str.to_datetime())
         +-------------------------+
-        | example                 |
+        | a                       |
         | ---                     |
         | datetime[μs, UTC]       |
         +=========================+
         | 2021-01-01 00:00:00 UTC |
         | 2021-02-01 00:00:00 UTC |
         | null                    |
+        | null                    |
         +-------------------------+
         """
 
     @abstractmethod
-    def to_float(self) -> Cell[float | None]:
-        """
-        Convert the string value in the cell to a float.
-
-        Returns
-        -------
-        float:
-            The float value. If the string cannot be converted to a float, None is returned.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["1", "3.4", "5.6", "abc"])
-        >>> column.transform(lambda cell: cell.str.to_float())
-        +---------+
-        | example |
-        |     --- |
-        |     f64 |
-        +=========+
-        | 1.00000 |
-        | 3.40000 |
-        | 5.60000 |
-        |    null |
-        +---------+
-        """
-
-    @abstractmethod
-    def to_int(self, *, base: int = 10) -> Cell[int | None]:
+    def to_int(self, *, base: _ConvertibleToIntCell = 10) -> Cell[int | None]:
         """
         Convert the string value in the cell to an integer.
 
@@ -357,31 +375,33 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column1 = Column("a", ["1", "2", "3", "abc"])
+        >>> column1 = Column("a", ["1", "2", "3", "abc", None])
         >>> column1.transform(lambda cell: cell.str.to_int())
-        +---------+
-        | example |
-        |     --- |
-        |     i64 |
-        +=========+
-        |       1 |
-        |       2 |
-        |       3 |
-        |    null |
-        +---------+
+        +------+
+        |    a |
+        |  --- |
+        |  i64 |
+        +======+
+        |    1 |
+        |    2 |
+        |    3 |
+        | null |
+        | null |
+        +------+
 
-        >>> column2 = Column("a", ["1", "10", "11", "abc"])
+        >>> column2 = Column("a", ["1", "10", "11", "abc", None])
         >>> column2.transform(lambda cell: cell.str.to_int(base=2))
-        +---------+
-        | example |
-        |     --- |
-        |     i64 |
-        +=========+
-        |       1 |
-        |       2 |
-        |       3 |
-        |    null |
-        +---------+
+        +------+
+        |    a |
+        |  --- |
+        |  i64 |
+        +======+
+        |    1 |
+        |    2 |
+        |    3 |
+        | null |
+        | null |
+        +------+
         """
 
     @abstractmethod
@@ -397,17 +417,18 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["AB", "BC", "CD"])
+        >>> column = Column("a", ["AB", "BC", "CD", None])
         >>> column.transform(lambda cell: cell.str.to_lowercase())
-        +---------+
-        | example |
-        | ---     |
-        | str     |
-        +=========+
-        | ab      |
-        | bc      |
-        | cd      |
-        +---------+
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        | ab   |
+        | bc   |
+        | cd   |
+        | null |
+        +------+
         """
 
     @abstractmethod
@@ -423,17 +444,18 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["ab", "bc", "cd"])
+        >>> column = Column("a", ["ab", "bc", "cd", None])
         >>> column.transform(lambda cell: cell.str.to_uppercase())
-        +---------+
-        | example |
-        | ---     |
-        | str     |
-        +=========+
-        | AB      |
-        | BC      |
-        | CD      |
-        +---------+
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        | AB   |
+        | BC   |
+        | CD   |
+        | null |
+        +------+
         """
 
     @abstractmethod
@@ -449,18 +471,19 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["", " abc", "abc ", " abc "])
+        >>> column = Column("a", ["", " abc", "abc ", " abc ", None])
         >>> column.transform(lambda cell: cell.str.trim())
-        +---------+
-        | example |
-        | ---     |
-        | str     |
-        +=========+
-        |         |
-        | abc     |
-        | abc     |
-        | abc     |
-        +---------+
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        |      |
+        | abc  |
+        | abc  |
+        | abc  |
+        | null |
+        +------+
         """
 
     @abstractmethod
@@ -476,18 +499,19 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["", " abc", "abc ", " abc "])
+        >>> column = Column("a", ["", " abc", "abc ", " abc ", None])
         >>> column.transform(lambda cell: cell.str.trim_end())
-        +---------+
-        | example |
-        | ---     |
-        | str     |
-        +=========+
-        |         |
-        |  abc    |
-        | abc     |
-        |  abc    |
-        +---------+
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        |      |
+        |  abc |
+        | abc  |
+        |  abc |
+        | null |
+        +------+
         """
 
     @abstractmethod
@@ -503,16 +527,17 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["", " abc", "abc ", " abc "])
+        >>> column = Column("a", ["", " abc", "abc ", " abc ", None])
         >>> column.transform(lambda cell: cell.str.trim_start())
-        +---------+
-        | example |
-        | ---     |
-        | str     |
-        +=========+
-        |         |
-        | abc     |
-        | abc     |
-        | abc     |
-        +---------+
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        |      |
+        | abc  |
+        | abc  |
+        | abc  |
+        | null |
+        +------+
         """

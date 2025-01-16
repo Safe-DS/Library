@@ -28,7 +28,7 @@ from tests.helpers import assert_cell_operation_works
     ],
 )
 def test_should_return_substring(string: str, start: int, length: int | None, expected: str) -> None:
-    assert_cell_operation_works(string, lambda cell: cell.str.substring(start, length), expected)
+    assert_cell_operation_works(string, lambda cell: cell.str.substring(start=start, length=length), expected)
 
 
 def test_should_raise_if_length_is_negative() -> None:
