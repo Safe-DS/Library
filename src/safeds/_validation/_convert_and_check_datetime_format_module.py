@@ -17,7 +17,7 @@ _DATE_REPLACEMENTS = {
     "_M": "_m",
     "^M": "-m",
     "M-full": "B",
-    "M-abbr": "b",
+    "M-short": "b",
     # Week
     "W": "V",
     "_W": "_V",
@@ -28,8 +28,10 @@ _DATE_REPLACEMENTS = {
     "^D": "-d",
     "DOW": "u",
     "DOW-full": "A",
-    "DOW-abbr": "a",
+    "DOW-short": "a",
     "DOY": "j",
+    "_DOY": "_j",
+    "^DOY": "-j",
 }
 
 _TIME_REPLACEMENTS = {
@@ -78,22 +80,44 @@ _DATETIME_REPLACEMENTS_WHEN_PARSING = {
 
 
 def _convert_and_check_datetime_format(
-    format: str,
+    format_: str,
     type_: Literal["datetime", "date", "time"],
     used_for_parsing: bool,
 ) -> str:
+    """
+    Convert our datetime format string to a format string understood by polars and check for errors.
+
+    Parameters
+    ----------
+    format_:
+        The datetime format to convert.
+    type_:
+        Whether format is for a datetime, date, or time.
+    used_for_parsing:
+        Whether the format is used for parsing.
+
+    Returns
+    -------
+    converted_format:
+        The converted datetime format.
+
+    Raises
+    ------
+    ValueError
+        If the format is invalid.
+    """
     replacements = _get_replacements(type_, used_for_parsing)
     converted_format = ""
     index = 0
 
-    while index < len(format):
-        char = char_at(format, index)
+    while index < len(format_):
+        char = char_at(format_, index)
 
         # Escaped characters
-        if char == "\\" and char_at(format, index + 1) == "\\":
+        if char == "\\" and char_at(format_, index + 1) == "\\":
             converted_format += "\\"
             index += 2
-        if char == "\\" and char_at(format, index + 1) == "{":
+        if char == "\\" and char_at(format_, index + 1) == "{":
             converted_format += "{"
             index += 2
         # Characters that need to be escaped for rust's chrono crate
@@ -108,11 +132,12 @@ def _convert_and_check_datetime_format(
             index += 1
         # Template expression
         elif char == "{":
-            end_index = format.find("}", index)
+            end_index = format_.find("}", index)
             if end_index == -1:
-                raise ValueError(f"Unclosed template expression at index {index}.")
+                message = f"Unclosed template expression at index {index}."
+                raise ValueError(message)
 
-            expression = format[index + 1 : end_index]
+            expression = format_[index + 1 : end_index]
             converted_format += _convert_and_check_template_expression(expression, type_, replacements)
             index = end_index + 1
         # Regular characters

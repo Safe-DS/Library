@@ -771,7 +771,7 @@ class DatetimeOperations(ABC):
 
         Examples
         --------
-        >>> from datetime import datetime, date, time
+        >>> from datetime import datetime, date
         >>> from safeds.data.tabular.containers import Column
         >>> column1 = Column("a", [datetime(2000, 1, 1), None])
         >>> column1.transform(lambda cell: cell.dt.replace(month=2, day=2, hour=2))
@@ -796,14 +796,61 @@ class DatetimeOperations(ABC):
         +------------+
         """
 
-    # TODO: explain format string + more examples
     @abstractmethod
     def to_string(self, *, format: str = "iso") -> Cell[str | None]:
-        """
+        r"""
         Convert a datetime, date, or time to a string.
 
-        The format can be either the special value "iso" to create ISO 8601 strings or a custom format string. The
-        custom format string can contain the following placeholders:
+        The `format` parameter controls the presentation. It can be `"iso"` to target ISO 8601 or a custom string. The
+        custom string can contain fixed placeholders (see below), which are replaced with the corresponding values. The
+        placeholders are case-sensitive and always enclosed in curly braces. Other text is included in the output
+        verbatim. To include a literal opening curly brace, use `\{`, and to include a literal backslash, use `\\`.
+
+        The following placeholders for _date components_ are available for **datetime** and **date**:
+
+        - `{Y}`, `{_Y}`, `{^Y}`: Year (zero-padded to four digits, space-padded to four digits, no padding).
+        - `{Y99}`, `{_Y99}`, `{^Y99}`: Year modulo 100 (zero-padded to two digits, space-padded to two digits, no
+          padding).
+        - `{M}`, `{_M}`, `{^M}`: Month (zero-padded to two digits, space-padded to two digits, no padding).
+        - `{M-full}`: Full name of the month (e.g. "January").
+        - `{M-short}`: Abbreviated name of the month with three letters (e.g. "Jan").
+        - `{W}`, `{_W}`, `{^W}`: Week number as defined by ISO 8601 (zero-padded to two digits, space-padded to two
+          digits, no padding).
+        - `{D}`, `{_D}`, `{^D}`: Day of the month (zero-padded to two digits, space-padded to two digits, no padding).
+        - `{DOW}`: Day of the week as defined by ISO 8601 (1 = Monday, 7 = Sunday).
+        - `{DOW-full}`: Full name of the day of the week (e.g. "Monday").
+        - `{DOW-short}`: Abbreviated name of the day of the week with three letters (e.g. "Mon").
+        - `{DOY}`, `{_DOY}`, `{^DOY}`: Day of the year, ranging from 1 to 366 (zero-padded to three digits, space-padded
+          to three digits, no padding).
+
+        The following placeholders for _time components_ are available for **datetime** and **time**:
+
+        - `{h}`, `{_h}`, `{^h}`: Hour (zero-padded to two digits, space-padded to two digits, no padding).
+        - `{h12}`, `{_h12}`, `{^h12}`: Hour in 12-hour format (zero-padded to two digits, space-padded to two digits, no
+          padding).
+        - `{m}`, `{_m}`, `{^m}`: Minute (zero-padded to two digits, space-padded to two digits, no padding).
+        - `{s}`, `{_s}`, `{^s}`: Second (zero-padded to two digits, space-padded to two digits, no padding).
+        - `{.f}`: Fractional seconds with a leading decimal point.
+        - `{ms}`: Millisecond (zero-padded to three digits).
+        - `{us}`: Microsecond (zero-padded to six digits).
+        - `{ns}`: Nanosecond (zero-padded to nine digits).
+        - `{AM/PM}`: AM or PM (uppercase).
+        - `{am/pm}`: am or pm (lowercase).
+
+        The following placeholders are available for **datetime** only:
+
+        - `{z}`: Offset of the timezone from UTC without a colon (e.g. "+0000").
+        - `{:z}`: Offset of the timezone from UTC with a colon (e.g. "+00:00").
+        - `{u}`: The UNIX timestamp in seconds.
+
+        The placeholders follow certain conventions:
+
+        - Generally, date components use uppercase letters and time components use lowercase letters.
+        - If a component may be formatted in multiple ways, we use shorter placeholders for ISO 8601. Placeholders for
+          other formats have a prefix (same value with different padding, see below) or suffix (other differences).
+        - By default, value are zero-padded, where applicable.
+        - A leading underscore (`_`) means the value is space-padded.
+        - A leading caret (`^`) means the value has no padding (think of the caret in regular expressions).
 
         Parameters
         ----------
@@ -822,16 +869,56 @@ class DatetimeOperations(ABC):
 
         Examples
         --------
+        >>> from datetime import datetime, date
         >>> from safeds.data.tabular.containers import Column
-        >>> import datetime
-        >>> column = Column("a", [datetime.date(2022, 1, 9)])
-        >>> column.transform(lambda cell: cell.dt.to_string())
+        >>> column1 = Column("a", [datetime(1999, 12, 31), datetime(2000, 1, 1, 12, 30, 0), None])
+        >>> column1.transform(lambda cell: cell.dt.to_string())
+        +----------------------------+
+        | a                          |
+        | ---                        |
+        | str                        |
+        +============================+
+        | 1999-12-31T00:00:00.000000 |
+        | 2000-01-01T12:30:00.000000 |
+        | null                       |
+        +----------------------------+
+
+        >>> column1.transform(lambda cell: cell.dt.to_string(
+        ...     format="{DOW-short} {D}-{M-short}-{Y} {h12}:{m}:{s} {AM/PM}"
+        ... ))
+        +-----------------------------+
+        | a                           |
+        | ---                         |
+        | str                         |
+        +=============================+
+        | Fri 31-Dec-1999 12:00:00 AM |
+        | Sat 01-Jan-2000 12:30:00 PM |
+        | null                        |
+        +-----------------------------+
+
+        >>> column2 = Column("a", [date(1999, 12, 31), date(2000, 1, 1), None])
+        >>> column2.transform(lambda cell: cell.dt.to_string())
         +------------+
         | a          |
         | ---        |
         | str        |
         +============+
-        | 2022-01-09 |
+        | 1999-12-31 |
+        | 2000-01-01 |
+        | null       |
+        +------------+
+
+        >>> column2.transform(lambda cell: cell.dt.to_string(
+        ...     format="{M}/{D}/{Y}"
+        ... ))
+        +------------+
+        | a          |
+        | ---        |
+        | str        |
+        +============+
+        | 12/31/1999 |
+        | 01/01/2000 |
+        | null       |
         +------------+
         """
 

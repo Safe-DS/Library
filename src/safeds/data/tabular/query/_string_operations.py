@@ -301,7 +301,7 @@ class StringOperations(ABC):
         +------+
         """
 
-    # TODO: add format parameter
+    # TODO: add format parameter + document
     @abstractmethod
     def to_date(self, *, format: str | None = None) -> Cell[datetime.date | None]:
         """
@@ -329,11 +329,11 @@ class StringOperations(ABC):
         +------------+
         """
 
-    # TODO: add format parameter
+    # TODO: add format parameter + document
     @abstractmethod
     def to_datetime(self, *, format: str | None = None) -> Cell[datetime.datetime | None]:
         """
-        Convert the string value in the cell to a datetime. Requires the string to be in the ISO 8601 format.
+        Convert the string value in the cell to a datetime.
 
         Returns
         -------

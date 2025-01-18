@@ -80,7 +80,7 @@ class _LazyStringOperations(StringOperations):
     def to_date(self, *, format: str | None = None) -> Cell[datetime.date | None]:
         if format == "iso":
             format = "%F"  # noqa: A001
-        else:
+        elif format is not None:
             format = _convert_and_check_datetime_format(format, type_="date", used_for_parsing=True)  # noqa: A001
 
         return _LazyCell(self._expression.str.to_date(format=format, strict=False))
@@ -88,7 +88,7 @@ class _LazyStringOperations(StringOperations):
     def to_datetime(self, *, format: str | None = None) -> Cell[datetime.datetime | None]:
         if format == "iso":
             format = "%+"  # noqa: A001
-        else:
+        elif format is not None:
             format = _convert_and_check_datetime_format(format, type_="datetime", used_for_parsing=True)  # noqa: A001
 
         return _LazyCell(self._expression.str.to_datetime(format=format, strict=False))
@@ -102,7 +102,7 @@ class _LazyStringOperations(StringOperations):
     def to_time(self, *, format: str | None = None) -> Cell[datetime.time | None]:
         if format == "iso":
             format = "%T"  # noqa: A001
-        else:
+        elif format is not None:
             format = _convert_and_check_datetime_format(format, type_="time", used_for_parsing=True)  # noqa: A001
 
         return _LazyCell(self._expression.str.to_time(format=format, strict=False))
