@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from safeds._utils import _get_similar_strings
 from safeds.exceptions import ColumnNotFoundError
 
 if TYPE_CHECKING:
@@ -52,20 +53,9 @@ def _build_error_message(schema: Schema, unknown_names: list[str]) -> str:
     result = "Could not find column(s):"
 
     for unknown_name in unknown_names:
-        similar_columns = _get_similar_column_names(schema, unknown_name)
+        similar_columns = _get_similar_strings(unknown_name, schema.column_names)
         result += f"\n    - '{unknown_name}'"
         if similar_columns:
             result += f": Did you mean one of {similar_columns}?"
 
     return result
-
-
-def _get_similar_column_names(schema: Schema, name: str) -> list[str]:
-    from difflib import get_close_matches
-
-    close_matches = get_close_matches(name, schema.column_names, n=3)
-
-    if close_matches and close_matches[0] == name:
-        return close_matches[0:1]
-    else:
-        return close_matches
