@@ -303,9 +303,9 @@ class StringOperations(ABC):
 
     # TODO: add format parameter
     @abstractmethod
-    def to_date(self) -> Cell[datetime.date | None]:
+    def to_date(self, *, format: str | None = None) -> Cell[datetime.date | None]:
         """
-        Convert the string value in the cell to a date. Requires the string to be in the ISO 8601 format.
+        Convert the string value in the cell to a date.
 
         Returns
         -------
@@ -331,7 +331,7 @@ class StringOperations(ABC):
 
     # TODO: add format parameter
     @abstractmethod
-    def to_datetime(self) -> Cell[datetime.datetime | None]:
+    def to_datetime(self, *, format: str | None = None) -> Cell[datetime.datetime | None]:
         """
         Convert the string value in the cell to a datetime. Requires the string to be in the ISO 8601 format.
 
@@ -343,7 +343,7 @@ class StringOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["2021-01-01T00:00:00z", "2021-02-01T00:00:00z", "abc", None])
+        >>> column = Column("a", ["2021-01-01T00:00:00Z", "2021-02-01T00:00:00Z", "abc", None])
         >>> column.transform(lambda cell: cell.str.to_datetime())
         +-------------------------+
         | a                       |
@@ -356,6 +356,8 @@ class StringOperations(ABC):
         | null                    |
         +-------------------------+
         """
+
+    # TODO: add to_time
 
     @abstractmethod
     def to_int(self, *, base: _ConvertibleToIntCell = 10) -> Cell[int | None]:

@@ -17,4 +17,4 @@ from tests.helpers import assert_cell_operation_works
     ],
 )
 def test_get_weekday(input_date: datetime.date, expected: bool) -> None:
-    assert_cell_operation_works(input_date, lambda cell: cell.dt.weekday(), expected)
+    assert_cell_operation_works(input_date, lambda cell: cell.dt.day_of_week(), expected)

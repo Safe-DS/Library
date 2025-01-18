@@ -1,7 +1,88 @@
+from __future__ import annotations
+
+from typing import Literal
+
+from safeds._utils import _get_similar_strings
+
+_DATE_REPLACEMENTS = {
+    # Year
+    "Y": "Y",
+    "_Y": "_Y",
+    "^Y": "-Y",
+    "Y99": "y",
+    "_Y99": "_y",
+    "^Y99": "-y",
+    # Month
+    "M": "m",
+    "_M": "_m",
+    "^M": "-m",
+    "M-full": "B",
+    "M-abbr": "b",
+    # Week
+    "W": "V",
+    "_W": "_V",
+    "^W": "-V",
+    # Day
+    "D": "d",
+    "_D": "_d",
+    "^D": "-d",
+    "DOW": "u",
+    "DOW-full": "A",
+    "DOW-abbr": "a",
+    "DOY": "j",
+}
+
+_TIME_REPLACEMENTS = {
+    # Hour
+    "h": "H",
+    "_h": "_H",
+    "^h": "-H",
+    "h12": "I",
+    "_h12": "_I",
+    "^h12": "-I",
+    # Minute
+    "m": "M",
+    "_m": "_M",
+    "^m": "-M",
+    # Second
+    "s": "S",
+    "_s": "_S",
+    "^s": "-S",
+    # Fractional seconds
+    ".f": ".f",
+    "ms": "3f",
+    "us": "6f",
+    "ns": "9f",
+    # AM/PM
+    "AM/PM": "p",
+    "am/pm": "P",
+}
+
+_DATETIME_REPLACEMENTS = {
+    # Date and time replacements are also valid for datetime
+    **_DATE_REPLACEMENTS,
+    **_TIME_REPLACEMENTS,
+    # Timezone
+    "z": "z",
+    ":z": ":z",
+    # UNIX timestamp
+    "u": "s",
+}
+
+_DATETIME_REPLACEMENTS_WHEN_PARSING = {
+    **_DATETIME_REPLACEMENTS,
+    # Allow omission of minutes for the timezone offset
+    "z": "#z",
+    ":z": "#z",
+}
+
+
 def _convert_and_check_datetime_format(
     format: str,
+    type_: Literal["datetime", "date", "time"],
     used_for_parsing: bool,
 ) -> str:
+    replacements = _get_replacements(type_, used_for_parsing)
     converted_format = ""
     index = 0
 
@@ -27,20 +108,31 @@ def _convert_and_check_datetime_format(
             index += 1
         # Template expression
         elif char == "{":
-            # Find the closing curly brace
-            closing_brace_index = format.find("}", index)
-            if closing_brace_index == -1:
+            end_index = format.find("}", index)
+            if end_index == -1:
                 raise ValueError(f"Unclosed template expression at index {index}.")
 
-            expression = format[index + 1 : closing_brace_index]
-            converted_format += _convert_and_check_template_expression(expression, used_for_parsing)
-            index = closing_brace_index + 1
+            expression = format[index + 1 : end_index]
+            converted_format += _convert_and_check_template_expression(expression, type_, replacements)
+            index = end_index + 1
         # Regular characters
         else:
             converted_format += char
             index += 1
 
     return converted_format
+
+
+def _get_replacements(
+    type_: Literal["datetime", "date", "time"],
+    used_for_parsing: bool,
+) -> dict[str, str]:
+    if type_ == "datetime":
+        return _DATETIME_REPLACEMENTS_WHEN_PARSING if used_for_parsing else _DATETIME_REPLACEMENTS
+    elif type_ == "date":
+        return _DATE_REPLACEMENTS
+    else:
+        return _TIME_REPLACEMENTS
 
 
 def char_at(string: str, i: int) -> str | None:
@@ -51,60 +143,26 @@ def char_at(string: str, i: int) -> str | None:
 
 def _convert_and_check_template_expression(
     expression: str,
-    used_for_parsing: bool,
+    type_: str,
+    replacements: dict[str, str],
 ) -> str:
-    converted_expression = expression
+    if expression in replacements:
+        return "%" + replacements[expression]
 
-    return converted_expression
+    # Unknown template expression
+    message = _build_error_message(expression, type_, list(replacements.keys()))
+    raise ValueError(message)
 
 
-# def _check_format_string(format_string: str) -> bool:
-#     valid_format_codes = {
-#         "F": "the standard",
-#         "a": "abbreviated weekday name",
-#         "A": "full weekday name",
-#         "w": "weekday as a decimal number",
-#         "d": "day of the month as a zero-padded decimal number",
-#         "b": "abbreviated month name",
-#         "B": "full month name",
-#         "m": "month as a zero-padded decimal number",
-#         "y": "year without century as a zero-padded decimal number",
-#         "Y": "year with century as a decimal number",
-#         "H": "hour (24-hour clock) as a zero-padded decimal number",
-#         "I": "hour (12-hour clock) as a zero-padded decimal number",
-#         "p": "locale's equivalent of either AM or PM",
-#         "M": "minute as a zero-padded decimal number",
-#         "S": "second as a zero-padded decimal number",
-#         "f": "microsecond as a zero-padded decimal number",
-#         "z": "UTC offset in the form ±HHMM[SS[.ffffff]]",
-#         "Z": "time zone name",
-#         "j": "day of the year as a zero-padded decimal number",
-#         "U": "week number of the year (Sunday as the first day of the week)",
-#         "W": "week number of the year (Monday as the first day of the week)",
-#         "c": "locale's appropriate date and time representation",
-#         "x": "locale's appropriate date representation",
-#         "X": "locale's appropriate time representation",
-#         "%": "a literal '%' character",
-#     }
-#
-#     # Keep track of the positions in the string
-#     i = 0
-#     n = len(format_string)
-#
-#     # Iterate over each character in the format string
-#     while i < n:
-#         if format_string[i] == "%":
-#             # Make sure there's at least one character following the '%'
-#             if i + 1 < n:
-#                 code = format_string[i + 1]
-#                 # Check if the following character is a valid format code
-#                 if code not in valid_format_codes:
-#                     return False
-#                 i += 2  # Skip ahead past the format code
-#             else:
-#                 # '%' is at the end of the string with no following format code
-#                 return False
-#         else:
-#             i += 1  # Continue to the next character
-#
-#     return True
+def _build_error_message(
+    expression: str,
+    type_: str,
+    valid_expressions: list[str],
+) -> str:
+    result = f"Invalid template expression '{expression}' for type {type_}."
+
+    similar_expressions = _get_similar_strings(expression, valid_expressions)
+    if similar_expressions:
+        result += f" Did you mean one of {similar_expressions}?"
+
+    return result

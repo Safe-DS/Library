@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
+from safeds._validation import _convert_and_check_datetime_format
 from safeds.data.tabular.containers._lazy_cell import _LazyCell
 
 from ._datetime_operations import DatetimeOperations
@@ -89,7 +90,7 @@ class _LazyDatetimeOperations(DatetimeOperations):
     def week(self) -> Cell[int | None]:
         return _LazyCell(self._expression.dt.week())
 
-    def weekday(self) -> Cell[int | None]:
+    def day_of_week(self) -> Cell[int | None]:
         return _LazyCell(self._expression.dt.weekday())
 
     def year(self) -> Cell[int | None]:
@@ -128,61 +129,10 @@ class _LazyDatetimeOperations(DatetimeOperations):
     def to_string(self, *, format: str = "iso") -> Cell[str | None]:
         if format == "iso":
             format = "iso:strict"  # noqa: A001
-        elif not _check_format_string(format):
-            raise ValueError("Invalid format string")
+        else:
+            format = _convert_and_check_datetime_format(format, type_="datetime", used_for_parsing=False)  # noqa: A001
+
         return _LazyCell(self._expression.dt.to_string(format=format))
 
-    def unix_time(self) -> Cell[int | None]:
-        return _LazyCell(self._expression.dt.epoch())
-
-
-def _check_format_string(format_string: str) -> bool:
-    valid_format_codes = {
-        "F": "the standard",
-        "a": "abbreviated weekday name",
-        "A": "full weekday name",
-        "w": "weekday as a decimal number",
-        "d": "day of the month as a zero-padded decimal number",
-        "b": "abbreviated month name",
-        "B": "full month name",
-        "m": "month as a zero-padded decimal number",
-        "y": "year without century as a zero-padded decimal number",
-        "Y": "year with century as a decimal number",
-        "H": "hour (24-hour clock) as a zero-padded decimal number",
-        "I": "hour (12-hour clock) as a zero-padded decimal number",
-        "p": "locale's equivalent of either AM or PM",
-        "M": "minute as a zero-padded decimal number",
-        "S": "second as a zero-padded decimal number",
-        "f": "microsecond as a zero-padded decimal number",
-        "z": "UTC offset in the form ±HHMM[SS[.ffffff]]",
-        "Z": "time zone name",
-        "j": "day of the year as a zero-padded decimal number",
-        "U": "week number of the year (Sunday as the first day of the week)",
-        "W": "week number of the year (Monday as the first day of the week)",
-        "c": "locale's appropriate date and time representation",
-        "x": "locale's appropriate date representation",
-        "X": "locale's appropriate time representation",
-        "%": "a literal '%' character",
-    }
-
-    # Keep track of the positions in the string
-    i = 0
-    n = len(format_string)
-
-    # Iterate over each character in the format string
-    while i < n:
-        if format_string[i] == "%":
-            # Make sure there's at least one character following the '%'
-            if i + 1 < n:
-                code = format_string[i + 1]
-                # Check if the following character is a valid format code
-                if code not in valid_format_codes:
-                    return False
-                i += 2  # Skip ahead past the format code
-            else:
-                # '%' is at the end of the string with no following format code
-                return False
-        else:
-            i += 1  # Continue to the next character
-
-    return True
+    def unix_timestamp(self) -> Cell[int | None]:
+        return _LazyCell(self._expression.dt.epoch(time_unit="s"))

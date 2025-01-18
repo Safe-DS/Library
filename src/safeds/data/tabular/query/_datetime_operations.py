@@ -166,6 +166,47 @@ class DatetimeOperations(ABC):
         """
 
     @abstractmethod
+    def day_of_week(self) -> Cell[int | None]:
+        """
+        Extract the day of the week from a datetime or date as defined by ISO 8601.
+
+        The day of the week is a number between 1 (Monday) and 7 (Sunday).
+
+        Returns
+        -------
+        cell:
+            The day of the week.
+
+        Examples
+        --------
+        >>> from datetime import datetime, date
+        >>> from safeds.data.tabular.containers import Column
+        >>> column1 = Column("a", [datetime(2000, 1, 1), datetime(2000, 1, 2), None])
+        >>> column1.transform(lambda cell: cell.dt.day_of_week())
+        +------+
+        |    a |
+        |  --- |
+        |   i8 |
+        +======+
+        |    6 |
+        |    7 |
+        | null |
+        +------+
+
+        >>> column2 = Column("a", [date(2000, 1, 1), date(2000, 1, 2), None])
+        >>> column2.transform(lambda cell: cell.dt.day_of_week())
+        +------+
+        |    a |
+        |  --- |
+        |   i8 |
+        +======+
+        |    6 |
+        |    7 |
+        | null |
+        +------+
+        """
+
+    @abstractmethod
     def day_of_year(self) -> Cell[int | None]:
         """
         Extract the day of the year from a datetime or date.
@@ -564,10 +605,11 @@ class DatetimeOperations(ABC):
     @abstractmethod
     def week(self) -> Cell[int | None]:
         """
-        Extract the week from a datetime or date.
+        Extract the ISO 8601 week number from a datetime or date.
 
-        The week is a number between 1 and 53. The first week of a year starts at the first Monday of the year.
-        Subsequent weeks start on Monday and end on Sunday.
+        The week is a number between 1 and 53. The first week of a year is the week that contains the first Thursday of
+        the year. The last week of a year is the week that contains the last Thursday of the year. In other words, a
+        week is associated with a year if it contains the majority of its days.
 
         Returns
         -------
@@ -578,7 +620,7 @@ class DatetimeOperations(ABC):
         --------
         >>> from datetime import datetime, date
         >>> from safeds.data.tabular.containers import Column
-        >>> column1 = Column("a", [datetime(1999, 12, 31), datetime(2000, 1, 2), datetime(2000, 1, 3), None])
+        >>> column1 = Column("a", [datetime(1999, 12, 31), datetime(2000, 1, 2), datetime(2001, 12, 31), None])
         >>> column1.transform(lambda cell: cell.dt.week())
         +------+
         |    a |
@@ -591,7 +633,7 @@ class DatetimeOperations(ABC):
         | null |
         +------+
 
-        >>> column2 = Column("a", [date(1999, 12, 31), date(2000, 1, 2), date(2000, 1, 4), None])
+        >>> column2 = Column("a", [date(1999, 12, 31), date(2000, 1, 2), datetime(2001, 12, 31), None])
         >>> column2.transform(lambda cell: cell.dt.week())
         +------+
         |    a |
@@ -601,47 +643,6 @@ class DatetimeOperations(ABC):
         |   52 |
         |   52 |
         |    1 |
-        | null |
-        +------+
-        """
-
-    @abstractmethod
-    def weekday(self) -> Cell[int | None]:
-        """
-        Extract the weekday from a datetime or date.
-
-        The weekday is a number between 1 (Monday) and 7 (Sunday).
-
-        Returns
-        -------
-        cell:
-            The weekday.
-
-        Examples
-        --------
-        >>> from datetime import datetime, date
-        >>> from safeds.data.tabular.containers import Column
-        >>> column1 = Column("a", [datetime(2000, 1, 1), datetime(2000, 1, 2), None])
-        >>> column1.transform(lambda cell: cell.dt.weekday())
-        +------+
-        |    a |
-        |  --- |
-        |   i8 |
-        +======+
-        |    6 |
-        |    7 |
-        | null |
-        +------+
-
-        >>> column2 = Column("a", [date(2000, 1, 1), date(2000, 1, 2), None])
-        >>> column2.transform(lambda cell: cell.dt.weekday())
-        +------+
-        |    a |
-        |  --- |
-        |   i8 |
-        +======+
-        |    6 |
-        |    7 |
         | null |
         +------+
         """
@@ -835,31 +836,31 @@ class DatetimeOperations(ABC):
         """
 
     @abstractmethod
-    def unix_time(self) -> Cell[int | None]:
+    def unix_timestamp(self) -> Cell[int | None]:
         """
-        Get the Unix time from a datetime.
+        Get the Unix timestamp from a datetime.
 
-        The Unix time is the elapsed time since 00:00:00 UTC on 1 January 1970. This method returns the Unix time in
-        microseconds.
+        A Unix timestamp is the elapsed time since 00:00:00 UTC on 1 January 1970. This method returns the value in
+        seconds.
 
         Returns
         -------
         cell:
-            The Unix time.
+            The Unix timestamp.
 
         Examples
         --------
         >>> from datetime import datetime
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("a", [datetime(1970, 1, 1), datetime(1970, 1, 2), None])
-        >>> column.transform(lambda cell: cell.dt.unix_time())
-        +-------------+
-        |           a |
-        |         --- |
-        |         i64 |
-        +=============+
-        |           0 |
-        | 86400000000 |
-        |        null |
-        +-------------+
+        >>> column.transform(lambda cell: cell.dt.unix_timestamp())
+        +-------+
+        |     a |
+        |   --- |
+        |   i64 |
+        +=======+
+        |     0 |
+        | 86400 |
+        |  null |
+        +-------+
         """

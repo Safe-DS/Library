@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
+from safeds._validation import _convert_and_check_datetime_format
 from safeds.data.tabular.containers._lazy_cell import _LazyCell
 
 from ._string_operations import StringOperations
@@ -76,17 +77,35 @@ class _LazyStringOperations(StringOperations):
     ) -> Cell[str | None]:
         return _LazyCell(self._expression.str.slice(start, length))
 
-    def to_date(self) -> Cell[datetime.date | None]:
-        return _LazyCell(self._expression.str.to_date(format="%F", strict=False))
+    def to_date(self, *, format: str | None = None) -> Cell[datetime.date | None]:
+        if format == "iso":
+            format = "%F"  # noqa: A001
+        else:
+            format = _convert_and_check_datetime_format(format, type_="date", used_for_parsing=True)  # noqa: A001
 
-    def to_datetime(self) -> Cell[datetime.datetime | None]:
-        return _LazyCell(self._expression.str.to_datetime(format="%+", strict=False))
+        return _LazyCell(self._expression.str.to_date(format=format, strict=False))
+
+    def to_datetime(self, *, format: str | None = None) -> Cell[datetime.datetime | None]:
+        if format == "iso":
+            format = "%+"  # noqa: A001
+        else:
+            format = _convert_and_check_datetime_format(format, type_="datetime", used_for_parsing=True)  # noqa: A001
+
+        return _LazyCell(self._expression.str.to_datetime(format=format, strict=False))
 
     def to_int(self, *, base: _ConvertibleToIntCell = 10) -> Cell[int | None]:
         return _LazyCell(self._expression.str.to_integer(base=base, strict=False))
 
     def to_lowercase(self) -> Cell[str | None]:
         return _LazyCell(self._expression.str.to_lowercase())
+
+    def to_time(self, *, format: str | None = None) -> Cell[datetime.time | None]:
+        if format == "iso":
+            format = "%T"  # noqa: A001
+        else:
+            format = _convert_and_check_datetime_format(format, type_="time", used_for_parsing=True)  # noqa: A001
+
+        return _LazyCell(self._expression.str.to_time(format=format, strict=False))
 
     def to_uppercase(self) -> Cell[str | None]:
         return _LazyCell(self._expression.str.to_uppercase())
