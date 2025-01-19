@@ -215,6 +215,34 @@ class MathOperations(ABC):
         """
 
     @abstractmethod
+    def cosh(self) -> Cell:
+        """
+        Get the hyperbolic cosine.
+
+        Returns
+        -------
+        cell:
+            The hyperbolic cosine.
+
+        Examples
+        --------
+        >>> import math
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [-1, 0, 1, None])
+        >>> column.transform(lambda cell: cell.math.cosh())
+        +---------+
+        |       a |
+        |     --- |
+        |     f64 |
+        +=========+
+        | 1.54308 |
+        | 1.00000 |
+        | 1.54308 |
+        |    null |
+        +---------+
+        """
+
+    @abstractmethod
     def floor(self) -> Cell:
         """
         Round down to the nearest integer.
@@ -402,6 +430,34 @@ class MathOperations(ABC):
         """
 
     @abstractmethod
+    def sinh(self) -> Cell:
+        """
+        Get the hyperbolic sine.
+
+        Returns
+        -------
+        cell:
+            The hyperbolic sine.
+
+        Examples
+        --------
+        >>> import math
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [-1, 0, 1, None])
+        >>> column.transform(lambda cell: cell.math.sinh())
+        +----------+
+        |        a |
+        |      --- |
+        |      f64 |
+        +==========+
+        | -1.17520 |
+        |  0.00000 |
+        |  1.17520 |
+        |     null |
+        +----------+
+        """
+
+    @abstractmethod
     def tan(self) -> Cell:
         """
         Get the tangent.
@@ -425,6 +481,34 @@ class MathOperations(ABC):
         |  0.00000 |
         |  1.00000 |
         | -1.00000 |
+        |     null |
+        +----------+
+        """
+
+    @abstractmethod
+    def tanh(self) -> Cell:
+        """
+        Get the hyperbolic tangent.
+
+        Returns
+        -------
+        cell:
+            The hyperbolic tangent.
+
+        Examples
+        --------
+        >>> import math
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [-1, 0, 1, None])
+        >>> column.transform(lambda cell: cell.math.tanh())
+        +----------+
+        |        a |
+        |      --- |
+        |      f64 |
+        +==========+
+        | -0.76159 |
+        |  0.00000 |
+        |  0.76159 |
         |     null |
         +----------+
         """
