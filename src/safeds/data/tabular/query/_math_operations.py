@@ -57,6 +57,11 @@ class MathOperations(ABC):
         """
         Get the absolute value.
 
+        Returns
+        -------
+        cell:
+            The absolute value.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
@@ -77,6 +82,11 @@ class MathOperations(ABC):
     def ceil(self) -> Cell:
         """
         Round up to the nearest integer.
+
+        Returns
+        -------
+        cell:
+            The rounded value.
 
         Examples
         --------
@@ -99,6 +109,11 @@ class MathOperations(ABC):
         """
         Round down to the nearest integer.
 
+        Returns
+        -------
+        cell:
+            The rounded value.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
@@ -113,4 +128,119 @@ class MathOperations(ABC):
         | 3.00000 |
         |    null |
         +---------+
+        """
+
+    @abstractmethod
+    def round_to_decimal_places(self, decimal_places: int) -> Cell:
+        """
+        Round to the specified number of decimal places.
+
+        Parameters
+        ----------
+        decimal_places:
+            The number of decimal places to round to.
+
+        Returns
+        -------
+        cell:
+            The rounded value.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [0.999, 1.123, 3.456, None])
+        >>> column.transform(lambda cell: cell.math.round_to_decimal_places(0))
+        +---------+
+        |       a |
+        |     --- |
+        |     f64 |
+        +=========+
+        | 1.00000 |
+        | 1.00000 |
+        | 3.00000 |
+        |    null |
+        +---------+
+
+        >>> column.transform(lambda cell: cell.math.round_to_decimal_places(2))
+        +---------+
+        |       a |
+        |     --- |
+        |     f64 |
+        +=========+
+        | 1.00000 |
+        | 1.12000 |
+        | 3.46000 |
+        |    null |
+        +---------+
+        """
+
+    @abstractmethod
+    def round_to_significant_figures(self, significant_figures: int) -> Cell:
+        """
+        Round to the specified number of significant figures.
+
+        Parameters
+        ----------
+        significant_figures:
+            The number of significant figures to round to.
+
+        Returns
+        -------
+        cell:
+            The rounded value.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [0.999, 1.123, 3.456, None])
+        >>> column.transform(lambda cell: cell.math.round_to_significant_figures(1))
+        +---------+
+        |       a |
+        |     --- |
+        |     f64 |
+        +=========+
+        | 1.00000 |
+        | 1.00000 |
+        | 3.00000 |
+        |    null |
+        +---------+
+
+        >>> column.transform(lambda cell: cell.math.round_to_significant_figures(2))
+        +---------+
+        |       a |
+        |     --- |
+        |     f64 |
+        +=========+
+        | 1.00000 |
+        | 1.10000 |
+        | 3.50000 |
+        |    null |
+        +---------+
+        """
+
+    @abstractmethod
+    def sign(self) -> Cell:
+        """
+        Get the sign (-1 for negative numbers, 0 for zero, and 1 for positive numbers).
+
+        Returns
+        -------
+        cell:
+            The sign.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [-2, 0, 2, None])
+        >>> column.transform(lambda cell: cell.math.sign())
+        +------+
+        |    a |
+        |  --- |
+        |  i64 |
+        +======+
+        |   -1 |
+        |    0 |
+        |    1 |
+        | null |
+        +------+
         """

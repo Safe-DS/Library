@@ -51,3 +51,12 @@ class _LazyMathOperations(MathOperations):
 
     def floor(self) -> Cell:
         return _LazyCell(self._expression.floor())
+
+    def round_to_decimal_places(self, decimal_places: int) -> Cell:
+        return _LazyCell(self._expression.round(decimal_places))
+
+    def round_to_significant_figures(self, significant_figures: int) -> Cell:
+        return _LazyCell(self._expression.round_sig_figs(significant_figures))
+
+    def sign(self) -> Cell:
+        return _LazyCell(self._expression.sign())
