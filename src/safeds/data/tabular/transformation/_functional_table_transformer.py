@@ -77,7 +77,7 @@ class FunctionalTableTransformer(TableTransformer):
         Parameters
         ----------
         table:
-            The table on which on which the callable is executed.
+            The table on which the callable is executed.
 
         Returns
         -------
