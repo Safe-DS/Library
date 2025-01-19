@@ -112,8 +112,8 @@ class Column(Sequence[T_co]):
 
         # Implementation
         self._name: str = name
-        self._lazy_frame: pl.LazyFrame = pl.LazyFrame(data, schema={name: dtype}, strict=False)
-        self.__series_cache: pl.Series | None = None
+        self.__series_cache: pl.Series | None = pl.Series(name, data, dtype=dtype, strict=False)
+        self._lazy_frame: pl.LazyFrame = self.__series_cache.to_frame().lazy()
 
     def __contains__(self, value: object) -> bool:
         import polars as pl

@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds._validation import _convert_and_check_datetime_format
+from safeds._validation import _convert_and_check_datetime_format, _check_bounds, _ClosedBound
 from safeds.data.tabular.containers._lazy_cell import _LazyCell
 
 from ._string_operations import StringOperations
@@ -75,9 +75,12 @@ class _LazyStringOperations(StringOperations):
         start: _ConvertibleToIntCell = 0,
         length: _ConvertibleToIntCell = None,
     ) -> Cell[str | None]:
+        if isinstance(length, int):
+            _check_bounds("length", length, lower_bound=_ClosedBound(0))
+
         return _LazyCell(self._expression.str.slice(start, length))
 
-    def to_date(self, *, format: str | None = None) -> Cell[datetime.date | None]:
+    def to_date(self, *, format: str | None = "iso") -> Cell[datetime.date | None]:
         if format == "iso":
             format = "%F"  # noqa: A001
         elif format is not None:
@@ -85,7 +88,7 @@ class _LazyStringOperations(StringOperations):
 
         return _LazyCell(self._expression.str.to_date(format=format, strict=False))
 
-    def to_datetime(self, *, format: str | None = None) -> Cell[datetime.datetime | None]:
+    def to_datetime(self, *, format: str | None = "iso") -> Cell[datetime.datetime | None]:
         if format == "iso":
             format = "%+"  # noqa: A001
         elif format is not None:
@@ -99,7 +102,7 @@ class _LazyStringOperations(StringOperations):
     def to_lowercase(self) -> Cell[str | None]:
         return _LazyCell(self._expression.str.to_lowercase())
 
-    def to_time(self, *, format: str | None = None) -> Cell[datetime.time | None]:
+    def to_time(self, *, format: str | None = "iso") -> Cell[datetime.time | None]:
         if format == "iso":
             format = "%T"  # noqa: A001
         elif format is not None:
