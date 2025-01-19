@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Callable, Iterator, Sequence
 from typing import TYPE_CHECKING, Literal, TypeVar, overload
 
-from safeds._utils import _structural_hash
+from safeds._utils import _safe_collect_lazy_frame, _structural_hash
 from safeds._validation import (
     _check_column_has_no_missing_values,
     _check_column_is_numeric,
@@ -16,7 +16,7 @@ from safeds.data.tabular.typing._polars_column_type import _PolarsColumnType
 from ._lazy_cell import _LazyCell
 
 if TYPE_CHECKING:
-    from polars import Series
+    import polars as pl
 
     from safeds.data.tabular.typing import ColumnType
     from safeds.exceptions import (  # noqa: F401
@@ -79,9 +79,10 @@ class Column(Sequence[T_co]):
     # ------------------------------------------------------------------------------------------------------------------
 
     @staticmethod
-    def _from_polars_series(data: Series) -> Column:
+    def _from_polars_series(data: pl.Series) -> Column:
         result = object.__new__(Column)
-        result._series = data
+        result._lazy_frame = data.to_frame().lazy()
+        result.__series_cache = data
         return result
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -101,7 +102,8 @@ class Column(Sequence[T_co]):
         dtype = None if type is None else type._polars_data_type
 
         # Implementation
-        self._series: pl.Series = pl.Series(name, data, dtype=dtype, strict=False)
+        self._lazy_frame: pl.LazyFrame = pl.LazyFrame(data, schema={name: dtype}, strict=False)
+        self.__series_cache: pl.Series | None = None
 
     def __contains__(self, value: object) -> bool:
         import polars as pl
@@ -156,6 +158,13 @@ class Column(Sequence[T_co]):
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
     # ------------------------------------------------------------------------------------------------------------------
+
+    @property
+    def _series(self) -> pl.Series:
+        if self.__series_cache is None:
+            self.__series_cache = _safe_collect_lazy_frame(self._lazy_frame).to_series(0)
+
+        return self.__series_cache
 
     @property
     def name(self) -> str:
