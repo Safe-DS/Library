@@ -58,6 +58,9 @@ class _LazyMathOperations(MathOperations):
     def ceil(self) -> Cell:
         return _LazyCell(self._expression.ceil())
 
+    def cos(self) -> Cell:
+        return _LazyCell(self._expression.cos())
+
     def floor(self) -> Cell:
         return _LazyCell(self._expression.floor())
 
@@ -69,3 +72,9 @@ class _LazyMathOperations(MathOperations):
 
     def sign(self) -> Cell:
         return _LazyCell(self._expression.sign())
+
+    def sin(self) -> Cell:
+        return _LazyCell(self._expression.sin())
+
+    def tan(self) -> Cell:
+        return _LazyCell(self._expression.tan())

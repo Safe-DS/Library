@@ -186,6 +186,35 @@ class MathOperations(ABC):
         """
 
     @abstractmethod
+    def cos(self) -> Cell:
+        """
+        Get the cosine.
+
+        Returns
+        -------
+        cell:
+            The cosine.
+
+        Examples
+        --------
+        >>> import math
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [0, math.pi / 2, math.pi, 3 * math.pi / 2, None])
+        >>> column.transform(lambda cell: cell.math.cos())
+        +----------+
+        |        a |
+        |      --- |
+        |      f64 |
+        +==========+
+        |  1.00000 |
+        |  0.00000 |
+        | -1.00000 |
+        | -0.00000 |
+        |     null |
+        +----------+
+        """
+
+    @abstractmethod
     def floor(self) -> Cell:
         """
         Round down to the nearest integer.
@@ -304,6 +333,9 @@ class MathOperations(ABC):
         """
         Get the sign (-1 for negative numbers, 0 for zero, and 1 for positive numbers).
 
+        Note that IEEE 754 defines a negative zero (-0) and a positive zero (+0). This method return a negative zero
+        for -0 and a positive zero for +0.
+
         Returns
         -------
         cell:
@@ -312,8 +344,8 @@ class MathOperations(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [-2, 0, 2, None])
-        >>> column.transform(lambda cell: cell.math.sign())
+        >>> column1 = Column("a", [-1, 0, 1, None])
+        >>> column1.transform(lambda cell: cell.math.sign())
         +------+
         |    a |
         |  --- |
@@ -324,4 +356,75 @@ class MathOperations(ABC):
         |    1 |
         | null |
         +------+
+
+        >>> column2 = Column("a", [-1.0, -0.0, +0.0, 1.0, None])
+        >>> column2.transform(lambda cell: cell.math.sign())
+        +----------+
+        |        a |
+        |      --- |
+        |      f64 |
+        +==========+
+        | -1.00000 |
+        | -0.00000 |
+        |  0.00000 |
+        |  1.00000 |
+        |     null |
+        +----------+
+        """
+
+    @abstractmethod
+    def sin(self) -> Cell:
+        """
+        Get the sine.
+
+        Returns
+        -------
+        cell:
+            The sine.
+
+        Examples
+        --------
+        >>> import math
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [0, math.pi / 2, math.pi, 3 * math.pi / 2, None])
+        >>> column.transform(lambda cell: cell.math.sin())
+        +----------+
+        |        a |
+        |      --- |
+        |      f64 |
+        +==========+
+        |  0.00000 |
+        |  1.00000 |
+        |  0.00000 |
+        | -1.00000 |
+        |     null |
+        +----------+
+        """
+
+    @abstractmethod
+    def tan(self) -> Cell:
+        """
+        Get the tangent.
+
+        Returns
+        -------
+        cell:
+            The tangent.
+
+        Examples
+        --------
+        >>> import math
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [0, math.pi / 4, 3 * math.pi / 4, None])
+        >>> column.transform(lambda cell: cell.math.tan())
+        +----------+
+        |        a |
+        |      --- |
+        |      f64 |
+        +==========+
+        |  0.00000 |
+        |  1.00000 |
+        | -1.00000 |
+        |     null |
+        +----------+
         """
