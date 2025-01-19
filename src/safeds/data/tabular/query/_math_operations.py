@@ -12,6 +12,21 @@ class MathOperations(ABC):
     Namespace for mathematical operations.
 
     This class cannot be instantiated directly. It can only be accessed using the `math` attribute of a cell.
+
+    Examples
+    --------
+    >>> from safeds.data.tabular.containers import Column
+    >>> column = Column("a", [-1, 0, 1])
+    >>> column.transform(lambda cell: cell.math.abs())
+    +-----+
+    |   a |
+    | --- |
+    | i64 |
+    +=====+
+    |   1 |
+    |   0 |
+    |   1 |
+    +-----+
     """
 
     # ------------------------------------------------------------------------------------------------------------------
