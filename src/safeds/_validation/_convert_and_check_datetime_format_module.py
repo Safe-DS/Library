@@ -1,8 +1,11 @@
 from __future__ import annotations
 
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 from safeds._utils import _get_similar_strings
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 _DATE_REPLACEMENTS = {
     # Year
@@ -175,14 +178,14 @@ def _convert_and_check_template_expression(
         return "%" + replacements[expression]
 
     # Unknown specifier
-    message = _build_error_message(expression, type_, list(replacements.keys()))
+    message = _build_error_message(expression, type_, replacements.keys())
     raise ValueError(message)
 
 
 def _build_error_message(
     expression: str,
     type_: str,
-    valid_expressions: list[str],
+    valid_expressions: Iterable[str],
 ) -> str:
     result = f"Invalid specifier '{expression}' for type {type_}."
 

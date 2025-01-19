@@ -1,4 +1,12 @@
-def _get_similar_strings(string: str, valid_strings: list[str]) -> list[str]:
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+
+def _get_similar_strings(string: str, valid_strings: Iterable[str]) -> list[str]:
     from difflib import get_close_matches
 
     close_matches = get_close_matches(string, valid_strings, n=3)
