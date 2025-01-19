@@ -324,6 +324,33 @@ class MathOperations(ABC):
         """
 
     @abstractmethod
+    def exp(self) -> Cell:
+        """
+        Get the exponential.
+
+        Returns
+        -------
+        cell:
+            The exponential.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [-1, 0, 1, None])
+        >>> column.transform(lambda cell: cell.math.exp())
+        +---------+
+        |       a |
+        |     --- |
+        |     f64 |
+        +=========+
+        | 0.36788 |
+        | 1.00000 |
+        | 2.71828 |
+        |    null |
+        +---------+
+        """
+
+    @abstractmethod
     def floor(self) -> Cell:
         """
         Round down to the nearest integer.
@@ -536,6 +563,32 @@ class MathOperations(ABC):
         |  1.17520 |
         |     null |
         +----------+
+        """
+
+    @abstractmethod
+    def sqrt(self) -> Cell:
+        """
+        Get the square root.
+
+        Returns
+        -------
+        cell:
+            The square root.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [1, 4, None])
+        >>> column.transform(lambda cell: cell.math.sqrt())
+        +---------+
+        |       a |
+        |     --- |
+        |     f64 |
+        +=========+
+        | 1.00000 |
+        | 2.00000 |
+        |    null |
+        +---------+
         """
 
     @abstractmethod
