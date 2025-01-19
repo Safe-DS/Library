@@ -139,22 +139,21 @@ class Table:
         +-----+-----+
         """
         import polars as pl
-        from polars.exceptions import DuplicateError, ShapeError
 
         if isinstance(columns, Column):
             columns = [columns]
+        if len(columns) == 0:
+            return Table({})
 
-        try:
-            return Table._from_polars_lazy_frame(
-                pl.LazyFrame([column._series for column in columns]),
-            )
-        # polars already validates this, so we don't do it upfront (performance)
-        except DuplicateError:
-            _check_columns_dont_exist(Table({}), [column.name for column in columns])
-            return Table({})  # pragma: no cover
-        except ShapeError:
-            _check_row_counts_are_equal(columns)
-            return Table({})  # pragma: no cover
+        _check_columns_dont_exist(Table({}), [column.name for column in columns])
+        _check_row_counts_are_equal(columns)
+
+        return Table._from_polars_lazy_frame(
+            pl.concat(
+                [column._lazy_frame for column in columns],
+                how="horizontal",
+            ),
+        )
 
     @staticmethod
     def from_csv_file(path: str | Path, *, separator: str = ",") -> Table:
@@ -490,10 +489,7 @@ class Table:
         """
         Add columns to the table and return the result as a new table.
 
-        **Notes:**
-
-        - The original table is not modified.
-        - This operation must fully load the data into memory, which can be expensive.
+        **Note:** The original table is not modified.
 
         Parameters
         ----------
@@ -534,7 +530,7 @@ class Table:
             Add a column with values computed from other columns.
         - [`add_index_column`][safeds.data.tabular.containers._table.Table.add_index_column]
         """
-        from polars.exceptions import DuplicateError, ShapeError
+        import polars as pl
 
         if isinstance(columns, Table):
             return self.add_tables_as_columns(columns)
@@ -544,17 +540,18 @@ class Table:
         if len(columns) == 0:
             return self
 
-        try:
-            return Table._from_polars_data_frame(
-                self._data_frame.hstack([column._series for column in columns]),
-            )
-        # polars already validates this, so we don't do it upfront (performance)
-        except DuplicateError:
-            _check_columns_dont_exist(self, [column.name for column in columns])
-            return Table({})  # pragma: no cover
-        except ShapeError:
-            _check_row_counts_are_equal([self, *columns])
-            return Table({})  # pragma: no cover
+        _check_columns_dont_exist(self, [column.name for column in columns])
+        _check_row_counts_are_equal([self, *columns], ignore_entries_without_rows=True)
+
+        return Table._from_polars_lazy_frame(
+            pl.concat(
+                [
+                    self._lazy_frame,
+                    *[column._lazy_frame for column in columns],
+                ],
+                how="horizontal",
+            ),
+        )
 
     def add_computed_column(
         self,
@@ -722,9 +719,7 @@ class Table:
         +-----+
         """
         _check_columns_exist(self, name)
-        return Column._from_polars_series(
-            _safe_collect_lazy_frame(self._lazy_frame.select(name)).get_column(name),
-        )
+        return Column._from_polars_lazy_frame(name, self._lazy_frame)
 
     def get_column_type(self, name: str) -> ColumnType:
         """
@@ -1088,6 +1083,8 @@ class Table:
         |   9 |  12 |   6 |
         +-----+-----+-----+
         """
+        import polars.selectors as cs
+
         if isinstance(new_columns, Column):
             new_columns = [new_columns]
         elif isinstance(new_columns, Table):
@@ -1106,15 +1103,14 @@ class Table:
                 self._lazy_frame.with_columns(new_column._series.alias(old_name)).rename({old_name: new_column.name}),
             )
 
-        import polars as pl
-
-        index = self.column_names.index(old_name)
+        column_names = self.column_names
+        index = column_names.index(old_name)
 
         return Table._from_polars_lazy_frame(
             self._lazy_frame.select(
-                *[pl.col(name) for name in self.column_names[:index]],
+                cs.by_name(column_names[:index]),
                 *[column._series for column in new_columns],
-                *[pl.col(name) for name in self.column_names[index + 1 :]],
+                cs.by_name(column_names[index + 1 :]),
             ),
         )
 
@@ -2550,7 +2546,7 @@ class Table:
         >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> columns = table.to_columns()
         """
-        return [Column._from_polars_series(column) for column in self._data_frame.get_columns()]
+        return [Column._from_polars_lazy_frame(name, self._lazy_frame) for name in self.column_names]
 
     def to_csv_file(self, path: str | Path) -> None:
         """
@@ -2588,6 +2584,8 @@ class Table:
     def to_dict(self) -> dict[str, list[Any]]:
         """
         Return a dictionary that maps column names to column values.
+
+        **Note:** This operation must fully load the data into memory, which can be expensive.
 
         Returns
         -------

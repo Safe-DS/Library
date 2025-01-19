@@ -6,7 +6,7 @@ from safeds.data.tabular.containers import Column
 
 def test_should_store_the_name() -> None:
     frame = pl.LazyFrame({"col1": []})
-    assert Column._from_polars_lazy_frame(frame, "col1").name == "col1"
+    assert Column._from_polars_lazy_frame("col1", frame).name == "col1"
 
 
 @pytest.mark.parametrize(
@@ -21,4 +21,4 @@ def test_should_store_the_name() -> None:
     ],
 )
 def test_should_store_the_data(frame: pl.LazyFrame, expected: list) -> None:
-    assert list(Column._from_polars_lazy_frame(frame, "col1")) == expected
+    assert list(Column._from_polars_lazy_frame("col1", frame)) == expected
