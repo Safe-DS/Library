@@ -9,8 +9,8 @@ from tests.helpers import assert_cell_operation_works
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
-        (datetime(1999, 3, 1, tzinfo=UTC), 3),
-        (date(1999, 3, 1), 3),
+        (datetime(1, 2, 3, tzinfo=UTC), 2),
+        (date(1, 2, 3), 2),
         (None, None),
     ],
     ids=[
@@ -19,7 +19,7 @@ from tests.helpers import assert_cell_operation_works
         "None",
     ],
 )
-def test_should_return_month(
+def test_should_extract_month(
     value: datetime | None,
     expected: int | None,
 ) -> None:

@@ -9,8 +9,8 @@ from tests.helpers import assert_cell_operation_works
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
-        (datetime(1, 2, 3, tzinfo=UTC), 1),
-        (date(1, 2, 3), 1),
+        (datetime(1, 2, 3, tzinfo=UTC), 3),
+        (date(1, 2, 3), 3),
         (None, None),
     ],
     ids=[
@@ -19,13 +19,13 @@ from tests.helpers import assert_cell_operation_works
         "None",
     ],
 )
-def test_should_extract_year(
+def test_should_extract_day(
     value: datetime | None,
     expected: int | None,
 ) -> None:
     assert_cell_operation_works(
         value,
-        lambda cell: cell.dt.year(),
+        lambda cell: cell.dt.day(),
         expected,
         type_if_none=ColumnType.datetime(),
     )
