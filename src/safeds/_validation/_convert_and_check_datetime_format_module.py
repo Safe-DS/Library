@@ -120,7 +120,7 @@ def _convert_and_check_datetime_format(
         if char == "\\" and char_at(format_, index + 1) == "\\":
             converted_format += "\\"
             index += 2
-        if char == "\\" and char_at(format_, index + 1) == "{":
+        elif char == "\\" and char_at(format_, index + 1) == "{":
             converted_format += "{"
             index += 2
         # Characters that need to be escaped for rust's chrono crate
@@ -190,7 +190,7 @@ def _build_error_message(
     result = f"Invalid specifier '{expression}' for type {type_}."
 
     similar_expressions = _get_similar_strings(expression, valid_expressions)
-    if similar_expressions:
+    if similar_expressions:  # pragma: no cover
         result += f" Did you mean one of {similar_expressions}?"
 
     return result

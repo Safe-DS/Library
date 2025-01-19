@@ -28,7 +28,7 @@ def _build_error_message(time_zone: str) -> str:
     result = f"Invalid time zone '{time_zone}'."
 
     similar_time_zones = _get_similar_strings(time_zone, _VALID_TZ_IDENTIFIERS)
-    if similar_time_zones:
+    if similar_time_zones:  # pragma: no cover
         result += f" Did you mean one of {similar_time_zones}?"
 
     return result

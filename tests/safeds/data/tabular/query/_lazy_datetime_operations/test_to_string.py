@@ -205,6 +205,33 @@ class TestDateTimeSpecifiers:
         )
 
 
+@pytest.mark.parametrize(
+    ("format_", "expected"),
+    [
+        ("\\", "\\"),
+        ("\\\\", "\\"),
+        ("\\{", "{"),
+        ("%", "%"),
+        ("\n", "\n"),
+        ("\t", "\t"),
+    ],
+    ids=[
+        "backslash at end",
+        "escaped backslash",
+        "escaped open curly brace",
+        "percent",
+        "newline",
+        "tab",
+    ],
+)
+def test_should_handle_escape_sequences(format_: str, expected: date | time | None) -> None:
+    assert_cell_operation_works(
+        DATETIME,
+        lambda cell: cell.dt.to_string(format=format_),
+        expected,
+    )
+
+
 def test_should_raise_for_unclosed_specifier() -> None:
     column = Column("a", [DATETIME])
     with pytest.raises(ValueError, match="Unclosed specifier"):
