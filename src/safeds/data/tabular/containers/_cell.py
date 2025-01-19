@@ -3,6 +3,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Generic, TypeVar
 
+from safeds._validation import _check_time_zone
+
 if TYPE_CHECKING:
     import datetime as python_datetime
 
@@ -150,6 +152,7 @@ class Cell(ABC, Generic[T_co]):
         minute: _ConvertibleToIntCell = 0,
         second: _ConvertibleToIntCell = 0,
         microsecond: _ConvertibleToIntCell = 0,
+        time_zone: str | None = None,
     ) -> Cell[python_datetime.datetime | None]:
         """
         Create a cell with a datetime.
@@ -172,6 +175,10 @@ class Cell(ABC, Generic[T_co]):
             The second. Must be between 0 and 59.
         microsecond:
             The microsecond. Must be between 0 and 999,999.
+        time_zone:
+            The time zone. If None, values are assumed to be in local time. This is different from setting the time zone
+            to `"UTC"`. Any TZ identifier defined in the
+            [tz database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) is valid.
 
         Returns
         -------
@@ -208,6 +215,8 @@ class Cell(ABC, Generic[T_co]):
 
         from ._lazy_cell import _LazyCell  # circular import
 
+        _check_time_zone(time_zone)
+
         pl_year = _to_polars_expression(year)
         pl_month = _to_polars_expression(month)
         pl_day = _to_polars_expression(day)
@@ -219,7 +228,18 @@ class Cell(ABC, Generic[T_co]):
         # By default, microseconds overflow into seconds
         return _LazyCell(
             pl.when(pl_microsecond <= 999_999)
-            .then(pl.datetime(pl_year, pl_month, pl_day, pl_hour, pl_minute, pl_second, pl_microsecond))
+            .then(
+                pl.datetime(
+                    pl_year,
+                    pl_month,
+                    pl_day,
+                    pl_hour,
+                    pl_minute,
+                    pl_second,
+                    pl_microsecond,
+                    time_zone=time_zone,
+                ),
+            )
             .otherwise(None),
         )
 
