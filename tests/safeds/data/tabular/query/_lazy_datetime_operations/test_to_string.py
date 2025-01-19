@@ -1,11 +1,11 @@
 from datetime import UTC, date, datetime, time
 
 import pytest
-from helpers import assert_cell_operation_works
 
 from safeds.data.tabular.containers import Column
 from safeds.data.tabular.typing import ColumnType
 from safeds.exceptions import LazyComputationError
+from tests.helpers import assert_cell_operation_works
 
 DATETIME = datetime(1, 2, 3, 4, 5, 6, 7, tzinfo=UTC)
 DATE = date(1, 2, 3)
