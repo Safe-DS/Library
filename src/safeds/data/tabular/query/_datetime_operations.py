@@ -4,7 +4,8 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
-    import datetime as python_datetime
+    from datetime import date as python_date
+    from datetime import time as python_time
 
     from safeds._typing import _ConvertibleToIntCell
     from safeds.data.tabular.containers import Cell
@@ -70,7 +71,7 @@ class DatetimeOperations(ABC):
 
         Examples
         --------
-        >>> from datetime import datetime, date
+        >>> from datetime import date, datetime
         >>> from safeds.data.tabular.containers import Column
         >>> column1 = Column("a", [datetime(1999, 12, 31), datetime(2000, 1, 1), datetime(2001, 1, 1), None])
         >>> column1.transform(lambda cell: cell.dt.century())
@@ -100,7 +101,7 @@ class DatetimeOperations(ABC):
         """
 
     @abstractmethod
-    def date(self) -> Cell[python_datetime.date | None]:
+    def date(self) -> Cell[python_date | None]:
         """
         Extract the date from a datetime.
 
@@ -138,7 +139,7 @@ class DatetimeOperations(ABC):
 
         Examples
         --------
-        >>> from datetime import datetime, date
+        >>> from datetime import date, datetime
         >>> from safeds.data.tabular.containers import Column
         >>> column1 = Column("a", [datetime(1999, 12, 31), datetime(2000, 1, 1), None])
         >>> column1.transform(lambda cell: cell.dt.day())
@@ -179,7 +180,7 @@ class DatetimeOperations(ABC):
 
         Examples
         --------
-        >>> from datetime import datetime, date
+        >>> from datetime import date, datetime
         >>> from safeds.data.tabular.containers import Column
         >>> column1 = Column("a", [datetime(2000, 1, 1), datetime(2000, 1, 2), None])
         >>> column1.transform(lambda cell: cell.dt.day_of_week())
@@ -220,7 +221,7 @@ class DatetimeOperations(ABC):
 
         Examples
         --------
-        >>> from datetime import datetime, date
+        >>> from datetime import date, datetime
         >>> from safeds.data.tabular.containers import Column
         >>> column1 = Column("a", [datetime(1999, 12, 31), datetime(2000, 1, 1), datetime(2000, 12, 31), None])
         >>> column1.transform(lambda cell: cell.dt.day_of_year())
@@ -342,7 +343,7 @@ class DatetimeOperations(ABC):
 
         Examples
         --------
-        >>> from datetime import datetime, date
+        >>> from datetime import date, datetime
         >>> from safeds.data.tabular.containers import Column
         >>> column1 = Column("a", [datetime(1999, 12, 31), datetime(2000, 1, 1), datetime(2001, 1, 1), None])
         >>> column1.transform(lambda cell: cell.dt.millennium())
@@ -461,7 +462,7 @@ class DatetimeOperations(ABC):
 
         Examples
         --------
-        >>> from datetime import datetime, date
+        >>> from datetime import date, datetime
         >>> from safeds.data.tabular.containers import Column
         >>> column1 = Column("a", [datetime(1999, 12, 31), datetime(2000, 1, 1), None])
         >>> column1.transform(lambda cell: cell.dt.month())
@@ -507,7 +508,7 @@ class DatetimeOperations(ABC):
 
         Examples
         --------
-        >>> from datetime import datetime, date
+        >>> from datetime import date, datetime
         >>> from safeds.data.tabular.containers import Column
         >>> column1 = Column("a", [datetime(1999, 12, 31), datetime(2000, 1, 1), datetime(2000, 4, 1), None])
         >>> column1.transform(lambda cell: cell.dt.quarter())
@@ -576,7 +577,7 @@ class DatetimeOperations(ABC):
         """
 
     @abstractmethod
-    def time(self) -> Cell[python_datetime.time | None]:
+    def time(self) -> Cell[python_time | None]:
         """
         Extract the time from a datetime.
 
@@ -618,7 +619,7 @@ class DatetimeOperations(ABC):
 
         Examples
         --------
-        >>> from datetime import datetime, date
+        >>> from datetime import date, datetime
         >>> from safeds.data.tabular.containers import Column
         >>> column1 = Column("a", [datetime(1999, 12, 31), datetime(2000, 1, 2), datetime(2001, 12, 31), None])
         >>> column1.transform(lambda cell: cell.dt.week())
@@ -659,7 +660,7 @@ class DatetimeOperations(ABC):
 
         Examples
         --------
-        >>> from datetime import datetime, date
+        >>> from datetime import date, datetime
         >>> from safeds.data.tabular.containers import Column
         >>> column1 = Column("a", [datetime(1999, 12, 31), datetime(2000, 1, 1), None])
         >>> column1.transform(lambda cell: cell.dt.year())
@@ -702,7 +703,7 @@ class DatetimeOperations(ABC):
 
         Examples
         --------
-        >>> from datetime import datetime, date
+        >>> from datetime import date, datetime
         >>> from safeds.data.tabular.containers import Column
         >>> column1 = Column("a", [datetime(1900, 1, 1), datetime(2000, 1, 1), None])
         >>> column1.transform(lambda cell: cell.dt.is_in_leap_year())
@@ -771,7 +772,7 @@ class DatetimeOperations(ABC):
 
         Examples
         --------
-        >>> from datetime import datetime, date
+        >>> from datetime import date, datetime
         >>> from safeds.data.tabular.containers import Column
         >>> column1 = Column("a", [datetime(2000, 1, 1), None])
         >>> column1.transform(lambda cell: cell.dt.replace(month=2, day=2, hour=2))
@@ -869,7 +870,7 @@ class DatetimeOperations(ABC):
 
         Examples
         --------
-        >>> from datetime import datetime, date
+        >>> from datetime import date, datetime
         >>> from safeds.data.tabular.containers import Column
         >>> column1 = Column("a", [datetime(1999, 12, 31), datetime(2000, 1, 1, 12, 30, 0), None])
         >>> column1.transform(lambda cell: cell.dt.to_string())
