@@ -73,11 +73,17 @@ class _LazyMathOperations(MathOperations):
     def cosh(self) -> Cell:
         return _LazyCell(self._expression.cosh())
 
+    def degrees_to_radians(self) -> Cell:
+        return _LazyCell(self._expression.radians())
+
     def exp(self) -> Cell:
         return _LazyCell(self._expression.exp())
 
     def floor(self) -> Cell:
         return _LazyCell(self._expression.floor())
+
+    def radians_to_degrees(self) -> Cell:
+        return _LazyCell(self._expression.degrees())
 
     def round_to_decimal_places(self, decimal_places: int) -> Cell:
         return _LazyCell(self._expression.round(decimal_places))

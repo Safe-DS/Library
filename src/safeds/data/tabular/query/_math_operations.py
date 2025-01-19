@@ -324,6 +324,35 @@ class MathOperations(ABC):
         """
 
     @abstractmethod
+    def degrees_to_radians(self) -> Cell:
+        """
+        Convert degrees to radians.
+
+        Returns
+        -------
+        cell:
+            The value in radians.
+
+        Examples
+        --------
+        >>> import math
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [0, 90, 180, 270, None])
+        >>> column.transform(lambda cell: cell.math.degrees_to_radians())
+        +---------+
+        |       a |
+        |     --- |
+        |     f64 |
+        +=========+
+        | 0.00000 |
+        | 1.57080 |
+        | 3.14159 |
+        | 4.71239 |
+        |    null |
+        +---------+
+        """
+
+    @abstractmethod
     def exp(self) -> Cell:
         """
         Get the exponential.
@@ -374,6 +403,35 @@ class MathOperations(ABC):
         | 3.00000 |
         |    null |
         +---------+
+        """
+
+    @abstractmethod
+    def radians_to_degrees(self) -> Cell:
+        """
+        Convert radians to degrees.
+
+        Returns
+        -------
+        cell:
+            The value in degrees.
+
+        Examples
+        --------
+        >>> import math
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [0, math.pi / 2, math.pi, 3 * math.pi / 2, None])
+        >>> column.transform(lambda cell: cell.math.radians_to_degrees())
+        +-----------+
+        |         a |
+        |       --- |
+        |       f64 |
+        +===========+
+        |   0.00000 |
+        |  90.00000 |
+        | 180.00000 |
+        | 270.00000 |
+        |      null |
+        +-----------+
         """
 
     @abstractmethod
