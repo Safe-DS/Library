@@ -113,7 +113,7 @@ def test_should_return_datetime(
     )
 
 
-def test_should_raise_if_time_zone_is_invalid():
+def test_should_raise_if_time_zone_is_invalid() -> None:
     column = Column("a", [None])
     with pytest.raises(ValueError, match="Invalid time zone"):
         column.transform(lambda _: Cell.datetime(1, 2, 3, time_zone="invalid"))

@@ -29,7 +29,7 @@ TIME = time(4, 5, 6, 7)
         "None",
     ],
 )
-def test_should_handle_iso_8601(value: datetime | date | time | None, expected: str | None):
+def test_should_handle_iso_8601(value: datetime | date | time | None, expected: str | None) -> None:
     assert_cell_operation_works(
         value,
         lambda cell: cell.dt.to_string(format="iso"),

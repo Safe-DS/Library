@@ -114,7 +114,7 @@ def _convert_and_check_datetime_format(
     index = 0
 
     while index < len(format_):
-        char = char_at(format_, index)
+        char = format_[index]
 
         # Escaped characters
         if char == "\\" and char_at(format_, index + 1) == "\\":

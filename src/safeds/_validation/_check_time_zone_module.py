@@ -5,7 +5,7 @@ from safeds._utils import _get_similar_strings
 _VALID_TZ_IDENTIFIERS = zoneinfo.available_timezones()
 
 
-def _check_time_zone(time_zone: str | None):
+def _check_time_zone(time_zone: str | None) -> None:
     """
     Check if the time zone is valid.
 
@@ -24,7 +24,7 @@ def _check_time_zone(time_zone: str | None):
         raise ValueError(message)
 
 
-def _build_error_message(time_zone: str):
+def _build_error_message(time_zone: str) -> str:
     result = f"Invalid time zone '{time_zone}'."
 
     similar_time_zones = _get_similar_strings(time_zone, _VALID_TZ_IDENTIFIERS)
