@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds._validation import _convert_and_check_datetime_format, _check_bounds, _ClosedBound
+from safeds._validation import _check_bounds, _ClosedBound, _convert_and_check_datetime_format
 from safeds.data.tabular.containers._lazy_cell import _LazyCell
 
 from ._string_operations import StringOperations
