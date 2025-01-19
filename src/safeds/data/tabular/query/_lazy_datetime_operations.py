@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 from safeds._utils import _structural_hash
 from safeds._validation import _convert_and_check_datetime_format
@@ -134,5 +134,5 @@ class _LazyDatetimeOperations(DatetimeOperations):
 
         return _LazyCell(self._expression.dt.to_string(format=format))
 
-    def unix_timestamp(self) -> Cell[int | None]:
-        return _LazyCell(self._expression.dt.epoch(time_unit="s"))
+    def unix_timestamp(self, *, unit: Literal["s", "ms", "us"] = "s") -> Cell[int | None]:
+        return _LazyCell(self._expression.dt.epoch(time_unit=unit))

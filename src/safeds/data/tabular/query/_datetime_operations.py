@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
     import datetime as python_datetime
@@ -923,12 +923,17 @@ class DatetimeOperations(ABC):
         """
 
     @abstractmethod
-    def unix_timestamp(self) -> Cell[int | None]:
+    def unix_timestamp(self, *, unit: Literal["s", "ms", "us"] = "s") -> Cell[int | None]:
         """
         Get the Unix timestamp from a datetime.
 
-        A Unix timestamp is the elapsed time since 00:00:00 UTC on 1 January 1970. This method returns the value in
-        seconds.
+        A Unix timestamp is the elapsed time since 00:00:00 UTC on 1 January 1970. By default, this method returns the
+        value in seconds, but that can be changed with the `unit` parameter.
+
+        Parameters
+        ----------
+        unit:
+            The unit of the timestamp. Can be "s" (seconds), "ms" (milliseconds), or "us" (microseconds).
 
         Returns
         -------
@@ -950,4 +955,15 @@ class DatetimeOperations(ABC):
         | 86400 |
         |  null |
         +-------+
+
+        >>> column.transform(lambda cell: cell.dt.unix_timestamp(unit="ms"))
+        +----------+
+        |        a |
+        |      --- |
+        |      i64 |
+        +==========+
+        |        0 |
+        | 86400000 |
+        |     null |
+        +----------+
         """
