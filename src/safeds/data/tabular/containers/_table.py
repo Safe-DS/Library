@@ -463,6 +463,8 @@ class Table:
         """
         The schema of the table, which is a mapping from column names to their types.
 
+        **Note:** This operation must compute the schema of the table, which can be expensive.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table

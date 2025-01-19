@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Callable, Iterator, Sequence
 from typing import TYPE_CHECKING, Literal, TypeVar, overload
 
-from safeds._utils import _safe_collect_lazy_frame, _structural_hash
+from safeds._utils import _safe_collect_lazy_frame, _safe_collect_lazy_frame_schema, _structural_hash
 from safeds._validation import (
     _check_column_has_no_missing_values,
     _check_column_is_numeric,
@@ -77,6 +77,13 @@ class Column(Sequence[T_co]):
     # ------------------------------------------------------------------------------------------------------------------
     # Import
     # ------------------------------------------------------------------------------------------------------------------
+
+    @staticmethod
+    def _from_polars_lazy_frame(data: pl.LazyFrame, name: str) -> Column:
+        result = object.__new__(Column)
+        result._lazy_frame = data.select(name)
+        result.__series_cache = None
+        return result
 
     @staticmethod
     def _from_polars_series(data: pl.Series) -> Column:
@@ -178,12 +185,15 @@ class Column(Sequence[T_co]):
         >>> column.name
         'a'
         """
-        return self._series.name
+        schema = _safe_collect_lazy_frame_schema(self._lazy_frame)
+        return schema.names()[0]
 
     @property
     def row_count(self) -> int:
         """
         The number of rows.
+
+        **Note:** This operation must fully load the data into memory, which can be expensive.
 
         Examples
         --------
@@ -221,7 +231,8 @@ class Column(Sequence[T_co]):
         >>> column.type
         int64
         """
-        return _PolarsColumnType(self._series.dtype)
+        schema = _safe_collect_lazy_frame_schema(self._lazy_frame)
+        return _PolarsColumnType(schema.dtypes()[0])
 
     # ------------------------------------------------------------------------------------------------------------------
     # Value operations

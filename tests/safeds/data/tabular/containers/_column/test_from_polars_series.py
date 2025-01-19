@@ -20,5 +20,5 @@ def test_should_store_the_name() -> None:
         "non-empty",
     ],
 )
-def test_should_store_the_data(series: pl.Series, expected: Column) -> None:
+def test_should_store_the_data(series: pl.Series, expected: list) -> None:
     assert list(Column._from_polars_series(series)) == expected
