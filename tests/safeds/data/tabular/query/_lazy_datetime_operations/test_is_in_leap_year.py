@@ -32,7 +32,7 @@ from tests.helpers import assert_cell_operation_works
     ],
 )
 def test_should_check_if_is_in_leap_date(
-    value: datetime | None,
+    value: datetime | date | None,
     expected: int | None,
 ) -> None:
     assert_cell_operation_works(

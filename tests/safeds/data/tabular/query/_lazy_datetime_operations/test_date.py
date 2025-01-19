@@ -9,23 +9,21 @@ from tests.helpers import assert_cell_operation_works
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
-        (datetime(1, 2, 3, tzinfo=UTC), 3),
-        (date(1, 2, 3), 3),
+        (datetime(1, 2, 3, tzinfo=UTC), date(1, 2, 3)),
         (None, None),
     ],
     ids=[
         "datetime",
-        "date",
         "None",
     ],
 )
-def test_should_extract_day(
-    value: datetime | date | None,
-    expected: int | None,
+def test_should_extract_date(
+    value: datetime | None,
+    expected: date | None,
 ) -> None:
     assert_cell_operation_works(
         value,
-        lambda cell: cell.dt.day(),
+        lambda cell: cell.dt.date(),
         expected,
         type_if_none=ColumnType.datetime(),
     )

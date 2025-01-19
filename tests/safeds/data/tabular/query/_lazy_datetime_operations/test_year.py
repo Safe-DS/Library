@@ -20,7 +20,7 @@ from tests.helpers import assert_cell_operation_works
     ],
 )
 def test_should_extract_year(
-    value: datetime | None,
+    value: datetime | date | None,
     expected: int | None,
 ) -> None:
     assert_cell_operation_works(
