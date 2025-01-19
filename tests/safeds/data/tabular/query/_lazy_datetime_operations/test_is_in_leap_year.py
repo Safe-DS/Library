@@ -31,7 +31,7 @@ from tests.helpers import assert_cell_operation_works
         "None",
     ],
 )
-def test_should_return_unix_timestamp(
+def test_should_check_if_is_in_leap_date(
     value: datetime | None,
     expected: int | None,
 ) -> None:
