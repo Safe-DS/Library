@@ -46,6 +46,15 @@ class _LazyMathOperations(MathOperations):
     def abs(self) -> Cell:
         return _LazyCell(self._expression.__abs__())
 
+    def arccos(self) -> Cell:
+        return _LazyCell(self._expression.arccos())
+
+    def arcsin(self) -> Cell:
+        return _LazyCell(self._expression.arcsin())
+
+    def arctan(self) -> Cell:
+        return _LazyCell(self._expression.arctan())
+
     def ceil(self) -> Cell:
         return _LazyCell(self._expression.ceil())
 

@@ -79,6 +79,87 @@ class MathOperations(ABC):
         """
 
     @abstractmethod
+    def arccos(self) -> Cell:
+        """
+        Get the inverse cosine.
+
+        Returns
+        -------
+        cell:
+            The inverse cosine.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [-1, 0, 1, None])
+        >>> column.transform(lambda cell: cell.math.arccos())
+        +---------+
+        |       a |
+        |     --- |
+        |     f64 |
+        +=========+
+        | 3.14159 |
+        | 1.57080 |
+        | 0.00000 |
+        |    null |
+        +---------+
+        """
+
+    @abstractmethod
+    def arcsin(self) -> Cell:
+        """
+        Get the inverse sine.
+
+        Returns
+        -------
+        cell:
+            The inverse sine.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [-1, 0, 1, None])
+        >>> column.transform(lambda cell: cell.math.arcsin())
+        +----------+
+        |        a |
+        |      --- |
+        |      f64 |
+        +==========+
+        | -1.57080 |
+        |  0.00000 |
+        |  1.57080 |
+        |     null |
+        +----------+
+        """
+
+    @abstractmethod
+    def arctan(self) -> Cell:
+        """
+        Get the inverse tangent.
+
+        Returns
+        -------
+        cell:
+            The inverse tangent.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [-1, 0, 1, None])
+        >>> column.transform(lambda cell: cell.math.arctan())
+        +----------+
+        |        a |
+        |      --- |
+        |      f64 |
+        +==========+
+        | -0.78540 |
+        |  0.00000 |
+        |  0.78540 |
+        |     null |
+        +----------+
+        """
+
+    @abstractmethod
     def ceil(self) -> Cell:
         """
         Round up to the nearest integer.
