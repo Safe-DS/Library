@@ -106,6 +106,33 @@ class MathOperations(ABC):
         """
 
     @abstractmethod
+    def arccosh(self) -> Cell:
+        """
+        Get the inverse hyperbolic cosine.
+
+        Returns
+        -------
+        cell:
+            The inverse hyperbolic cosine.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [-1, 0, 1, None])
+        >>> column.transform(lambda cell: cell.math.arccosh())
+        +---------+
+        |       a |
+        |     --- |
+        |     f64 |
+        +=========+
+        |     NaN |
+        |     NaN |
+        | 0.00000 |
+        |    null |
+        +---------+
+        """
+
+    @abstractmethod
     def arcsin(self) -> Cell:
         """
         Get the inverse sine.
@@ -128,6 +155,33 @@ class MathOperations(ABC):
         | -1.57080 |
         |  0.00000 |
         |  1.57080 |
+        |     null |
+        +----------+
+        """
+
+    @abstractmethod
+    def arcsinh(self) -> Cell:
+        """
+        Get the inverse hyperbolic sine.
+
+        Returns
+        -------
+        cell:
+            The inverse hyperbolic sine.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [-1, 0, 1, None])
+        >>> column.transform(lambda cell: cell.math.arcsinh())
+        +----------+
+        |        a |
+        |      --- |
+        |      f64 |
+        +==========+
+        | -0.88137 |
+        |  0.00000 |
+        |  0.88137 |
         |     null |
         +----------+
         """
@@ -157,6 +211,33 @@ class MathOperations(ABC):
         |  0.78540 |
         |     null |
         +----------+
+        """
+
+    @abstractmethod
+    def arctanh(self) -> Cell:
+        """
+        Get the inverse hyperbolic tangent.
+
+        Returns
+        -------
+        cell:
+            The inverse hyperbolic tangent.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [-1, 0, 1, None])
+        >>> column.transform(lambda cell: cell.math.arctanh())
+        +---------+
+        |       a |
+        |     --- |
+        |     f64 |
+        +=========+
+        |    -inf |
+        | 0.00000 |
+        |     inf |
+        |    null |
+        +---------+
         """
 
     @abstractmethod

@@ -49,11 +49,20 @@ class _LazyMathOperations(MathOperations):
     def arccos(self) -> Cell:
         return _LazyCell(self._expression.arccos())
 
+    def arccosh(self) -> Cell:
+        return _LazyCell(self._expression.arccosh())
+
     def arcsin(self) -> Cell:
         return _LazyCell(self._expression.arcsin())
 
+    def arcsinh(self) -> Cell:
+        return _LazyCell(self._expression.arcsinh())
+
     def arctan(self) -> Cell:
         return _LazyCell(self._expression.arctan())
+
+    def arctanh(self) -> Cell:
+        return _LazyCell(self._expression.arctanh())
 
     def ceil(self) -> Cell:
         return _LazyCell(self._expression.ceil())
