@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -401,6 +402,57 @@ class MathOperations(ABC):
         +=========+
         | 1.00000 |
         | 3.00000 |
+        |    null |
+        +---------+
+        """
+
+    @abstractmethod
+    def log(self, base: float = math.e) -> Cell:
+        """
+        Get the logarithm to the specified base. By default, the natural logarithm is computed.
+
+        Parameters
+        ----------
+        base:
+            The base of the logarithm. Must be positive and not equal to 1.
+
+        Returns
+        -------
+        cell:
+            The logarithm.
+
+        Raises
+        ------
+        ValueError
+            If the base is less than or equal to 0 or equal to 1.
+
+        Examples
+        --------
+        >>> import math
+        >>> from safeds.data.tabular.containers import Column
+        >>> column1 = Column("a", [0, 1, math.e, None])
+        >>> column1.transform(lambda cell: cell.math.log())
+        +---------+
+        |       a |
+        |     --- |
+        |     f64 |
+        +=========+
+        |    -inf |
+        | 0.00000 |
+        | 1.00000 |
+        |    null |
+        +---------+
+
+        >>> column2 = Column("a", [0, 1, 10, None])
+        >>> column2.transform(lambda cell: cell.math.log(10))
+        +---------+
+        |       a |
+        |     --- |
+        |     f64 |
+        +=========+
+        |    -inf |
+        | 0.00000 |
+        | 1.00000 |
         |    null |
         +---------+
         """

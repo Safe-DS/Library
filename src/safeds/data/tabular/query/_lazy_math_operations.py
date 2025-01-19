@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import math
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
+from safeds._validation import _check_bounds, _OpenBound
 from safeds.data.tabular.containers._lazy_cell import _LazyCell
 from safeds.data.tabular.query._math_operations import MathOperations
 
@@ -81,6 +83,13 @@ class _LazyMathOperations(MathOperations):
 
     def floor(self) -> Cell:
         return _LazyCell(self._expression.floor())
+
+    def log(self, base: float = math.e) -> Cell:
+        _check_bounds("base", base, lower_bound=_OpenBound(0))
+        if base == 1:
+            raise ValueError("The base of the logarithm must not be 1.")
+
+        return _LazyCell(self._expression.log(base))
 
     def radians_to_degrees(self) -> Cell:
         return _LazyCell(self._expression.degrees())
