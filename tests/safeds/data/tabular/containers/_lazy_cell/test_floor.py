@@ -27,9 +27,8 @@ from tests.helpers import assert_cell_operation_works
         "None",
     ],
 )
-class TestShouldReturnFloor:
-    def test_dunder_method(self, value: float | None, expected: float | None) -> None:
-        assert_cell_operation_works(value, lambda cell: math.floor(cell), expected, type_if_none=ColumnType.float64())
+def test_should_return_floor(value: float | None, expected: float | None) -> None:
+    assert_cell_operation_works(value, lambda cell: math.floor(cell), expected, type_if_none=ColumnType.float64())
 
-    def test_named_method(self, value: float | None, expected: float | None) -> None:
-        assert_cell_operation_works(value, lambda cell: cell.floor(), expected, type_if_none=ColumnType.float64())
+
+# The corresponding named method is inside the `math` namespace.

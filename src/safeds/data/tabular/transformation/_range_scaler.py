@@ -19,9 +19,9 @@ class RangeScaler(InvertibleTableTransformer):
 
     Parameters
     ----------
-    min_:
+    min:
         The minimum of the new range after the transformation
-    max_:
+    max:
         The maximum of the new range after the transformation
     selector:
         The list of columns used to fit the transformer. If `None`, all numeric columns are used.
@@ -36,15 +36,15 @@ class RangeScaler(InvertibleTableTransformer):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, *, selector: str | list[str] | None = None, min_: float = 0.0, max_: float = 1.0) -> None:
+    def __init__(self, *, selector: str | list[str] | None = None, min: float = 0.0, max: float = 1.0) -> None:
         super().__init__(selector)
 
-        if min_ >= max_:
+        if min >= max:
             raise ValueError('Parameter "max_" must be greater than parameter "min_".')
 
         # Parameters
-        self._min: float = min_
-        self._max: float = max_
+        self._min: float = min
+        self._max: float = max
 
         # Internal state
         self._data_min: pl.DataFrame | None = None
@@ -121,7 +121,7 @@ class RangeScaler(InvertibleTableTransformer):
         _data_max = _safe_collect_lazy_frame(table._lazy_frame.select(column_names).max())
 
         # Create a copy with the learned transformation
-        result = RangeScaler(min_=self._min, max_=self._max, selector=column_names)
+        result = RangeScaler(min=self._min, max=self._max, selector=column_names)
         result._data_min = _data_min
         result._data_max = _data_max
 

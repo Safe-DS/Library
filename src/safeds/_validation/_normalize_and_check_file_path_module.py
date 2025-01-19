@@ -15,12 +15,12 @@ def _normalize_and_check_file_path(
     check_if_file_exists: bool = False,
 ) -> Path:
     """
-    Check whether the provided path is a valid file path and normalize it.
+    Normalize a path and check its validity.
 
     Parameters
     ----------
     path:
-        Path to check and normalize.
+        Path to normalize and check.
     canonical_file_extension:
         If the path has no extension, this extension will be added. It should include the leading dot.
     valid_file_extensions:

@@ -3,22 +3,21 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Generic, TypeVar
 
+from safeds._validation import _check_time_zone
+
 if TYPE_CHECKING:
     import datetime as python_datetime
 
     import polars as pl
 
     from safeds._typing import (
-        _BooleanCell,
         _ConvertibleToBooleanCell,
         _ConvertibleToCell,
         _ConvertibleToIntCell,
         _PythonLiteral,
     )
+    from safeds.data.tabular.query import DatetimeOperations, DurationOperations, MathOperations, StringOperations
     from safeds.data.tabular.typing import ColumnType
-
-    from ._string_cell import StringCell
-    from ._temporal_cell import TemporalCell
 
 T_co = TypeVar("T_co", covariant=True)
 P = TypeVar("P")
@@ -28,7 +27,16 @@ class Cell(ABC, Generic[T_co]):
     """
     A single value in a table.
 
-    You only need to interact with this class in callbacks passed to higher-order functions.
+    You only need to interact with this class in callbacks passed to higher-order functions. Most operations are grouped
+    into namespaces, which are accessed through the following attributes:
+
+    - `dt`: Operations on datetime/date/time values
+    - `dur`: Operations on durations
+    - `math`: Mathematical operations on numbers
+    - `str`: Operations on strings
+
+    This class only has methods that are not specific to a data type (e.g. `cast`), methods with corresponding
+    operators (e.g. `add` for `+`), and static methods to create new cells.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -128,9 +136,9 @@ class Cell(ABC, Generic[T_co]):
 
         return _LazyCell(
             pl.date(
-                year=_unwrap(year),
-                month=_unwrap(month),
-                day=_unwrap(day),
+                year=_to_polars_expression(year),
+                month=_to_polars_expression(month),
+                day=_to_polars_expression(day),
             ),
         )
 
@@ -144,6 +152,7 @@ class Cell(ABC, Generic[T_co]):
         minute: _ConvertibleToIntCell = 0,
         second: _ConvertibleToIntCell = 0,
         microsecond: _ConvertibleToIntCell = 0,
+        time_zone: str | None = None,
     ) -> Cell[python_datetime.datetime | None]:
         """
         Create a cell with a datetime.
@@ -166,6 +175,10 @@ class Cell(ABC, Generic[T_co]):
             The second. Must be between 0 and 59.
         microsecond:
             The microsecond. Must be between 0 and 999,999.
+        time_zone:
+            The time zone. If None, values are assumed to be in local time. This is different from setting the time zone
+            to `"UTC"`. Any TZ identifier defined in the
+            [tz database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) is valid.
 
         Returns
         -------
@@ -202,18 +215,31 @@ class Cell(ABC, Generic[T_co]):
 
         from ._lazy_cell import _LazyCell  # circular import
 
-        pl_year = _unwrap(year)
-        pl_month = _unwrap(month)
-        pl_day = _unwrap(day)
-        pl_hour = _unwrap(hour)
-        pl_minute = _unwrap(minute)
-        pl_second = _unwrap(second)
-        pl_microsecond = _unwrap(microsecond)
+        _check_time_zone(time_zone)
+
+        pl_year = _to_polars_expression(year)
+        pl_month = _to_polars_expression(month)
+        pl_day = _to_polars_expression(day)
+        pl_hour = _to_polars_expression(hour)
+        pl_minute = _to_polars_expression(minute)
+        pl_second = _to_polars_expression(second)
+        pl_microsecond = _to_polars_expression(microsecond)
 
         # By default, microseconds overflow into seconds
         return _LazyCell(
             pl.when(pl_microsecond <= 999_999)
-            .then(pl.datetime(pl_year, pl_month, pl_day, pl_hour, pl_minute, pl_second, pl_microsecond))
+            .then(
+                pl.datetime(
+                    pl_year,
+                    pl_month,
+                    pl_day,
+                    pl_hour,
+                    pl_minute,
+                    pl_second,
+                    pl_microsecond,
+                    time_zone=time_zone,
+                ),
+            )
             .otherwise(None),
         )
 
@@ -287,13 +313,13 @@ class Cell(ABC, Generic[T_co]):
 
         return _LazyCell(
             pl.duration(
-                weeks=_unwrap(weeks),
-                days=_unwrap(days),
-                hours=_unwrap(hours),
-                minutes=_unwrap(minutes),
-                seconds=_unwrap(seconds),
-                milliseconds=_unwrap(milliseconds),
-                microseconds=_unwrap(microseconds),
+                weeks=_to_polars_expression(weeks),
+                days=_to_polars_expression(days),
+                hours=_to_polars_expression(hours),
+                minutes=_to_polars_expression(minutes),
+                seconds=_to_polars_expression(seconds),
+                milliseconds=_to_polars_expression(milliseconds),
+                microseconds=_to_polars_expression(microseconds),
             ),
         )
 
@@ -356,10 +382,10 @@ class Cell(ABC, Generic[T_co]):
 
         from ._lazy_cell import _LazyCell  # circular import
 
-        pl_hour = _unwrap(hour)
-        pl_minute = _unwrap(minute)
-        pl_second = _unwrap(second)
-        pl_microsecond = _unwrap(microsecond)
+        pl_hour = _to_polars_expression(hour)
+        pl_minute = _to_polars_expression(minute)
+        pl_second = _to_polars_expression(second)
+        pl_microsecond = _to_polars_expression(microsecond)
 
         # By default, microseconds overflow into seconds
         return _LazyCell(
@@ -391,7 +417,7 @@ class Cell(ABC, Generic[T_co]):
         if not cells:
             return Cell.constant(None)
 
-        return _LazyCell(pl.coalesce([_unwrap(cell) for cell in cells]))
+        return _LazyCell(pl.coalesce([_to_polars_expression(cell) for cell in cells]))
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
@@ -400,46 +426,46 @@ class Cell(ABC, Generic[T_co]):
     # "Boolean" operators (actually bitwise) -----------------------------------
 
     @abstractmethod
-    def __invert__(self) -> _BooleanCell: ...
+    def __invert__(self) -> Cell[bool | None]: ...
 
     @abstractmethod
-    def __and__(self, other: _ConvertibleToBooleanCell) -> _BooleanCell: ...
+    def __and__(self, other: _ConvertibleToBooleanCell) -> Cell[bool | None]: ...
 
     @abstractmethod
-    def __rand__(self, other: _ConvertibleToBooleanCell) -> _BooleanCell: ...
+    def __rand__(self, other: _ConvertibleToBooleanCell) -> Cell[bool | None]: ...
 
     @abstractmethod
-    def __or__(self, other: _ConvertibleToBooleanCell) -> _BooleanCell: ...
+    def __or__(self, other: _ConvertibleToBooleanCell) -> Cell[bool | None]: ...
 
     @abstractmethod
-    def __ror__(self, other: _ConvertibleToBooleanCell) -> _BooleanCell: ...
+    def __ror__(self, other: _ConvertibleToBooleanCell) -> Cell[bool | None]: ...
 
     @abstractmethod
-    def __xor__(self, other: _ConvertibleToBooleanCell) -> _BooleanCell: ...
+    def __xor__(self, other: _ConvertibleToBooleanCell) -> Cell[bool | None]: ...
 
     @abstractmethod
-    def __rxor__(self, other: _ConvertibleToBooleanCell) -> _BooleanCell: ...
+    def __rxor__(self, other: _ConvertibleToBooleanCell) -> Cell[bool | None]: ...
 
     # Comparison ---------------------------------------------------------------
 
     @abstractmethod
-    def __eq__(self, other: _ConvertibleToCell) -> _BooleanCell:  # type: ignore[override]
+    def __eq__(self, other: _ConvertibleToCell) -> Cell[bool | None]:  # type: ignore[override]
         ...
 
     @abstractmethod
-    def __ge__(self, other: _ConvertibleToCell) -> _BooleanCell: ...
+    def __ge__(self, other: _ConvertibleToCell) -> Cell[bool | None]: ...
 
     @abstractmethod
-    def __gt__(self, other: _ConvertibleToCell) -> _BooleanCell: ...
+    def __gt__(self, other: _ConvertibleToCell) -> Cell[bool | None]: ...
 
     @abstractmethod
-    def __le__(self, other: _ConvertibleToCell) -> _BooleanCell: ...
+    def __le__(self, other: _ConvertibleToCell) -> Cell[bool | None]: ...
 
     @abstractmethod
-    def __lt__(self, other: _ConvertibleToCell) -> _BooleanCell: ...
+    def __lt__(self, other: _ConvertibleToCell) -> Cell[bool | None]: ...
 
     @abstractmethod
-    def __ne__(self, other: _ConvertibleToCell) -> _BooleanCell:  # type: ignore[override]
+    def __ne__(self, other: _ConvertibleToCell) -> Cell[bool | None]:  # type: ignore[override]
         ...
 
     # Numeric operators --------------------------------------------------------
@@ -521,7 +547,73 @@ class Cell(ABC, Generic[T_co]):
 
     @property
     @abstractmethod
-    def str(self) -> StringCell:
+    def dt(self) -> DatetimeOperations:
+        """
+        Namespace for operations on datetime/date/time values.
+
+        Examples
+        --------
+        >>> from datetime import datetime
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [datetime(2025, 1, 1), datetime(2024, 1, 1)])
+        >>> column.transform(lambda cell: cell.dt.year())
+        +------+
+        |    a |
+        |  --- |
+        |  i32 |
+        +======+
+        | 2025 |
+        | 2024 |
+        +------+
+        """
+
+    @property
+    @abstractmethod
+    def dur(self) -> DurationOperations:
+        """
+        Namespace for operations on durations.
+
+        Examples
+        --------
+        >>> from datetime import timedelta
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [timedelta(hours=1), timedelta(hours=2)])
+        >>> column.transform(lambda cell: cell.dur.full_hours())
+        +-----+
+        |   a |
+        | --- |
+        | i64 |
+        +=====+
+        |   1 |
+        |   2 |
+        +-----+
+        """
+
+    @property
+    @abstractmethod
+    def math(self) -> MathOperations:
+        """
+        Namespace for mathematical operations.
+
+        Examples
+        --------
+        >>> from datetime import timedelta
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [1, -2])
+        >>> column.transform(lambda cell: cell.math.abs())
+        +-----+
+        |   a |
+        | --- |
+        | i64 |
+        +=====+
+        |   1 |
+        |   2 |
+        +-----+
+        """
+
+    @property
+    @abstractmethod
+    def str(self) -> StringOperations:
         """
         Namespace for operations on strings.
 
@@ -540,38 +632,21 @@ class Cell(ABC, Generic[T_co]):
         +-----+
         """
 
-    @property
-    @abstractmethod
-    def dt(self) -> TemporalCell:
-        """
-        Namespace for operations on temporal values.
-
-        Examples
-        --------
-        >>> import datetime
-        >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [datetime.datetime(2025, 1, 1), datetime.datetime(2024, 1, 1)])
-        >>> column.transform(lambda cell: cell.dt.year())
-        +------+
-        |    a |
-        |  --- |
-        |  i32 |
-        +======+
-        | 2025 |
-        | 2024 |
-        +------+
-        """
-
     # ------------------------------------------------------------------------------------------------------------------
     # Boolean operations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def not_(self) -> _BooleanCell:
+    def not_(self) -> Cell[bool | None]:
         """
-        Negate a boolean. This is equivalent to the `~` operator.
+        Negate a Boolean. This is equivalent to the `~` operator.
 
         Do **not** use the `not` operator. Its behavior cannot be overwritten in Python, so it will not work as
         expected.
+
+        Returns
+        -------
+        cell:
+            The result of the Boolean negation.
 
         Examples
         --------
@@ -601,12 +676,22 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__invert__()
 
-    def and_(self, other: _ConvertibleToBooleanCell) -> _BooleanCell:
+    def and_(self, other: _ConvertibleToBooleanCell) -> Cell[bool | None]:
         """
-        Perform a boolean AND operation. This is equivalent to the `&` operator.
+        Perform a Boolean AND operation. This is equivalent to the `&` operator.
 
         Do **not** use the `and` operator. Its behavior cannot be overwritten in Python, so it will not work as
         expected.
+
+        Parameters
+        ----------
+        other:
+            The right operand.
+
+        Returns
+        -------
+        cell:
+            The result of the conjunction.
 
         Examples
         --------
@@ -636,11 +721,21 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__and__(other)
 
-    def or_(self, other: _ConvertibleToBooleanCell) -> _BooleanCell:
+    def or_(self, other: _ConvertibleToBooleanCell) -> Cell[bool | None]:
         """
-        Perform a boolean OR operation. This is equivalent to the `|` operator.
+        Perform a Boolean OR operation. This is equivalent to the `|` operator.
 
         Do **not** use the `or` operator. Its behavior cannot be overwritten in Python, so it will not work as expected.
+
+        Parameters
+        ----------
+        other:
+            The right operand.
+
+        Returns
+        -------
+        cell:
+            The result of the disjunction.
 
         Examples
         --------
@@ -670,9 +765,19 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__or__(other)
 
-    def xor(self, other: _ConvertibleToBooleanCell) -> _BooleanCell:
+    def xor(self, other: _ConvertibleToBooleanCell) -> Cell[bool | None]:
         """
-        Perform a boolean XOR operation. This is equivalent to the `^` operator.
+        Perform a Boolean XOR operation. This is equivalent to the `^` operator.
+
+        Parameters
+        ----------
+        other:
+            The right operand.
+
+        Returns
+        -------
+        cell:
+            The result of the exclusive or.
 
         Examples
         --------
@@ -706,72 +811,14 @@ class Cell(ABC, Generic[T_co]):
     # Numeric operations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def abs(self) -> Cell:
-        """
-        Get the absolute value.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [1, -2, None])
-        >>> column.transform(lambda cell: cell.abs())
-        +------+
-        |    a |
-        |  --- |
-        |  i64 |
-        +======+
-        |    1 |
-        |    2 |
-        | null |
-        +------+
-        """
-        return self.__abs__()
-
-    def ceil(self) -> Cell:
-        """
-        Round up to the nearest integer.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [1.1, 3.0, None])
-        >>> column.transform(lambda cell: cell.ceil())
-        +---------+
-        |       a |
-        |     --- |
-        |     f64 |
-        +=========+
-        | 2.00000 |
-        | 3.00000 |
-        |    null |
-        +---------+
-        """
-        return self.__ceil__()
-
-    def floor(self) -> Cell:
-        """
-        Round down to the nearest integer.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [1.1, 3.0, None])
-        >>> column.transform(lambda cell: cell.floor())
-        +---------+
-        |       a |
-        |     --- |
-        |     f64 |
-        +=========+
-        | 1.00000 |
-        | 3.00000 |
-        |    null |
-        +---------+
-        """
-        return self.__floor__()
-
     def neg(self) -> Cell:
         """
         Negate the value. This is equivalent to the unary `-` operator.
+
+        Returns
+        -------
+        cell:
+            The negated value.
 
         Examples
         --------
@@ -805,6 +852,16 @@ class Cell(ABC, Generic[T_co]):
         """
         Add a value. This is equivalent to the `+` operator.
 
+        Parameters
+        ----------
+        other:
+            The right operand.
+
+        Returns
+        -------
+        cell:
+            The result of the addition.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
@@ -837,6 +894,16 @@ class Cell(ABC, Generic[T_co]):
         """
         Divide by a value. This is equivalent to the `/` operator.
 
+        Parameters
+        ----------
+        other:
+            The right operand.
+
+        Returns
+        -------
+        cell:
+            The result of the division.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
@@ -868,6 +935,16 @@ class Cell(ABC, Generic[T_co]):
     def mod(self, other: _ConvertibleToCell) -> Cell:
         """
         Perform a modulo operation. This is equivalent to the `%` operator.
+
+        Parameters
+        ----------
+        other:
+            The right operand.
+
+        Returns
+        -------
+        cell:
+            The result of the modulo operation.
 
         Examples
         --------
@@ -903,6 +980,16 @@ class Cell(ABC, Generic[T_co]):
         """
         Multiply by a value. This is equivalent to the `*` operator.
 
+        Parameters
+        ----------
+        other:
+            The right operand.
+
+        Returns
+        -------
+        cell:
+            The result of the multiplication.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
@@ -935,6 +1022,16 @@ class Cell(ABC, Generic[T_co]):
         """
         Raise to a power. This is equivalent to the `**` operator.
 
+        Parameters
+        ----------
+        other:
+            The right operand.
+
+        Returns
+        -------
+        cell:
+            The result of the exponentiation.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
@@ -949,7 +1046,6 @@ class Cell(ABC, Generic[T_co]):
         |   27 |
         | null |
         +------+
-
 
         >>> column.transform(lambda cell: cell ** 3)
         +------+
@@ -967,6 +1063,16 @@ class Cell(ABC, Generic[T_co]):
     def sub(self, other: _ConvertibleToCell) -> Cell:
         """
         Subtract a value. This is equivalent to the binary `-` operator.
+
+        Parameters
+        ----------
+        other:
+            The right operand.
+
+        Returns
+        -------
+        cell:
+            The result of the subtraction.
 
         Examples
         --------
@@ -1006,7 +1112,7 @@ class Cell(ABC, Generic[T_co]):
         other: _ConvertibleToCell,
         *,
         propagate_missing_values: bool = True,
-    ) -> _BooleanCell:
+    ) -> Cell[bool | None]:
         """
         Check if equal to a value. The default behavior is equivalent to the `==` operator.
 
@@ -1017,6 +1123,18 @@ class Cell(ABC, Generic[T_co]):
           result of the comparison if we do not know the values, which is consistent with the other cell operations.
         - If `propagate_missing_values` is `False`, `None` will be treated as a regular value. Here, `None == None`
           is `True`. This behavior is useful, if you want to work with missing values, e.g. to filter them out.
+
+        Parameters
+        ----------
+        other:
+            The value to compare to.
+        propagate_missing_values:
+            Whether to propagate missing values.
+
+        Returns
+        -------
+        cell:
+            The result of the comparison.
 
         Examples
         --------
@@ -1062,7 +1180,7 @@ class Cell(ABC, Generic[T_co]):
         other: _ConvertibleToCell,
         *,
         propagate_missing_values: bool = True,
-    ) -> _BooleanCell:
+    ) -> Cell[bool | None]:
         """
         Check if not equal to a value. The default behavior is equivalent to the `!=` operator.
 
@@ -1080,6 +1198,11 @@ class Cell(ABC, Generic[T_co]):
             The value to compare to.
         propagate_missing_values:
             Whether to propagate missing values.
+
+        Returns
+        -------
+        cell:
+            The result of the comparison.
 
         Examples
         --------
@@ -1119,9 +1242,19 @@ class Cell(ABC, Generic[T_co]):
         +-------+
         """
 
-    def ge(self, other: _ConvertibleToCell) -> _BooleanCell:
+    def ge(self, other: _ConvertibleToCell) -> Cell[bool | None]:
         """
         Check if greater than or equal to a value. This is equivalent to the `>=` operator.
+
+        Parameters
+        ----------
+        other:
+            The value to compare to.
+
+        Returns
+        -------
+        cell:
+            The result of the comparison.
 
         Examples
         --------
@@ -1151,9 +1284,19 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__ge__(other)
 
-    def gt(self, other: _ConvertibleToCell) -> _BooleanCell:
+    def gt(self, other: _ConvertibleToCell) -> Cell[bool | None]:
         """
         Check if greater than a value. This is equivalent to the `>` operator.
+
+        Parameters
+        ----------
+        other:
+            The value to compare to.
+
+        Returns
+        -------
+        cell:
+            The result of the comparison.
 
         Examples
         --------
@@ -1183,9 +1326,19 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__gt__(other)
 
-    def le(self, other: _ConvertibleToCell) -> _BooleanCell:
+    def le(self, other: _ConvertibleToCell) -> Cell[bool | None]:
         """
         Check if less than or equal to a value. This is equivalent to the `<=` operator.
+
+        Parameters
+        ----------
+        other:
+            The value to compare to.
+
+        Returns
+        -------
+        cell:
+            The result of the comparison.
 
         Examples
         --------
@@ -1215,9 +1368,19 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__le__(other)
 
-    def lt(self, other: _ConvertibleToCell) -> _BooleanCell:
+    def lt(self, other: _ConvertibleToCell) -> Cell[bool | None]:
         """
         Check if less than a value. This is equivalent to the `<` operator.
+
+        Parameters
+        ----------
+        other:
+            The value to compare to.
+
+        Returns
+        -------
+        cell:
+            The result of the comparison.
 
         Examples
         --------
@@ -1252,13 +1415,13 @@ class Cell(ABC, Generic[T_co]):
     # ------------------------------------------------------------------------------------------------------------------
 
     @abstractmethod
-    def cast(self, type_: ColumnType) -> Cell:
+    def cast(self, type: ColumnType) -> Cell:
         """
         Cast the cell to a different type.
 
         Parameters
         ----------
-        type_:
+        type:
             The type to cast to.
 
         Returns
@@ -1301,7 +1464,7 @@ class Cell(ABC, Generic[T_co]):
         """
 
 
-def _unwrap(cell_proxy: _ConvertibleToCell) -> pl.Expr:
+def _to_polars_expression(cell_proxy: _ConvertibleToCell) -> pl.Expr:
     import polars as pl
 
     if isinstance(cell_proxy, Cell):

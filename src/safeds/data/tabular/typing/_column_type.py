@@ -3,6 +3,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
+from safeds._validation import _check_time_zone
+
 if TYPE_CHECKING:
     import polars as pl
 
@@ -126,13 +128,24 @@ class ColumnType(ABC):
         return _PolarsColumnType(pl.Date())
 
     @staticmethod
-    def datetime() -> ColumnType:
-        """Create a `datetime` column type."""
+    def datetime(*, time_zone: str | None = None) -> ColumnType:
+        """
+        Create a `datetime` column type.
+
+        Parameters
+        ----------
+        time_zone:
+            The time zone. If None, values are assumed to be in local time. This is different from setting the time zone
+            to `"UTC"`. Any TZ identifier defined in the
+            [tz database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) is valid.
+        """
         import polars as pl
 
         from ._polars_column_type import _PolarsColumnType  # circular import
 
-        return _PolarsColumnType(pl.Datetime())
+        _check_time_zone(time_zone)
+
+        return _PolarsColumnType(pl.Datetime(time_zone=time_zone))
 
     @staticmethod
     def duration() -> ColumnType:

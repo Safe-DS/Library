@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Callable, Iterator, Sequence
 from typing import TYPE_CHECKING, Literal, TypeVar, overload
 
-from safeds._utils import _structural_hash
+from safeds._utils import _safe_collect_lazy_frame, _safe_collect_lazy_frame_schema, _structural_hash
 from safeds._validation import (
     _check_column_has_no_missing_values,
     _check_column_is_numeric,
@@ -16,9 +16,8 @@ from safeds.data.tabular.typing._polars_column_type import _PolarsColumnType
 from ._lazy_cell import _LazyCell
 
 if TYPE_CHECKING:
-    from polars import Series
+    import polars as pl
 
-    from safeds._typing import _BooleanCell
     from safeds.data.tabular.typing import ColumnType
     from safeds.exceptions import (  # noqa: F401
         ColumnTypeError,
@@ -45,7 +44,7 @@ class Column(Sequence[T_co]):
         The name of the column.
     data:
         The data of the column.
-    type_:
+    type:
         The type of the column. If `None` (default), the type is inferred from the data.
 
     Examples
@@ -63,7 +62,7 @@ class Column(Sequence[T_co]):
     +-----+
 
     >>> from safeds.data.tabular.typing import ColumnType
-    >>> Column("a", [1, 2, 3], type_=ColumnType.string())
+    >>> Column("a", [1, 2, 3], type=ColumnType.string())
     +-----+
     | a   |
     | --- |
@@ -80,9 +79,19 @@ class Column(Sequence[T_co]):
     # ------------------------------------------------------------------------------------------------------------------
 
     @staticmethod
-    def _from_polars_series(data: Series) -> Column:
+    def _from_polars_lazy_frame(name: str, data: pl.LazyFrame) -> Column:
         result = object.__new__(Column)
-        result._series = data
+        result._name = name
+        result._lazy_frame = data.select(name)
+        result.__series_cache = None
+        return result
+
+    @staticmethod
+    def _from_polars_series(data: pl.Series) -> Column:
+        result = object.__new__(Column)
+        result._name = data.name
+        result._lazy_frame = data.to_frame().lazy()
+        result.__series_cache = data
         return result
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -94,15 +103,17 @@ class Column(Sequence[T_co]):
         name: str,
         data: Sequence[T_co],
         *,
-        type_: ColumnType | None = None,
+        type: ColumnType | None = None,
     ) -> None:
         import polars as pl
 
         # Preprocessing
-        dtype = None if type_ is None else type_._polars_data_type
+        dtype = None if type is None else type._polars_data_type
 
         # Implementation
-        self._series: pl.Series = pl.Series(name, data, dtype=dtype, strict=False)
+        self._name: str = name
+        self.__series_cache: pl.Series | None = pl.Series(name, data, dtype=dtype, strict=False)
+        self._lazy_frame: pl.LazyFrame = self.__series_cache.to_frame().lazy()
 
     def __contains__(self, value: object) -> bool:
         import polars as pl
@@ -129,8 +140,11 @@ class Column(Sequence[T_co]):
     def __getitem__(self, index: int | slice) -> T_co | Column[T_co]:
         if isinstance(index, int):
             return self.get_value(index)
-        else:
-            return self._from_polars_series(self._series.__getitem__(index))
+
+        try:
+            return self._from_polars_lazy_frame(self.name, self._lazy_frame[index])
+        except ValueError:
+            return self._from_polars_series(self._series[index])
 
     def __hash__(self) -> int:
         return _structural_hash(
@@ -159,6 +173,13 @@ class Column(Sequence[T_co]):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
+    def _series(self) -> pl.Series:
+        if self.__series_cache is None:
+            self.__series_cache = _safe_collect_lazy_frame(self._lazy_frame).to_series()
+
+        return self.__series_cache
+
+    @property
     def name(self) -> str:
         """
         The name of the column.
@@ -170,12 +191,14 @@ class Column(Sequence[T_co]):
         >>> column.name
         'a'
         """
-        return self._series.name
+        return self._name
 
     @property
     def row_count(self) -> int:
         """
         The number of rows.
+
+        **Note:** This operation must fully load the data into memory, which can be expensive.
 
         Examples
         --------
@@ -213,7 +236,8 @@ class Column(Sequence[T_co]):
         >>> column.type
         int64
         """
-        return _PolarsColumnType(self._series.dtype)
+        schema = _safe_collect_lazy_frame_schema(self._lazy_frame)
+        return _PolarsColumnType(schema.dtypes()[0])
 
     # ------------------------------------------------------------------------------------------------------------------
     # Value operations
@@ -316,7 +340,8 @@ class Column(Sequence[T_co]):
         """
         _check_indices(self, index)
 
-        return self._series.__getitem__(index)
+        # Lazy containers do not allow indexed accesses
+        return self._series[index]
 
     # ------------------------------------------------------------------------------------------------------------------
     # Reductions
@@ -325,7 +350,7 @@ class Column(Sequence[T_co]):
     @overload
     def all(
         self,
-        predicate: Callable[[Cell[T_co]], _BooleanCell],
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
         *,
         ignore_unknown: Literal[True] = ...,
     ) -> bool: ...
@@ -333,14 +358,14 @@ class Column(Sequence[T_co]):
     @overload
     def all(
         self,
-        predicate: Callable[[Cell[T_co]], _BooleanCell],
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
         *,
         ignore_unknown: bool,
     ) -> bool | None: ...
 
     def all(
         self,
-        predicate: Callable[[Cell[T_co]], _BooleanCell],
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
         *,
         ignore_unknown: bool = True,
     ) -> bool | None:
@@ -394,14 +419,15 @@ class Column(Sequence[T_co]):
         """
         import polars as pl
 
-        # Expressions only work on data frames/lazy frames, so we wrap the polars Series first
         expression = predicate(_LazyCell(pl.col(self.name)))._polars_expression.all(ignore_nulls=ignore_unknown)
-        return self._series.to_frame().select(expression).item()
+        frame = _safe_collect_lazy_frame(self._lazy_frame.select(expression))
+
+        return frame.item()
 
     @overload
     def any(
         self,
-        predicate: Callable[[Cell[T_co]], _BooleanCell],
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
         *,
         ignore_unknown: Literal[True] = ...,
     ) -> bool: ...
@@ -409,14 +435,14 @@ class Column(Sequence[T_co]):
     @overload
     def any(
         self,
-        predicate: Callable[[Cell[T_co]], _BooleanCell],
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
         *,
         ignore_unknown: bool,
     ) -> bool | None: ...
 
     def any(
         self,
-        predicate: Callable[[Cell[T_co]], _BooleanCell],
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
         *,
         ignore_unknown: bool = True,
     ) -> bool | None:
@@ -470,14 +496,15 @@ class Column(Sequence[T_co]):
         """
         import polars as pl
 
-        # Expressions only work on data frames/lazy frames, so we wrap the polars Series first
         expression = predicate(_LazyCell(pl.col(self.name)))._polars_expression.any(ignore_nulls=ignore_unknown)
-        return self._series.to_frame().select(expression).item()
+        frame = _safe_collect_lazy_frame(self._lazy_frame.select(expression))
+
+        return frame.item()
 
     @overload
     def count_if(
         self,
-        predicate: Callable[[Cell[T_co]], _BooleanCell],
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
         *,
         ignore_unknown: Literal[True] = ...,
     ) -> int: ...
@@ -485,14 +512,14 @@ class Column(Sequence[T_co]):
     @overload
     def count_if(
         self,
-        predicate: Callable[[Cell[T_co]], _BooleanCell],
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
         *,
         ignore_unknown: bool,
     ) -> int | None: ...
 
     def count_if(
         self,
-        predicate: Callable[[Cell[T_co]], _BooleanCell],
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
         *,
         ignore_unknown: bool = True,
     ) -> int | None:
@@ -535,11 +562,11 @@ class Column(Sequence[T_co]):
         """
         import polars as pl
 
-        # Expressions only work on data frames/lazy frames, so we wrap the polars Series first
         expression = predicate(_LazyCell(pl.col(self.name)))._polars_expression
-        series = self._series.to_frame().select(expression.alias(self.name)).get_column(self.name)
+        frame = _safe_collect_lazy_frame(self._lazy_frame.select(expression))
+        series = frame.to_series()
 
-        if ignore_unknown or series.null_count() == 0:
+        if ignore_unknown or not series.has_nulls():
             return series.sum()
         else:
             return None
@@ -547,7 +574,7 @@ class Column(Sequence[T_co]):
     @overload
     def none(
         self,
-        predicate: Callable[[Cell[T_co]], _BooleanCell],
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
         *,
         ignore_unknown: Literal[True] = ...,
     ) -> bool: ...
@@ -555,14 +582,14 @@ class Column(Sequence[T_co]):
     @overload
     def none(
         self,
-        predicate: Callable[[Cell[T_co]], _BooleanCell],
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
         *,
         ignore_unknown: bool,
     ) -> bool | None: ...
 
     def none(
         self,
-        predicate: Callable[[Cell[T_co]], _BooleanCell],
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
         *,
         ignore_unknown: bool = True,
     ) -> bool | None:
@@ -616,9 +643,10 @@ class Column(Sequence[T_co]):
         """
         import polars as pl
 
-        # Expressions only work on data frames/lazy frames, so we wrap the polars Series first
         expression = predicate(_LazyCell(pl.col(self.name)))._polars_expression.not_().all(ignore_nulls=ignore_unknown)
-        return self._series.to_frame().select(expression).item()
+        frame = _safe_collect_lazy_frame(self._lazy_frame.select(expression))
+
+        return frame.item()
 
     # ------------------------------------------------------------------------------------------------------------------
     # Transformations
@@ -655,7 +683,8 @@ class Column(Sequence[T_co]):
         |   3 |
         +-----+
         """
-        return self._from_polars_series(self._series.rename(new_name))
+        result = self._lazy_frame.rename({self.name: new_name})
+        return self._from_polars_lazy_frame(new_name, result)
 
     def transform(
         self,
@@ -693,11 +722,10 @@ class Column(Sequence[T_co]):
         """
         import polars as pl
 
-        # Expressions only work on data frames/lazy frames, so we wrap the polars Series first
-        expression = transformer(_LazyCell(pl.col(self.name)))._polars_expression
-        series = self._series.to_frame().with_columns(expression.alias(self.name)).get_column(self.name)
+        expression = transformer(_LazyCell(pl.col(self.name)))._polars_expression.alias(self.name)
+        result = self._lazy_frame.with_columns(expression)  # with_columns always keeps number of rows
 
-        return self._from_polars_series(series)
+        return self._from_polars_lazy_frame(self.name, result)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Statistics
@@ -1222,7 +1250,7 @@ class Column(Sequence[T_co]):
         """
         from ._table import Table
 
-        return Table._from_polars_data_frame(self._series.to_frame())
+        return Table._from_polars_lazy_frame(self._lazy_frame)
 
     # ------------------------------------------------------------------------------------------------------------------
     # IPython integration
