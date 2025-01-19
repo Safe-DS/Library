@@ -803,11 +803,11 @@ class DatetimeOperations(ABC):
         Convert a datetime, date, or time to a string.
 
         The `format` parameter controls the presentation. It can be `"iso"` to target ISO 8601 or a custom string. The
-        custom string can contain fixed placeholders (see below), which are replaced with the corresponding values. The
-        placeholders are case-sensitive and always enclosed in curly braces. Other text is included in the output
+        custom string can contain fixed specifiers (see below), which are replaced with the corresponding values. The
+        specifiers are case-sensitive and always enclosed in curly braces. Other text is included in the output
         verbatim. To include a literal opening curly brace, use `\{`, and to include a literal backslash, use `\\`.
 
-        The following placeholders for _date components_ are available for **datetime** and **date**:
+        The following specifiers for _date components_ are available for **datetime** and **date**:
 
         - `{Y}`, `{_Y}`, `{^Y}`: Year (zero-padded to four digits, space-padded to four digits, no padding).
         - `{Y99}`, `{_Y99}`, `{^Y99}`: Year modulo 100 (zero-padded to two digits, space-padded to two digits, no
@@ -824,7 +824,7 @@ class DatetimeOperations(ABC):
         - `{DOY}`, `{_DOY}`, `{^DOY}`: Day of the year, ranging from 1 to 366 (zero-padded to three digits, space-padded
           to three digits, no padding).
 
-        The following placeholders for _time components_ are available for **datetime** and **time**:
+        The following specifiers for _time components_ are available for **datetime** and **time**:
 
         - `{h}`, `{_h}`, `{^h}`: Hour (zero-padded to two digits, space-padded to two digits, no padding).
         - `{h12}`, `{_h12}`, `{^h12}`: Hour in 12-hour format (zero-padded to two digits, space-padded to two digits, no
@@ -838,16 +838,16 @@ class DatetimeOperations(ABC):
         - `{AM/PM}`: AM or PM (uppercase).
         - `{am/pm}`: am or pm (lowercase).
 
-        The following placeholders are available for **datetime** only:
+        The following specifiers are available for **datetime** only:
 
         - `{z}`: Offset of the timezone from UTC without a colon (e.g. "+0000").
         - `{:z}`: Offset of the timezone from UTC with a colon (e.g. "+00:00").
         - `{u}`: The UNIX timestamp in seconds.
 
-        The placeholders follow certain conventions:
+        The specifiers follow certain conventions:
 
         - Generally, date components use uppercase letters and time components use lowercase letters.
-        - If a component may be formatted in multiple ways, we use shorter placeholders for ISO 8601. Placeholders for
+        - If a component may be formatted in multiple ways, we use shorter specifiers for ISO 8601. Specifiers for
           other formats have a prefix (same value with different padding, see below) or suffix (other differences).
         - By default, value are zero-padded, where applicable.
         - A leading underscore (`_`) means the value is space-padded.

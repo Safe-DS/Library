@@ -134,7 +134,7 @@ def _convert_and_check_datetime_format(
         elif char == "{":
             end_index = format_.find("}", index)
             if end_index == -1:
-                message = f"Unclosed template expression at index {index}."
+                message = f"Unclosed specifier at index {index}."
                 raise ValueError(message)
 
             expression = format_[index + 1 : end_index]
@@ -174,7 +174,7 @@ def _convert_and_check_template_expression(
     if expression in replacements:
         return "%" + replacements[expression]
 
-    # Unknown template expression
+    # Unknown specifier
     message = _build_error_message(expression, type_, list(replacements.keys()))
     raise ValueError(message)
 
@@ -184,7 +184,7 @@ def _build_error_message(
     type_: str,
     valid_expressions: list[str],
 ) -> str:
-    result = f"Invalid template expression '{expression}' for type {type_}."
+    result = f"Invalid specifier '{expression}' for type {type_}."
 
     similar_expressions = _get_similar_strings(expression, valid_expressions)
     if similar_expressions:
