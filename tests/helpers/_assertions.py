@@ -1,5 +1,6 @@
+import math
 from collections.abc import Callable
-from typing import Any
+from typing import Any, SupportsFloat
 
 from polars.testing import assert_frame_equal
 
@@ -68,6 +69,7 @@ def assert_cell_operation_works(
     expected: Any,
     *,
     type_if_none: ColumnType | None = None,
+    ignore_float_imprecision: bool = True,
 ) -> None:
     """
     Assert that a cell operation works as expected.
@@ -82,12 +84,25 @@ def assert_cell_operation_works(
         The expected value of the transformed cell.
     type_if_none:
         The type of the column if the value is `None`.
+    ignore_float_imprecision:
+        If False, check if floating point values match EXACTLY.
     """
     type_ = type_if_none if value is None else None
     column = Column("a", [value], type=type_)
     transformed_column = column.transform(transformer)
     actual = transformed_column[0]
-    assert actual == expected, f"Expected {expected}, but got {actual}."
+
+    message = f"Expected {expected}, but got {actual}."
+
+    if expected is None:
+        assert actual is None, message
+    elif isinstance(expected, SupportsFloat) and math.isnan(expected):
+        # NaN != NaN
+        assert math.isnan(actual), message
+    elif isinstance(expected, SupportsFloat) and ignore_float_imprecision:
+        assert math.isclose(actual, expected, abs_tol=1e-15), message
+    else:
+        assert actual == expected, message
 
 
 def assert_row_operation_works(
