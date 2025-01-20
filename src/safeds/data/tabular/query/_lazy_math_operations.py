@@ -103,6 +103,8 @@ class _LazyMathOperations(MathOperations):
         return _LazyCell(self._expression.degrees())
 
     def round_to_decimal_places(self, decimal_places: int) -> Cell:
+        _check_bounds("decimal_places", decimal_places, lower_bound=_ClosedBound(0))
+
         return _LazyCell(self._expression.round(decimal_places))
 
     def round_to_significant_figures(self, significant_figures: int) -> Cell:
