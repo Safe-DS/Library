@@ -1,3 +1,4 @@
+import math
 from collections.abc import Callable
 from typing import Any
 
@@ -87,7 +88,12 @@ def assert_cell_operation_works(
     column = Column("a", [value], type=type_)
     transformed_column = column.transform(transformer)
     actual = transformed_column[0]
-    assert actual == expected, f"Expected {expected}, but got {actual}."
+
+    # NaN != NaN; isnan cannot handle None
+    if expected is not None and math.isnan(expected):
+        assert math.isnan(actual), f"Expected {expected}, but got {actual}."
+    else:
+        assert actual == expected, f"Expected {expected}, but got {actual}."
 
 
 def assert_row_operation_works(
