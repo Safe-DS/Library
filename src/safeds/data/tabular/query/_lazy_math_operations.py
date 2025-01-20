@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import math
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
@@ -66,6 +65,9 @@ class _LazyMathOperations(MathOperations):
     def atanh(self) -> Cell:
         return _LazyCell(self._expression.arctanh())
 
+    def cbrt(self) -> Cell:
+        return _LazyCell(self._expression.cbrt())
+
     def ceil(self) -> Cell:
         return _LazyCell(self._expression.ceil())
 
@@ -84,12 +86,18 @@ class _LazyMathOperations(MathOperations):
     def floor(self) -> Cell:
         return _LazyCell(self._expression.floor())
 
-    def log(self, base: float = math.e) -> Cell:
+    def ln(self) -> Cell:
+        return _LazyCell(self._expression.log())
+
+    def log(self, base: float) -> Cell:
         _check_bounds("base", base, lower_bound=_OpenBound(0))
         if base == 1:
             raise ValueError("The base of the logarithm must not be 1.")
 
         return _LazyCell(self._expression.log(base))
+
+    def log10(self) -> Cell:
+        return _LazyCell(self._expression.log10())
 
     def radians_to_degrees(self) -> Cell:
         return _LazyCell(self._expression.degrees())

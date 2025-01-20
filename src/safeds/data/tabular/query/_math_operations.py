@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import math
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -243,6 +242,32 @@ class MathOperations(ABC):
         """
 
     @abstractmethod
+    def cbrt(self) -> Cell:
+        """
+        Get the cube root.
+
+        Returns
+        -------
+        cell:
+            The cube root.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [1, 8, None])
+        >>> column.transform(lambda cell: cell.math.cbrt())
+        +---------+
+        |       a |
+        |     --- |
+        |     f64 |
+        +=========+
+        | 1.00000 |
+        | 2.00000 |
+        |    null |
+        +---------+
+        """
+
+    @abstractmethod
     def ceil(self) -> Cell:
         """
         Round up to the nearest integer.
@@ -408,9 +433,37 @@ class MathOperations(ABC):
         """
 
     @abstractmethod
-    def log(self, base: float = math.e) -> Cell:
+    def ln(self) -> Cell:
         """
-        Get the logarithm to the specified base. By default, the natural logarithm is computed.
+        Get the natural logarithm.
+
+        Returns
+        -------
+        cell:
+            The natural logarithm.
+
+        Examples
+        --------
+        >>> import math
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [0, 1, math.e, None])
+        >>> column.transform(lambda cell: cell.math.ln())
+        +---------+
+        |       a |
+        |     --- |
+        |     f64 |
+        +=========+
+        |    -inf |
+        | 0.00000 |
+        | 1.00000 |
+        |    null |
+        +---------+
+        """
+
+    @abstractmethod
+    def log(self, base: float) -> Cell:
+        """
+        Get the logarithm to the specified base.
 
         Parameters
         ----------
@@ -432,7 +485,7 @@ class MathOperations(ABC):
         >>> import math
         >>> from safeds.data.tabular.containers import Column
         >>> column1 = Column("a", [0, 1, math.e, None])
-        >>> column1.transform(lambda cell: cell.math.log())
+        >>> column1.transform(lambda cell: cell.math.log(math.e))
         +---------+
         |       a |
         |     --- |
@@ -446,6 +499,34 @@ class MathOperations(ABC):
 
         >>> column2 = Column("a", [0, 1, 10, None])
         >>> column2.transform(lambda cell: cell.math.log(10))
+        +---------+
+        |       a |
+        |     --- |
+        |     f64 |
+        +=========+
+        |    -inf |
+        | 0.00000 |
+        | 1.00000 |
+        |    null |
+        +---------+
+        """
+
+    @abstractmethod
+    def log10(self) -> Cell:
+        """
+        Get the common logarithm (base 10).
+
+        Returns
+        -------
+        cell:
+            The common logarithm.
+
+        Examples
+        --------
+        >>> import math
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [0, 1, 10, None])
+        >>> column.transform(lambda cell: cell.math.log10())
         +---------+
         |       a |
         |     --- |
