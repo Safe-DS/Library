@@ -1,9 +1,9 @@
 import math
 
 import pytest
-from helpers import assert_cell_operation_works
 
 from safeds.data.tabular.typing import ColumnType
+from tests.helpers import assert_cell_operation_works
 
 E = math.e
 PHI = (1 + math.sqrt(5)) / 2

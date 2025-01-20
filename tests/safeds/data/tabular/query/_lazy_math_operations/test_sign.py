@@ -1,7 +1,7 @@
 import pytest
-from helpers import assert_cell_operation_works
 
 from safeds.data.tabular.typing import ColumnType
+from tests.helpers import assert_cell_operation_works
 
 
 @pytest.mark.parametrize(

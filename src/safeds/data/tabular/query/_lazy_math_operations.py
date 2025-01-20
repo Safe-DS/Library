@@ -4,7 +4,7 @@ import math
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds._validation import _check_bounds, _OpenBound
+from safeds._validation import _check_bounds, _ClosedBound, _OpenBound
 from safeds.data.tabular.containers._lazy_cell import _LazyCell
 from safeds.data.tabular.query._math_operations import MathOperations
 
@@ -98,6 +98,8 @@ class _LazyMathOperations(MathOperations):
         return _LazyCell(self._expression.round(decimal_places))
 
     def round_to_significant_figures(self, significant_figures: int) -> Cell:
+        _check_bounds("significant_figures", significant_figures, lower_bound=_ClosedBound(1))
+
         return _LazyCell(self._expression.round_sig_figs(significant_figures))
 
     def sign(self) -> Cell:
