@@ -13,9 +13,9 @@ PHI = (1 + math.sqrt(5)) / 2
     ("value", "expected"),
     [
         (0, 0),
-        (-(E - 1 / E) / (E + 1 / E), -1),
-        ((E - 1 / E) / (E + 1 / E), 1),
-        (1 / math.sqrt(5), math.log(PHI)),
+        (-0.5 * (E - 1 / E), -1),
+        (0.5 * (E - 1 / E), 1),
+        (0.5, math.log(PHI)),
         (None, None),
     ],
     ids=[
@@ -26,5 +26,5 @@ PHI = (1 + math.sqrt(5)) / 2
         "None",
     ],
 )
-def test_should_return_inverse_hyperbolic_tangent(value: float | None, expected: float | None) -> None:
-    assert_cell_operation_works(value, lambda cell: cell.math.artanh(), expected, type_if_none=ColumnType.float64())
+def test_should_return_inverse_hyperbolic_sine(value: float | None, expected: float | None) -> None:
+    assert_cell_operation_works(value, lambda cell: cell.math.asinh(), expected, type_if_none=ColumnType.float64())

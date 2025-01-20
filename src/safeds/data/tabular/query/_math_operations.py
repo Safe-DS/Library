@@ -81,7 +81,7 @@ class MathOperations(ABC):
         """
 
     @abstractmethod
-    def arccos(self) -> Cell:
+    def acos(self) -> Cell:
         """
         Get the inverse cosine.
 
@@ -94,7 +94,7 @@ class MathOperations(ABC):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("a", [-1, 0, 1, None])
-        >>> column.transform(lambda cell: cell.math.arccos())
+        >>> column.transform(lambda cell: cell.math.acos())
         +---------+
         |       a |
         |     --- |
@@ -108,34 +108,7 @@ class MathOperations(ABC):
         """
 
     @abstractmethod
-    def arcsin(self) -> Cell:
-        """
-        Get the inverse sine.
-
-        Returns
-        -------
-        cell:
-            The inverse sine.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [-1, 0, 1, None])
-        >>> column.transform(lambda cell: cell.math.arcsin())
-        +----------+
-        |        a |
-        |      --- |
-        |      f64 |
-        +==========+
-        | -1.57080 |
-        |  0.00000 |
-        |  1.57080 |
-        |     null |
-        +----------+
-        """
-
-    @abstractmethod
-    def arcosh(self) -> Cell:
+    def acosh(self) -> Cell:
         """
         Get the inverse hyperbolic cosine.
 
@@ -148,7 +121,7 @@ class MathOperations(ABC):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("a", [-1, 0, 1, None])
-        >>> column.transform(lambda cell: cell.math.arcosh())
+        >>> column.transform(lambda cell: cell.math.acosh())
         +---------+
         |       a |
         |     --- |
@@ -162,34 +135,34 @@ class MathOperations(ABC):
         """
 
     @abstractmethod
-    def arctan(self) -> Cell:
+    def asin(self) -> Cell:
         """
-        Get the inverse tangent.
+        Get the inverse sine.
 
         Returns
         -------
         cell:
-            The inverse tangent.
+            The inverse sine.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("a", [-1, 0, 1, None])
-        >>> column.transform(lambda cell: cell.math.arctan())
+        >>> column.transform(lambda cell: cell.math.asin())
         +----------+
         |        a |
         |      --- |
         |      f64 |
         +==========+
-        | -0.78540 |
+        | -1.57080 |
         |  0.00000 |
-        |  0.78540 |
+        |  1.57080 |
         |     null |
         +----------+
         """
 
     @abstractmethod
-    def arsinh(self) -> Cell:
+    def asinh(self) -> Cell:
         """
         Get the inverse hyperbolic sine.
 
@@ -202,7 +175,7 @@ class MathOperations(ABC):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("a", [-1, 0, 1, None])
-        >>> column.transform(lambda cell: cell.math.arsinh())
+        >>> column.transform(lambda cell: cell.math.asinh())
         +----------+
         |        a |
         |      --- |
@@ -216,7 +189,34 @@ class MathOperations(ABC):
         """
 
     @abstractmethod
-    def artanh(self) -> Cell:
+    def atan(self) -> Cell:
+        """
+        Get the inverse tangent.
+
+        Returns
+        -------
+        cell:
+            The inverse tangent.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [-1, 0, 1, None])
+        >>> column.transform(lambda cell: cell.math.atan())
+        +----------+
+        |        a |
+        |      --- |
+        |      f64 |
+        +==========+
+        | -0.78540 |
+        |  0.00000 |
+        |  0.78540 |
+        |     null |
+        +----------+
+        """
+
+    @abstractmethod
+    def atanh(self) -> Cell:
         """
         Get the inverse hyperbolic tangent.
 
@@ -229,7 +229,7 @@ class MathOperations(ABC):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("a", [-1, 0, 1, None])
-        >>> column.transform(lambda cell: cell.math.artanh())
+        >>> column.transform(lambda cell: cell.math.atanh())
         +---------+
         |       a |
         |     --- |

@@ -48,22 +48,22 @@ class _LazyMathOperations(MathOperations):
     def abs(self) -> Cell:
         return _LazyCell(self._expression.__abs__())
 
-    def arccos(self) -> Cell:
+    def acos(self) -> Cell:
         return _LazyCell(self._expression.arccos())
 
-    def arcsin(self) -> Cell:
-        return _LazyCell(self._expression.arcsin())
-
-    def arcosh(self) -> Cell:
+    def acosh(self) -> Cell:
         return _LazyCell(self._expression.arccosh())
 
-    def arctan(self) -> Cell:
-        return _LazyCell(self._expression.arctan())
+    def asin(self) -> Cell:
+        return _LazyCell(self._expression.arcsin())
 
-    def arsinh(self) -> Cell:
+    def asinh(self) -> Cell:
         return _LazyCell(self._expression.arcsinh())
 
-    def artanh(self) -> Cell:
+    def atan(self) -> Cell:
+        return _LazyCell(self._expression.arctan())
+
+    def atanh(self) -> Cell:
         return _LazyCell(self._expression.arctanh())
 
     def ceil(self) -> Cell:

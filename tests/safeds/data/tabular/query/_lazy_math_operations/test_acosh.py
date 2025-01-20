@@ -25,4 +25,4 @@ PHI = (1 + math.sqrt(5)) / 2
     ],
 )
 def test_should_return_inverse_hyperbolic_cosine(value: float | None, expected: float | None) -> None:
-    assert_cell_operation_works(value, lambda cell: cell.math.arcosh(), expected, type_if_none=ColumnType.float64())
+    assert_cell_operation_works(value, lambda cell: cell.math.acosh(), expected, type_if_none=ColumnType.float64())

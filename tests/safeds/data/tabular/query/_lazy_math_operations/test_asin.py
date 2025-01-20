@@ -22,4 +22,4 @@ from tests.helpers import assert_cell_operation_works
     ],
 )
 def test_should_return_inverse_sine(value: float | None, expected: float | None) -> None:
-    assert_cell_operation_works(value, lambda cell: cell.math.arcsin(), expected, type_if_none=ColumnType.float64())
+    assert_cell_operation_works(value, lambda cell: cell.math.asin(), expected, type_if_none=ColumnType.float64())
