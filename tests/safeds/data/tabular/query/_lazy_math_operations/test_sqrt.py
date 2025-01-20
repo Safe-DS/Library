@@ -16,11 +16,11 @@ from tests.helpers import assert_cell_operation_works
         (None, None),
     ],
     ids=[
-        "negative",
-        "zero",
-        "one",
-        "square of flot",
-        "square of int",
+        "-1",
+        "0",
+        "1",
+        "square of 1.5",
+        "square of 2",
         "None",
     ],
 )
