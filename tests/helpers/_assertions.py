@@ -1,6 +1,6 @@
 import math
 from collections.abc import Callable
-from typing import Any
+from typing import Any, SupportsFloat
 
 from polars.testing import assert_frame_equal
 
@@ -96,10 +96,10 @@ def assert_cell_operation_works(
 
     if expected is None:
         assert actual is None, message
-    elif math.isnan(expected):
+    elif isinstance(expected, SupportsFloat) and math.isnan(expected):
         # NaN != NaN
         assert math.isnan(actual), message
-    elif ignore_float_imprecision:
+    elif isinstance(expected, SupportsFloat) and ignore_float_imprecision:
         assert math.isclose(actual, expected, abs_tol=1e-15), message
     else:
         assert actual == expected, message
