@@ -62,7 +62,7 @@ def test_should_round_to_decimal_places(
     )
 
 
-def test_should_raise_if_parameter_is_out_of_bounds() -> None:
+def test_should_raise_if_decimal_places_is_out_of_bounds() -> None:
     column = Column("a", [1])
     with pytest.raises(OutOfBoundsError):
         column.transform(lambda cell: cell.math.round_to_decimal_places(-1))

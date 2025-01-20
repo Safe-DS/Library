@@ -109,7 +109,7 @@ def test_should_round_to_significant_figures(
         "zero",
     ],
 )
-def test_should_raise_if_parameter_is_out_of_bounds(significant_figures: int) -> None:
+def test_should_raise_if_significant_figures_is_out_of_bounds(significant_figures: int) -> None:
     column = Column("a", [1])
     with pytest.raises(OutOfBoundsError):
         column.transform(lambda cell: cell.math.round_to_significant_figures(significant_figures))
