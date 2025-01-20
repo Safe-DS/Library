@@ -10,6 +10,7 @@ from safeds.data.tabular.typing import ColumnType
     ("value", "expected"),
     [
         (0, 0),
+        (math.pi / 8, 22.5),
         (math.pi / 2, 90),
         (math.pi, 180),
         (3 * math.pi / 2, 270),
@@ -18,16 +19,17 @@ from safeds.data.tabular.typing import ColumnType
         (None, None),
     ],
     ids=[
-        "0°",
-        "90°",
-        "180°",
-        "270°",
-        "360°",
-        "720°",
+        "0 deg",
+        "22.5 deg",
+        "90 deg",
+        "180 deg",
+        "270 deg",
+        "360 deg",
+        "720 deg",
         "None",
     ],
 )
-def test_should_convert_radians_to_degrees(value: int | None, expected: int | None) -> None:
+def test_should_convert_radians_to_degrees(value: float | None, expected: float | None) -> None:
     assert_cell_operation_works(
         value,
         lambda cell: cell.math.radians_to_degrees(),

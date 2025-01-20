@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from safeds.data.tabular.containers import Cell
+    from safeds.exceptions import OutOfBoundsError  # noqa: F401
 
 
 class MathOperations(ABC):
@@ -494,12 +495,17 @@ class MathOperations(ABC):
         Parameters
         ----------
         decimal_places:
-            The number of decimal places to round to.
+            The number of decimal places to round to. Must be greater than or equal to 0.
 
         Returns
         -------
         cell:
             The rounded value.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If `decimal_places` is less than 0.
 
         Examples
         --------
@@ -538,12 +544,17 @@ class MathOperations(ABC):
         Parameters
         ----------
         significant_figures:
-            The number of significant figures to round to.
+            The number of significant figures to round to. Must be greater than or equal to 1.
 
         Returns
         -------
         cell:
             The rounded value.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If `significant_figures` is less than 1.
 
         Examples
         --------

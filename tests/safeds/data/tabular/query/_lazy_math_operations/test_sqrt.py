@@ -10,6 +10,7 @@ from helpers import assert_cell_operation_works
         (-1, math.nan),
         (0, 0),
         (1, 1),
+        (2.25, 1.5),
         (4, 2),
         (None, None),
     ],
@@ -17,9 +18,10 @@ from helpers import assert_cell_operation_works
         "negative",
         "zero",
         "one",
-        "perfect square",
+        "square of flot",
+        "square of int",
         "None",
     ],
 )
-def test_should_return_square_root(value: int | None, expected: int | None) -> None:
+def test_should_return_square_root(value: float | None, expected: float | None) -> None:
     assert_cell_operation_works(value, lambda cell: cell.math.sqrt(), expected)
