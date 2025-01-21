@@ -55,6 +55,13 @@ class _LazyStringOperations(StringOperations):
         else:
             return _LazyCell(self._expression.str.len_chars())
 
+    def pad_end(self, length: int, *, character: str = " ") -> Cell[str | None]:
+        _check_bounds("length", length, lower_bound=_ClosedBound(0))
+        if len(character) != 1:
+            raise ValueError("Can only pad with a single character.")
+
+        return _LazyCell(self._expression.str.pad_end(length, character))
+
     def pad_start(self, length: int, *, character: str = " ") -> Cell[str | None]:
         _check_bounds("length", length, lower_bound=_ClosedBound(0))
         if len(character) != 1:
