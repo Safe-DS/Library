@@ -84,7 +84,6 @@ class StringOperations(ABC):
         +-------+
         """
 
-
     @abstractmethod
     def reverse(self) -> Cell[str | None]:
         """
@@ -109,6 +108,37 @@ class StringOperations(ABC):
         | cb   |
         | null |
         +------+
+        """
+
+    @abstractmethod
+    def starts_with(self, prefix: _ConvertibleToStringCell) -> Cell[bool | None]:
+        """
+        Check if the string starts with the prefix.
+
+        Parameters
+        ----------
+        prefix:
+            The expected prefix.
+
+        Returns
+        -------
+        starts_with:
+            Whether the string starts with the prefix.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["ab", "bc", None])
+        >>> column.transform(lambda cell: cell.str.starts_with("a"))
+        +-------+
+        | a     |
+        | ---   |
+        | bool  |
+        +=======+
+        | true  |
+        | false |
+        | null  |
+        +-------+
         """
 
     @abstractmethod
@@ -293,39 +323,7 @@ class StringOperations(ABC):
     #     | null |
     #     +------+
     #     """
-    #
-    # @abstractmethod
-    # def starts_with(self, prefix: _ConvertibleToStringCell) -> Cell[bool | None]:
-    #     """
-    #     Check if the string value in the cell starts with the prefix.
-    #
-    #     Parameters
-    #     ----------
-    #     prefix:
-    #         The prefix to search for.
-    #
-    #     Returns
-    #     -------
-    #     starts_with:
-    #         Whether the string value starts with the prefix.
-    #
-    #     Examples
-    #     --------
-    #     >>> from safeds.data.tabular.containers import Column
-    #     >>> column = Column("a", ["ab", "bc", "cd", None])
-    #     >>> column.transform(lambda cell: cell.str.starts_with("a"))
-    #     +-------+
-    #     | a     |
-    #     | ---   |
-    #     | bool  |
-    #     +=======+
-    #     | true  |
-    #     | false |
-    #     | false |
-    #     | null  |
-    #     +-------+
-    #     """
-    #
+
     # @abstractmethod
     # def substring(
     #     self,
