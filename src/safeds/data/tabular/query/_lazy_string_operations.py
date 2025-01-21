@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
+from safeds._validation import _check_bounds, _ClosedBound
 from safeds.data.tabular.containers._lazy_cell import _LazyCell
 
 from ._string_operations import StringOperations
@@ -53,6 +54,13 @@ class _LazyStringOperations(StringOperations):
             return _LazyCell(self._expression.str.len_bytes())
         else:
             return _LazyCell(self._expression.str.len_chars())
+
+    def pad_start(self, length: int, *, character: str = " ") -> Cell[str | None]:
+        _check_bounds("length", length, lower_bound=_ClosedBound(0))
+        if len(character) != 1:
+            raise ValueError("Can only pad with a single character.")
+
+        return _LazyCell(self._expression.str.pad_start(length, character))
 
     def reverse(self) -> Cell[str | None]:
         return _LazyCell(self._expression.str.reverse())

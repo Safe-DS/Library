@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from safeds._typing import _ConvertibleToStringCell
     from safeds.data.tabular.containers import Cell
+    from safeds.exceptions import OutOfBoundsError  # noqa: F401
 
 
 class StringOperations(ABC):
@@ -113,6 +114,58 @@ class StringOperations(ABC):
         |    0 |
         |    1 |
         |    3 |
+        | null |
+        +------+
+        """
+
+    @abstractmethod
+    def pad_start(self, length: int, *, character: str = " ") -> Cell[str | None]:
+        """
+        Pad the start of the string with the given character until it has the given length.
+
+        Parameters
+        ----------
+        length:
+            The minimum length of the string. If the string is already at least as long, it is returned unchanged. Must
+            be greater than or equal to 0.
+        character:
+            How to pad the string. Must be a single character.
+
+        Returns
+        -------
+        cell:
+            The padded string.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If `length` is less than 0.
+        ValueError
+            If `char` is not a single character.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["ab", "bcde", None])
+        >>> column.transform(lambda cell: cell.str.pad_start(3))
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        |  ab  |
+        | bcde |
+        | null |
+        +------+
+
+        >>> column.transform(lambda cell: cell.str.pad_start(3, character="~"))
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        | ~ab  |
+        | bcde |
         | null |
         +------+
         """
