@@ -69,6 +69,11 @@ class _LazyStringOperations(StringOperations):
 
         return _LazyCell(self._expression.str.pad_start(length, character))
 
+    def repeat(self, count: _ConvertibleToIntCell) -> Cell[str | None]:
+        _check_bounds("count", count, lower_bound=_ClosedBound(0))
+
+        return _LazyCell(self._expression.repeat_by(count).list.join("", ignore_nulls=False))
+
     def reverse(self) -> Cell[str | None]:
         return _LazyCell(self._expression.str.reverse())
 

@@ -223,6 +223,42 @@ class StringOperations(ABC):
         """
 
     @abstractmethod
+    def repeat(self, count: _ConvertibleToIntCell) -> Cell[str | None]:
+        """
+        Repeat the string a number of times.
+
+        Parameters
+        ----------
+        count:
+            The number of times to repeat the string. Must be greater than or equal to 0.
+
+        Returns
+        -------
+        cell:
+            The repeated string.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If `count` is less than 0.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["ab", "bc", None])
+        >>> column.transform(lambda cell: cell.str.repeat(2))
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        | abab |
+        | bcbc |
+        | null |
+        +------+
+        """
+
+    @abstractmethod
     def reverse(self) -> Cell[str | None]:
         """
         Reverse the string.
@@ -294,16 +330,16 @@ class StringOperations(ABC):
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("a", ["1", "1.5", "abc", None])
         >>> column.transform(lambda cell: cell.str.to_float())
-        +------+
-        |    a |
-        |  --- |
-        |  f64 |
-        +======+
-        |    1 |
-        |  1.5 |
-        | null |
-        | null |
-        +------+
+        +---------+
+        |       a |
+        |     --- |
+        |     f64 |
+        +=========+
+        | 1.00000 |
+        | 1.50000 |
+        |    null |
+        |    null |
+        +---------+
         """
 
     @abstractmethod
