@@ -80,6 +80,15 @@ class _LazyStringOperations(StringOperations):
     def starts_with(self, prefix: _ConvertibleToStringCell) -> Cell[bool | None]:
         return _LazyCell(self._expression.str.starts_with(prefix))
 
+    def strip(self, *, characters: _ConvertibleToStringCell = None) -> Cell[str | None]:
+        return _LazyCell(self._expression.str.strip_chars(characters))
+
+    def strip_end(self, *, characters: _ConvertibleToStringCell = None) -> Cell[str | None]:
+        return _LazyCell(self._expression.str.strip_chars_end(characters))
+
+    def strip_start(self, *, characters: _ConvertibleToStringCell = None) -> Cell[str | None]:
+        return _LazyCell(self._expression.str.strip_chars_start(characters))
+
     def to_float(self) -> Cell[float | None]:
         import polars as pl
 

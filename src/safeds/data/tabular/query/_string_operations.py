@@ -316,6 +316,132 @@ class StringOperations(ABC):
         """
 
     @abstractmethod
+    def strip(self, *, characters: _ConvertibleToStringCell = None) -> Cell[str | None]:
+        """
+        Remove leading and trailing characters.
+
+        Parameters
+        ----------
+        characters:
+            The characters to remove. If None, whitespace is removed.
+
+        Returns
+        -------
+        cell:
+            The stripped string.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["  ab  ", "~ bc ~", None])
+        >>> column.transform(lambda cell: cell.str.strip())
+        +--------+
+        | a      |
+        | ---    |
+        | str    |
+        +========+
+        | ab     |
+        | ~ bc ~ |
+        | null   |
+        +--------+
+
+        >>> column.transform(lambda cell: cell.str.strip(characters=" ~"))
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        | ab   |
+        | bc   |
+        | null |
+        +------+
+        """
+
+    @abstractmethod
+    def strip_end(self, *, characters: _ConvertibleToStringCell = None) -> Cell[str | None]:
+        """
+        Remove trailing characters.
+
+        Parameters
+        ----------
+        characters:
+            The characters to remove. If None, whitespace is removed.
+
+        Returns
+        -------
+        cell:
+            The stripped string.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["  ab  ", "~ bc ~", None])
+        >>> column.transform(lambda cell: cell.str.strip_end())
+        +--------+
+        | a      |
+        | ---    |
+        | str    |
+        +========+
+        |   ab   |
+        | ~ bc ~ |
+        | null   |
+        +--------+
+
+        >>> column.transform(lambda cell: cell.str.strip_end(characters=" ~"))
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        |   ab |
+        | ~ bc |
+        | null |
+        +------+
+        """
+
+    @abstractmethod
+    def strip_start(self, *, characters: _ConvertibleToStringCell = None) -> Cell[str | None]:
+        """
+        Remove leading characters.
+
+        Parameters
+        ----------
+        characters:
+            The characters to remove. If None, whitespace is removed.
+
+        Returns
+        -------
+        cell:
+            The stripped string.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["  ab  ", "~ bc ~", None])
+        >>> column.transform(lambda cell: cell.str.strip_start())
+        +--------+
+        | a      |
+        | ---    |
+        | str    |
+        +========+
+        | ab     |
+        | ~ bc ~ |
+        | null   |
+        +--------+
+
+        >>> column.transform(lambda cell: cell.str.strip_start(characters=" ~"))
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        | ab   |
+        | bc ~ |
+        | null |
+        +------+
+        """
+
+    @abstractmethod
     def to_float(self) -> Cell[float | None]:
         """
         Convert the string to a float.
@@ -641,87 +767,3 @@ class StringOperations(ABC):
     #
     # # TODO: add to_time
     #
-
-    # @abstractmethod
-    # def trim(self) -> Cell[str | None]:
-    #     """
-    #     Remove whitespace from the start and end of the string value in the cell.
-    #
-    #     Returns
-    #     -------
-    #     trimmed:
-    #         The string value without whitespace at the start and end.
-    #
-    #     Examples
-    #     --------
-    #     >>> from safeds.data.tabular.containers import Column
-    #     >>> column = Column("a", ["", " abc", "abc ", " abc ", None])
-    #     >>> column.transform(lambda cell: cell.str.trim())
-    #     +------+
-    #     | a    |
-    #     | ---  |
-    #     | str  |
-    #     +======+
-    #     |      |
-    #     | abc  |
-    #     | abc  |
-    #     | abc  |
-    #     | null |
-    #     +------+
-    #     """
-    #
-    # @abstractmethod
-    # def trim_end(self) -> Cell[str | None]:
-    #     """
-    #     Remove whitespace from the end of the string value in the cell.
-    #
-    #     Returns
-    #     -------
-    #     trimmed:
-    #         The string value without whitespace at the end.
-    #
-    #     Examples
-    #     --------
-    #     >>> from safeds.data.tabular.containers import Column
-    #     >>> column = Column("a", ["", " abc", "abc ", " abc ", None])
-    #     >>> column.transform(lambda cell: cell.str.trim_end())
-    #     +------+
-    #     | a    |
-    #     | ---  |
-    #     | str  |
-    #     +======+
-    #     |      |
-    #     |  abc |
-    #     | abc  |
-    #     |  abc |
-    #     | null |
-    #     +------+
-    #     """
-    #
-    # @abstractmethod
-    # def trim_start(self) -> Cell[str | None]:
-    #     """
-    #     Remove whitespace from the start of the string value in the cell.
-    #
-    #     Returns
-    #     -------
-    #     trimmed:
-    #         The string value without whitespace at the start.
-    #
-    #     Examples
-    #     --------
-    #     >>> from safeds.data.tabular.containers import Column
-    #     >>> column = Column("a", ["", " abc", "abc ", " abc ", None])
-    #     >>> column.transform(lambda cell: cell.str.trim_start())
-    #     +------+
-    #     | a    |
-    #     | ---  |
-    #     | str  |
-    #     +======+
-    #     |      |
-    #     | abc  |
-    #     | abc  |
-    #     | abc  |
-    #     | null |
-    #     +------+
-    #     """
