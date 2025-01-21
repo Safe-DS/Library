@@ -84,6 +84,32 @@ class StringOperations(ABC):
         +------+
         """
 
+    @abstractmethod
+    def to_uppercase(self) -> Cell[str | None]:
+        """
+        Convert the string to uppercase.
+
+        Returns
+        -------
+        cell:
+            The uppercase string.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["ab", "bc", None])
+        >>> column.transform(lambda cell: cell.str.to_uppercase())
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        | AB   |
+        | BC   |
+        | null |
+        +------+
+        """
+
     # @abstractmethod
     # def contains(self, substring: _ConvertibleToStringCell) -> Cell[bool | None]:
     #     """
@@ -455,34 +481,7 @@ class StringOperations(ABC):
     #     | null |
     #     +------+
     #     """
-    #
-    # @abstractmethod
-    # def to_uppercase(self) -> Cell[str | None]:
-    #     """
-    #     Convert the string value in the cell to uppercase.
-    #
-    #     Returns
-    #     -------
-    #     uppercase:
-    #         The string value in uppercase.
-    #
-    #     Examples
-    #     --------
-    #     >>> from safeds.data.tabular.containers import Column
-    #     >>> column = Column("a", ["ab", "bc", "cd", None])
-    #     >>> column.transform(lambda cell: cell.str.to_uppercase())
-    #     +------+
-    #     | a    |
-    #     | ---  |
-    #     | str  |
-    #     +======+
-    #     | AB   |
-    #     | BC   |
-    #     | CD   |
-    #     | null |
-    #     +------+
-    #     """
-    #
+
     # @abstractmethod
     # def trim(self) -> Cell[str | None]:
     #     """

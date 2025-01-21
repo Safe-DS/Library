@@ -47,6 +47,9 @@ class _LazyStringOperations(StringOperations):
     def reverse(self) -> Cell[str | None]:
         return _LazyCell(self._expression.str.reverse())
 
+    def to_uppercase(self) -> Cell[str | None]:
+        return _LazyCell(self._expression.str.to_uppercase())
+
     # def contains(self, substring: _ConvertibleToStringCell) -> Cell[bool | None]:
     #     return _LazyCell(self._expression.str.contains(substring, literal=True))
     #
@@ -108,9 +111,6 @@ class _LazyStringOperations(StringOperations):
     #         format = _convert_and_check_datetime_format(format, type_="time", used_for_parsing=True)
     #
     #     return _LazyCell(self._expression.str.to_time(format=format, strict=False))
-    #
-    # def to_uppercase(self) -> Cell[str | None]:
-    #     return _LazyCell(self._expression.str.to_uppercase())
     #
     # def trim(self) -> Cell[str | None]:
     #     return _LazyCell(self._expression.str.strip_chars())
