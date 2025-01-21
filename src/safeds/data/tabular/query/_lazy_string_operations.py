@@ -126,20 +126,7 @@ class _LazyStringOperations(StringOperations):
     # def replace(self, old: _ConvertibleToStringCell, new: _ConvertibleToStringCell) -> Cell[str | None]:
     #     return _LazyCell(self._expression.str.replace_all(old, new, literal=True))
     #
-    # def starts_with(self, prefix: _ConvertibleToStringCell) -> Cell[bool | None]:
-    #     return _LazyCell(self._expression.str.starts_with(prefix))
-    #
-    # def substring(
-    #     self,
-    #     *,
-    #     start: _ConvertibleToIntCell = 0,
-    #     length: _ConvertibleToIntCell = None,
-    # ) -> Cell[str | None]:
-    #     if isinstance(length, int):
-    #         _check_bounds("length", length, lower_bound=_ClosedBound(0))
-    #
-    #     return _LazyCell(self._expression.str.slice(start, length))
-    #
+
     # def to_date(self, *, format: str | None = "iso") -> Cell[datetime.date | None]:
     #     if format == "iso":
     #         format = "%F"
@@ -164,12 +151,3 @@ class _LazyStringOperations(StringOperations):
     #         format = _convert_and_check_datetime_format(format, type_="time", used_for_parsing=True)
     #
     #     return _LazyCell(self._expression.str.to_time(format=format, strict=False))
-    #
-    # def trim(self) -> Cell[str | None]:
-    #     return _LazyCell(self._expression.str.strip_chars())
-    #
-    # def trim_end(self) -> Cell[str | None]:
-    #     return _LazyCell(self._expression.str.strip_chars_end())
-    #
-    # def trim_start(self) -> Cell[str | None]:
-    #     return _LazyCell(self._expression.str.strip_chars_start())

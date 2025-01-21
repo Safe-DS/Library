@@ -720,51 +720,6 @@ class StringOperations(ABC):
     #     +------+
     #     """
 
-    # @abstractmethod
-    # def substring(
-    #     self,
-    #     *,
-    #     start: _ConvertibleToIntCell = 0,
-    #     length: _ConvertibleToIntCell = None,
-    # ) -> Cell[str | None]:
-    #     """
-    #     Get a substring of the string value in the cell.
-    #
-    #     Parameters
-    #     ----------
-    #     start:
-    #         The start index of the substring.
-    #     length:
-    #         The length of the substring. If None, the slice contains all rows starting from `start`. Must greater than
-    #         or equal to 0.
-    #
-    #     Returns
-    #     -------
-    #     substring:
-    #         The substring of the string value.
-    #
-    #     Raises
-    #     ------
-    #     OutOfBoundsError
-    #         If length is less than 0.
-    #
-    #     Examples
-    #     --------
-    #     >>> from safeds.data.tabular.containers import Column
-    #     >>> column = Column("a", ["abc", "def", "ghi", None])
-    #     >>> column.transform(lambda cell: cell.str.substring(start=1, length=2))
-    #     +------+
-    #     | a    |
-    #     | ---  |
-    #     | str  |
-    #     +======+
-    #     | bc   |
-    #     | ef   |
-    #     | hi   |
-    #     | null |
-    #     +------+
-    #     """
-    #
     # # TODO: add format parameter + document
     # @abstractmethod
     # def to_date(self, *, format: str | None = "iso") -> Cell[datetime.date | None]:
