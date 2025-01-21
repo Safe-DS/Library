@@ -669,7 +669,7 @@ class MathOperations(ABC):
     @abstractmethod
     def sign(self) -> Cell:
         """
-        Get the sign (-1 for negative numbers, 0 for zero, and 1 for positive numbers).
+        Get the sign (-1 if negative, 0 for zero, and 1 if positive).
 
         Note that IEEE 754 defines a negative zero (-0) and a positive zero (+0). This method return a negative zero
         for -0 and a positive zero for +0.
