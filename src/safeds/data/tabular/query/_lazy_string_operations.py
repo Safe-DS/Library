@@ -171,7 +171,7 @@ class _LazyStringOperations(StringOperations):
 
     def to_time(self, *, format: str | None = "iso") -> Cell[datetime.time | None]:
         if format == "iso":
-            format = "%T"  # noqa: A001
+            format = "%T%.f"  # noqa: A001
         elif format is not None:
             format = _convert_and_check_datetime_format(format, type_="time", used_for_parsing=True)  # noqa: A001
 

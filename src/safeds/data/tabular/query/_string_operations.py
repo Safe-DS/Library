@@ -4,6 +4,8 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    import datetime
+
     from safeds._typing import _ConvertibleToIntCell, _ConvertibleToStringCell
     from safeds.data.tabular.containers import Cell
     from safeds.exceptions import OutOfBoundsError  # noqa: F401
@@ -658,6 +660,84 @@ class StringOperations(ABC):
         """
 
     @abstractmethod
+    def to_time(self, *, format: str | None = "iso") -> Cell[datetime.time | None]:
+        r"""
+        Convert a string to a time.
+
+        The `format` parameter controls the presentation. It can be `"iso"` to target ISO 8601 or a custom string. The
+        custom string can contain fixed specifiers (see below), which are replaced with the corresponding values. The
+        specifiers are case-sensitive and always enclosed in curly braces. Other text is included in the output
+        verbatim. To include a literal opening curly brace, use `\{`, and to include a literal backslash, use `\\`.
+
+        The following specifiers are available:
+
+        - `{h}`, `{_h}`, `{^h}`: Hour (zero-padded to two digits, space-padded to two digits, no padding).
+        - `{h12}`, `{_h12}`, `{^h12}`: Hour in 12-hour format (zero-padded to two digits, space-padded to two digits, no
+          padding).
+        - `{m}`, `{_m}`, `{^m}`: Minute (zero-padded to two digits, space-padded to two digits, no padding).
+        - `{s}`, `{_s}`, `{^s}`: Second (zero-padded to two digits, space-padded to two digits, no padding).
+        - `{.f}`: Fractional seconds with a leading decimal point.
+        - `{ms}`: Millisecond (zero-padded to three digits).
+        - `{us}`: Microsecond (zero-padded to six digits).
+        - `{ns}`: Nanosecond (zero-padded to nine digits).
+        - `{AM/PM}`: AM or PM (uppercase).
+        - `{am/pm}`: am or pm (lowercase).
+
+        The specifiers follow certain conventions:
+
+        - If a component may be formatted in multiple ways, we use shorter specifiers for ISO 8601. Specifiers for
+          other formats have a prefix (same value with different padding, see below) or suffix (other differences).
+        - By default, value are zero-padded, where applicable.
+        - A leading underscore (`_`) means the value is space-padded.
+        - A leading caret (`^`) means the value has no padding (think of the caret in regular expressions).
+
+        Parameters
+        ----------
+        format:
+            The format to use.
+
+        Returns
+        -------
+        cell:
+            The string representation.
+
+        Raises
+        ------
+        ValueError
+            If the format is invalid.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["12:34", "12:34:56", "12:34:56.789", "abc", None])
+        >>> column.transform(lambda cell: cell.str.to_time())
+        +--------------+
+        | a            |
+        | ---          |
+        | time         |
+        +==============+
+        | null         |
+        | 12:34:56     |
+        | 12:34:56.789 |
+        | null         |
+        | null         |
+        +--------------+
+
+        >>> column.transform(lambda cell: cell.str.to_time(format="{h}:{m}"))
+        +----------+
+        | a        |
+        | ---      |
+        | time     |
+        +==========+
+        | 12:34:00 |
+        | null     |
+        | null     |
+        | null     |
+        | null     |
+        +----------+
+        """
+
+    @abstractmethod
     def to_uppercase(self) -> Cell[str | None]:
         """
         Convert the string to uppercase.
@@ -837,6 +917,4 @@ class StringOperations(ABC):
     #     | null                    |
     #     +-------------------------+
     #     """
-    #
-    # # TODO: add to_time
     #
