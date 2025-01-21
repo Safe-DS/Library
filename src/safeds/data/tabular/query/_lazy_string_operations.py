@@ -75,6 +75,11 @@ class _LazyStringOperations(StringOperations):
     def starts_with(self, prefix: _ConvertibleToStringCell) -> Cell[bool | None]:
         return _LazyCell(self._expression.str.starts_with(prefix))
 
+    def to_float(self) -> Cell[float | None]:
+        import polars as pl
+
+        return _LazyCell(self._expression.cast(pl.Float64(), strict=False))
+
     def to_lowercase(self) -> Cell[str | None]:
         return _LazyCell(self._expression.str.to_lowercase())
 

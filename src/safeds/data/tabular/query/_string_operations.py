@@ -280,6 +280,33 @@ class StringOperations(ABC):
         """
 
     @abstractmethod
+    def to_float(self) -> Cell[float | None]:
+        """
+        Convert the string to a float.
+
+        Returns
+        -------
+        cell:
+            The float value. If the string cannot be converted to a float, None is returned.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["1", "1.5", "abc", None])
+        >>> column.transform(lambda cell: cell.str.to_float())
+        +------+
+        |    a |
+        |  --- |
+        |  f64 |
+        +======+
+        |    1 |
+        |  1.5 |
+        | null |
+        | null |
+        +------+
+        """
+
+    @abstractmethod
     def to_lowercase(self) -> Cell[str | None]:
         """
         Convert the string to lowercase.
