@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from safeds._typing import _ConvertibleToStringCell
+    from safeds._typing import _ConvertibleToIntCell, _ConvertibleToStringCell
     from safeds.data.tabular.containers import Cell
     from safeds.exceptions import OutOfBoundsError  # noqa: F401
 
@@ -307,6 +307,51 @@ class StringOperations(ABC):
         """
 
     @abstractmethod
+    def to_int(self, *, base: _ConvertibleToIntCell = 10) -> Cell[int | None]:
+        """
+        Convert the string to an integer.
+
+        Parameters
+        ----------
+        base:
+            The base of the integer.
+
+        Returns
+        -------
+        cell:
+            The integer value. If the string cannot be converted to an integer, None is returned.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column1 = Column("a", ["1", "10", "abc", None])
+        >>> column1.transform(lambda cell: cell.str.to_int())
+        +------+
+        |    a |
+        |  --- |
+        |  i64 |
+        +======+
+        |    1 |
+        |   10 |
+        | null |
+        | null |
+        +------+
+
+        >>> column2 = Column("a", ["1", "10", "abc", None])
+        >>> column2.transform(lambda cell: cell.str.to_int(base=2))
+        +------+
+        |    a |
+        |  --- |
+        |  i64 |
+        +======+
+        |    1 |
+        |    2 |
+        | null |
+        | null |
+        +------+
+        """
+
+    @abstractmethod
     def to_lowercase(self) -> Cell[str | None]:
         """
         Convert the string to lowercase.
@@ -560,52 +605,6 @@ class StringOperations(ABC):
     #
     # # TODO: add to_time
     #
-    # @abstractmethod
-    # def to_int(self, *, base: _ConvertibleToIntCell = 10) -> Cell[int | None]:
-    #     """
-    #     Convert the string value in the cell to an integer.
-    #
-    #     Parameters
-    #     ----------
-    #     base:
-    #         The base of the integer.
-    #
-    #     Returns
-    #     -------
-    #     int:
-    #         The integer value. If the string cannot be converted to an integer, None is returned.
-    #
-    #     Examples
-    #     --------
-    #     >>> from safeds.data.tabular.containers import Column
-    #     >>> column1 = Column("a", ["1", "2", "3", "abc", None])
-    #     >>> column1.transform(lambda cell: cell.str.to_int())
-    #     +------+
-    #     |    a |
-    #     |  --- |
-    #     |  i64 |
-    #     +======+
-    #     |    1 |
-    #     |    2 |
-    #     |    3 |
-    #     | null |
-    #     | null |
-    #     +------+
-    #
-    #     >>> column2 = Column("a", ["1", "10", "11", "abc", None])
-    #     >>> column2.transform(lambda cell: cell.str.to_int(base=2))
-    #     +------+
-    #     |    a |
-    #     |  --- |
-    #     |  i64 |
-    #     +======+
-    #     |    1 |
-    #     |    2 |
-    #     |    3 |
-    #     | null |
-    #     | null |
-    #     +------+
-    #     """
 
     # @abstractmethod
     # def trim(self) -> Cell[str | None]:

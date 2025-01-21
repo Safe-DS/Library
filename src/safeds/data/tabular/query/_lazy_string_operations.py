@@ -11,7 +11,7 @@ from ._string_operations import StringOperations
 if TYPE_CHECKING:
     import polars as pl
 
-    from safeds._typing import _ConvertibleToStringCell
+    from safeds._typing import _ConvertibleToIntCell, _ConvertibleToStringCell
     from safeds.data.tabular.containers._cell import Cell
 
 
@@ -80,6 +80,9 @@ class _LazyStringOperations(StringOperations):
 
         return _LazyCell(self._expression.cast(pl.Float64(), strict=False))
 
+    def to_int(self, *, base: _ConvertibleToIntCell = 10) -> Cell[int | None]:
+        return _LazyCell(self._expression.str.to_integer(base=base, strict=False))
+
     def to_lowercase(self) -> Cell[str | None]:
         return _LazyCell(self._expression.str.to_lowercase())
 
@@ -127,9 +130,7 @@ class _LazyStringOperations(StringOperations):
     #
     #     return _LazyCell(self._expression.str.to_datetime(format=format, strict=False))
     #
-    # def to_int(self, *, base: _ConvertibleToIntCell = 10) -> Cell[int | None]:
-    #     return _LazyCell(self._expression.str.to_integer(base=base, strict=False))
-    #
+
     # def to_time(self, *, format: str | None = "iso") -> Cell[datetime.time | None]:
     #     if format == "iso":
     #         format = "%T"
