@@ -65,7 +65,7 @@ class StringOperations(ABC):
 
         Returns
         -------
-        ends_with:
+        cell:
             Whether the string ends with the suffix.
 
         Examples
@@ -82,6 +82,39 @@ class StringOperations(ABC):
         | false |
         | null  |
         +-------+
+        """
+
+    @abstractmethod
+    def length(self, *, optimize_for_ascii: bool = False) -> Cell[int | None]:
+        """
+        Get the number of characters.
+
+        Parameters
+        ----------
+        optimize_for_ascii:
+            Greatly speed up this operation if the string is ASCII-only. If the string contains non-ASCII characters,
+            this option will return incorrect results, though.
+
+        Returns
+        -------
+        cell:
+            The number of characters.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["", "a", "abc", None])
+        >>> column.transform(lambda cell: cell.str.length())
+        +------+
+        |    a |
+        |  --- |
+        |  u32 |
+        +======+
+        |    0 |
+        |    1 |
+        |    3 |
+        | null |
+        +------+
         """
 
     @abstractmethod
@@ -122,7 +155,7 @@ class StringOperations(ABC):
 
         Returns
         -------
-        starts_with:
+        cell:
             Whether the string starts with the prefix.
 
         Examples
@@ -257,39 +290,7 @@ class StringOperations(ABC):
     #     +------+
     #     """
     #
-    # @abstractmethod
-    # def length(self, *, optimize_for_ascii: bool = False) -> Cell[int | None]:
-    #     """
-    #     Get the number of characters of the string value in the cell.
-    #
-    #     Parameters
-    #     ----------
-    #     optimize_for_ascii:
-    #         Greatly speed up this operation if the string is ASCII-only. If the string contains non-ASCII characters,
-    #         this option will return incorrect results, though.
-    #
-    #     Returns
-    #     -------
-    #     length:
-    #         The length of the string value.
-    #
-    #     Examples
-    #     --------
-    #     >>> from safeds.data.tabular.containers import Column
-    #     >>> column = Column("a", ["", "a", "abc", None])
-    #     >>> column.transform(lambda cell: cell.str.length())
-    #     +------+
-    #     |    a |
-    #     |  --- |
-    #     |  u32 |
-    #     +======+
-    #     |    0 |
-    #     |    1 |
-    #     |    3 |
-    #     | null |
-    #     +------+
-    #     """
-    #
+
     # @abstractmethod
     # def replace(self, old: _ConvertibleToStringCell, new: _ConvertibleToStringCell) -> Cell[str | None]:
     #     """

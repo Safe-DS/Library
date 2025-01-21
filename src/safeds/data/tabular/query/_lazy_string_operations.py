@@ -48,6 +48,12 @@ class _LazyStringOperations(StringOperations):
     def ends_with(self, suffix: _ConvertibleToStringCell) -> Cell[bool | None]:
         return _LazyCell(self._expression.str.ends_with(suffix))
 
+    def length(self, optimize_for_ascii: bool = False) -> Cell[int | None]:
+        if optimize_for_ascii:
+            return _LazyCell(self._expression.str.len_bytes())
+        else:
+            return _LazyCell(self._expression.str.len_chars())
+
     def reverse(self) -> Cell[str | None]:
         return _LazyCell(self._expression.str.reverse())
 
@@ -63,11 +69,6 @@ class _LazyStringOperations(StringOperations):
     # def contains(self, substring: _ConvertibleToStringCell) -> Cell[bool | None]:
     #     return _LazyCell(self._expression.str.contains(substring, literal=True))
     #
-    # def length(self, optimize_for_ascii: bool = False) -> Cell[int | None]:
-    #     if optimize_for_ascii:
-    #         return _LazyCell(self._expression.str.len_bytes())
-    #     else:
-    #         return _LazyCell(self._expression.str.len_chars())
 
     #
     # def index_of(self, substring: _ConvertibleToStringCell) -> Cell[int | None]:
