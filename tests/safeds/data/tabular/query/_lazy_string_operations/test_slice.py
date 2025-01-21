@@ -48,6 +48,6 @@ def test_should_slice_characters(
 
 
 def test_should_raise_for_negative_length() -> None:
-    column = Column("a", [])
+    column = Column("a", [1])
     with pytest.raises(OutOfBoundsError):
         column.transform(lambda cell: cell.str.slice(length=-1))

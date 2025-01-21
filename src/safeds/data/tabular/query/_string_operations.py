@@ -223,6 +223,68 @@ class StringOperations(ABC):
         """
 
     @abstractmethod
+    def remove_prefix(self, prefix: _ConvertibleToStringCell) -> Cell[str | None]:
+        """
+        Remove a prefix from the string. Strings without the prefix are not changed.
+
+        Parameters
+        ----------
+        prefix:
+            The prefix to remove.
+
+        Returns
+        -------
+        cell:
+            The string without the prefix.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["ab", "bc", None])
+        >>> column.transform(lambda cell: cell.str.remove_prefix("a"))
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        | b    |
+        | bc   |
+        | null |
+        +------+
+        """
+
+    @abstractmethod
+    def remove_suffix(self, suffix: _ConvertibleToStringCell) -> Cell[str | None]:
+        """
+        Remove a suffix from the string. Strings without the suffix are not changed.
+
+        Parameters
+        ----------
+        suffix:
+            The suffix to remove.
+
+        Returns
+        -------
+        cell:
+            The string without the suffix.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["ab", "bc", None])
+        >>> column.transform(lambda cell: cell.str.remove_suffix("b"))
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        | a    |
+        | bc   |
+        | null |
+        +------+
+        """
+
+    @abstractmethod
     def repeat(self, count: _ConvertibleToIntCell) -> Cell[str | None]:
         """
         Repeat the string a number of times.

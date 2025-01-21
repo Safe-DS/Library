@@ -35,7 +35,7 @@ def test_should_pad_start(value: str | None, length: int, character: str, expect
 
 
 def test_should_raise_if_length_is_out_of_bounds() -> None:
-    column = Column("col1", [])
+    column = Column("col1", [1])
     with pytest.raises(OutOfBoundsError):
         column.transform(lambda cell: cell.str.pad_start(-1))
 
@@ -52,6 +52,6 @@ def test_should_raise_if_length_is_out_of_bounds() -> None:
     ],
 )
 def test_should_raise_if_char_is_not_single_character(character: str) -> None:
-    column = Column("col1", [])
+    column = Column("col1", [1])
     with pytest.raises(ValueError, match=r"Can only pad with a single character\."):
         column.transform(lambda cell: cell.str.pad_start(1, character=character))

@@ -34,6 +34,6 @@ def test_should_repeat_string(value: str | None, count: int | None, expected: st
 
 
 def test_should_raise_if_count_is_out_of_bounds() -> None:
-    column = Column("a", [])
+    column = Column("a", [1])
     with pytest.raises(OutOfBoundsError):
         column.transform(lambda cell: cell.str.repeat(-1))
