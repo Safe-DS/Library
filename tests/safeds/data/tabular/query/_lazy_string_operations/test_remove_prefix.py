@@ -1,5 +1,6 @@
 import pytest
 
+from safeds.data.tabular.containers import Cell
 from safeds.data.tabular.typing import ColumnType
 from tests.helpers import assert_cell_operation_works
 
@@ -25,10 +26,21 @@ from tests.helpers import assert_cell_operation_works
         "None as both",
     ],
 )
-def test_should_remove_prefix(value: str | None, prefix: str | None, expected: bool | None) -> None:
-    assert_cell_operation_works(
-        value,
-        lambda cell: cell.str.remove_prefix(prefix),
-        expected,
-        type_if_none=ColumnType.string(),
-    )
+class TestShouldRemovePrefix:
+    def test_plain_arguments(self, value: str | None, prefix: str | None, expected: bool | None) -> None:
+        assert_cell_operation_works(
+            value,
+            lambda cell: cell.str.remove_prefix(prefix),
+            expected,
+            type_if_none=ColumnType.string(),
+        )
+
+    def test_arguments_wrapped_in_cell(self, value: str | None, prefix: str | None, expected: bool | None) -> None:
+        assert_cell_operation_works(
+            value,
+            lambda cell: cell.str.remove_prefix(
+                Cell.constant(prefix, type=ColumnType.string()),
+            ),
+            expected,
+            type_if_none=ColumnType.string(),
+        )

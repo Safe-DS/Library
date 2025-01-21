@@ -2,6 +2,7 @@ from datetime import UTC, date, datetime
 
 import pytest
 
+from safeds.data.tabular.containers import Cell
 from safeds.data.tabular.typing import ColumnType
 from tests.helpers import assert_cell_operation_works
 
@@ -100,28 +101,57 @@ DATE = date(1, 2, 3)
         "None",
     ],
 )
-def test_should_replace_components(
-    value: datetime | date | None,
-    year: int | None,
-    month: int | None,
-    day: int | None,
-    hour: int | None,
-    minute: int | None,
-    second: int | None,
-    microsecond: int | None,
-    expected: int | None,
-) -> None:
-    assert_cell_operation_works(
-        value,
-        lambda cell: cell.dt.replace(
-            year=year,
-            month=month,
-            day=day,
-            hour=hour,
-            minute=minute,
-            second=second,
-            microsecond=microsecond,
-        ),
-        expected,
-        type_if_none=ColumnType.datetime(),
-    )
+class TestShouldReplaceComponents:
+    def test_plain_arguments(
+        self,
+        value: datetime | date | None,
+        year: int | None,
+        month: int | None,
+        day: int | None,
+        hour: int | None,
+        minute: int | None,
+        second: int | None,
+        microsecond: int | None,
+        expected: int | None,
+    ) -> None:
+        assert_cell_operation_works(
+            value,
+            lambda cell: cell.dt.replace(
+                year=year,
+                month=month,
+                day=day,
+                hour=hour,
+                minute=minute,
+                second=second,
+                microsecond=microsecond,
+            ),
+            expected,
+            type_if_none=ColumnType.datetime(),
+        )
+
+    def test_arguments_wrapped_in_cell(
+        self,
+        value: datetime | date | None,
+        year: int | None,
+        month: int | None,
+        day: int | None,
+        hour: int | None,
+        minute: int | None,
+        second: int | None,
+        microsecond: int | None,
+        expected: int | None,
+    ) -> None:
+        assert_cell_operation_works(
+            value,
+            lambda cell: cell.dt.replace(
+                year=Cell.constant(year),
+                month=Cell.constant(month),
+                day=Cell.constant(day),
+                hour=Cell.constant(hour),
+                minute=Cell.constant(minute),
+                second=Cell.constant(second),
+                microsecond=Cell.constant(microsecond),
+            ),
+            expected,
+            type_if_none=ColumnType.datetime(),
+        )

@@ -1,5 +1,6 @@
 import pytest
 
+from safeds.data.tabular.containers import Cell
 from safeds.data.tabular.typing import ColumnType
 from tests.helpers import assert_cell_operation_works
 
@@ -25,10 +26,21 @@ from tests.helpers import assert_cell_operation_works
         "None for both",
     ],
 )
-def test_should_convert_string_to_integer(value: str | None, base: int | None, expected: float | None) -> None:
-    assert_cell_operation_works(
-        value,
-        lambda cell: cell.str.to_int(base=base),
-        expected,
-        type_if_none=ColumnType.string(),
-    )
+class TestShouldConvertStringToInteger:
+    def test_plain_arguments(self, value: str | None, base: int | None, expected: float | None) -> None:
+        assert_cell_operation_works(
+            value,
+            lambda cell: cell.str.to_int(base=base),
+            expected,
+            type_if_none=ColumnType.string(),
+        )
+
+    def test_arguments_wrapped_in_cell(self, value: str | None, base: int | None, expected: float | None) -> None:
+        assert_cell_operation_works(
+            value,
+            lambda cell: cell.str.to_int(
+                base=Cell.constant(base),
+            ),
+            expected,
+            type_if_none=ColumnType.string(),
+        )

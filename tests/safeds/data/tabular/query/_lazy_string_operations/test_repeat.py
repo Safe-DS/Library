@@ -1,6 +1,6 @@
 import pytest
 
-from safeds.data.tabular.containers import Column
+from safeds.data.tabular.containers import Cell, Column
 from safeds.data.tabular.typing import ColumnType
 from safeds.exceptions import OutOfBoundsError
 from tests.helpers import assert_cell_operation_works
@@ -29,8 +29,24 @@ from tests.helpers import assert_cell_operation_works
         "None for both",
     ],
 )
-def test_should_repeat_string(value: str | None, count: int | None, expected: str | None) -> None:
-    assert_cell_operation_works(value, lambda cell: cell.str.repeat(count), expected, type_if_none=ColumnType.string())
+class TestShouldRepeatString:
+    def test_plain_arguments(self, value: str | None, count: int | None, expected: str | None) -> None:
+        assert_cell_operation_works(
+            value,
+            lambda cell: cell.str.repeat(count),
+            expected,
+            type_if_none=ColumnType.string(),
+        )
+
+    def test_arguments_wrapped_in_cell(self, value: str | None, count: int | None, expected: str | None) -> None:
+        assert_cell_operation_works(
+            value,
+            lambda cell: cell.str.repeat(
+                Cell.constant(count),
+            ),
+            expected,
+            type_if_none=ColumnType.string(),
+        )
 
 
 def test_should_raise_if_count_is_out_of_bounds() -> None:

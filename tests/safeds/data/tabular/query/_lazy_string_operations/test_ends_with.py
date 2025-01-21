@@ -1,5 +1,6 @@
 import pytest
 
+from safeds.data.tabular.containers import Cell
 from safeds.data.tabular.typing import ColumnType
 from tests.helpers import assert_cell_operation_works
 
@@ -29,10 +30,21 @@ from tests.helpers import assert_cell_operation_works
         "None for both",
     ],
 )
-def test_should_check_if_string_ends_with_suffix(value: str | None, suffix: str | None, expected: bool | None) -> None:
-    assert_cell_operation_works(
-        value,
-        lambda cell: cell.str.ends_with(suffix),
-        expected,
-        type_if_none=ColumnType.string(),
-    )
+class TestShouldCheckIfStringEndsWithSuffix:
+    def test_plain_arguments(self, value: str | None, suffix: str | None, expected: bool | None) -> None:
+        assert_cell_operation_works(
+            value,
+            lambda cell: cell.str.ends_with(suffix),
+            expected,
+            type_if_none=ColumnType.string(),
+        )
+
+    def test_arguments_wrapped_in_cell(self, value: str | None, suffix: str | None, expected: bool | None) -> None:
+        assert_cell_operation_works(
+            value,
+            lambda cell: cell.str.ends_with(
+                Cell.constant(suffix),
+            ),
+            expected,
+            type_if_none=ColumnType.string(),
+        )

@@ -1,6 +1,6 @@
 import pytest
 
-from safeds.data.tabular.containers import Column
+from safeds.data.tabular.containers import Cell, Column
 from safeds.data.tabular.typing import ColumnType
 from safeds.exceptions import OutOfBoundsError
 from tests.helpers import assert_cell_operation_works
@@ -33,18 +33,37 @@ from tests.helpers import assert_cell_operation_works
         "None for all",
     ],
 )
-def test_should_slice_characters(
-    value: str | None,
-    start: int | None,
-    length: int | None,
-    expected: bool | None,
-) -> None:
-    assert_cell_operation_works(
-        value,
-        lambda cell: cell.str.slice(start=start, length=length),
-        expected,
-        type_if_none=ColumnType.string(),
-    )
+class TestShouldSliceCharacters:
+    def test_plain_arguments(
+        self,
+        value: str | None,
+        start: int | None,
+        length: int | None,
+        expected: bool | None,
+    ) -> None:
+        assert_cell_operation_works(
+            value,
+            lambda cell: cell.str.slice(start=start, length=length),
+            expected,
+            type_if_none=ColumnType.string(),
+        )
+
+    def test_arguments_wrapped_in_cell(
+        self,
+        value: str | None,
+        start: int | None,
+        length: int | None,
+        expected: bool | None,
+    ) -> None:
+        assert_cell_operation_works(
+            value,
+            lambda cell: cell.str.slice(
+                start=Cell.constant(start),
+                length=Cell.constant(length),
+            ),
+            expected,
+            type_if_none=ColumnType.string(),
+        )
 
 
 def test_should_raise_for_negative_length() -> None:
