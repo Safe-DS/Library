@@ -285,6 +285,62 @@ class StringOperations(ABC):
         """
 
     @abstractmethod
+    def slice(
+        self,
+        *,
+        start: _ConvertibleToIntCell = 0,
+        length: _ConvertibleToIntCell = None,
+    ) -> Cell[str | None]:
+        """
+        Get a slice of the string.
+
+        Parameters
+        ----------
+        start:
+            The start index of the slice. Nonnegative indices are counted from the beginning (starting at 0), negative
+            indices from the end (starting at -1).
+        length:
+            The length of the slice. If None, the slice contains all characters starting from `start`. Must greater than
+            or equal to 0.
+
+        Returns
+        -------
+        cell:
+            The sliced string.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If `length` is less than 0.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["abc", "de", None])
+        >>> column.transform(lambda cell: cell.str.slice(start=1))
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        | bc   |
+        | e    |
+        | null |
+        +------+
+
+        >>> column.transform(lambda cell: cell.str.slice(start=1, length=1))
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        | b    |
+        | e    |
+        | null |
+        +------+
+        """
+
+    @abstractmethod
     def starts_with(self, prefix: _ConvertibleToStringCell) -> Cell[bool | None]:
         """
         Check if the string starts with the prefix.

@@ -77,6 +77,17 @@ class _LazyStringOperations(StringOperations):
     def reverse(self) -> Cell[str | None]:
         return _LazyCell(self._expression.str.reverse())
 
+    def slice(
+        self,
+        *,
+        start: _ConvertibleToIntCell = 0,
+        length: _ConvertibleToIntCell = None,
+    ) -> Cell[str | None]:
+        if isinstance(length, int):
+            _check_bounds("length", length, lower_bound=_ClosedBound(0))
+
+        return _LazyCell(self._expression.str.slice(start, length))
+
     def starts_with(self, prefix: _ConvertibleToStringCell) -> Cell[bool | None]:
         return _LazyCell(self._expression.str.starts_with(prefix))
 
