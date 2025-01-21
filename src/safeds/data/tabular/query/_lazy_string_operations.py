@@ -47,6 +47,9 @@ class _LazyStringOperations(StringOperations):
     def reverse(self) -> Cell[str | None]:
         return _LazyCell(self._expression.str.reverse())
 
+    def to_lowercase(self) -> Cell[str | None]:
+        return _LazyCell(self._expression.str.to_lowercase())
+
     def to_uppercase(self) -> Cell[str | None]:
         return _LazyCell(self._expression.str.to_uppercase())
 
@@ -100,9 +103,6 @@ class _LazyStringOperations(StringOperations):
     #
     # def to_int(self, *, base: _ConvertibleToIntCell = 10) -> Cell[int | None]:
     #     return _LazyCell(self._expression.str.to_integer(base=base, strict=False))
-    #
-    # def to_lowercase(self) -> Cell[str | None]:
-    #     return _LazyCell(self._expression.str.to_lowercase())
     #
     # def to_time(self, *, format: str | None = "iso") -> Cell[datetime.time | None]:
     #     if format == "iso":

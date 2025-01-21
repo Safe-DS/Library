@@ -85,6 +85,32 @@ class StringOperations(ABC):
         """
 
     @abstractmethod
+    def to_lowercase(self) -> Cell[str | None]:
+        """
+        Convert the string to lowercase.
+
+        Returns
+        -------
+        cell:
+            The lowercase string.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["AB", "BC", None])
+        >>> column.transform(lambda cell: cell.str.to_lowercase())
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        | ab   |
+        | bc   |
+        | null |
+        +------+
+        """
+
+    @abstractmethod
     def to_uppercase(self) -> Cell[str | None]:
         """
         Convert the string to uppercase.
@@ -451,33 +477,6 @@ class StringOperations(ABC):
     #     |    2 |
     #     |    3 |
     #     | null |
-    #     | null |
-    #     +------+
-    #     """
-    #
-    # @abstractmethod
-    # def to_lowercase(self) -> Cell[str | None]:
-    #     """
-    #     Convert the string value in the cell to lowercase.
-    #
-    #     Returns
-    #     -------
-    #     lowercase:
-    #         The string value in lowercase.
-    #
-    #     Examples
-    #     --------
-    #     >>> from safeds.data.tabular.containers import Column
-    #     >>> column = Column("a", ["AB", "BC", "CD", None])
-    #     >>> column.transform(lambda cell: cell.str.to_lowercase())
-    #     +------+
-    #     | a    |
-    #     | ---  |
-    #     | str  |
-    #     +======+
-    #     | ab   |
-    #     | bc   |
-    #     | cd   |
     #     | null |
     #     +------+
     #     """
