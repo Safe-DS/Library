@@ -10,6 +10,7 @@ from ._string_operations import StringOperations
 if TYPE_CHECKING:
     import polars as pl
 
+    from safeds._typing import _ConvertibleToStringCell
     from safeds.data.tabular.containers._cell import Cell
 
 
@@ -44,6 +45,9 @@ class _LazyStringOperations(StringOperations):
     # String operations
     # ------------------------------------------------------------------------------------------------------------------
 
+    def ends_with(self, suffix: _ConvertibleToStringCell) -> Cell[bool | None]:
+        return _LazyCell(self._expression.str.ends_with(suffix))
+
     def reverse(self) -> Cell[str | None]:
         return _LazyCell(self._expression.str.reverse())
 
@@ -61,9 +65,7 @@ class _LazyStringOperations(StringOperations):
     #         return _LazyCell(self._expression.str.len_bytes())
     #     else:
     #         return _LazyCell(self._expression.str.len_chars())
-    #
-    # def ends_with(self, suffix: _ConvertibleToStringCell) -> Cell[bool | None]:
-    #     return _LazyCell(self._expression.str.ends_with(suffix))
+
     #
     # def index_of(self, substring: _ConvertibleToStringCell) -> Cell[int | None]:
     #     return _LazyCell(self._expression.str.find(substring, literal=True))

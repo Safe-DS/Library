@@ -4,13 +4,8 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from safeds._typing import _ConvertibleToStringCell
     from safeds.data.tabular.containers import Cell
-
-# TODO: examples with None
-# TODO: add more methods
-#  - reverse
-#  - to_time
-#  - ...
 
 
 class StringOperations(ABC):
@@ -57,6 +52,38 @@ class StringOperations(ABC):
     # ------------------------------------------------------------------------------------------------------------------
     # String operations
     # ------------------------------------------------------------------------------------------------------------------
+
+    @abstractmethod
+    def ends_with(self, suffix: _ConvertibleToStringCell) -> Cell[bool | None]:
+        """
+        Check if the string ends with the suffix.
+
+        Parameters
+        ----------
+        suffix:
+            The expected suffix.
+
+        Returns
+        -------
+        ends_with:
+            Whether the string ends with the suffix.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["ab", "bc", None])
+        >>> column.transform(lambda cell: cell.str.ends_with("b"))
+        +-------+
+        | a     |
+        | ---   |
+        | bool  |
+        +=======+
+        | true  |
+        | false |
+        | null  |
+        +-------+
+        """
+
 
     @abstractmethod
     def reverse(self) -> Cell[str | None]:
@@ -167,39 +194,7 @@ class StringOperations(ABC):
     #     | null  |
     #     +-------+
     #     """
-    #
-    # @abstractmethod
-    # def ends_with(self, suffix: _ConvertibleToStringCell) -> Cell[bool | None]:
-    #     """
-    #     Check if the string value in the cell ends with the suffix.
-    #
-    #     Parameters
-    #     ----------
-    #     suffix:
-    #         The suffix to search for.
-    #
-    #     Returns
-    #     -------
-    #     ends_with:
-    #         Whether the string value ends with the suffix.
-    #
-    #     Examples
-    #     --------
-    #     >>> from safeds.data.tabular.containers import Column
-    #     >>> column = Column("a", ["ab", "bc", "cd", None])
-    #     >>> column.transform(lambda cell: cell.str.ends_with("c"))
-    #     +-------+
-    #     | a     |
-    #     | ---   |
-    #     | bool  |
-    #     +=======+
-    #     | false |
-    #     | true  |
-    #     | false |
-    #     | null  |
-    #     +-------+
-    #     """
-    #
+
     # @abstractmethod
     # def index_of(self, substring: _ConvertibleToStringCell) -> Cell[int | None]:
     #     """

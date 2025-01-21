@@ -5,7 +5,7 @@ from tests.helpers import assert_cell_operation_works
 
 
 @pytest.mark.parametrize(
-    ("string", "expected"),
+    ("value", "expected"),
     [
         ("", ""),
         ("abc", "abc"),
@@ -21,9 +21,9 @@ from tests.helpers import assert_cell_operation_works
         "None",
     ],
 )
-def test_should_convert_string_to_lowercase(string: str | None, expected: str | None) -> None:
+def test_should_convert_string_to_lowercase(value: str | None, expected: str | None) -> None:
     assert_cell_operation_works(
-        string,
+        value,
         lambda cell: cell.str.to_lowercase(),
         expected,
         type_if_none=ColumnType.string(),
