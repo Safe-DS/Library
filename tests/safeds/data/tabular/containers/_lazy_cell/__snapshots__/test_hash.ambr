@@ -1,13 +1,13 @@
 # serializer version: 1
 # name: TestContract.test_should_return_same_hash_in_different_processes[column]
-  8162512882156938440
+  1166043995912835534
 # ---
 # name: TestContract.test_should_return_same_hash_in_different_processes[constant]
-  4610312201483200147
+  161664381415222824
 # ---
 # name: TestContract.test_should_return_same_hash_in_different_processes[date, column]
-  740357503917492401
+  1658093798669947354
 # ---
 # name: TestContract.test_should_return_same_hash_in_different_processes[date, int]
-  495023986348121879
+  2015176867097674126
 # ---
