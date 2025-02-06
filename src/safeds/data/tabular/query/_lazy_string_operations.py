@@ -50,6 +50,7 @@ class _LazyStringOperations(StringOperations):
     # String operations
     # ------------------------------------------------------------------------------------------------------------------
 
+    # TODO: convert cell to expr
     def contains(self, substring: _ConvertibleToStringCell) -> Cell[bool | None]:
         return _LazyCell(self._expression.str.contains(substring, literal=True))
 
@@ -58,6 +59,7 @@ class _LazyStringOperations(StringOperations):
 
         return _LazyCell(self._expression.str.ends_with(suffix))
 
+    # TODO: convert cell to expr
     def index_of(self, substring: _ConvertibleToStringCell) -> Cell[int | None]:
         return _LazyCell(self._expression.str.find(substring, literal=True))
 
@@ -100,6 +102,7 @@ class _LazyStringOperations(StringOperations):
         return _LazyCell(self._expression.str.strip_suffix(suffix))
 
     # TODO: regex? how many to replace? by default, one or all?
+    # TODO: convert cell to expr
     def replace(self, old: _ConvertibleToStringCell, new: _ConvertibleToStringCell) -> Cell[str | None]:
         return _LazyCell(self._expression.str.replace_all(old, new, literal=True))
 
