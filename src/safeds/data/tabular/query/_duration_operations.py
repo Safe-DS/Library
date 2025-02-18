@@ -7,14 +7,27 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import Cell
 
 
-# TODO: Examples with None
-
-
 class DurationOperations(ABC):
     """
     Namespace for operations on durations.
 
     This class cannot be instantiated directly. It can only be accessed using the `dur` attribute of a cell.
+
+    Examples
+    --------
+    >>> from datetime import timedelta
+    >>> from safeds.data.tabular.containers import Column
+    >>> column = Column("a", [timedelta(days=-1), timedelta(days=0), timedelta(days=1)])
+    >>> column.transform(lambda cell: cell.dur.abs())
+    +--------------+
+    | a            |
+    | ---          |
+    | duration[μs] |
+    +==============+
+    | 1d           |
+    | 0µs          |
+    | 1d           |
+    +--------------+
     """
 
     # ------------------------------------------------------------------------------------------------------------------
