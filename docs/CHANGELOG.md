@@ -1,3 +1,18 @@
+## [0.30.0](https://github.com/Safe-DS/Library/compare/v0.29.0...v0.30.0) (2025-02-26)
+
+### Features
+
+* add more mathematical operations ([#986](https://github.com/Safe-DS/Library/issues/986)) ([2539a20](https://github.com/Safe-DS/Library/commit/2539a204b7168fa846e543eeb8eb3a1efcf7b1e0)), closes [#977](https://github.com/Safe-DS/Library/issues/977)
+* add more string operations ([#993](https://github.com/Safe-DS/Library/issues/993)) ([9bc5673](https://github.com/Safe-DS/Library/commit/9bc56731da69a42ff447f4f5344350ba1999ba32)), closes [#977](https://github.com/Safe-DS/Library/issues/977)
+* consistent `selector` parameters ([#983](https://github.com/Safe-DS/Library/issues/983)) ([dc4640b](https://github.com/Safe-DS/Library/commit/dc4640b09835f98aab9520657edffeee59574fb7))
+* improved operations on cells ([#985](https://github.com/Safe-DS/Library/issues/985)) ([7396c94](https://github.com/Safe-DS/Library/commit/7396c947c1f19868108c363d26ae3db71a8c735a)), closes [#977](https://github.com/Safe-DS/Library/issues/977)
+* make `data` parameter of `Table` and `Column` required ([#978](https://github.com/Safe-DS/Library/issues/978)) ([29fdefa](https://github.com/Safe-DS/Library/commit/29fdefa3c038562f0c4d5b82f38d8d587f73b839))
+* stabilize `Cell` class ([#984](https://github.com/Safe-DS/Library/issues/984)) ([96be911](https://github.com/Safe-DS/Library/commit/96be911d094774af93b3bd35f219c48350b1c4a7)), closes [#977](https://github.com/Safe-DS/Library/issues/977)
+* stabilize `Column` ([#981](https://github.com/Safe-DS/Library/issues/981)) ([38dc89c](https://github.com/Safe-DS/Library/commit/38dc89cb494b6f6097640758ec513b5fb2d0c221)), closes [#754](https://github.com/Safe-DS/Library/issues/754) [#977](https://github.com/Safe-DS/Library/issues/977)
+* stabilize `Row` class ([#980](https://github.com/Safe-DS/Library/issues/980)) ([ca1ce3d](https://github.com/Safe-DS/Library/commit/ca1ce3d8e310ac0e5e0ecf65bfc71002979b66da)), closes [#977](https://github.com/Safe-DS/Library/issues/977)
+* stabilize `Table` class ([#979](https://github.com/Safe-DS/Library/issues/979)) ([db85617](https://github.com/Safe-DS/Library/commit/db8561746827c5a9d679e14a8edd2b8ff264e8ed)), closes [#875](https://github.com/Safe-DS/Library/issues/875) [#877](https://github.com/Safe-DS/Library/issues/877) [#977](https://github.com/Safe-DS/Library/issues/977) [#754](https://github.com/Safe-DS/Library/issues/754)
+* transform multiple columns of `Table` at once ([#982](https://github.com/Safe-DS/Library/issues/982)) ([2db9069](https://github.com/Safe-DS/Library/commit/2db906927e7a9be711d2d91f53b08c45352e7e0b))
+
 ## [0.29.0](https://github.com/Safe-DS/Library/compare/v0.28.1...v0.29.0) (2024-11-26)
 
 ### Features
