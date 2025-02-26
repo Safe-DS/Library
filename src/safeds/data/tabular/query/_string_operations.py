@@ -657,6 +657,85 @@ class StringOperations(ABC):
         """
 
     @abstractmethod
+    def to_date(self, *, format: str | None = "iso") -> Cell[datetime.date | None]:
+        r"""
+        Convert a string to a date.
+
+        The `format` parameter controls the presentation. It can be `"iso"` to target ISO 8601 or a custom string. The
+        custom string can contain fixed specifiers (see below), which are replaced with the corresponding values. The
+        specifiers are case-sensitive and always enclosed in curly braces. Other text is included in the output
+        verbatim. To include a literal opening curly brace, use `\{`, and to include a literal backslash, use `\\`.
+
+        The following specifiers are available:
+
+        - `{Y}`, `{_Y}`, `{^Y}`: Year (zero-padded to four digits, space-padded to four digits, no padding).
+        - `{Y99}`, `{_Y99}`, `{^Y99}`: Year modulo 100 (zero-padded to two digits, space-padded to two digits, no
+          padding).
+        - `{M}`, `{_M}`, `{^M}`: Month (zero-padded to two digits, space-padded to two digits, no padding).
+        - `{M-full}`: Full name of the month (e.g. "January").
+        - `{M-short}`: Abbreviated name of the month with three letters (e.g. "Jan").
+        - `{W}`, `{_W}`, `{^W}`: Week number as defined by ISO 8601 (zero-padded to two digits, space-padded to two
+          digits, no padding).
+        - `{D}`, `{_D}`, `{^D}`: Day of the month (zero-padded to two digits, space-padded to two digits, no padding).
+        - `{DOW}`: Day of the week as defined by ISO 8601 (1 = Monday, 7 = Sunday).
+        - `{DOW-full}`: Full name of the day of the week (e.g. "Monday").
+        - `{DOW-short}`: Abbreviated name of the day of the week with three letters (e.g. "Mon").
+        - `{DOY}`, `{_DOY}`, `{^DOY}`: Day of the year, ranging from 1 to 366 (zero-padded to three digits, space-padded
+          to three digits, no padding).
+
+        The specifiers follow certain conventions:
+
+        - If a component may be formatted in multiple ways, we use shorter specifiers for ISO 8601. Specifiers for
+          other formats have a prefix (same value with different padding, see below) or suffix (other differences).
+        - By default, value are zero-padded, where applicable.
+        - A leading underscore (`_`) means the value is space-padded.
+        - A leading caret (`^`) means the value has no padding (think of the caret in regular expressions).
+
+        Parameters
+        ----------
+        format:
+            The format to use.
+
+        Returns
+        -------
+        cell:
+            The parsed date.
+
+        Raises
+        ------
+        ValueError
+            If the format is invalid.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["0001-02-03", "03.02.0001", "abc", None])
+        >>> column.transform(lambda cell: cell.str.to_date())
+        +------------+
+        | a          |
+        | ---        |
+        | date       |
+        +============+
+        | 0001-02-03 |
+        | null       |
+        | null       |
+        | null       |
+        +------------+
+
+        >>> column.transform(lambda cell: cell.str.to_date(format="{D}.{M}.{Y}"))
+        +------------+
+        | a          |
+        | ---        |
+        | date       |
+        +============+
+        | null       |
+        | 0001-02-03 |
+        | null       |
+        | null       |
+        +------------+
+        """
+
+    @abstractmethod
     def to_float(self) -> Cell[float | None]:
         """
         Convert the string to a float.
@@ -794,7 +873,7 @@ class StringOperations(ABC):
         Returns
         -------
         cell:
-            The string representation.
+            The parsed time.
 
         Raises
         ------

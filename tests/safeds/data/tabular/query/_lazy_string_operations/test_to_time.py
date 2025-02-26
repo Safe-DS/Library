@@ -116,7 +116,7 @@ def test_should_handle_escape_sequences(value: str, format_: str, expected: time
 def test_should_raise_for_unclosed_specifier() -> None:
     column = Column("a", ["04:05:06"])
     with pytest.raises(ValueError, match="Unclosed specifier"):
-        column.transform(lambda cell: cell.str.to_time(format="{Y"))
+        column.transform(lambda cell: cell.str.to_time(format="{m"))
 
 
 @pytest.mark.parametrize(
