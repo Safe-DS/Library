@@ -323,6 +323,39 @@ class StringOperations(ABC):
         """
 
     @abstractmethod
+    def replace_all(self, old: _ConvertibleToStringCell, new: _ConvertibleToStringCell) -> Cell[str | None]:
+        """
+        Replace all occurrences of the old substring with the new substring.
+
+        Parameters
+        ----------
+        old:
+            The substring to replace.
+        new:
+            The substring to replace with.
+
+        Returns
+        -------
+        cell:
+            The string with all occurrences replaced.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["ab", "bc", None])
+        >>> column.transform(lambda cell: cell.str.replace_all("b", "z"))
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        | az   |
+        | zc   |
+        | null |
+        +------+
+        """
+
+    @abstractmethod
     def reverse(self) -> Cell[str | None]:
         """
         Reverse the string.

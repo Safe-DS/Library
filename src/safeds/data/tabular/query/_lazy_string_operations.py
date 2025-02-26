@@ -50,8 +50,9 @@ class _LazyStringOperations(StringOperations):
     # String operations
     # ------------------------------------------------------------------------------------------------------------------
 
-    # TODO: convert cell to expr
     def contains(self, substring: _ConvertibleToStringCell) -> Cell[bool | None]:
+        substring = _to_polars_expression(substring, type_if_none=ColumnType.string())
+
         return _LazyCell(self._expression.str.contains(substring, literal=True))
 
     def ends_with(self, suffix: _ConvertibleToStringCell) -> Cell[bool | None]:
@@ -59,8 +60,9 @@ class _LazyStringOperations(StringOperations):
 
         return _LazyCell(self._expression.str.ends_with(suffix))
 
-    # TODO: convert cell to expr
     def index_of(self, substring: _ConvertibleToStringCell) -> Cell[int | None]:
+        substring = _to_polars_expression(substring, type_if_none=ColumnType.string())
+
         return _LazyCell(self._expression.str.find(substring, literal=True))
 
     def length(self, optimize_for_ascii: bool = False) -> Cell[int | None]:
@@ -101,9 +103,10 @@ class _LazyStringOperations(StringOperations):
 
         return _LazyCell(self._expression.str.strip_suffix(suffix))
 
-    # TODO: regex? how many to replace? by default, one or all?
-    # TODO: convert cell to expr
-    def replace(self, old: _ConvertibleToStringCell, new: _ConvertibleToStringCell) -> Cell[str | None]:
+    def replace_all(self, old: _ConvertibleToStringCell, new: _ConvertibleToStringCell) -> Cell[str | None]:
+        old = _to_polars_expression(old, type_if_none=ColumnType.string())
+        new = _to_polars_expression(new, type_if_none=ColumnType.string())
+
         return _LazyCell(self._expression.str.replace_all(old, new, literal=True))
 
     def reverse(self) -> Cell[str | None]:
