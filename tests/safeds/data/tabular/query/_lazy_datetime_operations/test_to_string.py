@@ -224,7 +224,7 @@ class TestDateTimeSpecifiers:
         "tab",
     ],
 )
-def test_should_handle_escape_sequences(format_: str, expected: date | time | None) -> None:
+def test_should_handle_escape_sequences(format_: str, expected: str) -> None:
     assert_cell_operation_works(
         DATETIME,
         lambda cell: cell.dt.to_string(format=format_),

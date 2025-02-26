@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Literal
 
 from safeds._utils import _structural_hash
 from safeds._validation import _convert_and_check_datetime_format
+from safeds.data.tabular.containers._cell import _to_polars_expression
 from safeds.data.tabular.containers._lazy_cell import _LazyCell
 
 from ._datetime_operations import DatetimeOperations
@@ -114,6 +115,14 @@ class _LazyDatetimeOperations(DatetimeOperations):
         second: _ConvertibleToIntCell = None,
         microsecond: _ConvertibleToIntCell = None,
     ) -> Cell:
+        year = _to_polars_expression(year)
+        month = _to_polars_expression(month)
+        day = _to_polars_expression(day)
+        hour = _to_polars_expression(hour)
+        minute = _to_polars_expression(minute)
+        second = _to_polars_expression(second)
+        microsecond = _to_polars_expression(microsecond)
+
         return _LazyCell(
             self._expression.dt.replace(
                 year=year,

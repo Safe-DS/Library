@@ -44,7 +44,7 @@ class Cell(ABC, Generic[T_co]):
     # ------------------------------------------------------------------------------------------------------------------
 
     @staticmethod
-    def constant(value: _PythonLiteral | None) -> Cell:
+    def constant(value: _PythonLiteral | None, *, type: ColumnType | None = None) -> Cell:
         """
         Create a cell with a constant value.
 
@@ -52,6 +52,8 @@ class Cell(ABC, Generic[T_co]):
         ----------
         value:
             The value to create the cell from.
+        type:
+            The type of the cell. If None, the type is inferred from the value.
 
         Returns
         -------
@@ -77,7 +79,9 @@ class Cell(ABC, Generic[T_co]):
 
         from ._lazy_cell import _LazyCell  # circular import
 
-        return _LazyCell(pl.lit(value))
+        dtype = type._polars_data_type if type is not None else None
+
+        return _LazyCell(pl.lit(value, dtype=dtype))
 
     @staticmethod
     def date(
@@ -1453,7 +1457,7 @@ class Cell(ABC, Generic[T_co]):
     @property
     @abstractmethod
     def _polars_expression(self) -> pl.Expr:
-        """The Polars expression that corresponds to this cell."""
+        """The polars expression that corresponds to this cell."""
 
     @abstractmethod
     def _equals(self, other: object) -> bool:
@@ -1464,10 +1468,32 @@ class Cell(ABC, Generic[T_co]):
         """
 
 
-def _to_polars_expression(cell_proxy: _ConvertibleToCell) -> pl.Expr:
+def _to_polars_expression(cell_proxy: _ConvertibleToCell, *, type_if_none: ColumnType | None = None) -> pl.Expr:
+    """
+    Convert a cell proxy to a polars expression.
+
+    Parameters
+    ----------
+    cell_proxy:
+        The cell proxy to convert.
+    type_if_none:
+        The type to use if `cell_proxy` is `None`. If `None`, the type is inferred from the context.
+
+    Returns
+    -------
+    expression:
+        The polars expression.
+    """
     import polars as pl
 
+    # Cell
     if isinstance(cell_proxy, Cell):
         return cell_proxy._polars_expression
+
+    # Plain value
+    if cell_proxy is None and type_if_none is not None:
+        dtype = type_if_none._polars_data_type
     else:
-        return pl.lit(cell_proxy)
+        dtype = None
+
+    return pl.lit(cell_proxy, dtype)

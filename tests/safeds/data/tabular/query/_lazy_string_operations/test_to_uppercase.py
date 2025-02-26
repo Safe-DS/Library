@@ -1,18 +1,30 @@
 import pytest
 
+from safeds.data.tabular.typing import ColumnType
 from tests.helpers import assert_cell_operation_works
 
 
 @pytest.mark.parametrize(
-    ("string", "expected"),
+    ("value", "expected"),
     [
         ("", ""),
-        ("AbC", "ABC"),
+        ("abc", "ABC"),
+        ("ABC", "ABC"),
+        ("aBc", "ABC"),
+        (None, None),
     ],
     ids=[
         "empty",
-        "non-empty",
+        "full lowercase",
+        "full uppercase",
+        "mixed",
+        "None",
     ],
 )
-def test_should_uppercase_a_string(string: str, expected: str) -> None:
-    assert_cell_operation_works(string, lambda cell: cell.str.to_uppercase(), expected)
+def test_should_convert_string_to_uppercase(value: str | None, expected: str | None) -> None:
+    assert_cell_operation_works(
+        value,
+        lambda cell: cell.str.to_uppercase(),
+        expected,
+        type_if_none=ColumnType.string(),
+    )

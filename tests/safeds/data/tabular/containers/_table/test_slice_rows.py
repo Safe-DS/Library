@@ -68,12 +68,12 @@ from safeds.exceptions import OutOfBoundsError
         "empty",
         "no rows",
         "full table",
-        "positive start in bounds",
-        "positive start out of bounds",
+        "non-negative start in bounds",
+        "non-negative start out of bounds",
         "negative start in bounds",
         "negative start out of bounds",
-        "positive length in bounds",
-        "positive length out of bounds",
+        "non-negative length in bounds",
+        "non-negative length out of bounds",
     ],
 )
 class TestHappyPath:

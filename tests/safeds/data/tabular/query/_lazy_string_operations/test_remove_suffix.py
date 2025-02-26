@@ -8,33 +8,29 @@ from tests.helpers import assert_cell_operation_works
 @pytest.mark.parametrize(
     ("value", "suffix", "expected"),
     [
-        ("", "", True),
-        ("", "c", False),
-        ("abc", "", True),
-        ("abc", "c", True),
-        ("abc", "abc", True),
-        ("abc", "d", False),
-        (None, "", None),
-        ("abc", None, None),
+        ("", " ", ""),
+        ("~ a ~", "", "~ a ~"),
+        ("~ a ~", " ~", "~ a"),
+        ("~ a ~", "~ ", "~ a ~"),
+        (None, " ", None),
+        ("~ a ~", None, None),
         (None, None, None),
     ],
     ids=[
-        "empty string, empty suffix",
-        "empty string, non-empty suffix",
-        "non-empty string, empty suffix",
-        "correct suffix",
-        "suffix equal to string",
-        "incorrect suffix",
+        "empty",
+        "empty suffix",
+        "non-empty (has suffix)",
+        "non-empty (does not have suffix)",
         "None as string",
         "None as suffix",
-        "None for both",
+        "None as both",
     ],
 )
-class TestShouldCheckIfStringEndsWithSuffix:
+class TestShouldRemoveSuffix:
     def test_plain_arguments(self, value: str | None, suffix: str | None, expected: bool | None) -> None:
         assert_cell_operation_works(
             value,
-            lambda cell: cell.str.ends_with(suffix),
+            lambda cell: cell.str.remove_suffix(suffix),
             expected,
             type_if_none=ColumnType.string(),
         )
@@ -42,8 +38,8 @@ class TestShouldCheckIfStringEndsWithSuffix:
     def test_arguments_wrapped_in_cell(self, value: str | None, suffix: str | None, expected: bool | None) -> None:
         assert_cell_operation_works(
             value,
-            lambda cell: cell.str.ends_with(
-                Cell.constant(suffix),
+            lambda cell: cell.str.remove_suffix(
+                Cell.constant(suffix, type=ColumnType.string()),
             ),
             expected,
             type_if_none=ColumnType.string(),

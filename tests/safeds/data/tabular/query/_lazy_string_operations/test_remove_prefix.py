@@ -8,33 +8,29 @@ from tests.helpers import assert_cell_operation_works
 @pytest.mark.parametrize(
     ("value", "prefix", "expected"),
     [
-        ("", "", True),
-        ("", "a", False),
-        ("abc", "", True),
-        ("abc", "a", True),
-        ("abc", "abc", True),
-        ("abc", "d", False),
-        (None, "", None),
-        ("abc", None, None),
+        ("", " ", ""),
+        ("~ a ~", "", "~ a ~"),
+        ("~ a ~", "~ ", "a ~"),
+        ("~ a ~", " ~", "~ a ~"),
+        (None, " ", None),
+        ("~ a ~", None, None),
         (None, None, None),
     ],
     ids=[
-        "empty string, empty prefix",
-        "empty string, non-empty prefix",
-        "non-empty string, empty prefix",
-        "correct prefix",
-        "prefix equal to string",
-        "incorrect prefix",
+        "empty",
+        "empty prefix",
+        "non-empty (has prefix)",
+        "non-empty (does not have prefix)",
         "None as string",
         "None as prefix",
-        "None for both",
+        "None as both",
     ],
 )
-class TestShouldCheckIfStringStartsWithPrefix:
+class TestShouldRemovePrefix:
     def test_plain_arguments(self, value: str | None, prefix: str | None, expected: bool | None) -> None:
         assert_cell_operation_works(
             value,
-            lambda cell: cell.str.starts_with(prefix),
+            lambda cell: cell.str.remove_prefix(prefix),
             expected,
             type_if_none=ColumnType.string(),
         )
@@ -42,8 +38,8 @@ class TestShouldCheckIfStringStartsWithPrefix:
     def test_arguments_wrapped_in_cell(self, value: str | None, prefix: str | None, expected: bool | None) -> None:
         assert_cell_operation_works(
             value,
-            lambda cell: cell.str.starts_with(
-                Cell.constant(prefix),
+            lambda cell: cell.str.remove_prefix(
+                Cell.constant(prefix, type=ColumnType.string()),
             ),
             expected,
             type_if_none=ColumnType.string(),

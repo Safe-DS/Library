@@ -8,12 +8,7 @@ if TYPE_CHECKING:
 
     from safeds._typing import _ConvertibleToIntCell, _ConvertibleToStringCell
     from safeds.data.tabular.containers import Cell
-
-# TODO: examples with None
-# TODO: add more methods
-#  - reverse
-#  - to_time
-#  - ...
+    from safeds.exceptions import OutOfBoundsError  # noqa: F401
 
 
 class StringOperations(ABC):
@@ -64,7 +59,7 @@ class StringOperations(ABC):
     @abstractmethod
     def contains(self, substring: _ConvertibleToStringCell) -> Cell[bool | None]:
         """
-        Check if the string value in the cell contains the substring.
+        Check if the string contains the substring.
 
         Parameters
         ----------
@@ -74,19 +69,18 @@ class StringOperations(ABC):
         Returns
         -------
         contains:
-            Whether the string value contains the substring.
+            Whether the string contains the substring.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["ab", "bc", "cd", None])
+        >>> column = Column("a", ["ab", "cd", None])
         >>> column.transform(lambda cell: cell.str.contains("b"))
         +-------+
         | a     |
         | ---   |
         | bool  |
         +=======+
-        | true  |
         | true  |
         | false |
         | null  |
@@ -96,29 +90,28 @@ class StringOperations(ABC):
     @abstractmethod
     def ends_with(self, suffix: _ConvertibleToStringCell) -> Cell[bool | None]:
         """
-        Check if the string value in the cell ends with the suffix.
+        Check if the string ends with the suffix.
 
         Parameters
         ----------
         suffix:
-            The suffix to search for.
+            The expected suffix.
 
         Returns
         -------
-        ends_with:
-            Whether the string value ends with the suffix.
+        cell:
+            Whether the string ends with the suffix.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["ab", "bc", "cd", None])
-        >>> column.transform(lambda cell: cell.str.ends_with("c"))
+        >>> column = Column("a", ["ab", "bc", None])
+        >>> column.transform(lambda cell: cell.str.ends_with("b"))
         +-------+
         | a     |
         | ---   |
         | bool  |
         +=======+
-        | false |
         | true  |
         | false |
         | null  |
@@ -128,7 +121,7 @@ class StringOperations(ABC):
     @abstractmethod
     def index_of(self, substring: _ConvertibleToStringCell) -> Cell[int | None]:
         """
-        Get the index of the first occurrence of the substring in the string value in the cell.
+        Get the index of the first occurrence of the substring.
 
         Parameters
         ----------
@@ -137,13 +130,13 @@ class StringOperations(ABC):
 
         Returns
         -------
-        index_of:
+        cell:
             The index of the first occurrence of the substring. If the substring is not found, None is returned.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["ab", "bc", "cd", None])
+        >>> column = Column("a", ["ab", "cd", None])
         >>> column.transform(lambda cell: cell.str.index_of("b"))
         +------+
         |    a |
@@ -151,7 +144,6 @@ class StringOperations(ABC):
         |  u32 |
         +======+
         |    1 |
-        |    0 |
         | null |
         | null |
         +------+
@@ -160,7 +152,7 @@ class StringOperations(ABC):
     @abstractmethod
     def length(self, *, optimize_for_ascii: bool = False) -> Cell[int | None]:
         """
-        Get the number of characters of the string value in the cell.
+        Get the number of characters.
 
         Parameters
         ----------
@@ -170,8 +162,8 @@ class StringOperations(ABC):
 
         Returns
         -------
-        length:
-            The length of the string value.
+        cell:
+            The number of characters.
 
         Examples
         --------
@@ -191,9 +183,211 @@ class StringOperations(ABC):
         """
 
     @abstractmethod
-    def replace(self, old: _ConvertibleToStringCell, new: _ConvertibleToStringCell) -> Cell[str | None]:
+    def pad_end(self, length: int, *, character: str = " ") -> Cell[str | None]:
         """
-        Replace occurrences of the old substring with the new substring in the string value in the cell.
+        Pad the end of the string with the given character until it has the given length.
+
+        Parameters
+        ----------
+        length:
+            The minimum length of the string. If the string is already at least as long, it is returned unchanged. Must
+            be greater than or equal to 0.
+        character:
+            How to pad the string. Must be a single character.
+
+        Returns
+        -------
+        cell:
+            The padded string.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If `length` is less than 0.
+        ValueError
+            If `char` is not a single character.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["ab", "bcde", None])
+        >>> column.transform(lambda cell: cell.str.pad_end(3))
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        | ab   |
+        | bcde |
+        | null |
+        +------+
+
+        >>> column.transform(lambda cell: cell.str.pad_end(3, character="~"))
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        | ab~  |
+        | bcde |
+        | null |
+        +------+
+        """
+
+    @abstractmethod
+    def pad_start(self, length: int, *, character: str = " ") -> Cell[str | None]:
+        """
+        Pad the start of the string with the given character until it has the given length.
+
+        Parameters
+        ----------
+        length:
+            The minimum length of the string. If the string is already at least as long, it is returned unchanged. Must
+            be greater than or equal to 0.
+        character:
+            How to pad the string. Must be a single character.
+
+        Returns
+        -------
+        cell:
+            The padded string.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If `length` is less than 0.
+        ValueError
+            If `char` is not a single character.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["ab", "bcde", None])
+        >>> column.transform(lambda cell: cell.str.pad_start(3))
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        |  ab  |
+        | bcde |
+        | null |
+        +------+
+
+        >>> column.transform(lambda cell: cell.str.pad_start(3, character="~"))
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        | ~ab  |
+        | bcde |
+        | null |
+        +------+
+        """
+
+    @abstractmethod
+    def remove_prefix(self, prefix: _ConvertibleToStringCell) -> Cell[str | None]:
+        """
+        Remove a prefix from the string. Strings without the prefix are not changed.
+
+        Parameters
+        ----------
+        prefix:
+            The prefix to remove.
+
+        Returns
+        -------
+        cell:
+            The string without the prefix.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["ab", "bc", None])
+        >>> column.transform(lambda cell: cell.str.remove_prefix("a"))
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        | b    |
+        | bc   |
+        | null |
+        +------+
+        """
+
+    @abstractmethod
+    def remove_suffix(self, suffix: _ConvertibleToStringCell) -> Cell[str | None]:
+        """
+        Remove a suffix from the string. Strings without the suffix are not changed.
+
+        Parameters
+        ----------
+        suffix:
+            The suffix to remove.
+
+        Returns
+        -------
+        cell:
+            The string without the suffix.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["ab", "bc", None])
+        >>> column.transform(lambda cell: cell.str.remove_suffix("b"))
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        | a    |
+        | bc   |
+        | null |
+        +------+
+        """
+
+    @abstractmethod
+    def repeat(self, count: _ConvertibleToIntCell) -> Cell[str | None]:
+        """
+        Repeat the string a number of times.
+
+        Parameters
+        ----------
+        count:
+            The number of times to repeat the string. Must be greater than or equal to 0.
+
+        Returns
+        -------
+        cell:
+            The repeated string.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If `count` is less than 0.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["ab", "bc", None])
+        >>> column.transform(lambda cell: cell.str.repeat(2))
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        | abab |
+        | bcbc |
+        | null |
+        +------+
+        """
+
+    @abstractmethod
+    def replace_all(self, old: _ConvertibleToStringCell, new: _ConvertibleToStringCell) -> Cell[str | None]:
+        """
+        Replace all occurrences of the old substring with the new substring.
 
         Parameters
         ----------
@@ -204,14 +398,14 @@ class StringOperations(ABC):
 
         Returns
         -------
-        replaced_string:
-            The string value with the occurrences replaced.
+        cell:
+            The string with all occurrences replaced.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["ab", "bc", "cd", None])
-        >>> column.transform(lambda cell: cell.str.replace("b", "z"))
+        >>> column = Column("a", ["ab", "bc", None])
+        >>> column.transform(lambda cell: cell.str.replace_all("b", "z"))
         +------+
         | a    |
         | ---  |
@@ -219,7 +413,88 @@ class StringOperations(ABC):
         +======+
         | az   |
         | zc   |
-        | cd   |
+        | null |
+        +------+
+        """
+
+    @abstractmethod
+    def reverse(self) -> Cell[str | None]:
+        """
+        Reverse the string.
+
+        Returns
+        -------
+        cell:
+            The reversed string.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["ab", "bc", None])
+        >>> column.transform(lambda cell: cell.str.reverse())
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        | ba   |
+        | cb   |
+        | null |
+        +------+
+        """
+
+    @abstractmethod
+    def slice(
+        self,
+        *,
+        start: _ConvertibleToIntCell = 0,
+        length: _ConvertibleToIntCell = None,
+    ) -> Cell[str | None]:
+        """
+        Get a slice of the string.
+
+        Parameters
+        ----------
+        start:
+            The start index of the slice. Nonnegative indices are counted from the beginning (starting at 0), negative
+            indices from the end (starting at -1).
+        length:
+            The length of the slice. If None, the slice contains all characters starting from `start`. Must greater than
+            or equal to 0.
+
+        Returns
+        -------
+        cell:
+            The sliced string.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If `length` is less than 0.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["abc", "de", None])
+        >>> column.transform(lambda cell: cell.str.slice(start=1))
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        | bc   |
+        | e    |
+        | null |
+        +------+
+
+        >>> column.transform(lambda cell: cell.str.slice(start=1, length=1))
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        | b    |
+        | e    |
         | null |
         +------+
         """
@@ -227,22 +502,22 @@ class StringOperations(ABC):
     @abstractmethod
     def starts_with(self, prefix: _ConvertibleToStringCell) -> Cell[bool | None]:
         """
-        Check if the string value in the cell starts with the prefix.
+        Check if the string starts with the prefix.
 
         Parameters
         ----------
         prefix:
-            The prefix to search for.
+            The expected prefix.
 
         Returns
         -------
-        starts_with:
-            Whether the string value starts with the prefix.
+        cell:
+            Whether the string starts with the prefix.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["ab", "bc", "cd", None])
+        >>> column = Column("a", ["ab", "bc", None])
         >>> column.transform(lambda cell: cell.str.starts_with("a"))
         +-------+
         | a     |
@@ -251,118 +526,349 @@ class StringOperations(ABC):
         +=======+
         | true  |
         | false |
-        | false |
         | null  |
         +-------+
         """
 
     @abstractmethod
-    def substring(
-        self,
-        *,
-        start: _ConvertibleToIntCell = 0,
-        length: _ConvertibleToIntCell = None,
-    ) -> Cell[str | None]:
+    def strip(self, *, characters: _ConvertibleToStringCell = None) -> Cell[str | None]:
         """
-        Get a substring of the string value in the cell.
+        Remove leading and trailing characters.
 
         Parameters
         ----------
-        start:
-            The start index of the substring.
-        length:
-            The length of the substring. If None, the slice contains all rows starting from `start`. Must greater than
-            or equal to 0.
+        characters:
+            The characters to remove. If None, whitespace is removed.
 
         Returns
         -------
-        substring:
-            The substring of the string value.
-
-        Raises
-        ------
-        OutOfBoundsError
-            If length is less than 0.
+        cell:
+            The stripped string.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["abc", "def", "ghi", None])
-        >>> column.transform(lambda cell: cell.str.substring(start=1, length=2))
+        >>> column = Column("a", ["  ab  ", "~ bc ~", None])
+        >>> column.transform(lambda cell: cell.str.strip())
+        +--------+
+        | a      |
+        | ---    |
+        | str    |
+        +========+
+        | ab     |
+        | ~ bc ~ |
+        | null   |
+        +--------+
+
+        >>> column.transform(lambda cell: cell.str.strip(characters=" ~"))
         +------+
         | a    |
         | ---  |
         | str  |
         +======+
+        | ab   |
         | bc   |
-        | ef   |
-        | hi   |
         | null |
         +------+
         """
 
-    # TODO: add format parameter + document
     @abstractmethod
-    def to_date(self, *, format: str | None = "iso") -> Cell[datetime.date | None]:
+    def strip_end(self, *, characters: _ConvertibleToStringCell = None) -> Cell[str | None]:
         """
-        Convert the string value in the cell to a date.
+        Remove trailing characters.
+
+        Parameters
+        ----------
+        characters:
+            The characters to remove. If None, whitespace is removed.
 
         Returns
         -------
-        date:
-            The date value. If the string cannot be converted to a date, None is returned.
+        cell:
+            The stripped string.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["2021-01-01", "2021-02-01", "abc", None])
+        >>> column = Column("a", ["  ab  ", "~ bc ~", None])
+        >>> column.transform(lambda cell: cell.str.strip_end())
+        +--------+
+        | a      |
+        | ---    |
+        | str    |
+        +========+
+        |   ab   |
+        | ~ bc ~ |
+        | null   |
+        +--------+
+
+        >>> column.transform(lambda cell: cell.str.strip_end(characters=" ~"))
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        |   ab |
+        | ~ bc |
+        | null |
+        +------+
+        """
+
+    @abstractmethod
+    def strip_start(self, *, characters: _ConvertibleToStringCell = None) -> Cell[str | None]:
+        """
+        Remove leading characters.
+
+        Parameters
+        ----------
+        characters:
+            The characters to remove. If None, whitespace is removed.
+
+        Returns
+        -------
+        cell:
+            The stripped string.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["  ab  ", "~ bc ~", None])
+        >>> column.transform(lambda cell: cell.str.strip_start())
+        +--------+
+        | a      |
+        | ---    |
+        | str    |
+        +========+
+        | ab     |
+        | ~ bc ~ |
+        | null   |
+        +--------+
+
+        >>> column.transform(lambda cell: cell.str.strip_start(characters=" ~"))
+        +------+
+        | a    |
+        | ---  |
+        | str  |
+        +======+
+        | ab   |
+        | bc ~ |
+        | null |
+        +------+
+        """
+
+    @abstractmethod
+    def to_date(self, *, format: str | None = "iso") -> Cell[datetime.date | None]:
+        r"""
+        Convert a string to a date.
+
+        The `format` parameter controls the presentation. It can be `"iso"` to target ISO 8601 or a custom string. The
+        custom string can contain fixed specifiers (see below), which are replaced with the corresponding values. The
+        specifiers are case-sensitive and always enclosed in curly braces. Other text is included in the output
+        verbatim. To include a literal opening curly brace, use `\{`, and to include a literal backslash, use `\\`.
+
+        The following specifiers are available:
+
+        - `{Y}`, `{_Y}`, `{^Y}`: Year (zero-padded to four digits, space-padded to four digits, no padding).
+        - `{Y99}`, `{_Y99}`, `{^Y99}`: Year modulo 100 (zero-padded to two digits, space-padded to two digits, no
+          padding).
+        - `{M}`, `{_M}`, `{^M}`: Month (zero-padded to two digits, space-padded to two digits, no padding).
+        - `{M-full}`: Full name of the month (e.g. "January").
+        - `{M-short}`: Abbreviated name of the month with three letters (e.g. "Jan").
+        - `{W}`, `{_W}`, `{^W}`: Week number as defined by ISO 8601 (zero-padded to two digits, space-padded to two
+          digits, no padding).
+        - `{D}`, `{_D}`, `{^D}`: Day of the month (zero-padded to two digits, space-padded to two digits, no padding).
+        - `{DOW}`: Day of the week as defined by ISO 8601 (1 = Monday, 7 = Sunday).
+        - `{DOW-full}`: Full name of the day of the week (e.g. "Monday").
+        - `{DOW-short}`: Abbreviated name of the day of the week with three letters (e.g. "Mon").
+        - `{DOY}`, `{_DOY}`, `{^DOY}`: Day of the year, ranging from 1 to 366 (zero-padded to three digits, space-padded
+          to three digits, no padding).
+
+        The specifiers follow certain conventions:
+
+        - If a component may be formatted in multiple ways, we use shorter specifiers for ISO 8601. Specifiers for
+          other formats have a prefix (same value with different padding, see below) or suffix (other differences).
+        - By default, value are zero-padded, where applicable.
+        - A leading underscore (`_`) means the value is space-padded.
+        - A leading caret (`^`) means the value has no padding (think of the caret in regular expressions).
+
+        Parameters
+        ----------
+        format:
+            The format to use.
+
+        Returns
+        -------
+        cell:
+            The parsed date.
+
+        Raises
+        ------
+        ValueError
+            If the format is invalid.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["1999-02-03", "03.02.2001", "abc", None])
         >>> column.transform(lambda cell: cell.str.to_date())
         +------------+
         | a          |
         | ---        |
         | date       |
         +============+
-        | 2021-01-01 |
-        | 2021-02-01 |
+        | 1999-02-03 |
+        | null       |
+        | null       |
+        | null       |
+        +------------+
+
+        >>> column.transform(lambda cell: cell.str.to_date(format="{D}.{M}.{Y}"))
+        +------------+
+        | a          |
+        | ---        |
+        | date       |
+        +============+
+        | null       |
+        | 2001-02-03 |
         | null       |
         | null       |
         +------------+
         """
 
-    # TODO: add format parameter + document
     @abstractmethod
     def to_datetime(self, *, format: str | None = "iso") -> Cell[datetime.datetime | None]:
-        """
-        Convert the string value in the cell to a datetime.
+        r"""
+        Convert a string to a datetime.
+
+        The `format` parameter controls the presentation. It can be `"iso"` to target ISO 8601 or a custom string. The
+        custom string can contain fixed specifiers (see below), which are replaced with the corresponding values. The
+        specifiers are case-sensitive and always enclosed in curly braces. Other text is included in the output
+        verbatim. To include a literal opening curly brace, use `\{`, and to include a literal backslash, use `\\`.
+
+        The following specifiers for _date components_ are available for **datetime** and **date**:
+
+        - `{Y}`, `{_Y}`, `{^Y}`: Year (zero-padded to four digits, space-padded to four digits, no padding).
+        - `{Y99}`, `{_Y99}`, `{^Y99}`: Year modulo 100 (zero-padded to two digits, space-padded to two digits, no
+          padding).
+        - `{M}`, `{_M}`, `{^M}`: Month (zero-padded to two digits, space-padded to two digits, no padding).
+        - `{M-full}`: Full name of the month (e.g. "January").
+        - `{M-short}`: Abbreviated name of the month with three letters (e.g. "Jan").
+        - `{W}`, `{_W}`, `{^W}`: Week number as defined by ISO 8601 (zero-padded to two digits, space-padded to two
+          digits, no padding).
+        - `{D}`, `{_D}`, `{^D}`: Day of the month (zero-padded to two digits, space-padded to two digits, no padding).
+        - `{DOW}`: Day of the week as defined by ISO 8601 (1 = Monday, 7 = Sunday).
+        - `{DOW-full}`: Full name of the day of the week (e.g. "Monday").
+        - `{DOW-short}`: Abbreviated name of the day of the week with three letters (e.g. "Mon").
+        - `{DOY}`, `{_DOY}`, `{^DOY}`: Day of the year, ranging from 1 to 366 (zero-padded to three digits, space-padded
+          to three digits, no padding).
+
+        The following specifiers for _time components_ are available for **datetime** and **time**:
+
+        - `{h}`, `{_h}`, `{^h}`: Hour (zero-padded to two digits, space-padded to two digits, no padding).
+        - `{h12}`, `{_h12}`, `{^h12}`: Hour in 12-hour format (zero-padded to two digits, space-padded to two digits, no
+          padding).
+        - `{m}`, `{_m}`, `{^m}`: Minute (zero-padded to two digits, space-padded to two digits, no padding).
+        - `{s}`, `{_s}`, `{^s}`: Second (zero-padded to two digits, space-padded to two digits, no padding).
+        - `{.f}`: Fractional seconds with a leading decimal point.
+        - `{ms}`: Millisecond (zero-padded to three digits).
+        - `{us}`: Microsecond (zero-padded to six digits).
+        - `{ns}`: Nanosecond (zero-padded to nine digits).
+        - `{AM/PM}`: AM or PM (uppercase).
+        - `{am/pm}`: am or pm (lowercase).
+
+        The following specifiers are available for **datetime** only:
+
+        - `{z}`: Offset of the timezone from UTC without a colon (e.g. "+0000").
+        - `{:z}`: Offset of the timezone from UTC with a colon (e.g. "+00:00").
+        - `{u}`: The UNIX timestamp in seconds.
+
+        The specifiers follow certain conventions:
+
+        - Generally, date components use uppercase letters and time components use lowercase letters.
+        - If a component may be formatted in multiple ways, we use shorter specifiers for ISO 8601. Specifiers for
+          other formats have a prefix (same value with different padding, see below) or suffix (other differences).
+        - By default, value are zero-padded, where applicable.
+        - A leading underscore (`_`) means the value is space-padded.
+        - A leading caret (`^`) means the value has no padding (think of the caret in regular expressions).
+
+        Parameters
+        ----------
+        format:
+            The format to use.
 
         Returns
         -------
-        datetime:
-            The datetime value. If the string cannot be converted to a datetime, None is returned.
+        cell:
+            The parsed datetime.
+
+        Raises
+        ------
+        ValueError
+            If the format is invalid.
 
         Examples
         --------
+        >>> from datetime import date, datetime
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["2021-01-01T00:00:00Z", "2021-02-01T00:00:00Z", "abc", None])
-        >>> column.transform(lambda cell: cell.str.to_datetime())
+        >>> column1 = Column("a", ["1999-12-31T01:02:03Z", "12:30 Jan 23 2024", "abc", None])
+        >>> column1.transform(lambda cell: cell.str.to_datetime())
         +-------------------------+
         | a                       |
         | ---                     |
         | datetime[μs, UTC]       |
         +=========================+
-        | 2021-01-01 00:00:00 UTC |
-        | 2021-02-01 00:00:00 UTC |
+        | 1999-12-31 01:02:03 UTC |
+        | null                    |
         | null                    |
         | null                    |
         +-------------------------+
+
+        >>> column1.transform(lambda cell: cell.str.to_datetime(
+        ...     format="{h}:{m} {M-short} {D} {Y}"
+        ... ))
+        +---------------------+
+        | a                   |
+        | ---                 |
+        | datetime[μs]        |
+        +=====================+
+        | null                |
+        | 2024-01-23 12:30:00 |
+        | null                |
+        | null                |
+        +---------------------+
         """
 
-    # TODO: add to_time
+    @abstractmethod
+    def to_float(self) -> Cell[float | None]:
+        """
+        Convert the string to a float.
+
+        Returns
+        -------
+        cell:
+            The float value. If the string cannot be converted to a float, None is returned.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["1", "1.5", "abc", None])
+        >>> column.transform(lambda cell: cell.str.to_float())
+        +---------+
+        |       a |
+        |     --- |
+        |     f64 |
+        +=========+
+        | 1.00000 |
+        | 1.50000 |
+        |    null |
+        |    null |
+        +---------+
+        """
 
     @abstractmethod
     def to_int(self, *, base: _ConvertibleToIntCell = 10) -> Cell[int | None]:
         """
-        Convert the string value in the cell to an integer.
+        Convert the string to an integer.
 
         Parameters
         ----------
@@ -371,13 +877,13 @@ class StringOperations(ABC):
 
         Returns
         -------
-        int:
+        cell:
             The integer value. If the string cannot be converted to an integer, None is returned.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column1 = Column("a", ["1", "2", "3", "abc", None])
+        >>> column1 = Column("a", ["1", "10", "abc", None])
         >>> column1.transform(lambda cell: cell.str.to_int())
         +------+
         |    a |
@@ -385,13 +891,12 @@ class StringOperations(ABC):
         |  i64 |
         +======+
         |    1 |
-        |    2 |
-        |    3 |
+        |   10 |
         | null |
         | null |
         +------+
 
-        >>> column2 = Column("a", ["1", "10", "11", "abc", None])
+        >>> column2 = Column("a", ["1", "10", "abc", None])
         >>> column2.transform(lambda cell: cell.str.to_int(base=2))
         +------+
         |    a |
@@ -400,7 +905,6 @@ class StringOperations(ABC):
         +======+
         |    1 |
         |    2 |
-        |    3 |
         | null |
         | null |
         +------+
@@ -409,17 +913,17 @@ class StringOperations(ABC):
     @abstractmethod
     def to_lowercase(self) -> Cell[str | None]:
         """
-        Convert the string value in the cell to lowercase.
+        Convert the string to lowercase.
 
         Returns
         -------
-        lowercase:
-            The string value in lowercase.
+        cell:
+            The lowercase string.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["AB", "BC", "CD", None])
+        >>> column = Column("a", ["AB", "BC", None])
         >>> column.transform(lambda cell: cell.str.to_lowercase())
         +------+
         | a    |
@@ -428,25 +932,102 @@ class StringOperations(ABC):
         +======+
         | ab   |
         | bc   |
-        | cd   |
         | null |
         +------+
         """
 
     @abstractmethod
-    def to_uppercase(self) -> Cell[str | None]:
-        """
-        Convert the string value in the cell to uppercase.
+    def to_time(self, *, format: str | None = "iso") -> Cell[datetime.time | None]:
+        r"""
+        Convert a string to a time.
+
+        The `format` parameter controls the presentation. It can be `"iso"` to target ISO 8601 or a custom string. The
+        custom string can contain fixed specifiers (see below), which are replaced with the corresponding values. The
+        specifiers are case-sensitive and always enclosed in curly braces. Other text is included in the output
+        verbatim. To include a literal opening curly brace, use `\{`, and to include a literal backslash, use `\\`.
+
+        The following specifiers are available:
+
+        - `{h}`, `{_h}`, `{^h}`: Hour (zero-padded to two digits, space-padded to two digits, no padding).
+        - `{h12}`, `{_h12}`, `{^h12}`: Hour in 12-hour format (zero-padded to two digits, space-padded to two digits, no
+          padding).
+        - `{m}`, `{_m}`, `{^m}`: Minute (zero-padded to two digits, space-padded to two digits, no padding).
+        - `{s}`, `{_s}`, `{^s}`: Second (zero-padded to two digits, space-padded to two digits, no padding).
+        - `{.f}`: Fractional seconds with a leading decimal point.
+        - `{ms}`: Millisecond (zero-padded to three digits).
+        - `{us}`: Microsecond (zero-padded to six digits).
+        - `{ns}`: Nanosecond (zero-padded to nine digits).
+        - `{AM/PM}`: AM or PM (uppercase).
+        - `{am/pm}`: am or pm (lowercase).
+
+        The specifiers follow certain conventions:
+
+        - If a component may be formatted in multiple ways, we use shorter specifiers for ISO 8601. Specifiers for
+          other formats have a prefix (same value with different padding, see below) or suffix (other differences).
+        - By default, value are zero-padded, where applicable.
+        - A leading underscore (`_`) means the value is space-padded.
+        - A leading caret (`^`) means the value has no padding (think of the caret in regular expressions).
+
+        Parameters
+        ----------
+        format:
+            The format to use.
 
         Returns
         -------
-        uppercase:
-            The string value in uppercase.
+        cell:
+            The parsed time.
+
+        Raises
+        ------
+        ValueError
+            If the format is invalid.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["ab", "bc", "cd", None])
+        >>> column = Column("a", ["12:34", "12:34:56", "12:34:56.789", "abc", None])
+        >>> column.transform(lambda cell: cell.str.to_time())
+        +--------------+
+        | a            |
+        | ---          |
+        | time         |
+        +==============+
+        | null         |
+        | 12:34:56     |
+        | 12:34:56.789 |
+        | null         |
+        | null         |
+        +--------------+
+
+        >>> column.transform(lambda cell: cell.str.to_time(format="{h}:{m}"))
+        +----------+
+        | a        |
+        | ---      |
+        | time     |
+        +==========+
+        | 12:34:00 |
+        | null     |
+        | null     |
+        | null     |
+        | null     |
+        +----------+
+        """
+
+    @abstractmethod
+    def to_uppercase(self) -> Cell[str | None]:
+        """
+        Convert the string to uppercase.
+
+        Returns
+        -------
+        cell:
+            The uppercase string.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["ab", "bc", None])
         >>> column.transform(lambda cell: cell.str.to_uppercase())
         +------+
         | a    |
@@ -455,91 +1036,162 @@ class StringOperations(ABC):
         +======+
         | AB   |
         | BC   |
-        | CD   |
         | null |
         +------+
         """
 
-    @abstractmethod
-    def trim(self) -> Cell[str | None]:
-        """
-        Remove whitespace from the start and end of the string value in the cell.
+    # @abstractmethod
+    # def contains(self, substring: _ConvertibleToStringCell) -> Cell[bool | None]:
+    #     """
+    #     Check if the string value in the cell contains the substring.
+    #
+    #     Parameters
+    #     ----------
+    #     substring:
+    #         The substring to search for.
+    #
+    #     Returns
+    #     -------
+    #     contains:
+    #         Whether the string value contains the substring.
+    #
+    #     Examples
+    #     --------
+    #     >>> from safeds.data.tabular.containers import Column
+    #     >>> column = Column("a", ["ab", "bc", "cd", None])
+    #     >>> column.transform(lambda cell: cell.str.contains("b"))
+    #     +-------+
+    #     | a     |
+    #     | ---   |
+    #     | bool  |
+    #     +=======+
+    #     | true  |
+    #     | true  |
+    #     | false |
+    #     | null  |
+    #     +-------+
+    #     """
 
-        Returns
-        -------
-        trimmed:
-            The string value without whitespace at the start and end.
+    # @abstractmethod
+    # def index_of(self, substring: _ConvertibleToStringCell) -> Cell[int | None]:
+    #     """
+    #     Get the index of the first occurrence of the substring in the string value in the cell.
+    #
+    #     Parameters
+    #     ----------
+    #     substring:
+    #         The substring to search for.
+    #
+    #     Returns
+    #     -------
+    #     index_of:
+    #         The index of the first occurrence of the substring. If the substring is not found, None is returned.
+    #
+    #     Examples
+    #     --------
+    #     >>> from safeds.data.tabular.containers import Column
+    #     >>> column = Column("a", ["ab", "bc", "cd", None])
+    #     >>> column.transform(lambda cell: cell.str.index_of("b"))
+    #     +------+
+    #     |    a |
+    #     |  --- |
+    #     |  u32 |
+    #     +======+
+    #     |    1 |
+    #     |    0 |
+    #     | null |
+    #     | null |
+    #     +------+
+    #     """
+    #
 
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["", " abc", "abc ", " abc ", None])
-        >>> column.transform(lambda cell: cell.str.trim())
-        +------+
-        | a    |
-        | ---  |
-        | str  |
-        +======+
-        |      |
-        | abc  |
-        | abc  |
-        | abc  |
-        | null |
-        +------+
-        """
+    # @abstractmethod
+    # def replace(self, old: _ConvertibleToStringCell, new: _ConvertibleToStringCell) -> Cell[str | None]:
+    #     """
+    #     Replace occurrences of the old substring with the new substring in the string value in the cell.
+    #
+    #     Parameters
+    #     ----------
+    #     old:
+    #         The substring to replace.
+    #     new:
+    #         The substring to replace with.
+    #
+    #     Returns
+    #     -------
+    #     replaced_string:
+    #         The string value with the occurrences replaced.
+    #
+    #     Examples
+    #     --------
+    #     >>> from safeds.data.tabular.containers import Column
+    #     >>> column = Column("a", ["ab", "bc", "cd", None])
+    #     >>> column.transform(lambda cell: cell.str.replace("b", "z"))
+    #     +------+
+    #     | a    |
+    #     | ---  |
+    #     | str  |
+    #     +======+
+    #     | az   |
+    #     | zc   |
+    #     | cd   |
+    #     | null |
+    #     +------+
+    #     """
 
-    @abstractmethod
-    def trim_end(self) -> Cell[str | None]:
-        """
-        Remove whitespace from the end of the string value in the cell.
-
-        Returns
-        -------
-        trimmed:
-            The string value without whitespace at the end.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["", " abc", "abc ", " abc ", None])
-        >>> column.transform(lambda cell: cell.str.trim_end())
-        +------+
-        | a    |
-        | ---  |
-        | str  |
-        +======+
-        |      |
-        |  abc |
-        | abc  |
-        |  abc |
-        | null |
-        +------+
-        """
-
-    @abstractmethod
-    def trim_start(self) -> Cell[str | None]:
-        """
-        Remove whitespace from the start of the string value in the cell.
-
-        Returns
-        -------
-        trimmed:
-            The string value without whitespace at the start.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", ["", " abc", "abc ", " abc ", None])
-        >>> column.transform(lambda cell: cell.str.trim_start())
-        +------+
-        | a    |
-        | ---  |
-        | str  |
-        +======+
-        |      |
-        | abc  |
-        | abc  |
-        | abc  |
-        | null |
-        +------+
-        """
+    # # TODO: add format parameter + document
+    # @abstractmethod
+    # def to_date(self, *, format: str | None = "iso") -> Cell[datetime.date | None]:
+    #     """
+    #     Convert the string value in the cell to a date.
+    #
+    #     Returns
+    #     -------
+    #     date:
+    #         The date value. If the string cannot be converted to a date, None is returned.
+    #
+    #     Examples
+    #     --------
+    #     >>> from safeds.data.tabular.containers import Column
+    #     >>> column = Column("a", ["2021-01-01", "2021-02-01", "abc", None])
+    #     >>> column.transform(lambda cell: cell.str.to_date())
+    #     +------------+
+    #     | a          |
+    #     | ---        |
+    #     | date       |
+    #     +============+
+    #     | 2021-01-01 |
+    #     | 2021-02-01 |
+    #     | null       |
+    #     | null       |
+    #     +------------+
+    #     """
+    #
+    # # TODO: add format parameter + document
+    # @abstractmethod
+    # def to_datetime(self, *, format: str | None = "iso") -> Cell[datetime.datetime | None]:
+    #     """
+    #     Convert the string value in the cell to a datetime.
+    #
+    #     Returns
+    #     -------
+    #     datetime:
+    #         The datetime value. If the string cannot be converted to a datetime, None is returned.
+    #
+    #     Examples
+    #     --------
+    #     >>> from safeds.data.tabular.containers import Column
+    #     >>> column = Column("a", ["2021-01-01T00:00:00Z", "2021-02-01T00:00:00Z", "abc", None])
+    #     >>> column.transform(lambda cell: cell.str.to_datetime())
+    #     +-------------------------+
+    #     | a                       |
+    #     | ---                     |
+    #     | datetime[μs, UTC]       |
+    #     +=========================+
+    #     | 2021-01-01 00:00:00 UTC |
+    #     | 2021-02-01 00:00:00 UTC |
+    #     | null                    |
+    #     | null                    |
+    #     +-------------------------+
+    #     """
+    #

@@ -1,26 +1,46 @@
 import pytest
 
+from safeds.data.tabular.containers import Cell
+from safeds.data.tabular.typing import ColumnType
 from tests.helpers import assert_cell_operation_works
 
 
 @pytest.mark.parametrize(
-    ("string", "base", "expected"),
+    ("value", "base", "expected"),
     [
         ("", 10, None),
-        ("11", 10, 11),
-        ("11", 2, 3),
         ("abc", 10, None),
+        ("10", 10, 10),
+        ("10", 2, 2),
+        (None, 10, None),
+        ("0", None, None),
+        (None, None, None),
     ],
     ids=[
         "empty",
-        "11 base 10",
-        "11 base 2",
-        "invalid string",
+        "invalid",
+        "base 10",
+        "base 2",
+        "None as value",
+        "None as base",
+        "None for both",
     ],
 )
-def test_should_parse_integer(string: str, base: int, expected: bool) -> None:
-    assert_cell_operation_works(
-        string,
-        lambda cell: cell.str.to_int(base=base),
-        expected,
-    )
+class TestShouldConvertStringToInteger:
+    def test_plain_arguments(self, value: str | None, base: int | None, expected: float | None) -> None:
+        assert_cell_operation_works(
+            value,
+            lambda cell: cell.str.to_int(base=base),
+            expected,
+            type_if_none=ColumnType.string(),
+        )
+
+    def test_arguments_wrapped_in_cell(self, value: str | None, base: int | None, expected: float | None) -> None:
+        assert_cell_operation_works(
+            value,
+            lambda cell: cell.str.to_int(
+                base=Cell.constant(base),
+            ),
+            expected,
+            type_if_none=ColumnType.string(),
+        )
