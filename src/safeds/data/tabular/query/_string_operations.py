@@ -57,6 +57,37 @@ class StringOperations(ABC):
     # ------------------------------------------------------------------------------------------------------------------
 
     @abstractmethod
+    def contains(self, substring: _ConvertibleToStringCell) -> Cell[bool | None]:
+        """
+        Check if the string contains the substring.
+
+        Parameters
+        ----------
+        substring:
+            The substring to search for.
+
+        Returns
+        -------
+        contains:
+            Whether the string contains the substring.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["ab", "cd", None])
+        >>> column.transform(lambda cell: cell.str.contains("b"))
+        +-------+
+        | a     |
+        | ---   |
+        | bool  |
+        +=======+
+        | true  |
+        | false |
+        | None  |
+        +-------+
+        """
+
+    @abstractmethod
     def ends_with(self, suffix: _ConvertibleToStringCell) -> Cell[bool | None]:
         """
         Check if the string ends with the suffix.
