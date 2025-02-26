@@ -83,7 +83,7 @@ class StringOperations(ABC):
         +=======+
         | true  |
         | false |
-        | None  |
+        | null  |
         +-------+
         """
 
@@ -116,6 +116,37 @@ class StringOperations(ABC):
         | false |
         | null  |
         +-------+
+        """
+
+    @abstractmethod
+    def index_of(self, substring: _ConvertibleToStringCell) -> Cell[int | None]:
+        """
+        Get the index of the first occurrence of the substring.
+
+        Parameters
+        ----------
+        substring:
+            The substring to search for.
+
+        Returns
+        -------
+        cell:
+            The index of the first occurrence of the substring. If the substring is not found, None is returned.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", ["ab", "cd", None])
+        >>> column.transform(lambda cell: cell.str.index_of("b"))
+        +------+
+        |    a |
+        |  --- |
+        |  u32 |
+        +======+
+        |    1 |
+        | null |
+        | null |
+        +------+
         """
 
     @abstractmethod
