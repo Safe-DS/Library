@@ -4,6 +4,8 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
+    from datetime import timedelta
+
     from safeds.data.tabular.containers import Cell
 
 
@@ -54,7 +56,7 @@ class DurationOperations(ABC):
     # ------------------------------------------------------------------------------------------------------------------
 
     @abstractmethod
-    def abs(self) -> Cell[None]:
+    def abs(self) -> Cell[timedelta | None]:
         """
         Get the absolute value of the duration.
 
