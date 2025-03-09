@@ -33,12 +33,19 @@ from safeds.exceptions import ColumnNotFoundError
             lambda cell: cell <= 2,
             Table({"col1": [], "col2": []}),
         ),
+        (
+            lambda: Table({"col1": [None], "col2": [None]}),
+            "col1",
+            lambda cell: cell <= 2,
+            Table({"col1": [None], "col2": [None]}),
+        ),
     ],
     ids=[
         "no rows",
         "no matches",
         "some matches",
         "only matches",
+        "None",
     ],
 )
 class TestHappyPath:

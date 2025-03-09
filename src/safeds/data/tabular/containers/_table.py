@@ -1529,7 +1529,7 @@ class Table:
         mask = predicate(_LazyVectorizedRow(self))
 
         return Table._from_polars_lazy_frame(
-            self._lazy_frame.filter(~mask._polars_expression),
+            self._lazy_frame.remove(mask._polars_expression),
         )
 
     def remove_rows_by_column(
@@ -1592,7 +1592,7 @@ class Table:
         mask = predicate(_LazyCell(pl.col(name)))
 
         return Table._from_polars_lazy_frame(
-            self._lazy_frame.filter(~mask._polars_expression),
+            self._lazy_frame.remove(mask._polars_expression),
         )
 
     def remove_rows_with_missing_values(

@@ -33,6 +33,11 @@ from safeds.data.tabular.containers import Cell, Row, Table
             lambda row: row["col1"] <= 2,
             Table({"col1": []}),
         ),
+        (
+            lambda: Table({"col1": [None]}),
+            lambda row: row["col1"] <= 2,
+            Table({"col1": [None]}),
+        ),
     ],
     ids=[
         "empty",
@@ -40,6 +45,7 @@ from safeds.data.tabular.containers import Cell, Row, Table
         "no matches",
         "some matches",
         "only matches",
+        "None",
     ],
 )
 class TestHappyPath:
