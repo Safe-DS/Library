@@ -57,7 +57,7 @@ def test_should_return_time(
         # invalid microsecond
         (1, 2, 3, -1),
         pytest.param(
-            1, 2, 3, 1_000_000, marks=pytest.mark.xfail(reason="https://github.com/pola-rs/polars/issues/21664")
+            1, 2, 3, 1_000_000, marks=pytest.mark.xfail(reason="https://github.com/pola-rs/polars/issues/21664"),
         ),
     ],
     ids=[
