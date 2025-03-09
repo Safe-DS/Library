@@ -151,10 +151,10 @@ class Cell(ABC, Generic[T_co]):
         year: _ConvertibleToIntCell,
         month: _ConvertibleToIntCell,
         day: _ConvertibleToIntCell,
+        hour: _ConvertibleToIntCell,
+        minute: _ConvertibleToIntCell,
+        second: _ConvertibleToIntCell,
         *,
-        hour: _ConvertibleToIntCell = 0,
-        minute: _ConvertibleToIntCell = 0,
-        second: _ConvertibleToIntCell = 0,
         microsecond: _ConvertibleToIntCell = 0,
         time_zone: str | None = None,
     ) -> Cell[python_datetime.datetime | None]:
@@ -193,7 +193,7 @@ class Cell(ABC, Generic[T_co]):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("a", [1, 2, None])
-        >>> column.transform(lambda _: Cell.datetime(2025, 1, 15, hour=12))
+        >>> column.transform(lambda _: Cell.datetime(2025, 1, 15, 12, 0 ,0))
         +---------------------+
         | a                   |
         | ---                 |
@@ -204,7 +204,7 @@ class Cell(ABC, Generic[T_co]):
         | 2025-01-15 12:00:00 |
         +---------------------+
 
-        >>> column.transform(lambda cell: Cell.datetime(2025, 1, 15, hour=cell))
+        >>> column.transform(lambda cell: Cell.datetime(2025, 1, 15, cell, 0, 0))
         +---------------------+
         | a                   |
         | ---                 |

@@ -634,7 +634,7 @@ class DatetimeOperations(ABC):
         | null |
         +------+
 
-        >>> column2 = Column("a", [date(1999, 12, 31), date(2000, 1, 2), datetime(2001, 12, 31), None])
+        >>> column2 = Column("a", [date(1999, 12, 31), date(2000, 1, 2), date(2001, 12, 31), None])
         >>> column2.transform(lambda cell: cell.dt.week())
         +------+
         |    a |
