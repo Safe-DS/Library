@@ -1,8 +1,13 @@
 from __future__ import annotations
 
 from abc import abstractmethod
+from typing import TYPE_CHECKING
 
 from safeds.data.tabular.typing import ColumnType
+
+if TYPE_CHECKING:
+    import polars as pl
+
 
 
 class ColumnSelector:
@@ -146,3 +151,12 @@ class ColumnSelector:
 
     def sub(self, other: ColumnSelector) -> ColumnSelector:
         return self.__sub__(other)
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Internal
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @property
+    @abstractmethod
+    def _polars_expression(self) -> pl.Expr:
+        """The polars expression that corresponds to this selector."""
