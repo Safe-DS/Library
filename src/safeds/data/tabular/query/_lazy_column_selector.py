@@ -1,11 +1,10 @@
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
+from safeds._utils import _structural_hash
 
-from src.safeds._utils import _structural_hash
-
-from src.safeds.data.tabular.query._column_selector import ColumnSelector
-
+from ._column_selector import ColumnSelector
 
 if TYPE_CHECKING:
     import polars as pl

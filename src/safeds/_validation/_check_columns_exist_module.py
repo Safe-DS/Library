@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds._utils import _get_similar_strings
+from safeds.data.tabular.query._column_selector import ColumnSelector
 from safeds.exceptions import ColumnNotFoundError
 
 if TYPE_CHECKING:
@@ -14,7 +15,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.typing import Schema
 
 
-def _check_columns_exist(table_or_schema: Table | Schema, selector: str | list[str]) -> None:
+def _check_columns_exist(table_or_schema: Table | Schema, selector: str | list[str] | ColumnSelector) -> None:
     """
     Check whether the specified columns exist, and raise an error if they do not.
 
@@ -32,6 +33,9 @@ def _check_columns_exist(table_or_schema: Table | Schema, selector: str | list[s
     """
     from safeds.data.tabular.containers import Table  # circular import
 
+    if isinstance(selector, ColumnSelector):
+        # TODO: validation of column selector (expand + check?)
+        return
     if isinstance(table_or_schema, Table):
         table_or_schema = table_or_schema.schema
     if isinstance(selector, str):

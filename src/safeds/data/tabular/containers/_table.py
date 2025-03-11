@@ -26,6 +26,7 @@ from safeds.exceptions import (
     LengthMismatchError,
 )
 
+from ..query._column_selector import ColumnSelector
 from ._column import Column
 from ._lazy_cell import _LazyCell
 from ._lazy_vectorized_row import _LazyVectorizedRow
@@ -1116,7 +1117,7 @@ class Table:
 
     def select_columns(
         self,
-        selector: str | list[str],
+        selector: str | list[str] | ColumnSelector,
     ) -> Table:
         """
         Select a subset of the columns and return the result as a new table.
@@ -1161,6 +1162,9 @@ class Table:
         - [`remove_non_numeric_columns`][safeds.data.tabular.containers._table.Table.remove_non_numeric_columns]
         """
         _check_columns_exist(self, selector)
+
+        if isinstance(selector, ColumnSelector):
+            selector = selector._polars_expression
 
         return Table._from_polars_lazy_frame(
             self._lazy_frame.select(selector),

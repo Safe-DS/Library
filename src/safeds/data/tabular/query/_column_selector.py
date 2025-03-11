@@ -3,11 +3,10 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import TYPE_CHECKING
 
-from safeds.data.tabular.typing import ColumnType
-
 if TYPE_CHECKING:
     import polars as pl
 
+    from safeds.data.tabular.typing import ColumnType
 
 
 class ColumnSelector:
@@ -18,6 +17,7 @@ class ColumnSelector:
     @staticmethod
     def all() -> ColumnSelector:
         import polars.selectors as cs
+
         from ._lazy_column_selector import _LazyColumnSelector  # circular import
 
         return _LazyColumnSelector(cs.all())
@@ -25,6 +25,7 @@ class ColumnSelector:
     @staticmethod
     def by_index(indices: int | list[int]) -> ColumnSelector:
         import polars.selectors as cs
+
         from ._lazy_column_selector import _LazyColumnSelector  # circular import
 
         return _LazyColumnSelector(cs.by_index(indices))
@@ -32,6 +33,7 @@ class ColumnSelector:
     @staticmethod
     def by_name(names: str | list[str], *, ignore_unknown_names: bool = False) -> ColumnSelector:
         import polars.selectors as cs
+
         from ._lazy_column_selector import _LazyColumnSelector  # circular import
 
         return _LazyColumnSelector(cs.by_name(names, require_all=not ignore_unknown_names))
@@ -39,6 +41,7 @@ class ColumnSelector:
     @staticmethod
     def by_type(types: ColumnType | list[ColumnType]) -> ColumnSelector:
         import polars.selectors as cs
+
         from ._lazy_column_selector import _LazyColumnSelector  # circular import
 
         return _LazyColumnSelector(cs.by_dtype(types))
@@ -46,6 +49,7 @@ class ColumnSelector:
     @staticmethod
     def is_float() -> ColumnSelector:
         import polars.selectors as cs
+
         from ._lazy_column_selector import _LazyColumnSelector  # circular import
 
         return _LazyColumnSelector(cs.float())
@@ -53,6 +57,7 @@ class ColumnSelector:
     @staticmethod
     def is_int() -> ColumnSelector:
         import polars.selectors as cs
+
         from ._lazy_column_selector import _LazyColumnSelector  # circular import
 
         return _LazyColumnSelector(cs.integer())
@@ -60,6 +65,7 @@ class ColumnSelector:
     @staticmethod
     def is_numeric() -> ColumnSelector:
         import polars.selectors as cs
+
         from ._lazy_column_selector import _LazyColumnSelector  # circular import
 
         return _LazyColumnSelector(cs.numeric())
@@ -67,6 +73,7 @@ class ColumnSelector:
     @staticmethod
     def is_signed_int() -> ColumnSelector:
         import polars.selectors as cs
+
         from ._lazy_column_selector import _LazyColumnSelector  # circular import
 
         return _LazyColumnSelector(cs.signed_integer())
@@ -74,6 +81,7 @@ class ColumnSelector:
     @staticmethod
     def is_temporal() -> ColumnSelector:
         import polars.selectors as cs
+
         from ._lazy_column_selector import _LazyColumnSelector  # circular import
 
         return _LazyColumnSelector(cs.temporal())
@@ -81,6 +89,7 @@ class ColumnSelector:
     @staticmethod
     def is_unsigned_int() -> ColumnSelector:
         import polars.selectors as cs
+
         from ._lazy_column_selector import _LazyColumnSelector  # circular import
 
         return _LazyColumnSelector(cs.unsigned_integer())
