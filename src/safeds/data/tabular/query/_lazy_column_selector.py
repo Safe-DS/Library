@@ -25,28 +25,28 @@ class _LazyColumnSelector(ColumnSelector):
         return _LazyColumnSelector(self._selector.__and__(other._polars_selector))
 
     def __rand__(self, other: ColumnSelector) -> ColumnSelector:
-        expression = self._selector.__rand__(other._polars_selector)
+        expression = self._selector.__rand__(other._polars_selector).meta._as_selector()
         return _LazyColumnSelector(expression)
 
     def __or__(self, other: ColumnSelector) -> ColumnSelector:
         return _LazyColumnSelector(self._selector.__or__(other._polars_selector))
 
     def __ror__(self, other: ColumnSelector) -> ColumnSelector:
-        expression = self._selector.__ror__(other._polars_selector)
+        expression = self._selector.__ror__(other._polars_selector).meta._as_selector()
         return _LazyColumnSelector(expression)
 
     def __sub__(self, other: ColumnSelector) -> ColumnSelector:
         return _LazyColumnSelector(self._selector.__sub__(other._polars_selector))
 
     def __rsub__(self, other: ColumnSelector) -> ColumnSelector:
-        expression = self._selector.__rsub__(other._polars_selector)
+        expression = self._selector.__rsub__(other._polars_selector).meta._as_selector()
         return _LazyColumnSelector(expression)
 
     def __xor__(self, other: ColumnSelector) -> ColumnSelector:
         return _LazyColumnSelector(self._selector.__xor__(other._polars_selector))
 
     def __rxor__(self, other: ColumnSelector) -> ColumnSelector:
-        expression = self._selector.__rxor__(other._polars_selector)
+        expression = self._selector.__rxor__(other._polars_selector).meta._as_selector()
         return _LazyColumnSelector(expression)
 
     # Other --------------------------------------------------------------------

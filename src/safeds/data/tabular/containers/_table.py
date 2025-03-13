@@ -1228,13 +1228,14 @@ class Table:
             Transform the entire table with a fitted transformer.
         """
         import polars as pl
+        import polars.selectors as cs
 
         _check_columns_exist(self, selector)
 
         if isinstance(selector, str):
             selector = [selector]
         if isinstance(selector, ColumnSelector):
-            selector = selector._polars_selector.expand_selector(self)
+            selector = cs.expand_selector(self._lazy_frame, selector._polars_selector)
 
         parameter_count = transformer.__code__.co_argcount
         if parameter_count == 1:

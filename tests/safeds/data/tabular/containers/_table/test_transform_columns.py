@@ -64,7 +64,7 @@ from safeds.exceptions import ColumnNotFoundError
             lambda: Table({"col1": [1, 2], "col2": [3, 4]}),
             ColumnSelector.by_name("col1"),
             lambda _: Cell.constant(None),
-            Table({"col1": [None, None]}),
+            Table({"col1": [None, None], "col2": [3, 4]}),
         )
     ],
     ids=[
