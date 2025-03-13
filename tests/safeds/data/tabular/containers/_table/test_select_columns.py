@@ -3,6 +3,7 @@ from collections.abc import Callable
 import pytest
 
 from safeds.data.tabular.containers import Table
+from safeds.data.tabular.query import ColumnSelector
 from safeds.exceptions import ColumnNotFoundError
 
 
@@ -29,6 +30,11 @@ from safeds.exceptions import ColumnNotFoundError
             ["col1", "col2"],
             Table({"col1": [], "col2": []}),
         ),
+        (
+            lambda: Table({"col1": [], "col2": []}),
+            ColumnSelector.by_name("col1"),
+            Table({"col1": []}),
+        ),
         # Related to https://github.com/Safe-DS/Library/issues/115
         (
             lambda: Table({"A": [1], "B": [2], "C": [3]}),
@@ -41,6 +47,7 @@ from safeds.exceptions import ColumnNotFoundError
         "non-empty table, empty list",
         "non-empty table, single column",
         "non-empty table, multiple columns",
+        "selector",
         "swapped order",
     ],
 )
@@ -48,7 +55,7 @@ class TestHappyPath:
     def test_should_select_columns(
         self,
         table_factory: Callable[[], Table],
-        names: str | list[str],
+        names: str | list[str] | ColumnSelector,
         expected: Table,
     ) -> None:
         actual = table_factory().select_columns(names)

@@ -3,6 +3,7 @@ from torch.types import Device
 
 from safeds._config import _get_device
 from safeds.data.tabular.containers import Table
+from safeds.data.tabular.query import ColumnSelector
 from safeds.data.tabular.transformation import StandardScaler
 from safeds.ml.nn import (
     NeuralNetworkRegressor,
@@ -25,7 +26,7 @@ def test_forward_model(device: Device) -> None:
     table_1 = Table.from_csv_file(
         path=resolve_resource_path(_inflation_path),
     )
-    table_1 = table_1.remove_columns(["date"], ignore_unknown_names=True)
+    table_1 = table_1.remove_columns(ColumnSelector.by_name("date", ignore_unknown_names=True))
     table_2 = table_1.slice_rows(start=0, length=table_1.row_count - 14)
     table_2 = table_2.add_columns([(table_1.slice_rows(start=14)).get_column("value").rename("target")])
     train_table, test_table = table_2.split_rows(0.8)

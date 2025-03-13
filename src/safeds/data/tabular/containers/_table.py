@@ -778,9 +778,7 @@ class Table:
 
     def remove_columns(
         self,
-        selector: str | list[str],
-        *,
-        ignore_unknown_names: bool = False,
+        selector: str | list[str] | ColumnSelector,
     ) -> Table:
         """
         Remove the specified columns from the table and return the result as a new table.
@@ -791,9 +789,6 @@ class Table:
         ----------
         selector:
             The columns to remove.
-        ignore_unknown_names:
-            If set to True, columns that are not present in the table will be ignored.
-            If set to False, an error will be raised if any of the specified columns do not exist.
 
         Returns
         -------
@@ -803,7 +798,7 @@ class Table:
         Raises
         ------
         ColumnNotFoundError
-            If a column does not exist and unknown names are not ignored.
+            If a column does not exist.
 
         Examples
         --------
@@ -820,17 +815,6 @@ class Table:
         |   6 |
         +-----+
 
-        >>> table.remove_columns(["c"], ignore_unknown_names=True)
-        +-----+-----+
-        |   a |   b |
-        | --- | --- |
-        | i64 | i64 |
-        +===========+
-        |   1 |   4 |
-        |   2 |   5 |
-        |   3 |   6 |
-        +-----+-----+
-
         Related
         -------
         - [`select_columns`][safeds.data.tabular.containers._table.Table.select_columns]:
@@ -838,14 +822,15 @@ class Table:
         - [`remove_columns_with_missing_values`][safeds.data.tabular.containers._table.Table.remove_columns_with_missing_values]
         - [`remove_non_numeric_columns`][safeds.data.tabular.containers._table.Table.remove_non_numeric_columns]
         """
+        _check_columns_exist(self, selector)
+
         if isinstance(selector, str):
             selector = [selector]
-
-        if not ignore_unknown_names:
-            _check_columns_exist(self, selector)
+        if isinstance(selector, ColumnSelector):
+            selector = selector._polars_expression
 
         return Table._from_polars_lazy_frame(
-            self._lazy_frame.drop(selector, strict=not ignore_unknown_names),
+            self._lazy_frame.drop(selector),
         )
 
     def remove_columns_with_missing_values(
@@ -1096,7 +1081,7 @@ class Table:
         _check_row_counts_are_equal([self, *new_columns])
 
         if len(new_columns) == 0:
-            return self.remove_columns(old_name, ignore_unknown_names=True)
+            return self.remove_columns(old_name)
 
         if len(new_columns) == 1:
             new_column = new_columns[0]

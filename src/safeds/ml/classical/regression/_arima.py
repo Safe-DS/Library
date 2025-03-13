@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 from safeds._utils import _structural_hash
 from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Column
+from safeds.data.tabular.query import ColumnSelector
 from safeds.exceptions import (
     DatasetMissesDataError,
     MissingValuesColumnError,
@@ -136,7 +137,7 @@ class ArimaModelRegressor:
         # make a table without
         forecast_horizon = len(time_series.target._series.to_numpy())
         result_table = time_series.to_table()
-        result_table = result_table.remove_columns([time_series.target.name], ignore_unknown_names=True)
+        result_table = result_table.remove_columns(ColumnSelector.by_name(time_series.target.name, ignore_unknown_names=True))
         # Validation
         if not self.is_fitted or self._arima is None:
             raise NotFittedError(kind="model")

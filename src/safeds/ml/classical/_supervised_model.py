@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, Self
 from safeds._utils import _structural_hash
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Column, Table
+from safeds.data.tabular.query import ColumnSelector
 from safeds.exceptions import (
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
@@ -421,7 +422,7 @@ def _predict_with_sklearn_model(
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", message="X does not have valid feature names")
             predicted_target_vector = model.predict(features._data_frame)
-        output = dataset.remove_columns(target_name, ignore_unknown_names=True).add_columns(
+        output = dataset.remove_columns(ColumnSelector.by_name(target_name, ignore_unknown_names=True)).add_columns(
             Column(target_name, predicted_target_vector),
         )
 
