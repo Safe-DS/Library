@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from safeds.data.tabular.typing import ColumnType
 
 if TYPE_CHECKING:
-    import polars as pl
+    from polars._typing import SelectorType
 
 
 class ColumnSelector:
@@ -651,5 +651,5 @@ class ColumnSelector:
 
     @property
     @abstractmethod
-    def _polars_expression(self) -> pl.Expr:
+    def _polars_selector(self) -> SelectorType:
         """The polars expression that corresponds to this selector."""

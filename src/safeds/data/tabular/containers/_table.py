@@ -827,7 +827,7 @@ class Table:
         if isinstance(selector, str):
             selector = [selector]
         if isinstance(selector, ColumnSelector):
-            selector = selector._polars_expression
+            selector = selector._polars_selector
 
         return Table._from_polars_lazy_frame(
             self._lazy_frame.drop(selector),
@@ -1149,7 +1149,7 @@ class Table:
         _check_columns_exist(self, selector)
 
         if isinstance(selector, ColumnSelector):
-            selector = selector._polars_expression
+            selector = selector._polars_selector
 
         return Table._from_polars_lazy_frame(
             self._lazy_frame.select(selector),
@@ -1234,7 +1234,7 @@ class Table:
         if isinstance(selector, str):
             selector = [selector]
         if isinstance(selector, ColumnSelector):
-            selector = selector._polars_expression.expand_selector(self)
+            selector = selector._polars_selector.expand_selector(self)
 
         parameter_count = transformer.__code__.co_argcount
         if parameter_count == 1:
