@@ -3,6 +3,7 @@ from collections.abc import Callable
 import pytest
 
 from safeds.data.tabular.containers import Cell, Row, Table
+from safeds.data.tabular.query import ColumnSelector
 from safeds.exceptions import ColumnNotFoundError
 
 
@@ -58,6 +59,13 @@ from safeds.exceptions import ColumnNotFoundError
             lambda cell, row: 2 * cell + row["col2"],
             Table({"col1": [5, 8], "col2": [3, 4]}),
         ),
+        # selector
+        (
+            lambda: Table({"col1": [1, 2], "col2": [3, 4]}),
+            ColumnSelector.by_name("col1"),
+            lambda _: Cell.constant(None),
+            Table({"col1": [None, None]}),
+        )
     ],
     ids=[
         "no rows (constant value)",
@@ -67,6 +75,7 @@ from safeds.exceptions import ColumnNotFoundError
         "multiple columns transformed (constant value)",
         "multiple columns transformed (computed value)",
         "lambda takes row parameter",
+        "selector"
     ],
 )
 class TestHappyPath:

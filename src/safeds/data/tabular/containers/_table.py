@@ -20,13 +20,13 @@ from safeds._validation import (
     _normalize_and_check_file_path,
 )
 from safeds.data.tabular.plotting import TablePlotter
+from safeds.data.tabular.query._column_selector import ColumnSelector
 from safeds.data.tabular.typing import Schema
 from safeds.exceptions import (
     DuplicateColumnError,
     LengthMismatchError,
 )
 
-from ..query._column_selector import ColumnSelector
 from ._column import Column
 from ._lazy_cell import _LazyCell
 from ._lazy_vectorized_row import _LazyVectorizedRow
@@ -1233,6 +1233,8 @@ class Table:
 
         if isinstance(selector, str):
             selector = [selector]
+        if isinstance(selector, ColumnSelector):
+            selector = selector._polars_expression.expand_selector(self)
 
         parameter_count = transformer.__code__.co_argcount
         if parameter_count == 1:
