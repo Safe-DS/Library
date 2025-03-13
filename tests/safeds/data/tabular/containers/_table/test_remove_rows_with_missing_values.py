@@ -3,6 +3,7 @@ from collections.abc import Callable
 import pytest
 
 from safeds.data.tabular.containers import Table
+from safeds.data.tabular.query import ColumnSelector
 
 
 @pytest.mark.parametrize(
@@ -50,6 +51,12 @@ from safeds.data.tabular.containers import Table
             [],
             Table({"col1": [1, 2, None], "col2": [1, None, 3], "col3": [None, 2, 3]}),
         ),
+        # selector
+        (
+            lambda: Table({"col1": [1, 2, None], "col2": [1, None, 3], "col3": [None, 2, 3]}),
+            ColumnSelector.by_name("col1"),
+            Table({"col1": [1, 2], "col2": [1, None], "col3": [None, 2]}),
+        ),
     ],
     ids=[
         "empty",
@@ -59,6 +66,7 @@ from safeds.data.tabular.containers import Table
         "missing values (several columns selected)",
         "missing values (one column selected)",
         "missing values (no columns selected)",
+        "selector",
     ],
 )
 class TestHappyPath:

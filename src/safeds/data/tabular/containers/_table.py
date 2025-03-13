@@ -1157,7 +1157,7 @@ class Table:
 
     def transform_columns(
         self,
-        selector: str | list[str],
+        selector: str | list[str] | ColumnSelector,
         transformer: Callable[[Cell], Cell] | Callable[[Cell, Row], Cell],
     ) -> Table:
         """
@@ -1590,7 +1590,7 @@ class Table:
     def remove_rows_with_missing_values(
         self,
         *,
-        selector: str | list[str] | None = None,
+        selector: str | list[str] | ColumnSelector | None = None,
     ) -> Table:
         """
         Remove rows that contain missing values in the specified columns and return the result as a new table.
@@ -1651,6 +1651,8 @@ class Table:
         if isinstance(selector, list) and not selector:
             # polars panics in this case
             return self
+        if isinstance(selector, ColumnSelector):
+            selector = selector._polars_selector
 
         return Table._from_polars_lazy_frame(
             self._lazy_frame.drop_nulls(subset=selector),
@@ -1659,7 +1661,7 @@ class Table:
     def remove_rows_with_outliers(
         self,
         *,
-        selector: str | list[str] | None = None,
+        selector: str | list[str] | ColumnSelector | None = None,
         z_score_threshold: float = 3,
     ) -> Table:
         """
@@ -1728,6 +1730,9 @@ class Table:
         - [`remove_duplicate_rows`][safeds.data.tabular.containers._table.Table.remove_duplicate_rows]
         - [`remove_rows_with_missing_values`][safeds.data.tabular.containers._table.Table.remove_rows_with_missing_values]
         """
+        import polars as pl
+        import polars.selectors as cs
+
         _check_bounds(
             "z_score_threshold",
             z_score_threshold,
@@ -1737,11 +1742,13 @@ class Table:
         if selector is None:
             selector = self.column_names
 
-        import polars as pl
-        import polars.selectors as cs
+        if isinstance(selector, ColumnSelector):
+            selector = selector._polars_selector
+        else:
+            selector = cs.by_name(selector)
 
         # polar's `all_horizontal` raises a `ComputeError` if there are no columns
-        selected = self._lazy_frame.select(cs.numeric() & cs.by_name(selector))
+        selected = self._lazy_frame.select(cs.numeric() & selector)
         selected_names = _safe_collect_lazy_frame_schema(selected).names()
         if not selected_names:
             return self

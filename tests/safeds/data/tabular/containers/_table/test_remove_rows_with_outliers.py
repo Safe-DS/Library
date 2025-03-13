@@ -3,6 +3,7 @@ from collections.abc import Callable
 import pytest
 
 from safeds.data.tabular.containers import Table
+from safeds.data.tabular.query import ColumnSelector
 from safeds.exceptions import OutOfBoundsError
 
 
@@ -72,6 +73,13 @@ from safeds.exceptions import OutOfBoundsError
             1,
             Table({"col1": [1, 1, 1000], "col2": [1, 1000, 1], "col3": [1000, 1, 1]}),
         ),
+        # selector
+        (
+            lambda: Table({"col1": [1, 1, 1000], "col2": [1, 1000, 1], "col3": [1000, 1, 1]}),
+            ColumnSelector.by_name("col1"),
+            1,
+            Table({"col1": [1, 1], "col2": [1, 1000], "col3": [1000, 1]}),
+        ),
     ],
     ids=[
         "empty",
@@ -83,6 +91,7 @@ from safeds.exceptions import OutOfBoundsError
         "outliers (several columns selected)",
         "outliers (one column selected)",
         "outliers (no columns selected)",
+        "selector",
     ],
 )
 class TestHappyPath:
