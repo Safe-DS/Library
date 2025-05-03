@@ -90,7 +90,7 @@ class TestFromBytes:
     def test_should_write_and_load_bytes_jpeg(self, resource_path: str | Path, device: Device) -> None:
         configure_test_with_device(device)
         image = Image.from_file(resolve_resource_path(resource_path))
-        image_copy = Image.from_bytes(typing.cast(bytes, image._repr_jpeg_()))
+        image_copy = Image.from_bytes(typing.cast("bytes", image._repr_jpeg_()))
         _assert_width_height_channel(image, image_copy)
 
     @pytest.mark.parametrize(

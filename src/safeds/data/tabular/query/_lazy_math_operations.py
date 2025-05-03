@@ -105,7 +105,7 @@ class _LazyMathOperations(MathOperations):
     def round_to_decimal_places(self, decimal_places: int) -> Cell:
         _check_bounds("decimal_places", decimal_places, lower_bound=_ClosedBound(0))
 
-        return _LazyCell(self._expression.round(decimal_places))
+        return _LazyCell(self._expression.round(decimal_places, mode="half_away_from_zero"))
 
     def round_to_significant_figures(self, significant_figures: int) -> Cell:
         _check_bounds("significant_figures", significant_figures, lower_bound=_ClosedBound(1))
