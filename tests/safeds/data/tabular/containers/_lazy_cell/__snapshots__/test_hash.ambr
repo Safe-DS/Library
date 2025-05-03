@@ -3,11 +3,11 @@
   2158421768275916388
 # ---
 # name: TestContract.test_should_return_same_hash_in_different_processes[constant]
-  795242721712471450
+  710604215793755931
 # ---
 # name: TestContract.test_should_return_same_hash_in_different_processes[date, column]
-  3029334420570699438
+  3351686242835407272
 # ---
 # name: TestContract.test_should_return_same_hash_in_different_processes[date, int]
-  2441473117647356403
+  1048293479160868681
 # ---
