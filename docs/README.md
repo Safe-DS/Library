@@ -36,7 +36,7 @@ On a Windows PC with an NVIDIA graphics card, you may also want to install the C
 `torchvision`:
 
 ```shell
-pip install --upgrade torch torchvision --index-url https://download.pytorch.org/whl/cu121
+pip install --upgrade torch torchvision --index-url https://download.pytorch.org/whl/cu128
 ```
 
 ## Contributing
