@@ -11,7 +11,7 @@ from safeds.data.tabular.query import StringOperations
     [
         (
             Cell.constant("a").str,
-            "(String(a)).str",
+            '("a").str',
         ),
         (
             _LazyCell(pl.col("a")).str,

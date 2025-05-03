@@ -260,7 +260,7 @@ class _Constant(SimpleImputer.Strategy):
         return f"Constant({self._value})"
 
     def _get_replacement(self, table: Table) -> dict[str, Any]:
-        return {name: self._value for name in table.column_names}
+        return dict.fromkeys(table.column_names, self._value)
 
 
 class _Mean(SimpleImputer.Strategy):
