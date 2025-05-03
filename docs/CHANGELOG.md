@@ -1,3 +1,10 @@
+## [0.30.1](https://github.com/Safe-DS/Library/compare/v0.30.0...v0.30.1) (2025-05-03)
+
+### Bug Fixes
+
+* handling of missing value in `removeRows`/`removeRowsByColumn` ([#1001](https://github.com/Safe-DS/Library/issues/1001)) ([f30d1f4](https://github.com/Safe-DS/Library/commit/f30d1f421a7e722870356e6b818c53dad7bb918c)), closes [#998](https://github.com/Safe-DS/Library/issues/998)
+* wrong type hint ([eea9f05](https://github.com/Safe-DS/Library/commit/eea9f05cdb8af09790b7778e910b8047509744e9))
+
 ## [0.30.0](https://github.com/Safe-DS/Library/compare/v0.29.0...v0.30.0) (2025-02-26)
 
 ### Features
