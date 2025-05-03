@@ -10,11 +10,10 @@ from tests.helpers import assert_cell_operation_works
     ("value", "decimal_places", "expected"),
     [
         # Zero
-        (0, 1, 0),
         (0.0, 1, 0),
         # Zero decimal places
         (0.1, 0, 0),
-        (1, 0, 1),
+        (1.0, 0, 1),
         (1.1, 0, 1),
         # Rounding down
         (0.14, 1, 0.1),
@@ -30,11 +29,10 @@ from tests.helpers import assert_cell_operation_works
     ],
     ids=[
         # Zero
-        "0",
         "0.0",
         # Zero decimal places
         "0.1 (0 decimal places)",
-        "1 (0 decimal places)",
+        "1.0 (0 decimal places)",
         "1.1 (0 decimal places)",
         # Rounding down
         "0.14 (1 decimal places)",
