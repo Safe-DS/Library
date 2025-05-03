@@ -2363,14 +2363,7 @@ class Table:
             coalesce=True,
         )
 
-        # Can be removed once https://github.com/pola-rs/polars/issues/20670 is fixed
-        if mode == "right" and len(left_names) > 1:
-            # We must collect because of https://github.com/pola-rs/polars/issues/20671
-            result = _safe_collect_lazy_frame(result).drop(left_names).lazy()
-
-        return self._from_polars_lazy_frame(
-            result,
-        )
+        return self._from_polars_lazy_frame(result)
 
     def transform_table(self, fitted_transformer: TableTransformer) -> Table:
         """
