@@ -17,19 +17,19 @@ jobs:
           - "macos-latest"
           - "windows-latest"
         python-version:
-          - "3.11"
           - "3.12"
+          - "3.13"
         exclude:
           - platform: "macos-latest"
-            python-version: "3.11"
+            python-version: "3.12"
           - platform: "windows-latest"
-            python-version: "3.11"
+            python-version: "3.12"
     uses: lars-reimann/.github/.github/workflows/poetry-codecov-reusable.yml@main
     with:
       working-directory: .
       platform: ${{ matrix.platform }}
       python-version: ${{ matrix.python-version }}
       module-name: safeds
-      coverage: ${{ matrix.platform == 'ubuntu-latest' && matrix.python-version == '3.11' }}
+      coverage: ${{ matrix.platform == 'macos-latest' && matrix.python-version == '3.13' }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
