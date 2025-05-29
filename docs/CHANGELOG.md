@@ -1,3 +1,9 @@
+## [0.31.0](https://github.com/Safe-DS/Library/compare/v0.30.1...v0.31.0) (2025-05-29)
+
+### Features
+
+* disable Python 3.11, enable Python 3.13 ([#1019](https://github.com/Safe-DS/Library/issues/1019)) ([4024754](https://github.com/Safe-DS/Library/commit/4024754656a2d949eb891b012ddca56ea88b5762))
+
 ## [0.30.1](https://github.com/Safe-DS/Library/compare/v0.30.0...v0.30.1) (2025-05-03)
 
 ### Bug Fixes
