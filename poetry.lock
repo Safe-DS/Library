@@ -1467,14 +1467,14 @@ min-versions = ["babel (==2.9.0)", "click (==7.0)", "colorama (==0.4) ; platform
 
 [[package]]
 name = "mkdocs-autorefs"
-version = "1.4.1"
+version = "1.4.2"
 description = "Automatically link across pages in MkDocs."
 optional = false
 python-versions = ">=3.9"
 groups = ["docs"]
 files = [
-    {file = "mkdocs_autorefs-1.4.1-py3-none-any.whl", hash = "sha256:9793c5ac06a6ebbe52ec0f8439256e66187badf4b5334b5fde0b128ec134df4f"},
-    {file = "mkdocs_autorefs-1.4.1.tar.gz", hash = "sha256:4b5b6235a4becb2b10425c2fa191737e415b37aa3418919db33e5d774c9db079"},
+    {file = "mkdocs_autorefs-1.4.2-py3-none-any.whl", hash = "sha256:83d6d777b66ec3c372a1aad4ae0cf77c243ba5bcda5bf0c6b8a2c5e7a3d89f13"},
+    {file = "mkdocs_autorefs-1.4.2.tar.gz", hash = "sha256:e2ebe1abd2b67d597ed19378c0fff84d73d1dbce411fce7a7cc6f161888b6749"},
 ]
 
 [package.dependencies]
@@ -1577,14 +1577,14 @@ mkdocs = ">=1.4.1"
 
 [[package]]
 name = "mkdocs-material"
-version = "9.6.12"
+version = "9.6.14"
 description = "Documentation that simply works"
 optional = false
 python-versions = ">=3.8"
 groups = ["docs"]
 files = [
-    {file = "mkdocs_material-9.6.12-py3-none-any.whl", hash = "sha256:92b4fbdc329e4febc267ca6e2c51e8501fa97b2225c5f4deb4d4e43550f8e61e"},
-    {file = "mkdocs_material-9.6.12.tar.gz", hash = "sha256:add6a6337b29f9ea7912cb1efc661de2c369060b040eb5119855d794ea85b473"},
+    {file = "mkdocs_material-9.6.14-py3-none-any.whl", hash = "sha256:3b9cee6d3688551bf7a8e8f41afda97a3c39a12f0325436d76c86706114b721b"},
+    {file = "mkdocs_material-9.6.14.tar.gz", hash = "sha256:39d795e90dce6b531387c255bd07e866e027828b7346d3eba5ac3de265053754"},
 ]
 
 [package.dependencies]
@@ -1659,14 +1659,14 @@ python-legacy = ["mkdocstrings-python-legacy (>=0.2.1)"]
 
 [[package]]
 name = "mkdocstrings-python"
-version = "1.16.10"
+version = "1.16.11"
 description = "A Python handler for mkdocstrings."
 optional = false
 python-versions = ">=3.9"
 groups = ["docs"]
 files = [
-    {file = "mkdocstrings_python-1.16.10-py3-none-any.whl", hash = "sha256:63bb9f01f8848a644bdb6289e86dc38ceddeaa63ecc2e291e3b2ca52702a6643"},
-    {file = "mkdocstrings_python-1.16.10.tar.gz", hash = "sha256:f9eedfd98effb612ab4d0ed6dd2b73aff6eba5215e0a65cea6d877717f75502e"},
+    {file = "mkdocstrings_python-1.16.11-py3-none-any.whl", hash = "sha256:25d96cc9c1f9c272ea1bd8222c900b5f852bf46c984003e9c7c56eaa4696190f"},
+    {file = "mkdocstrings_python-1.16.11.tar.gz", hash = "sha256:935f95efa887f99178e4a7becaaa1286fb35adafffd669b04fd611d97c00e5ce"},
 ]
 
 [package.dependencies]
@@ -3963,7 +3963,7 @@ version = "6.5.1"
 description = "Tornado is a Python web framework and asynchronous networking library, originally developed at FriendFeed."
 optional = false
 python-versions = ">=3.9"
-groups = ["dev", "docs"]
+groups = ["docs"]
 files = [
     {file = "tornado-6.5.1-cp39-abi3-macosx_10_9_universal2.whl", hash = "sha256:d50065ba7fd11d3bd41bcad0825227cc9a95154bad83239357094c36708001f7"},
     {file = "tornado-6.5.1-cp39-abi3-macosx_10_9_x86_64.whl", hash = "sha256:9e9ca370f717997cb85606d074b0e5b247282cf5e2e1611568b8821afe0342d6"},
