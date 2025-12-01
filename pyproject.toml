@@ -45,7 +45,7 @@ torchvision = [
 
 [tool.poetry.group.docs.dependencies]
 mkdocs = "^1.4.2"
-mkdocstrings = ">=0.20,<0.31"
+mkdocstrings = ">=0.20,<1.1"
 mkdocstrings-python = ">=0.8.3,<1.19.0"
 mkdocs-autorefs = ">=0.4.1,<1.5.0"
 mkdocs-exclude = "^1.0.2"
