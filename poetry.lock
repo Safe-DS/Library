@@ -834,6 +834,7 @@ python-versions = ">=3.10"
 groups = ["docs"]
 files = [
     {file = "griffelib-2.0.0-py3-none-any.whl", hash = "sha256:01284878c966508b6d6f1dbff9b6fa607bc062d8261c5c7253cb285b06422a7f"},
+    {file = "griffelib-2.0.0.tar.gz", hash = "sha256:e504d637a089f5cab9b5daf18f7645970509bf4f53eda8d79ed71cce8bd97934"},
 ]
 
 [package.extras]
@@ -1540,18 +1541,19 @@ mkdocs = "*"
 
 [[package]]
 name = "mkdocs-gen-files"
-version = "0.6.0"
+version = "0.6.1"
 description = "MkDocs plugin to programmatically generate documentation pages during the build"
 optional = false
 python-versions = ">=3.9"
 groups = ["docs"]
 files = [
-    {file = "mkdocs_gen_files-0.6.0-py3-none-any.whl", hash = "sha256:815af15f3e2dbfda379629c1b95c02c8e6f232edf2a901186ea3b204ab1135b2"},
-    {file = "mkdocs_gen_files-0.6.0.tar.gz", hash = "sha256:52022dc14dcc0451e05e54a8f5d5e7760351b6701eff816d1e9739577ec5635e"},
+    {file = "mkdocs_gen_files-0.6.1-py3-none-any.whl", hash = "sha256:b3182bfc6219e35b8d26658cb988368659d5d023aac30c2a819247558fc12189"},
+    {file = "mkdocs_gen_files-0.6.1.tar.gz", hash = "sha256:57d7ff2229e23d077e46d14a33db6d37c8823f6ce1a503c874c1764a71679763"},
 ]
 
 [package.dependencies]
-mkdocs = ">=1.4.1"
+mkdocs = ">=1.4.1,<=1.6.1"
+properdocs = ">=1.6.5"
 
 [[package]]
 name = "mkdocs-get-deps"
@@ -1587,18 +1589,18 @@ selectolax = ">=0.3.29"
 
 [[package]]
 name = "mkdocs-jupyter"
-version = "0.25.1"
+version = "0.26.1"
 description = "Use Jupyter in mkdocs websites"
 optional = false
 python-versions = ">=3.9"
 groups = ["docs"]
 files = [
-    {file = "mkdocs_jupyter-0.25.1-py3-none-any.whl", hash = "sha256:3f679a857609885d322880e72533ef5255561bbfdb13cfee2a1e92ef4d4ad8d8"},
-    {file = "mkdocs_jupyter-0.25.1.tar.gz", hash = "sha256:0e9272ff4947e0ec683c92423a4bfb42a26477c103ab1a6ab8277e2dcc8f7afe"},
+    {file = "mkdocs_jupyter-0.26.1-py3-none-any.whl", hash = "sha256:527242c2c8f1d30970764bbab752de41243e5703f458d8bc05336ec53828192e"},
+    {file = "mkdocs_jupyter-0.26.1.tar.gz", hash = "sha256:7c80c0d3953de91e5b40a0d3209233795c8f800243ab298e4ec38e0504eda630"},
 ]
 
 [package.dependencies]
-ipykernel = ">6.0.0,<7.0.0"
+ipykernel = ">6.0.0,<8"
 jupytext = ">1.13.8,<2"
 mkdocs = ">=1.4.0,<2"
 mkdocs-material = ">9.0.0"
@@ -1607,29 +1609,30 @@ pygments = ">2.12.0"
 
 [[package]]
 name = "mkdocs-literate-nav"
-version = "0.6.2"
+version = "0.6.3"
 description = "MkDocs plugin to specify the navigation in Markdown instead of YAML"
 optional = false
 python-versions = ">=3.9"
 groups = ["docs"]
 files = [
-    {file = "mkdocs_literate_nav-0.6.2-py3-none-any.whl", hash = "sha256:0a6489a26ec7598477b56fa112056a5e3a6c15729f0214bea8a4dbc55bd5f630"},
-    {file = "mkdocs_literate_nav-0.6.2.tar.gz", hash = "sha256:760e1708aa4be86af81a2b56e82c739d5a8388a0eab1517ecfd8e5aa40810a75"},
+    {file = "mkdocs_literate_nav-0.6.3-py3-none-any.whl", hash = "sha256:2c421561280fa9184f88cbf399bebbd4cc17ee507e978a31ce11fd6f3aabf233"},
+    {file = "mkdocs_literate_nav-0.6.3.tar.gz", hash = "sha256:edbaca22343f861fe4e34aac47d55a0c9955c640dbf02eea99fe631e914cf9ee"},
 ]
 
 [package.dependencies]
-mkdocs = ">=1.4.1"
+mkdocs = ">=1.4.1,<=1.6.1"
+properdocs = ">=1.6.5"
 
 [[package]]
 name = "mkdocs-material"
-version = "9.7.5"
+version = "9.7.6"
 description = "Documentation that simply works"
 optional = false
 python-versions = ">=3.8"
 groups = ["docs"]
 files = [
-    {file = "mkdocs_material-9.7.5-py3-none-any.whl", hash = "sha256:7cf9df2ff121fd098ff6e05c732b0be3699afca9642e2dfe4926c40eb5873eec"},
-    {file = "mkdocs_material-9.7.5.tar.gz", hash = "sha256:f76bdab532bad1d9c57ca7187b37eccf64dd12e1586909307f8856db3be384ea"},
+    {file = "mkdocs_material-9.7.6-py3-none-any.whl", hash = "sha256:71b84353921b8ea1ba84fe11c50912cc512da8fe0881038fcc9a0761c0e635ba"},
+    {file = "mkdocs_material-9.7.6.tar.gz", hash = "sha256:00bdde50574f776d328b1862fe65daeaf581ec309bd150f7bff345a098c64a69"},
 ]
 
 [package.dependencies]
@@ -1664,18 +1667,19 @@ files = [
 
 [[package]]
 name = "mkdocs-section-index"
-version = "0.3.10"
+version = "0.3.11"
 description = "MkDocs plugin to allow clickable sections that lead to an index page"
 optional = false
 python-versions = ">=3.9"
 groups = ["docs"]
 files = [
-    {file = "mkdocs_section_index-0.3.10-py3-none-any.whl", hash = "sha256:bc27c0d0dc497c0ebaee1fc72839362aed77be7318b5ec0c30628f65918e4776"},
-    {file = "mkdocs_section_index-0.3.10.tar.gz", hash = "sha256:a82afbda633c82c5568f0e3b008176b9b365bf4bd8b6f919d6eff09ee146b9f8"},
+    {file = "mkdocs_section_index-0.3.11-py3-none-any.whl", hash = "sha256:26f008f4860789e6c41dce868e3e1dcd1528f8cbc1db181416c5edc18f0f15a0"},
+    {file = "mkdocs_section_index-0.3.11.tar.gz", hash = "sha256:81a5948af0e974bfb474f40b45aeddbb621024ff132eb8ace8854b9db6b41812"},
 ]
 
 [package.dependencies]
-mkdocs = ">=1.2"
+mkdocs = ">=1.2,<=1.6.1"
+properdocs = ">=1.6.5"
 
 [[package]]
 name = "mkdocstrings"
@@ -2708,6 +2712,35 @@ files = [
 
 [package.dependencies]
 wcwidth = "*"
+
+[[package]]
+name = "properdocs"
+version = "1.6.7"
+description = "Project documentation with Markdown."
+optional = false
+python-versions = ">=3.9"
+groups = ["docs"]
+files = [
+    {file = "properdocs-1.6.7-py3-none-any.whl", hash = "sha256:6fa0cfa2e01bf338f684892c8a506cf70ea88ae7f3479c933b6fa20168101cbd"},
+    {file = "properdocs-1.6.7.tar.gz", hash = "sha256:adc7b16e562890af0e098a7e5b02e3a81c20894a87d6a28d345c9300de73c26e"},
+]
+
+[package.dependencies]
+click = ">=7.0"
+colorama = {version = ">=0.4", markers = "platform_system == \"Windows\""}
+ghp-import = ">=1.0"
+jinja2 = ">=2.11.1"
+markdown = ">=3.3.6"
+markupsafe = ">=2.0.1"
+packaging = ">=20.5"
+pathspec = ">=0.11.1"
+platformdirs = ">=2.2.0"
+pyyaml = ">=5.1"
+pyyaml-env-tag = ">=0.1"
+watchdog = ">=2.0"
+
+[package.extras]
+i18n = ["babel (>=2.9.0)"]
 
 [[package]]
 name = "psutil"
@@ -4089,7 +4122,7 @@ version = "6.5.5"
 description = "Tornado is a Python web framework and asynchronous networking library, originally developed at FriendFeed."
 optional = false
 python-versions = ">=3.9"
-groups = ["dev", "docs"]
+groups = ["docs"]
 files = [
     {file = "tornado-6.5.5-cp39-abi3-macosx_10_9_universal2.whl", hash = "sha256:487dc9cc380e29f58c7ab88f9e27cdeef04b2140862e5076a66fb6bb68bb1bfa"},
     {file = "tornado-6.5.5-cp39-abi3-macosx_10_9_x86_64.whl", hash = "sha256:65a7f1d46d4bb41df1ac99f5fcb685fb25c7e61613742d5108b010975a9a6521"},
@@ -4484,4 +4517,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12,<3.14"
-content-hash = "32f6151fae2852755696b36e576bbec3499e6417861a1a257321042872be0e7d"
+content-hash = "f5e680d60193f240c2fb84593fb77383a1d854164f47ff63b571cccebab3fe94"
